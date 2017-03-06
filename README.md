@@ -1,5 +1,5 @@
 # ezXSS
-ezXSS is an easy way to test (blind) XSS.
+ezXSS is an easy way to test (blind) XSS. A free and PHP version of [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) - [more info](#user-content-why)
 
 ## Current features
 Some features ezXSS has
