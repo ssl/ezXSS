@@ -1,5 +1,5 @@
 # ezXSS
-ezXSS is an easy way to test (blind) XSS. A free and PHP version of [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) - [more info](#user-content-why)
+ezXSS is an easy way to test (blind) XSS.
 
 ## Current features
 Some features ezXSS has
@@ -31,6 +31,7 @@ ezXSS is ez to install
 ## Todo
 Some things I am planning to add/change in a future version
 
+* Live JS - send JS code LIVE while the person is on the page
 * Fixing some responsive things (dashboard is responsive but some bugs)
 * Page grabbing (& on regex)
 * Cleanup code in Components
@@ -38,4 +39,4 @@ Some things I am planning to add/change in a future version
 * You got ideas?
 
 ## Why?
-If you want to host [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) yourself you need a linux server and a Mailgun account. I wanted to create a just PHP version which you can even host on shared hostings or localhost. ezXSS has the most important features that xsshunter has (and soon maybe more). the JS file of ezXSS is based on xsshunter but all other files are self made.
+If you want to host [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) yourself you need a linux server and a Mailgun account. I wanted to create a just PHP version which you can even host on shared hostings or localhost. ezXSS has the most important features that xsshunter has (and more ezXSS-only adding). The idea and the JS file of ezXSS is based on xsshunter, all other files are self made.
