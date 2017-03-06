@@ -40,3 +40,6 @@ Some things I am planning to add/change in a future version
 
 ## Why?
 If you want to host [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) yourself you need a linux server and a Mailgun account. I wanted to create a just PHP version which you can even host on shared hostings or localhost. ezXSS has the most important features that xsshunter has (and more ezXSS-only adding). The idea and the JS file of ezXSS is based on xsshunter, all other files are self made.
+
+## Screenshots
+> ![View report](http://i.imgur.com/pgmVoZY.png)
