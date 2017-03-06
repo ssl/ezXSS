@@ -31,6 +31,7 @@ ezXSS is ez to install
 ## Todo
 Some things I am planning to add/change in a future version
 
+* Page alerts
 * Live JS - send JS code LIVE while the person is on the page
 * Fixing some responsive things (dashboard is responsive but some bugs)
 * Page grabbing (& on regex)
