@@ -37,7 +37,7 @@
   //> Send email
   $htmlTemplate = str_replace(
     ["{{id}}", "{{domain}}", "{{url}}", "{{ip}}", "{{referer}}", "{{user-agent}}", "{{cookies}}", "{{dom}}", "{{origin}}", "{{time}}"],
-    [$id, $domain, htmlspecialchars($jsonDecoded["uri"]), $userIP.$userIP2, htmlspecialchars($jsonDecoded["referer"]), htmlspecialchars($jsonDecoded["user-agent"]), htmlspecialchars($jsonDecoded["cookies"]), htmlspecialchars(substr($jsonDecoded["dom"], 0, $domPart)) . $domExtra, htmlspecialchars($jsonDecoded["origin"]), time()],
+    [$id, $domain, htmlspecialchars($jsonDecoded["uri"]), $userIP.$userIP2, htmlspecialchars($jsonDecoded["referrer"]), htmlspecialchars($jsonDecoded["user-agent"]), htmlspecialchars($jsonDecoded["cookies"]), htmlspecialchars(substr($jsonDecoded["dom"], 0, $domPart)) . $domExtra, htmlspecialchars($jsonDecoded["origin"]), time()],
     file_get_contents("manage/src/templates/site/mail.htm")
   );
 
