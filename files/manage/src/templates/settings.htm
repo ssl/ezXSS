@@ -1,0 +1,67 @@
+<div class="wrapper">
+
+  {{menu}}
+
+  <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="view-header">
+              <div class="header-icon"><i class="fa fa-cog"> </i></div>
+              <div class="header-title">
+                <h3 class="m-b-xs">Settings</h3>
+                <small>Change your main settings or password</small>
+              </div>
+            </div>
+            <hr>
+          </div>
+        </div>
+
+        <div class="row">
+
+          <div class="col-lg-12"><div id="alert"></div></div>
+
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Main settings</div>
+              <div class="panel-body">
+                <form class="form" id="main-settings">
+                  <div class="form-group">
+                    {{csrf[]}}
+                    <label class="control-label" for="email">Email alert mail</label>
+                    <input type="email" name="email" id="email" value="{{settings[email]}}" class="form-control">
+                  </div>
+                  <button class="btn">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Password settings</div>
+              <div class="panel-body">
+                <form class="form" id="pwd-settings">
+                  {{csrf[]}}
+                  <div class="form-group">
+                    <label class="control-label" for="password">Old password</label>
+                    <input type="password" name="password" id="password" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="newpassword">New password</label>
+                    <input type="password" name="newpassword" id="newpassword" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="newpassword2">New password again</label>
+                    <input type="password" name="newpassword2" id="newpassword2" class="form-control">
+                  </div>
+                  <button class="btn">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+  </section>
+</div>

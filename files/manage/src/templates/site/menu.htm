@@ -1,0 +1,35 @@
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <div id="mobile-menu">
+        <div class="left-nav-toggle"><a href="#"><i class="stroke-hamburgermenu"></i></a></div>
+      </div>
+      <a class="navbar-brand" href="index.html">ezXSS<span>v.1.0</span></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right" style="margin-top: 5px;">
+        <li class="profil-link"><a href="#"><span class="profile-address">{{settings[username]}}</span></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<aside class="navigation">
+  <nav>
+    <ul class="nav luna-nav">
+      <li class="nav-category">Main</li>
+      <li><a href="dashboard">Dashboard</a></li>
+      <li><a href="settings">Settings</a></li>
+      <li><a href="payload">Payload</a></li>
+
+      <li class="nav-category">Reports</li>
+      <li><a href="reports">All reports</a></li>
+      <li><a href="search">Search</a></li>
+
+      <li class="nav-info">
+        <i class="pe pe-7s-shield text-accent"></i>
+        <div class="m-t-xs"><span class="c-white">ezXSS</span> github.com/ssl/ezxss</div>
+      </li>
+    </ul>
+  </nav>
+</aside>

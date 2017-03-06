@@ -1,0 +1,79 @@
+<div class="wrapper">
+
+  {{menu}}
+
+  <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="view-header">
+              <div class="header-icon"><i class="fa fa-industry"> </i></div>
+              <div class="header-title">
+                <h3 class="m-b-xs">Dashboard</h3>
+                <small>Statistics of your ezXSS</small>
+              </div>
+            </div>
+            <hr>
+          </div>
+        </div>
+
+        <div class="row">
+
+          <div class="col-lg-2 col-xs-6">
+            <div class="panel panel-filled">
+              <div class="panel-body">
+                <h2 class="m-b-none">{{stats[total]}}</h2>
+                <div class="small">Total reports</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-xs-6">
+            <div class="panel panel-filled">
+              <div class="panel-body">
+                <h2 class="m-b-none">{{stats[week]}}</h2>
+                <div class="small">Reports this week</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-xs-6">
+            <div class="panel panel-filled">
+              <div class="panel-body">
+                <h2 class="m-b-none">{{stats[last]}}</h2>
+                <div class="small">Last report</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-xs-6">
+            <div class="panel panel-filled">
+              <div class="panel-body">
+                <h2 class="m-b-none">{{stats[totaldomains]}}</h2>
+                <div class="small">Total domains</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-xs-6">
+            <div class="panel panel-filled">
+              <div class="panel-body">
+                <h2 class="m-b-none">{{stats[weekdomains]}}</h2>
+                <div class="small">Domains this week</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-xs-6">
+            <div class="panel panel-filled">
+              <div class="panel-body">
+                <h2 class="m-b-none"></h2>
+                <div class="small"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+  </section>
+</div>

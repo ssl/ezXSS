@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ezXSS</title>
+    <style media="screen">
+      table {
+        font-size: 14px;
+        font-family: Roboto Mono,monospace;
+        border-spacing: 0;
+        border-collapse: collapse;
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+        background-color: #3b3d45;
+        border-radius: 5px;
+      }
+      th {
+        color: #ffffff;
+        width: 150px;
+        padding: 8px;
+        line-height: 1.42857143;
+        vertical-align: bottom;
+        border-bottom: none;
+        border-color: #484c5a;
+        border-top: 0;
+        text-align: left;
+      }
+      td {
+        padding: 8px;
+        line-height: 1.42857143;
+        vertical-align: top;
+        border-top: 1px solid #3d404c;
+        border-color: #484c5a;
+        color: #8e949c;
+      }
+      textarea {
+        background-color: transparent;
+        width: 100%;
+        height: 100px;
+      }
+      a {
+        color: #8e949c !important;
+      }
+      .view-header {
+        font-family: Roboto Mono,monospace;
+        border-radius: 5px;
+        background-color: #3b3d45;
+        margin: 20px 0;
+        min-height: 50px;
+        padding: 15px;
+      }
+      .header-icon {
+        font-size: 60px;
+        color: #f6a821;
+        width: 68px;
+        float: left;
+        margin-top: -8px;
+        margin-right: 20px;
+      }
+      .header-title {
+          margin-left: 68px;
+      }
+      .m-b-xs {
+        font-family: inherit;
+        font-weight: 500;
+        line-height: 1.1;
+        font-size: 24px;
+        color: #FFFFFF;
+        margin-bottom: 2px;
+        margin-top: 10px;
+      }
+      small {
+        font-size: 85%;
+        color: #949ba2;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="view-header">
+      <div class="header-icon">ez</div>
+      <div class="header-title">
+        <h3 class="m-b-xs" style="margin-top: -8px;">XSS Report #{{id}}</h3>
+        <small style="color: #8e949c;">Get a fast view below or view the whole report on https://{{domain}}/manage/reports?id={{id}}</small>
+      </div>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>URL</td>
+          <td style="color: #8e949c;">{{url}}</td>
+        </tr>
+
+        <tr>
+          <td>IP</td>
+          <td>{{ip}}</td>
+        </tr>
+
+        <tr>
+          <td>Referer</td>
+          <td style="color: #8e949c;">{{referer}}</td>
+        </tr>
+
+        <tr>
+          <td>User-Agent</td>
+          <td>{{user-agent}}</td>
+        </tr>
+
+        <tr>
+          <td>Cookies</td>
+          <td style="color: #8e949c;">{{cookies}}</td>
+        </tr>
+
+        <tr>
+          <td>DOM</td>
+          <td><textarea spellcheck="false" style="color: #8e949c;">{{dom}}</textarea></td>
+        </tr>
+
+        <tr>
+          <td>Origin</td>
+          <td>{{origin}}</td>
+        </tr>
+
+        <tr>
+          <td>Time</td>
+          <td>{{time}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
