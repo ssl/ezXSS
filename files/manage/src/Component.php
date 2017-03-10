@@ -62,7 +62,7 @@
         $html = '<div class="col-lg-12"><div class="panel panel-filled"><div class="panel-heading">All reports</div><div class="panel-body">
         <div class="table-responsive"><table class=table><thead><tr><th>#</th><th>Domain</th><th>URL</th><th>IP</th><th>View</th></tr></thead><tbody>';
 
-        $page = (isset($_GET["page"])) ? intval(trim(htmlspecialchars($_GET["page"]))) : 0;
+        $page = ((isset($_GET["page"])) ? intval(trim(htmlspecialchars($_GET["page"]))) : 0) * 50;
         foreach($this->database->newQuery("SELECT * FROM reports ORDER BY id DESC LIMIT {$page},50") as $report) {
           $html .= "<tr><th scope=row>" . htmlspecialchars($report["id"]) . "</th><td>" . htmlspecialchars($report["origin"]) . "</td><td>" . htmlspecialchars($report["uri"]) . "</td><td>" . htmlspecialchars($report["ip"]) . "</td><td><a href='?id=" . htmlspecialchars($report["id"]) . "' class=btn>View</a></td></tr>";
         }
