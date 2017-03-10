@@ -20,9 +20,9 @@
       //> Return stats for the dashboard
       if($type == "total") return $this->database->rowCount("SELECT * FROM reports", array());
       if($type == "week") return $this->database->rowCount("SELECT * FROM reports WHERE time > :time", array(":time" => time()-604800));
-      if($type == "totaldomains") return $this->database->rowCount("SELECT COUNT(DISTINCT origin) FROM reports", array());
-      if($type == "weekdomains") return $this->database->rowCount("SELECT COUNT(DISTINCT origin) FROM reports WHERE time > :time", array(":time" => time()-604800));
-
+      if($type == "totaldomains") { $query = $this->database->newQueryArray("SELECT COUNT(DISTINCT origin) FROM reports", array()); return $query[0]; }
+      if($type == "weekdomains") { $query = $this->database->newQueryArray("SELECT COUNT(DISTINCT origin) FROM reports WHERE time > :time", array(":time" => time()-604800)); return $query[0]; };
+      
       if($type == "last") {
         $last = $this->database->newQueryArray("SELECT * FROM reports ORDER BY id DESC LIMIT 1", array());
 
