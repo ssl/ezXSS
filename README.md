@@ -25,7 +25,7 @@ ezXSS is ez to install
 * Download the 'files' folder and put all the files inside your root (without the 'files' folder)
 * Create an empty database and provide your database information in '/manage/src/Database.php' (also set isSet on true)
 * Go to yoursite.com/install.php and setup a username, password and alert email
-* Make sure the install.php file is deleted and the XSS works, try the XSS on [w3schools](https://www.w3schools.com/html/tryit.asp?filename=tryhtml_intro) or codepen.
+* Make sure the install.php file is deleted and the XSS works, try the XSS on [w3schools](https://www.w3schools.com/html/tryit.asp?filename=tryhtml_intro) or [codepen](codepen.io).
 * Login to your account via yoursite.com/manage/login to view stats, reports, seach reports, get payloads and update settings.
 
 ## Todo
