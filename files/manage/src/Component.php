@@ -47,7 +47,7 @@
     public function report($i) {
       if(isset($_GET["id"])) {
         $report = $this->database->newQueryArray("SELECT * FROM reports WHERE id = :id LIMIT 1", array(":id" => $_GET["id"]));
-
+        $report["time"] = date('Y/m/d h:i:s A', $report["time"]);
         if(isset($report["id"])) {
           $html = file_get_contents(__DIR__ . "/templates/site/report-id.htm");
           preg_match_all("/{{(.*?)\[(.*?)\]}}/", $html, $matches);
