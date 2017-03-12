@@ -1,3 +1,7 @@
 RewriteEngine on
+
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+
 RewriteCond %{REQUEST_URI} !assets
 RewriteRule ^(.*)$ index.php [L]
