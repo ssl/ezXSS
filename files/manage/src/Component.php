@@ -49,6 +49,7 @@
         $report = $this->database->newQueryArray("SELECT * FROM reports WHERE id = :id LIMIT 1", array(":id" => $_GET["id"]));
 
         if(isset($report["id"])) {
+          $report["time"] = date('F j Y, g:i a', $report["time"]);
           $html = file_get_contents(__DIR__ . "/templates/site/report-id.htm");
           preg_match_all("/{{(.*?)\[(.*?)\]}}/", $html, $matches);
           foreach($matches[1] as $key => $value) {
