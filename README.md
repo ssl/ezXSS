@@ -29,14 +29,15 @@ ezXSS is ez to install
 * Login to your account via yoursite.com/manage/login to view stats, reports, seach reports, get payloads and update settings.
 
 ## Todo
-Some things I am planning to add/change in a future version
+Some things I am planning to add/change in a future version. This list is sorted on how important/fast it is going to be added.
 
+* Planning to recode the whole JS file to a small lightweight version.
 * Remove all not-used CSS because CSS is currently bigger than everything else combined
+* Cleanup code in Components
+* Cleanup code overal, there is some bad-practice code thats need to be fixed
 * Page alerts
 * Live JS - send JS code LIVE while the person is on the page
 * Page grabbing (& on regex)
-* Cleanup code in Components
-* Cleanup code overal, there is some bad-practice code thats need to be fixed
 * You got ideas?
 
 ## Why?
