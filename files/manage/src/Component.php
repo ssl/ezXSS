@@ -22,16 +22,16 @@
       if($type == "week") return $this->database->rowCount("SELECT * FROM reports WHERE time > :time", array(":time" => time()-604800));
       if($type == "totaldomains") { $query = $this->database->newQueryArray("SELECT COUNT(DISTINCT origin) FROM reports", array()); return $query[0]; }
       if($type == "weekdomains") { $query = $this->database->newQueryArray("SELECT COUNT(DISTINCT origin) FROM reports WHERE time > :time", array(":time" => time()-604800)); return $query[0]; };
-      
+
       if($type == "last") {
         $last = $this->database->newQueryArray("SELECT * FROM reports ORDER BY id DESC LIMIT 1", array());
 
         $time = time() - $last["time"];
         $syntaxText = "s";
 
-        if($time > 60) $time /=60; $syntaxText = "m";
-        if($time > 60) $time /=60; $syntaxText = "h";
-        if($time > 24) $time /=24; $syntaxText = "d";
+        if($time > 60) { $time /= 60; $syntaxText = "m"; }
+        if($time > 60) { $time /= 60; $syntaxText = "h"; }
+        if($time > 24) { $time /= 24; $syntaxText = "d"; }
         return floor($time) . $syntaxText;
 
       }
@@ -62,7 +62,7 @@
         $html = '<div class="col-lg-12"><div class="panel panel-filled"><div class="panel-heading">All reports</div><div class="panel-body">
         <div class="table-responsive"><table class=table><thead><tr><th>#</th><th>Domain</th><th>URL</th><th>IP</th><th>View</th></tr></thead><tbody>';
 
-        $page = (isset($_GET["page"])) ? intval(trim(htmlspecialchars($_GET["page"]))) : 0;
+        $page =  (isset($_GET["page"])) ? intval(trim(htmlspecialchars($_GET["page"]))) : 0;
         $pageLimit = $page * 50;
         foreach($this->database->newQuery("SELECT * FROM reports ORDER BY id DESC LIMIT {$pageLimit},50") as $report) {
           $html .= "<tr><th scope=row>" . htmlspecialchars($report["id"]) . "</th><td>" . htmlspecialchars($report["origin"]) . "</td><td>" . htmlspecialchars($report["uri"]) . "</td><td>" . htmlspecialchars($report["ip"]) . "</td><td><a href='?id=" . htmlspecialchars($report["id"]) . "' class=btn>View</a></td></tr>";

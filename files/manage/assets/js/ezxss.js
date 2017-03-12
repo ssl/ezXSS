@@ -28,8 +28,9 @@ $(document).ready(function() {
             }
         });
     });
+
     
-        $('.left-nav-toggle a').on('click', function(event){
+    $('.left-nav-toggle a').on('click', function(event){
         event.preventDefault();
         $("body").toggleClass("nav-toggle");
     });

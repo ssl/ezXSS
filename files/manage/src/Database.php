@@ -5,9 +5,9 @@
     //> Setup your database settings and put isSet on true
     public  $isSet = false;
     private $databaseHost = "127.0.0.1";
-    private $databaseUser = "user";
+    private $databaseUser = "";
     private $databasePassword = "";
-    private $databaseName = "ezxss";
+    private $databaseName = "";
     private $DB;
 
     public function __construct() {

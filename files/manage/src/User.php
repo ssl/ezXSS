@@ -5,7 +5,9 @@
     public function __construct() {
       $this->database = new Database();
 
+      session_set_cookie_params(6000000, "/", null, true, true); 
       if(!isset($_SESSION)) session_start();
+
     }
 
     public function isLoggedIn() {
