@@ -33,6 +33,10 @@ Some things I am planning to add/change in a future version. This list is sorted
 
 * Planning to recode the whole JS file to a small lightweight version.
 * Remove all not-used CSS because CSS is currently bigger than everything else combined
+* Add feature to share a report with a other ezXSS user with domain+secretkey
+* Option to block/achive a domain because you get too many reports or not interested in the domain
+* If report is 100% the same as a other report, do not safe/re-alert.
+* Remove https:// and http:// from domain in report
 * Cleanup code in Components
 * Cleanup code overal, there is some bad-practice code thats need to be fixed
 * Page alerts
