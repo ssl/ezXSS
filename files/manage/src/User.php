@@ -41,7 +41,7 @@
       //> Make sure all fields are correct
       if(!$this->isLoggedIn()) return array("echo" => "You need to be logged in!");
       if (!password_verify($current, $this->sessionInfo("password"))) return array("echo" => "Current password is not correct.");
-      if($new != $new2) return array("echo" => "The retypted password is not the same as the new password.");
+      if($new != $new2) return array("echo" => "The retyped password is not the same as the new password.");
       if(strlen($new) < 8) return array("echo" => "The new password needs to be atleast 8 characters long.");
 
       //> Update settings in database, refresh session and return
