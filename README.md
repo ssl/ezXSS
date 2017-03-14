@@ -31,7 +31,6 @@ ezXSS is ez to install
 ## Todo
 Some things I am planning to add/change in a future version. This list is sorted on how important/fast it is going to be added.
 
-* Planning to recode the whole JS file to a small lightweight version.
 * Remove all not-used CSS because CSS is currently bigger than everything else combined
 * Add feature to share a report with a other ezXSS user with domain+secretkey
 * Option to block/achive a domain because you get too many reports or not interested in the domain
