@@ -14,7 +14,7 @@
 	  INSERT INTO `settings` (`id`, `setting`, `value`) VALUES (1, 'username', :username),(2, 'password', :password),(3, 'email', :email);";
 	  $database->newQueryArray($sqlQuery, array(":username" => $username, ":password" => $password, ":email" => $email));
 	  $domain = htmlspecialchars($_SERVER['SERVER_NAME']);
-	  $current = 'var dmnezxss = "//'.$domain.'";';
+	  $current = 'var ez_domain = "//'.$domain.'";';
 	  $current .= file_get_contents("install-js.js");
 	  file_put_contents("index.js", $current);
 	  unlink("install-js.js");
