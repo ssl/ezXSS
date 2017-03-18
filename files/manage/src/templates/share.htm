@@ -1,0 +1,72 @@
+<div class="wrapper">
+
+  {{menu}}
+
+  <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="view-header">
+              <div class="header-icon"><i class="fa fa-share"> </i></div>
+              <div class="header-title">
+                <h3 class="m-b-xs">Share</h3>
+                <small>Share your reports with other ezXSS users or let them share with you</small>
+              </div>
+            </div>
+            <hr>
+          </div>
+        </div>
+
+        <div class="row">
+
+          <div class="col-lg-12"><div id="alert"></div></div>
+
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Share with others</div>
+              <div class="panel-body">
+                <form class="form" id="share-others">
+                  <div class="form-group">
+                    {{csrf[]}}
+                    <label class="control-label" for="reportid">Report ID</label>
+                    <input type="text" name="reportid" id="reportid" value="" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="domain">Domain</label>
+                    <input type="text" name="domain" id="domain" value="" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="key">Secret key</label>
+                    <input type="text" name="key" id="key" value="" class="form-control">
+                  </div>
+                  <button class="btn">Share</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Share with me</div>
+              <div class="panel-body">
+                <div class="form-group">
+                  <label class="control-label" for="domain">Your domain</label>
+                  <input type="text" name="domain" id="domain" value="{{domain}}" disabled class="form-control">
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="key">Your secret key</label>
+                  <input type="text" name="key" id="key" value="{{settings[secretkey]}}" disabled class="form-control">
+                </div>
+                <p>If you generate a new secret key, your old one will no longer work.</p>
+                <form class="form" id="share-new">
+                  {{csrf[]}}
+                  <button class="btn">Generate new</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+  </section>
+</div>

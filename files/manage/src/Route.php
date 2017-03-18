@@ -13,7 +13,7 @@
       if(empty($file) && $this->user->isLoggedIn()) return $this->redirect("dashboard");
       if($file == "login" && $this->user->isLoggedIn()) return $this->redirect("dashboard");
       if($file != "login" && !$this->user->isLoggedIn()) return $this->redirect("login");
-      if(!in_array($file, array("login", "dashboard", "settings", "reports", "search", "payload"))) return $this->redirect("login");
+      if(!in_array($file, array("login", "dashboard", "settings", "reports", "search", "payload", "filters", "share"))) return $this->redirect("login");
 
       return $this->templateHtml($file);
     }

@@ -9,7 +9,7 @@
     public function json() {
       //> Make sure the action is valid
       $action = $this->post("action");
-      if(!in_array($action, array("login", "main-settings", "pwd-settings"))) {
+      if(!in_array($action, array("login", "main-settings", "pwd-settings", "filter-settings", "share-new", "share-others"))) {
         return $this->toJson(array("echo" => "Could not found this action, what did you do?"));
       }
 
@@ -17,9 +17,12 @@
 
       //> Call the correct function based on the action
       switch($action) {
-        case "login" : return $this->toJson($this->user->login($this->post("username"), $this->post("password"))) ; break;
-        case "main-settings" : return $this->toJson($this->user->updateMain($this->post("email"))); break;
+        case "login" : return $this->toJson($this->user->login($this->post("username"), $this->post("password"))); break;
+        case "main-settings" : return $this->toJson($this->user->updateMain($this->post("email"), $this->post("dompart"), $this->post("timezone"))); break;
         case "pwd-settings" : return $this->toJson($this->user->updatePassword($this->post("password"), $this->post("newpassword"), $this->post("newpassword2"))); break;
+        case "filter-settings" : return $this->toJson($this->user->updateFilters($this->post("save"), $this->post("alert"))); break;
+        case "share-new" : return $this->toJson($this->user->generateKey()); break;
+        case "share-others" : return $this->toJson($this->user->shareReport($this->post("reportid"), $this->post("domain"), $this->post("key"))); break;
         default : return $this->toJson(array("echo" => "Could not found this action, what did you do?")); break;
       }
 

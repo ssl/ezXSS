@@ -8,7 +8,8 @@
     }
 
     public function settings($info) {
-      return htmlspecialchars($this->user->sessionInfo($info));
+      $setting = $this->database->newQueryArray("SELECT * FROM settings WHERE setting = :setting LIMIT 1", array(":setting" => $info));
+      return htmlspecialchars($setting["value"]);
     }
 
     public function csrf($i) {
@@ -49,7 +50,9 @@
         $report = $this->database->newQueryArray("SELECT * FROM reports WHERE id = :id LIMIT 1", array(":id" => $_GET["id"]));
 
         if(isset($report["id"])) {
-          $report["time"] = date('F j Y, g:i a', $report["time"]);
+          date_default_timezone_set($this->settings("timezone"));
+          $report["time"] = date("F j Y, g:i a", $report["time"]);
+
           $html = file_get_contents(__DIR__ . "/templates/site/report-id.htm");
           preg_match_all("/{{(.*?)\[(.*?)\]}}/", $html, $matches);
           foreach($matches[1] as $key => $value) {
@@ -66,6 +69,7 @@
         $page =  (isset($_GET["page"])) ? intval(trim(htmlspecialchars($_GET["page"]))) : 0;
         $pageLimit = $page * 50;
         foreach($this->database->newQuery("SELECT * FROM reports ORDER BY id DESC LIMIT {$pageLimit},50") as $report) {
+          $report["uri"] = strlen($report["uri"]) > 80 ? substr($report["uri"], 0, 80) . "..." : $report["uri"];
           $html .= "<tr><th scope=row>" . htmlspecialchars($report["id"]) . "</th><td>" . htmlspecialchars($report["origin"]) . "</td><td>" . htmlspecialchars($report["uri"]) . "</td><td>" . htmlspecialchars($report["ip"]) . "</td><td><a href='?id=" . htmlspecialchars($report["id"]) . "' class=btn>View</a></td></tr>";
         }
 

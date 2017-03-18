@@ -3,7 +3,7 @@
   class Database {
 
     //> Setup your database settings and put isSet on true
-    public  $isSet = false;
+    public  $isSet = true;
     private $databaseHost = "127.0.0.1";
     private $databaseUser = "";
     private $databasePassword = "";
