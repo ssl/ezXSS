@@ -41,6 +41,7 @@ Some things I am planning to add/change in a future version. This list is sorted
 * Making updating ez with 1 click update page
 * Cleaning up some bad-practice code
 * Option to delete reports
+* Option to add API for alerts (alerts on Chrome, Windows, telegram etc.)
 * Easy payload tester
 * Page alerts
 * Live JS - send JS code LIVE while the person is on the page
