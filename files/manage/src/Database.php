@@ -3,11 +3,11 @@
   class Database {
 
     //> Setup your database settings and put isSet on true
-    public  $isSet = true;
+    public  $isSet = false;
     private $databaseHost = '127.0.0.1';
-    private $databaseUser = 'zaaxuweb_user';
-    private $databasePassword = 'GVa(P)?.ZY=Lmr4qjJif';
-    private $databaseName = 'zaaxuweb_ezxss';
+    private $databaseUser = '';
+    private $databasePassword = '';
+    private $databaseName = '';
     private $DB;
 
     public function __construct() {
