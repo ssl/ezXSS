@@ -3,17 +3,15 @@
   class Database {
 
     //> Setup your database settings and put isSet on true
-    public  $isSet = false;
-    private $databaseHost = "127.0.0.1";
-    private $databaseUser = "";
-    private $databasePassword = "";
-    private $databaseName = "";
+    public  $isSet = true;
+    private $databaseHost = '127.0.0.1';
+    private $databaseUser = 'zaaxuweb_user';
+    private $databasePassword = 'GVa(P)?.ZY=Lmr4qjJif';
+    private $databaseName = 'zaaxuweb_ezxss';
     private $DB;
 
     public function __construct() {
-      if(!isset($this->DB)) {
-        $this->DB = new PDO("mysql:host=". $this->databaseHost .";dbname=". $this->databaseName, $this->databaseUser, $this->databasePassword);
-      }
+      $this->DB = new PDO('mysql:host='. $this->databaseHost .';dbname='. $this->databaseName, $this->databaseUser, $this->databasePassword);
     }
 
     public function newQuery($query) {
