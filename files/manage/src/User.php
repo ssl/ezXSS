@@ -87,7 +87,7 @@
       //> Make sure all fields are correct
       $password = $this->database->newQueryArray('SELECT * FROM settings WHERE setting = "password" LIMIT 1');
       if (!password_verify($current, $password['value'])) return ['echo' => 'Current password is not correct.'];
-      if($new != $new2) return ['echo' => 'The retypted password is not the same as the new password.'];
+      if($new != $new2) return ['echo' => 'The retyped password is not the same as the new password.'];
       if(strlen($new) < 8) return ['echo' => 'The new password needs to be atleast 8 characters long.'];
 
       //> Update settings in database, refresh session and return
