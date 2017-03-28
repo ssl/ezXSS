@@ -51,4 +51,11 @@ Some things I am planning to add/change in a future version. This list is sorted
 If you want to host [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) yourself you need a linux server and a Mailgun account. I wanted to create a just PHP version which you can even host on shared hostings or localhost. ezXSS has almost all features that xsshunter has and even more (and adding).
 
 ## Screenshots
+> ![Dashboard](https://camo.githubusercontent.com/475465b4e3eabc40e66f02881c70176b8cac60d3/687474703a2f2f692e696d6775722e636f6d2f674e70497a51642e706e67)
+> ![Settings](https://camo.githubusercontent.com/ba79d75005cd98fdefeabeb4b5dea41cbe134622/687474703a2f2f692e696d6775722e636f6d2f39596e716b62582e706e67)
+> ![Payload](https://camo.githubusercontent.com/2a13fd993cc9d12670dc0db203e4eb080c5dd11b/68747470733a2f2f67792e65652f61786f)
+> ![Filters](https://camo.githubusercontent.com/ec377979979536b320c14f7e6f128ed524cf60c0/68747470733a2f2f67792e65652f617869)
+> ![Share](https://camo.githubusercontent.com/a62ed168c6becd39c330e04fa886cab874a89b3e/68747470733a2f2f67792e65652f617875)
+> ![All reports](https://camo.githubusercontent.com/251872dc3fe809a159750342b0adc0f97ef11a5c/68747470733a2f2f67792e65652f617871)
 > ![View report](https://camo.githubusercontent.com/5e12587698c36dab841205f7d68bc26e2644b50f/68747470733a2f2f67792e65652f616d75)
+> ![Search](https://camo.githubusercontent.com/bf0e25bb00f84d5fd4f524faaa012734275fe573/68747470733a2f2f67792e65652f617877)
