@@ -17,12 +17,8 @@
     INSERT INTO `settings` (`id`, `setting`, `value`) VALUES (1, 'username', :username),(2, 'password', :password),(3, 'email', :email),(4, 'secretkey', 'none'),(5, 'filter-save', '1'),(6, 'filter-alert', '1'),(7, 'dompart', '500'),(8, 'timezone', 'Europe/Amsterdam');";
 	  
     $database->newQueryArray($sqlQuery, [':username' => $username, ':password' => $password, ':email' => $email]);
-    $domain = htmlspecialchars($_SERVER['SERVER_NAME']);
-    $current = 'var ez_domain = "//'.$domain.'";';
-    $current .= file_get_contents('install-js.js');
 	  
     file_put_contents('index.js', $current);
-    unlink('install-js.js');
     unlink('install.php');
     header('Location: /manage');
   }
