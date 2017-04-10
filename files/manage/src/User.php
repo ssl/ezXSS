@@ -36,7 +36,7 @@
     }
 
     public function updateFilters($save, $alert) {
-      //> Make sure all fields are correct
+      //> Make sure everything is OK
       if(!$this->isLoggedIn()) return ['echo' => 'You need to be logged in!'];
       if($save != 0 && $save != 1 || $alert != 0 && $alert != 1) return ['echo' => 'Value needs to be true or false (1 or 0)'];
 
@@ -46,48 +46,40 @@
     }
 
     public function shareReport($id, $domain, $secretKey) {
-      //> Make sure all fields are correct
+      //> Make sure everything is OK
       if(!$this->isLoggedIn()) return ['echo' => 'You need to be logged in!'];
-
       $report = $this->database->newQueryArray('SELECT * FROM reports WHERE id = :id LIMIT 1', [':id' => $id]);
-
       if(!isset($report['id'])) return ['echo' => 'The report ID is not found.'];
       $report['screenshot'] = base64_encode(file_get_contents('https://' . $_SERVER['SERVER_NAME'] . '/manage/assets/images/reports/' . $report['screenshot'] . '.png'));
       $report['referrer'] = !empty($report['referer']) ? 'Shared via ' . $_SERVER['SERVER_NAME'] . ' - '. $report['referer'] : 'Shared via ' . $_SERVER['SERVER_NAME'];
-      $report['shared'] = $secretKey;
+      $report['shared'] = true;
 
-      $ch = curl_init(urlencode($domain) . '/Callback');
+      //> Send the information to the other user
+      $ch = curl_init(urlencode($domain) . '/callback');
       curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
       curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($report));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-
       $result = curl_exec($ch);
 
-      if($result == 'github.com/ssl/ezXSS0') return ['echo' => 'Wrong secret key, unable to share it.'];
       if($result != 'github.com/ssl/ezXSS') return ['echo' => 'Unable to find a valid ezXSS installation. Please check the domain.'];
-
       return ['echo' => 'Successfully shared the report.'];
-
     }
 
-    public function generateKey() {
-      //> Make sure all fields are correct
+    public function updatePayload($customjs) {
+      //> Make sure everything is OK
       if(!$this->isLoggedIn()) return ['echo' => 'You need to be logged in!'];
 
-      $key = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(30/strlen($x)))), 1, 30);
-      $this->database->newQueryArray('UPDATE settings SET value = :value WHERE setting = "secretkey"', [':value' => $key]);
-      return ['echo' => 'Your new key is generated and saved!'];
+      $this->database->newQueryArray('UPDATE settings SET value = :value WHERE setting = "customjs"', [':value' => $customjs]);
+      return ['echo' => 'Your new custom javascript is saved!'];
     }
 
     public function updatePassword($current, $new, $new2) {
-      //> Make sure account is logged in
+      //> Make sure everything is OK
       if(!$this->isLoggedIn()) return ['echo' => 'You need to be logged in!'];
-
-      //> Make sure all fields are correct
       $password = $this->database->newQueryArray('SELECT * FROM settings WHERE setting = "password" LIMIT 1');
       if (!password_verify($current, $password['value'])) return ['echo' => 'Current password is not correct.'];
-      if($new != $new2) return ['echo' => 'The retyped password is not the same as the new password.'];
+      if($new != $new2) return ['echo' => 'The retypted password is not the same as the new password.'];
       if(strlen($new) < 8) return ['echo' => 'The new password needs to be atleast 8 characters long.'];
 
       //> Update settings in database, refresh session and return
@@ -97,7 +89,7 @@
     }
 
     public function updateMain($email, $dompart, $timezone) {
-      //> Make sure all fields are correct
+      //> Make sure everything is OK
       if(!$this->isLoggedIn()) return ['echo' => 'You need to be logged in!'];
       if(!filter_var($email, FILTER_VALIDATE_EMAIL)) return ['echo' => 'This is not a correct e-mailadres.'];
       if(!is_int((int)$dompart)) return ['echo' => 'The dom lenght needs to be a int number.'];
@@ -112,6 +104,10 @@
     }
 
     public function login($username, $password) {
+      //> Make sure everything is OK
+      if($this->isLoggedIn()) return ['redirect' => 'dashboard'];
+      if(empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') return ['echo' => 'This login can only be used over SSL (HTTPS)'];
+
       //> Query to get user information
       $usernameCheck = $this->database->newQueryArray('SELECT * FROM settings WHERE value = :value AND setting = "username" LIMIT 1', [':value' => $username]);
       $passwordCheck = $this->database->newQueryArray('SELECT * FROM settings WHERE setting = "password" LIMIT 1', [':password' => $password]);

@@ -19,6 +19,8 @@
 
         <div class="row">
 
+          <div class="col-lg-12"><div id="alert"></div></div>
+
           <div class="col-lg-2 col-xs-6">
             <div class="panel panel-filled">
               <div class="panel-body">
@@ -67,12 +69,44 @@
           <div class="col-lg-2 col-xs-6">
             <div class="panel panel-filled">
               <div class="panel-body">
-                <h2 class="m-b-none"></h2>
-                <div class="small"></div>
+                <h2 class="m-b-none">{{stats[totalshared]}}</h2>
+                <div class="small">Total shared with you</div>
               </div>
             </div>
           </div>
 
+        </div>
+
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Current status</div>
+              <div class="panel-body">
+                {{updateStatus[]}}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Filters</div>
+              <div class="panel-body">
+                <p>You can stop a double report from saving or alerting. If all information in report is the same it will ignore it.</p>
+                <form class="form" id="filter-settings">
+                  <div class="form-group">
+                    {{csrf[]}}
+                    <label class="control-label" for="save">Save report</label>
+                    <input type="text" name="save" id="save" value="{{settings[filter-save]}}" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="alert">Email alert</label>
+                    <input type="text" name="alert" id="emailalert" value="{{settings[filter-alert]}}" class="form-control">
+                  </div>
+                  <button class="btn">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
   </section>

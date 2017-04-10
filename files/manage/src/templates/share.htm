@@ -35,10 +35,6 @@
                     <label class="control-label" for="domain">Domain</label>
                     <input type="text" name="domain" id="domain" value="" class="form-control">
                   </div>
-                  <div class="form-group">
-                    <label class="control-label" for="key">Secret key</label>
-                    <input type="text" name="key" id="key" value="" class="form-control">
-                  </div>
                   <button class="btn">Share</button>
                 </form>
               </div>
@@ -53,15 +49,6 @@
                   <label class="control-label" for="domain">Your domain</label>
                   <input type="text" name="domain" id="domain" value="{{domain}}" disabled class="form-control">
                 </div>
-                <div class="form-group">
-                  <label class="control-label" for="key">Your secret key</label>
-                  <input type="text" name="key" id="key" value="{{settings[secretkey]}}" disabled class="form-control">
-                </div>
-                <p>If you generate a new secret key, your old one will no longer work.</p>
-                <form class="form" id="share-new">
-                  {{csrf[]}}
-                  <button class="btn">Generate new</button>
-                </form>
               </div>
             </div>
           </div>
