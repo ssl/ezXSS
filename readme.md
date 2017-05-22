@@ -47,6 +47,8 @@ Adding in the new 2.0 version:
 * New way of searching
 * Delete screenshot image if report is deleted
 * Page alerts or Google Chrome alerts on new report
+* A lot of small features added, updated or deleted.
+* A new favicon
 
 Adding in a future version:
 * Page grabbing (& on regex)
