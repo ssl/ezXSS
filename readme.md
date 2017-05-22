@@ -45,6 +45,7 @@ Adding in the new 2.0 version:
 * Cleaning up some bad-practice code 
 * ~~Fix searching~~
 * New way of searching
+* Delete screenshot image if report is deleted
 * Page alerts or Google Chrome alerts on new report
 
 Adding in a future version:
