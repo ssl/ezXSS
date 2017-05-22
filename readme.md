@@ -37,14 +37,20 @@ ezXSS is ez to install
 ## Todo
 Some things I am planning to add/change in a future version. This list is sorted on how important/fast it is going to be added.
 
-* New design in release 2.0
+Adding in the new 2.0 version:
+* ~~New design~~
+* New email design
 * Fast show DOM
 * Making installation ez with a installation page
-* Cleaning up some bad-practice code
-* Page alerts & API for alerts (alerts on Chrome, Windows, telegram etc.)
-* Live JS - send JS code LIVE while the person is on the page
+* Cleaning up some bad-practice code 
+* ~~Fix searching~~
+* New way of searching
+* Page alerts or Google Chrome alerts on new report
+
+Adding in a future version:
 * Page grabbing (& on regex)
-* Fix searching
+* Live JS - send JS code LIVE while the person is on the page
+* Callback API for alerts on Telegram etc.
 * You got ideas?
 
 ## Why?
