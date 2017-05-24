@@ -47,7 +47,7 @@ Adding in the new 2.0 version:
 * Delete screenshot image if report is deleted
 * Page alerts or Google Chrome alerts on new report
 * A lot of small features added, updated or deleted.
-* A new favicon
+* ~~A new favicon~~
 * Password only login (removing username)
 * Adding 2FA Google Auth for people who want extra security
 
