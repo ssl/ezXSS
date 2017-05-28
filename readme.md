@@ -41,9 +41,9 @@ Adding in the new 2.0 version:
 * ~~New design~~
 * New email design
 * Making installation ez with a installation page
-* Cleaning up some bad-practice code 
+* ~~Cleaning up some bad-practice code ~~
 * ~~Fix searching~~
-* New way of searching
+* ~~New way of searching~~
 * Delete screenshot image if report is deleted
 * Page alerts or Google Chrome alerts on new report
 * A lot of small features added, updated or deleted.
