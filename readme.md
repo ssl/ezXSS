@@ -45,7 +45,6 @@ Adding in the new 2.0 version:
 * ~~Fix searching~~
 * ~~New way of searching & deleting~~
 * Delete screenshot image if report is deleted
-* Page alerts or Google Chrome alerts on new report
 * ~~A lot of small features added, updated or deleted.~~
 * ~~A new favicon~~
 * ~~Password only login (removing username)~~
@@ -53,6 +52,7 @@ Adding in the new 2.0 version:
 
 Adding in a future version:
 * Page grabbing (& on regex)
+* Page alerts or Google Chrome alerts on new report
 * Live JS - send JS code LIVE while the person is on the page
 * Callback API for alerts on Telegram etc.
 * You got ideas?
