@@ -48,7 +48,7 @@ Adding in the new 2.0 version:
 * ~~A lot of small features added, updated or deleted.~~
 * ~~A new favicon~~
 * ~~Password only login (removing username)~~
-* Adding 2FA Google Auth for people who want extra security
+* ~~Adding 2FA Google Auth for people who want extra security~~
 
 Adding in a future version:
 * Page grabbing (& on regex)
