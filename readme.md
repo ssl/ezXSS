@@ -39,7 +39,7 @@ Some things I am planning to add/change in a future version. This list is sorted
 
 Adding in the new 2.0 version:
 * ~~New design~~
-* New email design
+* ~~New email design~~
 * Making installation ez with a installation page
 * ~~Cleaning up some bad-practice code~~
 * ~~Fix searching~~
