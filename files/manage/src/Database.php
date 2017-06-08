@@ -3,40 +3,40 @@
   class Database {
 
     //> Setup your database settings and put isSet on true
-    public  $isSet = false;
+    public  $isSet = true;
     private $databaseHost = '127.0.0.1';
-    private $databaseUser = '';
-    private $databasePassword = '';
-    private $databaseName = '';
+    private $databaseUser = 'zaaxuweb_user';
+    private $databasePassword = 'mUWIOX=y2I}o#6Ei_~';
+    private $databaseName = 'zaaxuweb_ezxss';
     private $DB;
 
     public function __construct() {
       $this->DB = new PDO('mysql:host='. $this->databaseHost .';dbname='. $this->databaseName, $this->databaseUser, $this->databasePassword);
     }
 
-    public function newQuery($query) {
+    public function query($query) {
       return $this->DB->query($query);
     }
 
-    public function newQueryArray($query, $array = array()) {
-      $newQueryArray = $this->DB->prepare($query);
-      $newQueryArray->execute($array);
-      return $newQueryArray->fetch();
+    public function fetch($query, $array = []) {
+      $fetch = $this->DB->prepare($query);
+      $fetch->execute($array);
+      return $fetch->fetch();
     }
 
-    public function lastInsertId($query, $array) {
+    public function lastInsertId($query, $array = []) {
       $lastInsertId = $this->DB->prepare($query);
       $lastInsertId->execute($array);
       return $this->DB->lastInsertId();
     }
 
-    public function allQueryArray($query, $array) {
-      $newQueryArray = $this->DB->prepare($query);
-      $newQueryArray->execute($array);
-      return $newQueryArray->fetchAll();
+    public function fetchAll($query, $array = []) {
+      $fetchAll = $this->DB->prepare($query);
+      $fetchAll->execute($array);
+      return $fetchAll->fetchAll();
     }
 
-    public function rowCount($query, $array) {
+    public function rowCount($query, $array = []) {
       $rowCount = $this->DB->prepare($query);
       $rowCount->execute($array);
       return $rowCount->rowCount();

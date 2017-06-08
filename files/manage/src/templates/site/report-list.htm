@@ -1,0 +1,24 @@
+<tr id="{{report[id]}}">
+  <th scope=row style="width:50px;max-width:50px;">{{report[id]}}</th>
+  <td>
+    <div class="btn-group btn-view" style="width:100px;max-width:100px;" role=group>
+      <a href="?id={{report[id]}}" class=btn>View</a>
+      <div class=btn-group role=group>
+        <button type=button class="btn btn-default dropdown-toggle" data-toggle=dropdown aria-haspopup=true aria-expanded=true>
+          <span class=caret></span>
+        </button>
+
+        <div class=dropdown-backdrop></div>
+
+        <ul class=dropdown-menu>
+          <li><a href="share?id={{report[id]}}">Share</a></li>
+          <li><a class="delete" report-id="{{report[id]}}">Delete</a></li>
+        </ul>
+
+      </div>
+    </div>
+  </td>
+  <td>{{report[origin]}}</td>
+  <td>{{report[uri]}}</td>
+  <td>{{report[ip]}}</td>
+</tr>

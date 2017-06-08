@@ -11,13 +11,20 @@
             </tr>
           </thead>
 
+          <style media="screen">
+            td {
+              word-wrap: break-word;
+              max-width: 800px;
+            }
+          </style>
+
           <tbody>
             <tr><td>URL</td><td>{{report[uri]}}</td></tr>
             <tr><td>IP</td><td>{{report[ip]}}</td></tr>
             <tr><td>Referer</td><td>{{report[referer]}}</td></tr>
             <tr><td>User-Agent</td><td>{{report[user-agent]}}</td></tr>
             <tr><td>Cookies</td><td>{{report[cookies]}}</td></tr>
-            <tr><td>DOM</td><td><textarea spellcheck=false style="width:100%;">{{report[dom]}}</textarea></td></tr>
+            <tr><td>DOM</td><td><textarea spellcheck=false style="width:100%;" id="dom">{{report[dom]}}</textarea></td></tr>
             <tr><td>Screenshot</td><td><img style="width:100%;" onerror="this.style.display='none';this.after('Unable to load screenshot');" src="/manage/assets/images/reports/{{report[screenshot]}}.png"></td></tr>
             <tr><td>Origin</td><td>{{report[origin]}}</td></tr>
             <tr><td>Time</td><td>{{report[time]}}</td></tr>

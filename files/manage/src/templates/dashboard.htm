@@ -7,7 +7,6 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="view-header">
-              <div class="header-icon"><i class="fa fa-industry"> </i></div>
               <div class="header-title">
                 <h3 class="m-b-xs">Dashboard</h3>
                 <small>Statistics of your ezXSS</small>
@@ -82,28 +81,19 @@
             <div class="panel panel-filled">
               <div class="panel-heading">Current status</div>
               <div class="panel-body">
-                {{updateStatus[]}}
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">Filters</div>
-              <div class="panel-body">
-                <p>You can stop a double report from saving or alerting. If all information in report is the same it will ignore it.</p>
-                <form class="form" id="filter-settings">
-                  <div class="form-group">
-                    {{csrf[]}}
-                    <label class="control-label" for="save">Save report</label>
-                    <input type="text" name="save" id="save" value="{{settings[filter-save]}}" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label class="control-label" for="alert">Email alert</label>
-                    <input type="text" name="alert" id="emailalert" value="{{settings[filter-alert]}}" class="form-control">
-                  </div>
-                  <button class="btn">Save</button>
-                </form>
+                <div class="form-group">
+                  <label class="control-label">Your version</label>
+                  <input value="v2.0" disabled class="form-control">
+                </div>
+                <div class="form-group">
+                  <label class="control-label">Latests version</label>
+                  <input value="v{{updateStatus[tag_name]}}" disabled class="form-control">
+                </div>
+                <div class="form-group">
+                  <label class="control-label">Update log of latests version</label>
+                  <textarea disabled class="form-control" rows=5>{{updateStatus[body]}}</textarea>
+                </div>
+                <a class="btn" href="{{updateStatus[zipball_url]}}">Download v{{updateStatus[tag_name]}}</a>
               </div>
             </div>
           </div>

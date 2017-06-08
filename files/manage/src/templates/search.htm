@@ -7,7 +7,6 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="view-header">
-              <div class="header-icon"><i class="fa fa-search"> </i></div>
               <div class="header-title">
                 <h3 class="m-b-xs">Search</h3>
                 <small>Search reports with IP, ID or domain</small>
@@ -19,17 +18,14 @@
 
         <div class="row">
 
-          <div class="col-lg-12"><div id="alert"></div></div>
-
           <div class="col-lg-6">
             <div class="panel panel-filled">
               <div class="panel-heading">Search on IP</div>
               <div class="panel-body">
-                <form>
+                <form method="get" action="reports">
                   <div class="form-group">
                     <label class="control-label" for="search">IP</label>
-                    <input hidden name="type" value="ip">
-                    <input type="text" name="search" id="search" class="form-control">
+                    <input type="text" name="search" class="form-control">
                   </div>
                   <button type="submit" class="btn">Search</button>
                 </form>
@@ -41,11 +37,10 @@
             <div class="panel panel-filled">
               <div class="panel-heading">Search on ID</div>
               <div class="panel-body">
-                <form>
+                <form method="get" action="reports">
                   <div class="form-group">
                     <label class="control-label" for="search">ID</label>
-                    <input hidden name="type" value="id">
-                    <input type="text" name="search" id="search" class="form-control">
+                    <input type="text" name="search" class="form-control">
                   </div>
                   <button type="submit" class="btn">Search</button>
                 </form>
@@ -57,11 +52,10 @@
             <div class="panel panel-filled">
               <div class="panel-heading">Search on domain</div>
               <div class="panel-body">
-                <form>
+                <form method="get" action="reports">
                   <div class="form-group">
                     <label class="control-label" for="search">Domain</label>
-                    <input hidden name="type" value="origin">
-                    <input type="text" name="search" id="search" class="form-control">
+                    <input type="text" name="search" class="form-control">
                   </div>
                   <button type="submit" class="btn">Search</button>
                 </form>
@@ -70,8 +64,6 @@
           </div>
 
         </div>
-
-        {{searchResults[]}}
 
       </div>
   </section>

@@ -4,7 +4,7 @@
 
   require_once __DIR__ . '/Autoload.php';
 
-  //> Check if it is a post or normal request
+  #) Check if it is a post or normal request
   if($requestUrl == 'request') {
     $request = new Request();
     echo $request->json();

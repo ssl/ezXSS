@@ -6,21 +6,21 @@
     die();
   }
 
-  //> Decode the JSON from the post
+  #) Decode the JSON from the post
   $phpInput = file_get_contents('php://input');
   $json = json_decode($phpInput);
 
-  //> Require Database for querys
+  #) Require Database for querys
   require_once __DIR__ . '/manage/src/Database.php';
   $database = new Database();
 
-  //> Get settings
+  #) Get settings
   $setting = [];
-  foreach($database->newQuery('SELECT * FROM settings') as $settings) {
+  foreach($database->query('SELECT * FROM settings') as $settings) {
     $setting[$settings['setting']] = htmlspecialchars($settings['value']);
   }
 
-  //> Some information and settings
+  #) Some information and settings
   $userIP = isset($json->shared) ? $json->ip : (isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']);
   $domain = htmlspecialchars($_SERVER['SERVER_NAME']);
   $doubleReport = false;
@@ -34,7 +34,7 @@
   }
 
   if($setting['filter-save'] == 0 || $setting['filter-alert'] == 0) {
-    $check = $database->newQueryArray('SELECT * FROM reports WHERE cookies = :cookies AND dom = :dom AND origin = :origin AND referer = :referer AND uri = :uri AND `user-agent` = :userAgent AND ip = :ip LIMIT 1',
+    $check = $database->fetch('SELECT * FROM reports WHERE cookies = :cookies AND dom = :dom AND origin = :origin AND referer = :referer AND uri = :uri AND `user-agent` = :userAgent AND ip = :ip LIMIT 1',
     [':cookies' => $json->cookies, ':dom' => $json->dom, ':origin' => $json->origin, ':referer' => $json->referrer, ':uri' => $json->uri, ':userAgent' => $json->{'user-agent'}, ':ip' => $userIP]);
 
     if(isset($check['id'])) {
@@ -45,7 +45,7 @@
     }
   }
 
-  //> Create image
+  #) Create image
   $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $json->screenshot));
   $imageName = time() . md5($json->uri . time() . bin2hex(openssl_random_pseudo_bytes(16))) . bin2hex(openssl_random_pseudo_bytes(5));
   $imagePath = "manage/assets/images/reports/{$imageName}.png";
@@ -53,13 +53,13 @@
   fwrite($saveImage, $image);
   fclose($saveImage);
 
-  //> Insert into DB
+  #) Insert into DB
   if( ($doubleReport && $setting['filter-save'] == 1) || (!$doubleReport) ) {
     $id = $database->lastInsertId('INSERT INTO reports (`cookies`, `dom`, `origin`, `referer`, `screenshot`, `uri`, `user-agent`, `ip`, `time`) VALUES (:cookies, :dom, :origin, :referer, :screenshot, :uri, :userAgent, :ip, :time)',
     [':cookies' => $json->cookies, ':dom' => $json->dom, ':origin' => $json->origin, ':referer' => $json->referrer, ':screenshot' => $imageName, ':uri' => $json->uri, ':userAgent' => $json->{'user-agent'}, ':ip' => $userIP, ':time' => time()]);
   }
 
-  //> Send email
+  #) Send email
   if( ($doubleReport && $setting['filter-alert'] == 1) || (!$doubleReport) ) {
     $htmlTemplate = str_replace(
       ['{{id}}', '{{domain}}', '{{url}}', '{{ip}}', '{{referer}}', '{{user-agent}}', '{{cookies}}', '{{dom}}', '{{screenshot}}', '{{origin}}', '{{time}}'],

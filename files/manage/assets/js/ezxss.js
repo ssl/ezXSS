@@ -29,7 +29,14 @@ $(document).ready(function() {
         });
     });
 
-    
+    $(".delete").click(function() {
+      var id = $(this).attr('report-id');
+      request("delete-report", {id:id,csrf:csrf}).then(function(r) {
+        $("#"+id).fadeOut( "slow", function() {});
+      });
+    });
+
+
     $('.left-nav-toggle a').on('click', function(event){
         event.preventDefault();
         $("body").toggleClass("nav-toggle");
@@ -63,6 +70,7 @@ $(document).ready(function() {
         hpanel.remove();
     });
 });
+
 
 $("#alert").on("click", ".close", function() {
     $("#alert").slideUp();

@@ -7,7 +7,6 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="view-header">
-              <div class="header-icon"><i class="fa fa-cog"> </i></div>
               <div class="header-title">
                 <h3 class="m-b-xs">Settings</h3>
                 <small>Change your main settings or password</small>
@@ -64,6 +63,42 @@
                     <input type="password" name="newpassword2" id="newpassword2" class="form-control">
                   </div>
                   <button class="btn">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Filters</div>
+              <div class="panel-body">
+                <p>You can stop a double report from saving or alerting. If all information in report is the same it will ignore it.</p>
+                <form class="form" id="filter-settings">
+                  <div class="form-group">
+                    {{csrf[]}}
+                    <label class="control-label" for="save">Save report</label>
+                    <input type="text" name="save" id="save" value="{{settings[filter-save]}}" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="alert">Email alert</label>
+                    <input type="text" name="alert" id="emailalert" value="{{settings[filter-alert]}}" class="form-control">
+                  </div>
+                  <button class="btn">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">2FA login</div>
+              <div class="panel-body">
+                <p>You can activate Google Authenticator 2FA for extra protection or disable it.</p>
+                <form class="form" id="twofactor-settings">
+                  {{csrf[]}}
+                  {{twofactorSettings[]}}
                 </form>
               </div>
             </div>
