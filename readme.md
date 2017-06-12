@@ -30,9 +30,9 @@ Some features ezXSS has
 ezXSS is ez to install
 
 * Download the 'files' folder and put all the files inside your root
-* Create an empty database and provide your database information in '/manage/src/Database.php' (also set isSet on true)
-* Go to yoursite.com/install.php and setup a username, password and alert email
-* Make sure the install.php file is deleted and the XSS works, try the XSS on [w3schools](https://www.w3schools.com/html/tryit.asp?filename=tryhtml_intro) or [codepen](https://codepen.io).
+* Create an empty database and provide your database information in '/manage/src/Database.php'
+* Go to /manage/install in your browser and setup a password and email
+* Done! That was ez right?
 
 ## Todo
 Some things I am planning to add/change in a future version. This list is sorted on how important/fast it is going to be added.
