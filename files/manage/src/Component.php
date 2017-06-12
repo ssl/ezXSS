@@ -71,7 +71,7 @@
       $secretCheck = $this->database->fetch('SELECT * FROM settings WHERE setting = "secret"');
 
       if(strlen($secretCheck['value']) != 16) {
-        $html = str_replace("{{secret}}", $this->generateSecret(), file_get_contents(__DIR__ . '/templates/site/twofactor-enable.htm'));
+        $html = str_replace('{{secret}}', $this->generateSecret(), file_get_contents(__DIR__ . '/templates/site/twofactor-enable.htm'));
       } else {
         $html = file_get_contents(__DIR__ . '/templates/site/twofactor-disable.htm');
       }
@@ -83,12 +83,7 @@
       $secretCheck = $this->database->fetch('SELECT * FROM settings WHERE setting = "secret"');
 
       if(strlen($secretCheck['value']) == 16) {
-        return '<div class="form-group">
-          <label class="control-label" for="password">2FA Code</label>
-          <input type="text" name="code" id="code" class="form-control">
-        </div>';
-      } else {
-        return '';
+        return file_get_contents(__DIR__ . '/templates/site/login-2fa.htm');
       }
     }
 
@@ -102,7 +97,7 @@
       return $this->secret;
     }
 
-    public function page($navigation) {
+    public function page($navigation = false) {
       $page = (isset($_GET['page'])) ? intval(trim(htmlspecialchars($_GET['page']))) : 0;
 
       if($navigation == '+') $page += 1;
@@ -115,13 +110,27 @@
     public function searchQuery() {
       if(isset($_GET['search'])) {
         return '&search=' . $_GET['search'];
-      } else {
-        return '';
       }
     }
 
     public function subString($string, $lenght) {
       return strlen($string) > $lenght ? substr($string, 0, $lenght) . '..' : $string;
+    }
+
+    public function reportPage($type) {
+      if($type == 'tableHead') {
+        if(isset($_GET['id'])) {
+          return file_get_contents(__DIR__ . '/templates/site/report-id-table.htm');
+        } else {
+          return file_get_contents(__DIR__ . '/templates/site/report-list-table.htm');
+        }
+      }
+
+      if($type == 'showPaginate') {
+        if(isset($_GET['id'])) {
+          return 'display:none';
+        }
+      }
     }
 
     public function report() {
@@ -135,7 +144,7 @@
             $html = str_replace($matches[0][$key], htmlspecialchars($report["{$matches[2][$key]}"]), $html);
           }
         } else {
-          header("Location: /manage/reports");
+          header('Location: /manage/reports');
         }
 
       } else {
@@ -148,7 +157,8 @@
         }
 
         $htmlTemplate = file_get_contents(__DIR__ . '/templates/site/report-list.htm');
-
+        $html = '';
+        
         foreach($this->database->fetchAll($query, $array) as $report) {
           $report['uri'] = $this->subString($report['uri'], 80);
           $report['ip'] = $this->subString($report['ip'], 15);

@@ -26,18 +26,14 @@
 
           <div class="col-lg-12">
             <div class="panel panel-filled">
-              <div class="panel-heading">All reports</div>
+              <div class="panel-heading">Information</div>
               <div class="panel-body">
                 <div class="table-responsive">
 
                   <table style="white-space: nowrap;" class="table">
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>View</th>
-                        <th>Domain</th>
-                        <th>URL</th>
-                        <th>IP</th>
+                        {{reportPage[tableHead]}}
                       </tr>
                     </thead>
                     <tbody>
@@ -45,7 +41,7 @@
                     </tbody>
                   </table>
 
-                  <div class="col-sm-6">
+                  <div class="col-sm-6" style="{{reportPage[showPaginate]}}">
                     <div class="dataTables_paginate paging_simple_numbers">
                       <ul class=pagination>
                         <li class="paginate_button previous">

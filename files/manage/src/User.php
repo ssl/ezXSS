@@ -6,7 +6,7 @@
       $this->database = new Database();
       $this->base32Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
-      session_set_cookie_params(6000000, '/', null, true, true);
+      session_set_cookie_params(6000000, '/', null, false, true);
       if(!isset($_SESSION)) session_start();
 
     }
@@ -65,20 +65,24 @@
       return 'Successfully shared the report.';
     }
 
+    public function deleteReport($id) {
+      #) Make sure everything is OK
+      if(!$this->isLoggedIn()) return 'You need to be logged in!';
+
+      #) Delete screenshot
+      $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id', [':id' => $id]);
+      unlink('assets/images/reports/' . $report['screenshot'] . '.png');
+
+      $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
+      return 'Report is deleted.';
+    }
+
     public function updatePayload($customjs) {
       #) Make sure everything is OK
       if(!$this->isLoggedIn()) return 'You need to be logged in!';
 
       $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "customjs"', [':value' => $customjs]);
       return 'Your new custom javascript is saved!';
-    }
-
-    public function deleteReport($id) {
-      #) Make sure everything is OK
-      if(!$this->isLoggedIn()) return 'You need to be logged in!';
-
-      $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
-      return 'Report is deleted.';
     }
 
     public function updatePassword($current, $new, $new2) {
@@ -98,7 +102,7 @@
     public function updateMain($email, $dompart, $timezone) {
       #) Make sure everything is OK
       if(!$this->isLoggedIn()) return 'You need to be logged in!';
-      if(!filter_var($email, FILTER_VALIDATE_EMAIL)) return 'This is not a correct e-mailadres.';
+      if(!filter_var($email, FILTER_VALIDATE_EMAIL)) return 'This is not a correct email address.';
       if(!is_int((int)$dompart)) return 'The dom lenght needs to be a int number.';
       if(!in_array($timezone, timezone_identifiers_list())) return 'The timezone is not a valid timezone.';
 
@@ -136,10 +140,26 @@
 
     }
 
+    public function install($password, $email) {
+      #) Make sure everything is OK
+      $installCheck = $this->database->rowCount('SELECT * FROM settings');
+      if($installCheck > 0) return 'This website is already installed! :-)';
+      if(strlen($password) < 8) return 'The password needs to be atleast 8 characters long.';
+      if(!filter_var($email, FILTER_VALIDATE_EMAIL)) return 'This is not a correct email address.';
+
+      #) Input information in database
+      $this->database->query('CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`setting` varchar(500) NOT NULL,`value` text NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;');
+      $this->database->query('CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`screenshot` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=0;');
+      $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("secret", ""),("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", "");');
+      $this->database->fetch('INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email);', [':password' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 11]), 'email' => $email]);
+
+      $this->createSession();
+      return ['redirect' => 'dashboard'];
+    }
+
     public function login($password, $code) {
       #) Make sure everything is OK
       if($this->isLoggedIn()) return ['redirect' => 'dashboard'];
-      if(empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') return 'This login can only be used over SSL (HTTPS)';
 
       #) Query to get user information
       $passwordCheck = $this->database->fetch('SELECT * FROM settings WHERE setting = "password" LIMIT 1', [':password' => $password]);
@@ -148,7 +168,6 @@
       #) Check if account is valid
       if (!password_verify($password, $passwordCheck['value'])) return 'The password you entered is not valid.';
       if(strlen($secretCheck['value']) == 16 && $this->getCode($secretCheck['value']) != $code) return 'The code is incorrect.';
-
 
       $this->createSession();
       return ['redirect' => 'dashboard'];

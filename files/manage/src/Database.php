@@ -2,8 +2,7 @@
 
   class Database {
 
-    //> Setup your database settings and put isSet on true
-    public  $isSet = false;
+    //> Setup your database information
     private $databaseHost = '127.0.0.1';
     private $databaseUser = '';
     private $databasePassword = '';
@@ -11,7 +10,9 @@
     private $DB;
 
     public function __construct() {
-      $this->DB = new PDO('mysql:host='. $this->databaseHost .';dbname='. $this->databaseName, $this->databaseUser, $this->databasePassword);
+      try {
+        $this->DB = new PDO('mysql:host='. $this->databaseHost .';dbname='. $this->databaseName, $this->databaseUser, $this->databasePassword);
+      } catch(PDOException $e) { }
     }
 
     public function query($query) {

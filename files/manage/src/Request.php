@@ -22,6 +22,7 @@
         case 'payload-customjs' : return $this->toJson($this->user->updatePayload($this->post('customjs'))); break;
         case 'update' : return $this->toJson($this->user->updateSystem($this->post('version'))); break;
         case 'delete-report' : return $this->toJson($this->user->deleteReport($this->post('id'))); break;
+        case 'install' : return $this->toJson($this->user->install($this->post('password'), $this->post('email'))); break;
         default : return $this->toJson(['echo' => 'Could not found this action, what did you do?']); break;
       }
 
