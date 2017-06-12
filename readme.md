@@ -44,7 +44,7 @@ Adding in the new 2.0 version:
 * ~~Cleaning up some bad-practice code~~
 * ~~Fix searching~~
 * ~~New way of searching & deleting~~
-* Delete screenshot image if report is deleted
+* ~~Delete screenshot image if report is deleted~~
 * ~~A lot of small features added, updated or deleted.~~
 * ~~A new favicon~~
 * ~~Password only login (removing username)~~
