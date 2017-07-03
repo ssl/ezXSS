@@ -11,7 +11,7 @@
       #) Redirect home to login if not logged in, or to dashboard when logged in
       if(empty($file) && !$this->user->isLoggedIn()) return $this->redirect('login');
       if(empty($file) && $this->user->isLoggedIn()) return $this->redirect('dashboard');
-      if($file == 'login' || $file == 'install' && $this->user->isLoggedIn()) return $this->redirect('dashboard');
+      if(($file == 'login' || $file == 'install') && $this->user->isLoggedIn()) return $this->redirect('dashboard');
       if($file != 'login' && $file != 'install' && !$this->user->isLoggedIn()) return $this->redirect('login');
       if(!in_array($file, ['login', 'dashboard', 'settings', 'reports', 'search', 'payload', 'share', 'install'])) return $this->redirect('login');
 
