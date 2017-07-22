@@ -41,6 +41,11 @@ ezXSS is ez to install
 Some things I am planning to add/change in a future version. This list is sorted on how important/fast it is going to be added.
 
 Adding in a future version:
+* Save custom JS for later
+* Adding more payloads
+* Better share method
+* Adding some extra security
+* 'Remember me' session
 * Page grabbing (& on regex)
 * Page alerts or Google Chrome alerts on new report
 * Live JS - send JS code LIVE while the person is on the page
