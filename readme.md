@@ -25,7 +25,7 @@ Some features ezXSS has
 * its just ez :-)
 
 ## Required
-* PHP 5.3 or up
+* PHP 5.5 or up
 * A domain name (consider a short one)
 * An SSL (consider Cloudflare or Let's Encrypt for a free SSL)
 
