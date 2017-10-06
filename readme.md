@@ -41,6 +41,7 @@ ezXSS is ez to install
 Some things I am planning to add/change in a future version. This list is sorted on how important/fast it is going to be added.
 
 Adding in a future version:
+* There is one file left that is not OOP
 * Better searching with regex
 * Save custom JS for later
 * Adding more payloads
