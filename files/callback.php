@@ -1,8 +1,12 @@
 <?php
 
+  /*
+  
+  this fill will be integrated in the system in next version
+  this file will be removed in next version
+  
+  */
 
-  // this fill will be integrated in the system in next version
-  // this file will be removed in next version
 
   echo 'github.com/ssl/ezXSS';
 
