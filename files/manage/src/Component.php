@@ -4,6 +4,7 @@
 
     public function __construct() {
       $this->user = new User();
+      $this->basic = new Basic();
       $this->database = new Database();
       $this->releases = [];
       $this->secret = '';
@@ -120,15 +121,15 @@
     public function reportPage($type) {
       if($type == 'tableHead') {
         if(isset($_GET['id'])) {
-          return file_get_contents(__DIR__ . '/templates/site/report-id-table.htm');
+          return $this->basic->htmlBlocks('reportIdTable');
         } else {
-          return file_get_contents(__DIR__ . '/templates/site/report-list-table.htm');
+          return $this->basic->htmlBlocks('reportListTable');
         }
       }
 
       if($type == 'showPaginate') {
         if(isset($_GET['id'])) {
-          return 'display:none';
+          return $this->basic->htmlBlocks('displayNone');
         }
       }
     }
@@ -158,7 +159,7 @@
 
         $htmlTemplate = file_get_contents(__DIR__ . '/templates/site/report-list.htm');
         $html = '';
-        
+
         foreach($this->database->fetchAll($query, $array) as $report) {
           $report['uri'] = $this->subString($report['uri'], 80);
           $report['ip'] = $this->subString($report['ip'], 15);

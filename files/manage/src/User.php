@@ -47,9 +47,9 @@
     public function shareReport($id, $domain) {
       #) Make sure everything is OK
       if(!$this->isLoggedIn()) return 'You need to be logged in!';
+      if($domain == $_SERVER['SERVER_NAME']) return 'You cannot share a report with yourself.';
       $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id LIMIT 1', [':id' => $id]);
       if(!isset($report['id'])) return 'The report ID is not found.';
-      $report['screenshot'] = base64_encode(file_get_contents('https://' . $_SERVER['SERVER_NAME'] . '/manage/assets/images/reports/' . $report['screenshot'] . '.png'));
       $report['referrer'] = !empty($report['referer']) ? 'Shared via ' . $_SERVER['SERVER_NAME'] . ' - '. $report['referer'] : 'Shared via ' . $_SERVER['SERVER_NAME'];
       $report['shared'] = true;
 
@@ -68,10 +68,6 @@
     public function deleteReport($id) {
       #) Make sure everything is OK
       if(!$this->isLoggedIn()) return 'You need to be logged in!';
-
-      #) Delete screenshot
-      $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id', [':id' => $id]);
-      unlink('assets/images/reports/' . $report['screenshot'] . '.png');
 
       $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
       return 'Report is deleted.';
@@ -149,7 +145,7 @@
 
       #) Input information in database
       $this->database->query('CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`setting` varchar(500) NOT NULL,`value` text NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;');
-      $this->database->query('CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`screenshot` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=0;');
+      $this->database->query('CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=0;');
       $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("secret", ""),("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", "");');
       $this->database->fetch('INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email);', [':password' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 11]), 'email' => $email]);
 

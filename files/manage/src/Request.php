@@ -8,7 +8,7 @@
 
     public function json() {
       if($this->user->sessionInfo('csrfToken') != $this->post('csrf')) {
-        return $this->toJson(['echo' => 'CSRF token is not valid']);
+        return $this->toJson('CSRF token is not valid');
       }
 
       #) Call the correct function based on the action
@@ -23,7 +23,7 @@
         case 'update' : return $this->toJson($this->user->updateSystem($this->post('version'))); break;
         case 'delete-report' : return $this->toJson($this->user->deleteReport($this->post('id'))); break;
         case 'install' : return $this->toJson($this->user->install($this->post('password'), $this->post('email'))); break;
-        default : return $this->toJson(['echo' => 'Could not found this action, what did you do?']); break;
+        default : return $this->toJson('Could not found this action, what did you do?'); break;
       }
 
     }
