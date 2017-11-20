@@ -40,18 +40,17 @@ ezXSS is ez to install
 ## Todo
 Some things I am planning to add/change in a future version. This list is sorted on how important/fast it is going to be added.
 
-Adding in a future version:
-* There is one file left that is not OOP
+Adding in a future versions:
+* Archive reports
+* Block certain domains
+* Make all files OOP (1 file left)
 * Better searching with regex
 * Save custom JS for later
 * Adding more payloads
 * Better share method
-* Adding some extra security
-* 'Remember me' session
-* Page grabbing (& on regex)
-* Page alerts or Google Chrome alerts on new report
+* Page grabbing
 * Live JS - send JS code LIVE while the person is on the page
-* Callback API for alerts on Telegram etc.
+* Callback API for alerts on Telegram, Chrome etc.
 * You got ideas?
 
 ## Why?
