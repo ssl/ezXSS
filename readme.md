@@ -40,14 +40,14 @@ ezXSS is ez to install
 ## Todo
 Some things I am planning to add/change in a future version. This list is sorted on how important/fast it is going to be added.
 
-Adding in a future versions:
-* Archive reports
+Adding in a future versions (top to bottom for priority):
 * Block certain domains
 * Make all files OOP (1 file left)
-* Better searching with regex
 * Save custom JS for later
-* Adding more payloads
 * Better share method
+* Archive reports
+* Better searching with regex
+* Adding more payloads
 * Page grabbing
 * Live JS - send JS code LIVE while the person is on the page
 * Callback API for alerts on Telegram, Chrome etc.
@@ -56,7 +56,7 @@ Adding in a future versions:
 ## Why?
 If you want to host [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) yourself you need a linux server and a Mailgun account. I wanted to create a just PHP version which you can even host on shared hostings or localhost. ezXSS has almost all features that xsshunter has and even more (and adding).
 
-## Screenshots
+## Screenshots of 2.0
 ![Dashboard](http://i.imgur.com/9jE9w1S.png)
 ![Settings](http://i.imgur.com/SZlQMQt.png)
 ![Payload](http://i.imgur.com/0UCqUVa.png)
