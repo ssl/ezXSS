@@ -4,10 +4,10 @@ ezXSS is an easy way to test (blind) XSS.
 ## Current features
 Some features ezXSS has
 
-* Easy to use dashboard with statics, payloads, view reports, search reports and more
+* Easy to use dashboard with statics, payloads, view/share/search reports and more
 * Payload generator
-* Email alert on payload
-* Full page screenshot
+* Instant email alert on payload
+* Custom javascript for extra testing
 * Prevent double payloads from saving or alerting
 * Share reports with other ezXSS users
 * Easily manage and view reports in the system
@@ -16,7 +16,7 @@ Some features ezXSS has
 * The following information is collected on a vulnerable page:
     * The URL of the page
     * IP Address
-    * Any page referer
+    * Any page referer (or share referer)
     * The User-Agent
     * All Non-HTTP-Only Cookies
     * Full HTML DOM source of the page
@@ -27,7 +27,7 @@ Some features ezXSS has
 ## Required
 * PHP 5.5 or up
 * A domain name (consider a short one)
-* An SSL (consider Cloudflare or Let's Encrypt for a free SSL)
+* An SSL if you want to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL)
 
 ## Installation
 ezXSS is ez to install
@@ -37,10 +37,10 @@ ezXSS is ez to install
 * Go to /manage/install in your browser and setup a password and email
 * Done! That was ez right?
 
-## Todo
-Some things I am planning to add/change in a future version. This list is sorted on how important/fast it is going to be added.
+## To do list
+Some things I am planning to add/change in future versions. This list is sorted on how important/fast it is going to be added.
 
-Adding in a future versions (top to bottom for priority):
+Adding in a future versions:
 * Block certain domains
 * Make all files OOP (1 file left)
 * Save custom JS for later
@@ -54,7 +54,7 @@ Adding in a future versions (top to bottom for priority):
 * You got ideas?
 
 ## Why?
-If you want to host [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) yourself you need a linux server and a Mailgun account. I wanted to create a just PHP version which you can even host on shared hostings or localhost. ezXSS has almost all features that xsshunter has and even more (and adding).
+If you want to host [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) yourself you need a linux server and a Mailgun account. I wanted to create a just PHP version which you can even host on shared hostings or local. ezXSS has almost all features that xsshunter has and even more (and adding).
 
 ## Screenshots of 2.0
 ![Dashboard](http://i.imgur.com/9jE9w1S.png)
