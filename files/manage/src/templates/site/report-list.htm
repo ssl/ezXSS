@@ -11,8 +11,9 @@
         <div class=dropdown-backdrop></div>
 
         <ul class=dropdown-menu>
-          <li><a href="share?id={{report[id]}}">Share</a></li>
+          <li><a class="share" report-id="{{report[id]}}" data-toggle="modal" data-target="#shareModal">Share</a></li>
           <li><a class="delete" report-id="{{report[id]}}">Delete</a></li>
+          <li><a class="archive" report-id="{{report[id]}}">Archive</a></li>
         </ul>
 
       </div>

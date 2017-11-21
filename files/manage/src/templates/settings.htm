@@ -105,6 +105,68 @@
           </div>
         </div>
 
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Domain settings</div>
+              <div class="panel-body">
+                <p>If you use a other domain for the payload, you can edit this here.</p>
+                <form class="form" id="domain-settings">
+                  <div class="form-group">
+                    {{csrf[]}}
+                    <label class="control-label" for="domain">Payload domain</label>
+                    <input type="text" name="domain" id="domain" value="{{settings[payload-domain]}}" class="form-control">
+                  </div>
+                  <button class="btn">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Block domains</div>
+              <div class="panel-body">
+                <p>If you get too many reports from a domain, you can block the domain. Seperate multiple domains with a comma.</p>
+                <form class="form" id="blockeddomains-settings">
+                  <div class="form-group">
+                    {{csrf[]}}
+                    <label class="control-label" for="domains">Blocked domains</label>
+                    <input type="text" name="domains" id="domains" value="{{settings[blocked-domains]}}" class="form-control">
+                  </div>
+                  <button class="btn">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">API key</div>
+              <div class="panel-body">
+                <p>In case you need to view/create a API key. Creating a new API key will deactive the old key.</p>
+                <form class="form" id="blockeddomains-settings">
+                  <div class="form-group">
+                    {{csrf[]}}
+                    <div class="input-group">
+                      <input type="text" name="apiKey" id="apiKey" value="{{settings[api-key]}}" disabled class="form-control">
+                      <span class="input-group-addon"><a class="api">Create new</a></span>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
       </div>
   </section>
 </div>
+
+<script type="text/javascript">
+  var csrf = "{{csrf[true]}}";
+</script>

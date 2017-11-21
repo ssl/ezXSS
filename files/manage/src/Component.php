@@ -134,7 +134,7 @@
       }
     }
 
-    public function report() {
+    public function report($archive) {
       if(isset($_GET['id'])) {
         $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id LIMIT 1', [':id' => $_GET['id']]);
 
@@ -142,6 +142,9 @@
           $html = file_get_contents(__DIR__ . '/templates/site/report-id.htm');
           preg_match_all('/{{(.*?)\[(.*?)\]}}/', $html, $matches);
           foreach($matches[1] as $key => $value) {
+            if($matches[2][$key] == "time") {
+              $report["{$matches[2][$key]}"] = date("F j, Y, g:i a", $report["{$matches[2][$key]}"]);
+            }
             $html = str_replace($matches[0][$key], htmlspecialchars($report["{$matches[2][$key]}"]), $html);
           }
         } else {
@@ -150,11 +153,11 @@
 
       } else {
         if(isset($_GET['search'])) {
-          $query = 'SELECT * FROM reports WHERE id = :search OR ip = :search OR origin = :search LIMIT ' . ($this->page() * 50) . ',50';
-          $array = [':search' => $_GET['search']];
+          $query = 'SELECT * FROM reports WHERE uri LIKE :search OR ip LIKE :search OR origin LIKE :search LIMIT ' . ($this->page() * 50) . ',50';
+          $array = [':search' => '%' . $_GET['search'] . '%'];
         } else {
-          $query = 'SELECT * FROM reports ORDER BY id DESC LIMIT ' . ($this->page() * 50) . ',50';
-          $array = [];
+          $query = 'SELECT * FROM reports WHERE archive = :archive ORDER BY id DESC LIMIT ' . ($this->page() * 50) . ',50';
+          $array = [':archive' => $archive];
         }
 
         $htmlTemplate = file_get_contents(__DIR__ . '/templates/site/report-list.htm');

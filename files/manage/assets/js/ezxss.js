@@ -36,6 +36,27 @@ $(document).ready(function() {
       });
     });
 
+    $(".archive").click(function() {
+      var id = $(this).attr('report-id');
+      request("archive-report", {id:id,csrf:csrf}).then(function(r) {
+        $("#"+id).fadeOut( "slow", function() {});
+      });
+    });
+
+    $(".share").click(function() {
+      var id = $(this).attr('report-id');
+      $('#reportid').val(id);
+    });
+
+    $(".api").click(function() {
+      request("new-api", {csrf:csrf}).then(function(r) {
+        $('#apiKey').val("");
+        $("#alert").html('<div class="alert" role="alert"><p class="close">×</p>' + r.echo + '</div>');
+        $("#alert").hide();
+        $("#alert").slideDown("slow");
+      });
+    });
+
 
     $('.left-nav-toggle a').on('click', function(event){
         event.preventDefault();

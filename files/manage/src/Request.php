@@ -18,10 +18,15 @@
         case 'pwd-settings' : return $this->toJson($this->user->updatePassword($this->post('password'), $this->post('newpassword'), $this->post('newpassword2'))); break;
         case 'filter-settings' : return $this->toJson($this->user->updateFilters($this->post('save'), $this->post('emailalert'))); break;
         case 'twofactor-settings' : return $this->toJson($this->user->updateTwofactor($this->post('secret'), $this->post('code'))); break;
+        case 'domain-settings' : return $this->toJson($this->user->updateDomain($this->post('domain'))); break;
+        case 'blockeddomains-settings' : return $this->toJson($this->user->updateBlockedDomains($this->post('domains'))); break;
+        case 'notepad-settings' : return $this->toJson($this->user->updateNotepad($this->post('notepad'))); break;
         case 'share-others' : return $this->toJson($this->user->shareReport($this->post('reportid'), $this->post('domain'))); break;
         case 'payload-customjs' : return $this->toJson($this->user->updatePayload($this->post('customjs'))); break;
         case 'update' : return $this->toJson($this->user->updateSystem($this->post('version'))); break;
+        case 'new-api' : return $this->toJson($this->user->newApi()); break;
         case 'delete-report' : return $this->toJson($this->user->deleteReport($this->post('id'))); break;
+        case 'archive-report' : return $this->toJson($this->user->archiveReport($this->post('id'))); break;
         case 'install' : return $this->toJson($this->user->install($this->post('password'), $this->post('email'))); break;
         default : return $this->toJson('Could not found this action, what did you do?'); break;
       }

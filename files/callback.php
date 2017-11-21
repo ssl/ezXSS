@@ -1,13 +1,5 @@
 <?php
 
-  /*
-  
-  this fill will be integrated in the system in next version
-  this file will be removed in next version
-  
-  */
-
-
   echo 'github.com/ssl/ezXSS';
 
   if ($_SERVER['REQUEST_METHOD'] != 'POST') {
@@ -36,9 +28,13 @@
   date_default_timezone_set($setting['timezone']);
 
   if($setting['dompart'] > 0 && strlen($json->dom) > $setting['dompart']) {
-    $domExtra = '\n\nView full dom on the report page or change this setting on /settings';
+    $domExtra = '&#13;&#10;&#13;&#10;View full dom on the report page or change this setting on /settings';
   } else {
     $domExtra = '';
+  }
+
+  if($json->origin == $setting['blocked-domains'] || in_array($json->origin, explode(',', $setting['blocked-domains']))) {
+    exit();
   }
 
   if($setting['filter-save'] == 0 || $setting['filter-alert'] == 0) {
@@ -53,25 +49,17 @@
     }
   }
 
-  #) Create image
-  $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $json->screenshot));
-  $imageName = time() . md5($json->uri . time() . bin2hex(openssl_random_pseudo_bytes(16))) . bin2hex(openssl_random_pseudo_bytes(5));
-  $imagePath = "manage/assets/images/reports/{$imageName}.png";
-  $saveImage = fopen($imagePath,'w');
-  fwrite($saveImage, $image);
-  fclose($saveImage);
-
   #) Insert into DB
   if( ($doubleReport && $setting['filter-save'] == 1) || (!$doubleReport) ) {
-    $id = $database->lastInsertId('INSERT INTO reports (`cookies`, `dom`, `origin`, `referer`, `screenshot`, `uri`, `user-agent`, `ip`, `time`) VALUES (:cookies, :dom, :origin, :referer, :screenshot, :uri, :userAgent, :ip, :time)',
-    [':cookies' => $json->cookies, ':dom' => $json->dom, ':origin' => $json->origin, ':referer' => $json->referrer, ':screenshot' => $imageName, ':uri' => $json->uri, ':userAgent' => $json->{'user-agent'}, ':ip' => $userIP, ':time' => time()]);
+    $id = $database->lastInsertId('INSERT INTO reports (`cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`) VALUES (:cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time)',
+    [':cookies' => $json->cookies, ':dom' => $json->dom, ':origin' => $json->origin, ':referer' => $json->referrer, ':uri' => $json->uri, ':userAgent' => $json->{'user-agent'}, ':ip' => $userIP, ':time' => time()]);
   }
 
   #) Send email
   if( ($doubleReport && $setting['filter-alert'] == 1) || (!$doubleReport) ) {
     $htmlTemplate = str_replace(
-      ['{{id}}', '{{domain}}', '{{url}}', '{{ip}}', '{{referer}}', '{{user-agent}}', '{{cookies}}', '{{dom}}', '{{screenshot}}', '{{origin}}', '{{time}}'],
-      [$id, $domain, htmlspecialchars($json->uri), htmlspecialchars($userIP), htmlspecialchars($json->referrer), htmlspecialchars($json->{'user-agent'}), htmlspecialchars($json->cookies), htmlspecialchars(substr($json->dom, 0, $setting['dompart'])) . $domExtra, $domain . "/" . $imagePath, htmlspecialchars($json->origin), date('F j Y, g:i a')],
+      ['{{id}}', '{{domain}}', '{{url}}', '{{ip}}', '{{referer}}', '{{user-agent}}', '{{cookies}}', '{{dom}}', '{{origin}}', '{{time}}'],
+      [$id, $domain, htmlspecialchars($json->uri), htmlspecialchars($userIP), htmlspecialchars($json->referrer), htmlspecialchars($json->{'user-agent'}), htmlspecialchars($json->cookies), htmlspecialchars(substr($json->dom, 0, $setting['dompart'])) . $domExtra, htmlspecialchars($json->origin), date('F j Y, g:i a')],
       file_get_contents('manage/src/templates/site/mail.htm')
     );
 

@@ -8,15 +8,10 @@
           <div class="col-lg-12">
             <div class="view-header">
               <div class="header-title" style="float:left;">
-                <h3 class="m-b-xs">All reports</h3>
-                <small>View all reports, search for reports and share or delete them.</small>
+                <h3 class="m-b-xs">Archived reports</h3>
+                <small>View all archived reports, search for reports and share or delete them.</small>
               </div>
-              <div class="search hidden-xs" style="margin-top: 15px;width: 345px;float:right;">
-                <form method="get">
-                  <input type="text" value="{{get[search]}}" name="search" placeholder="Search for domain, IP or URL" class="form-control" style="float: left;width: 260px;">
-                  <button type="submit" class="btn" style="float:right;">Search</button>
-                </form>
-              </div>
+              
             </div>
             <hr>
           </div>
@@ -37,7 +32,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {{report[0]}}
+                      {{report[1]}}
                     </tbody>
                   </table>
 

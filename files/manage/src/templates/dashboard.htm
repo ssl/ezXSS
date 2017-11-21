@@ -83,7 +83,7 @@
               <div class="panel-body">
                 <div class="form-group">
                   <label class="control-label">Your version</label>
-                  <input value="v2.1" disabled class="form-control">
+                  <input value="v2.2" disabled class="form-control">
                 </div>
                 <div class="form-group">
                   <label class="control-label">Latests version</label>
@@ -94,6 +94,23 @@
                   <textarea disabled class="form-control" rows=5>{{updateStatus[body]}}</textarea>
                 </div>
                 <a class="btn" href="{{updateStatus[zipball_url]}}">Download v{{updateStatus[tag_name]}}</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="panel panel-filled">
+              <div class="panel-heading">Notepad</div>
+              <div class="panel-body">
+                <p>Here you can save some things for later, like a report id or a custom js.</p>
+                <form class="form" id="notepad-settings">
+                  <div class="form-group">
+                    {{csrf[]}}
+                    <label class="control-label" for="notepad">Notepad</label>
+                    <textarea class="form-control" name="notepad" id="notepad" rows=10>{{settings[notepad]}}</textarea>
+                  </div>
+                  <button class="btn">Save</button>
+                </form>
               </div>
             </div>
           </div>

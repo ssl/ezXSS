@@ -13,7 +13,7 @@
       if(empty($file) && $this->user->isLoggedIn()) return $this->redirect('dashboard');
       if(($file == 'login' || $file == 'install') && $this->user->isLoggedIn()) return $this->redirect('dashboard');
       if($file != 'login' && $file != 'install' && !$this->user->isLoggedIn()) return $this->redirect('login');
-      if(!in_array($file, ['login', 'dashboard', 'settings', 'reports', 'search', 'payload', 'share', 'install'])) return $this->redirect('login');
+      if(!in_array($file, ['login', 'dashboard', 'settings', 'reports', 'archive', 'api', 'payload', 'install'])) return $this->redirect('login');
 
       return $this->templateHtml($file);
     }
