@@ -45,7 +45,7 @@ Adding in a future versions:
 * Block certain domains
 * Make all files OOP (1 file left)
 * Save custom JS for later
-* Better share method
+* ~~Better share method~~
 * ~~Archive reports~~
 * Better searching with regex
 * ~~Adding more payloads & custom payload domain~~
