@@ -1,5 +1,5 @@
 # ezXSS
-ezXSS is an easy way to test (blind) XSS.
+ezXSS is an easy way to test (blind) Cross Site Scripting.
 
 ## Current features
 Some features ezXSS has
@@ -47,7 +47,7 @@ Adding in a future versions:
 * Save custom JS for later
 * ~~Better share method~~
 * ~~Archive reports~~
-* Better searching with regex
+* ~~Better searching~~
 * ~~Adding more payloads & custom payload domain~~
 * Page grabbing
 * Live JS - send JS code LIVE while the person is on the page
