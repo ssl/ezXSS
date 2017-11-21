@@ -41,14 +41,7 @@ ezXSS is ez to install
 Some things I am planning to add/change in future versions. This list is sorted on how important/fast it is going to be added.
 
 Adding in a future versions:
-* ~~Fixing some bugs (time bug on report)~~
-* ~~Block certain domains~~
 * Make all files OOP (1 file left)
-* ~~Notepad to save things like custom JS~~
-* ~~Better share method~~
-* ~~Archive reports~~
-* ~~Better searching~~
-* ~~Adding more payloads & custom payload domain~~
 * Page grabbing
 * Live JS - send JS code LIVE while the person is on the page
 * Callback API for alerts on Telegram, Chrome etc.
@@ -57,10 +50,10 @@ Adding in a future versions:
 ## Why?
 If you want to host [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) yourself you need a linux server and a Mailgun account. I wanted to create a just PHP version which you can even host on shared hostings or local. ezXSS has almost all features that xsshunter has and even more (and adding).
 
-## Screenshots of 2.0
-![Dashboard](http://i.imgur.com/9jE9w1S.png)
-![Settings](http://i.imgur.com/SZlQMQt.png)
-![Payload](http://i.imgur.com/0UCqUVa.png)
-![Share](http://i.imgur.com/EbFhVEJ.png)
-![Reports](http://i.imgur.com/z73HOPH.png)
-![Search](http://i.imgur.com/rrlFohd.png)
+## Screenshots
+
+![Dashboard](https://i.imgur.com/0us9M4M.png)
+![Settings](https://i.imgur.com/5BbdyYQ.png)
+![Payload](https://i.imgur.com/5nKDqcQ.png)
+![Reports](https://i.imgur.com/6TTXOw3.png)
+![Login](https://i.imgur.com/I9W7jxU.png)
