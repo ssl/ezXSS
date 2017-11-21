@@ -46,7 +46,7 @@ Adding in a future versions:
 * Make all files OOP (1 file left)
 * Save custom JS for later
 * Better share method
-* Archive reports
+* ~~Archive reports~~
 * Better searching with regex
 * ~~Adding more payloads & custom payload domain~~
 * Page grabbing
