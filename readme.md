@@ -48,7 +48,7 @@ Adding in a future versions:
 * Better share method
 * Archive reports
 * Better searching with regex
-* Adding more payloads
+* ~~Adding more payloads & custom payload domain~~
 * Page grabbing
 * Live JS - send JS code LIVE while the person is on the page
 * Callback API for alerts on Telegram, Chrome etc.
