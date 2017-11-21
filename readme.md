@@ -41,10 +41,10 @@ ezXSS is ez to install
 Some things I am planning to add/change in future versions. This list is sorted on how important/fast it is going to be added.
 
 Adding in a future versions:
+* Finishing the API
 * Make all files OOP (1 file left)
 * Page grabbing
 * Live JS - send JS code LIVE while the person is on the page
-* Callback API for alerts on Telegram, Chrome etc.
 * You got ideas?
 
 ## Why?
