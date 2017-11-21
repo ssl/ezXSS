@@ -41,6 +41,7 @@ ezXSS is ez to install
 Some things I am planning to add/change in future versions. This list is sorted on how important/fast it is going to be added.
 
 Adding in a future versions:
+* ~~Fixing some bugs (time bug on report)~~
 * Block certain domains
 * Make all files OOP (1 file left)
 * Save custom JS for later
