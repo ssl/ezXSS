@@ -15,7 +15,7 @@
 
     public function settings($name) {
       $setting = $this->database->fetch('SELECT * FROM settings WHERE setting = :name LIMIT 1', [':name' => $name]);
-      return htmlspecialchars($setting['value']);
+      return htmlspecialchars($setting['value'], ENT_QUOTES);
     }
 
     public function csrf($plain = false) {
