@@ -40,6 +40,8 @@ ezXSS is ez to install
 ## To do list
 Some things I am planning to add/change in future versions. This list is sorted on how important/fast it is going to be added.
 
+I'm currently busy with ezXSS 3.0.
+
 Adding in a future versions:
 * Finishing the API
 * Make all files OOP (1 file left)
