@@ -49,9 +49,6 @@ Adding in a future versions:
 * Live JS - send JS code LIVE while the person is on the page
 * You got ideas?
 
-## Why?
-If you want to host [xsshunter](https://github.com/mandatoryprogrammer/xsshunter) yourself you need a linux server and a Mailgun account. I wanted to create a just PHP version which you can even host on shared hostings or local. ezXSS has almost all features that xsshunter has and even more (and adding).
-
 ## Screenshots
 
 ![Dashboard](https://i.imgur.com/0us9M4M.png)
