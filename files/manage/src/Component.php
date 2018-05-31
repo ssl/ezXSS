@@ -110,7 +110,7 @@
 
     public function searchQuery() {
       if(isset($_GET['search'])) {
-        return '&search=' . $_GET['search'];
+        return '&search=' . htmlspecialchars($_GET['search']);
       }
     }
 
