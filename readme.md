@@ -1,6 +1,8 @@
 # ezXSS
 ezXSS is an easy way to test (blind) Cross Site Scripting.
 
+![Alert](https://ssl.github.io/cdn/ezXSS/error.png) I'm currently busy with building ezXSS 3. The whole application will be re-coded.
+
 ## Current features
 Some features ezXSS has
 
