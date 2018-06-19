@@ -16,9 +16,15 @@
 
   #) Get settings
   $setting = [];
-  foreach($database->query('SELECT * FROM settings') as $settings) {
-    $setting[$settings['setting']] = htmlspecialchars($settings['value']);
+  $settingQuery = $database->query('SELECT * FROM settings');
+  if(is_array($settingQuery)){
+    foreach($settingQuery as $settings) {
+      $setting[$settings['setting']] = htmlspecialchars($settings['value']);
+    }
+  }else{
+    die();
   }
+  
 
   #) Some information and settings
   $userIP = isset($json->shared) ? $json->ip : (isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']);
