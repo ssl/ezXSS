@@ -40,13 +40,15 @@ ezXSS is ez to install
 * Done! That was ez right?
 
 ## To do list
-Some things I am planning to add/change in future versions. This list is sorted on how important/fast it is going to be added.
+Some things I am planning to add/change in future versions.
 
 I'm currently busy with ezXSS 3.0.
 
-Adding in a future versions:
+* Cleaner dashboard
+* Enable/Disable screenshots
 * Finishing the API
-* Make all files OOP (1 file left)
+* Adding SMS/Slack/Telegram notifications
+* Fully OOP based
 * Page grabbing
 * Live JS - send JS code LIVE while the person is on the page
 * You got ideas?
