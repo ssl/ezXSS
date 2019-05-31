@@ -29,7 +29,7 @@ Some features ezXSS has
 * its just ez :-)
 
 ## Required
-* A host with PHP 7.0 or up
+* A host with PHP 7.1 or up
 * A domain name (consider a short one)
 * An SSL if you want to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL)
 
