@@ -9,6 +9,11 @@
     ini_set('display_errors', 1);
   }
 
+  if (version_compare(phpversion(), '7.1', '<')) {
+    echo 'PHP 7.1 or up is required to use ezXSS';
+    exit();
+  }
+
   $requestUrl = explode('?', $_SERVER['REQUEST_URI'])[0];
 
   if(strpos($requestUrl, '/manage/') === 0 || strpos($requestUrl, '/manage') === 0) {
