@@ -44,8 +44,6 @@ ezXSS is ez to install
 ## Demo
 For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.
 
-**If you want to buy me a beer: 1EzxssMj2wAj63LkNwRJfsjVgWxbPt2DbN**
-
 ## Screenshots
 
 ![Dashboard](https://i.imgur.com/79wSggJ.png)
