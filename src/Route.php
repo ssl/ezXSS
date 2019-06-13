@@ -76,13 +76,13 @@
         $setting[$settings['setting']] = $settings['value'];
       }
 
-      if($json->origin == $setting['blocked-domains'] || in_array($json->origin, explode(',', $setting['blocked-domains']))) {
-        return 'github.com/ssl/ezXSS';
-      }
-
       $userIp = isset($json->shared) ? $json->ip : (isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']);
       $domain = htmlspecialchars($_SERVER['SERVER_NAME']);
       $json->origin = str_replace(['https://', 'http://'], '', $json->origin);
+      
+      if($json->origin == $setting['blocked-domains'] || in_array($json->origin, explode(',', $setting['blocked-domains']))) {
+        return 'github.com/ssl/ezXSS';
+      }
 
       $doubleReport = false;
       if($setting['filter-save'] == 0 || $setting['filter-alert'] == 0) {
