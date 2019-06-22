@@ -36,10 +36,54 @@ Some features ezXSS has
 ## Installation
 ezXSS is ez to install
 
-* Clone the repository and put the files in the document root
-* Create an empty database and provide your database information in 'src/Database.php'
-* Visit /manage/install in your browser and setup a password and email
-* Done! That was ez right?
+Apache:
+    * Clone the repository and put the files in the document root ( for example - /var/www/html/ezxss )
+    * Create an empty database and provide your database information in 'src/Database.php'
+    * Visit /manage/install in your browser and setup a password and email
+    * Done! That was ez right?
+
+Nginx:
+    * Clone the repository and put the files in the document root
+    * Create an empty database and provide your database information in 'src/Database.php'
+    * Edit nginx site-enabled file, create file named ezxss.conf
+    * Add below code, change server_name to your domain name
+    * Restart your nginx server ( service nginx restart )
+    * Done! Enjoy your new ezXSS 3.0!
+
+    server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/html/ezxss;
+        client_max_body_size 150m;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name 'YOUR DOMAIN NAME';
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST';
+        add_header 'Access-Control-Allow-Headers' 'origin, x-requested-with, content-type';
+
+        autoindex off; 
+        location /
+        {
+                if ($uri !~ "assets")
+                {
+                        set $rule_0 1$rule_0;
+                }
+
+                if ($rule_0 = "1")
+                {
+                        rewrite ^/(.*)$ /index.php;
+                }
+        }
+
+        location ~ \.php$ {
+            include snippets/fastcgi-php.conf;
+            fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+        }   
+    }
+
+
 
 ## Demo
 For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.
