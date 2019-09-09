@@ -61,7 +61,7 @@
         return 'The password you entered is not valid.';
       }
 
-      if(strlen($secret['value']) == 16 && $this->basic->getCode($secretCheck['value']) != $code) {
+      if(strlen($secret['value']) == 16 && $this->basic->getCode($secret['value']) != $code) {
         return 'The code is incorrect.';
       }
 
