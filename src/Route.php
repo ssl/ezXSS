@@ -155,6 +155,23 @@
       );
     }
 
+/*
+	* Return javascript code for import payload
+	* @method jsPayloadImport
+	* @return Javascript payload code for import usage
+*/
+    public function jsPayloadImport() {
+      if(!$this->database->rowCount('SELECT * FROM settings') > 0) {
+        return $this->redirect('install');
+      }
+
+      return str_replace(
+        ['{{domain}}'],
+        [$this->basic->domain()],
+        $this->getFile('payload_import', 'js')
+      );
+    }
+
     /**
   	* Parse values from template
   	* @method parseTemplate

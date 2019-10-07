@@ -45,4 +45,14 @@
       echo $route->jsPayload();
     }
 
+    if($requestUrl == '/i') {
+      header('Content-Type: application/x-javascript');
+	//header('Access-Control-Allow-Origin: *');
+	//header('Access-Control-Allow-Methods: GET, POST');
+	//header('Access-Control-Allow-Headers: origin, x-requested-with, content-type');
+
+      echo $route->jsPayloadImport();
+    }
+
+
   }
