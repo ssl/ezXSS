@@ -62,10 +62,10 @@
     public function statistics($branch) {
       switch($branch) {
         case 'total' :
-            return $this->database->rowCount('SELECT * FROM reports', []);
+            return ($this->database->fetch('SELECT COUNT(DISTINCT id) FROM reports', []))[0];
             break;
         case 'week' :
-            return $this->database->rowCount('SELECT * FROM reports WHERE time > :time', [':time' => time()-604800]);
+            return ($this->database->fetch('SELECT COUNT(DISTINCT id) FROM reports WHERE time > :time', [':time' => time()-604800]))[0];
             break;
         case 'totaldomains' :
             return ($this->database->fetch('SELECT COUNT(DISTINCT origin) FROM reports', []))[0];
@@ -74,7 +74,7 @@
             return ($this->database->fetch('SELECT COUNT(DISTINCT origin) FROM reports WHERE time > :time', [':time' => time()-604800]))[0];
             break;
         case 'totalshared' :
-            return $this->database->rowCount('SELECT * FROM reports WHERE referer LIKE "Shared via %"', []);
+            return ($this->database->fetch('SELECT COUNT(DISTINCT id) FROM reports WHERE referer LIKE "Shared via %"', []))[0];
             break;
       }
 
