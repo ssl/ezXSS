@@ -103,7 +103,7 @@
     public function repoInfo($key) {
       if($this->releases === []) {
         try {
-          $ch = curl_init('https://status.ezxss.com/?v=3.0');
+          $ch = curl_init('https://status.ezxss.com/?v=3.1');
           curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
           curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
           curl_setopt($ch, CURLOPT_HTTPHEADER, ['User-Agent: ezXSS']);
