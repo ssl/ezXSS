@@ -172,6 +172,22 @@
       );
     }
 
+/*
+	* Return javascript code for import payload with screenshot functions
+*/
+    public function jsPayloadImportScreen() {
+      if(!$this->database->rowCount('SELECT * FROM settings') > 0) {
+        return $this->redirect('install');
+      }
+
+      return str_replace(
+        ['{{domain}}', '{{screenshot}}'],
+        [$this->basic->domain(), (($this->database->fetchSetting('screenshot')) ? $this->getFile('screenshot', 'js') : '')],
+        $this->getFile('payload_import_screen', 'js')
+      );
+    }
+
+
     /**
   	* Parse values from template
   	* @method parseTemplate
