@@ -175,10 +175,10 @@
     */
     public function reportsList($archive) {
       if(isset($_GET['search'])) {
-        $query = 'SELECT * FROM reports WHERE uri LIKE :uri OR ip LIKE :ip OR origin LIKE :origin LIMIT :limit,50';
+        $query = 'SELECT id,shareid,uri,ip,origin FROM reports WHERE uri LIKE :uri OR ip LIKE :ip OR origin LIKE :origin LIMIT :limit,50';
         $array = [':uri' => '%' . $_GET['search'] . '%', ':ip' => '%' . $_GET['search'] . '%', ':origin' => '%' . $_GET['search'] . '%', ':limit' => $this->page() * 50];
       } else {
-        $query = 'SELECT * FROM reports WHERE archive = :archive ORDER BY id DESC LIMIT :limit,50';
+        $query = 'SELECT id,shareid,uri,ip,origin FROM reports WHERE archive = :archive ORDER BY id DESC LIMIT :limit,50';
         $array = [':archive' => $archive, ':limit' => $this->page() * 50];
       }
 
