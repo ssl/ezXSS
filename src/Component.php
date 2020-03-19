@@ -211,7 +211,16 @@
     */
     public function report($key) {
       if($this->reportInfo === []) {
-        $this->reportInfo = $this->database->fetch('SELECT * FROM reports WHERE id = :id OR shareid = :id LIMIT 1', [':id' => explode('/', $_SERVER['REQUEST_URI'])[3]]);
+        $id = explode('/', $_SERVER['REQUEST_URI'])[3];
+
+        if(is_numeric($id)) {
+          if(!$this->user->isLoggedIn()) {
+            return header('Location: /manage/login');
+          }
+          $this->reportInfo = $this->database->fetch('SELECT * FROM reports WHERE id = :id LIMIT 1', [':id' => $id]);
+        } else {
+          $this->reportInfo = $this->database->fetch('SELECT * FROM reports WHERE shareid = :id LIMIT 1', [':id' => $id]);
+        }
 
         if(!isset($this->reportInfo['id'])) {
           return header('Location: /manage/reports');
