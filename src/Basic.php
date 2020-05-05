@@ -55,7 +55,7 @@
 
               <li class="nav-info">
                 <i class="pe pe-7s-shield text-accent"></i>
-                <div class="m-t-xs"><span class="c-white">ezXSS v3.1</span> github.com/ssl/ezxss</div>
+                <div class="m-t-xs"><span class="c-white">ezXSS v3.2</span> github.com/ssl/ezxss</div>
               </li>
 
               <li class="nav-category">Main</li>
@@ -86,7 +86,7 @@ HTML;
 
               <li class="nav-info">
                 <i class="pe pe-7s-shield text-accent"></i>
-                <div class="m-t-xs"><span class="c-white">ezXSS v3.1</span> github.com/ssl/ezxss</div>
+                <div class="m-t-xs"><span class="c-white">ezXSS v3.2</span> github.com/ssl/ezxss</div>
               </li>
 
             </ul>

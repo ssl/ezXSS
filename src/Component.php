@@ -103,7 +103,7 @@
     public function repoInfo($key) {
       if($this->releases === []) {
         try {
-          $ch = curl_init('https://status.ezxss.com/?v=3.1');
+          $ch = curl_init('https://status.ezxss.com/?v=3.2');
           curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
           curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
           curl_setopt($ch, CURLOPT_HTTPHEADER, ['User-Agent: ezXSS']);
@@ -175,10 +175,10 @@
     */
     public function reportsList($archive) {
       if(isset($_GET['search'])) {
-        $query = 'SELECT * FROM reports WHERE uri LIKE :uri OR ip LIKE :ip OR origin LIKE :origin LIMIT :limit,50';
+        $query = 'SELECT id,shareid,uri,ip,origin FROM reports WHERE uri LIKE :uri OR ip LIKE :ip OR origin LIKE :origin LIMIT :limit,50';
         $array = [':uri' => '%' . $_GET['search'] . '%', ':ip' => '%' . $_GET['search'] . '%', ':origin' => '%' . $_GET['search'] . '%', ':limit' => $this->page() * 50];
       } else {
-        $query = 'SELECT * FROM reports WHERE archive = :archive ORDER BY id DESC LIMIT :limit,50';
+        $query = 'SELECT id,shareid,uri,ip,origin FROM reports WHERE archive = :archive ORDER BY id DESC LIMIT :limit,50';
         $array = [':archive' => $archive, ':limit' => $this->page() * 50];
       }
 
@@ -211,7 +211,16 @@
     */
     public function report($key) {
       if($this->reportInfo === []) {
-        $this->reportInfo = $this->database->fetch('SELECT * FROM reports WHERE id = :id OR shareid = :id LIMIT 1', [':id' => explode('/', $_SERVER['REQUEST_URI'])[3]]);
+        $id = explode('/', $_SERVER['REQUEST_URI'])[3];
+
+        if(is_numeric($id)) {
+          if(!$this->user->isLoggedIn()) {
+            return header('Location: /manage/login');
+          }
+          $this->reportInfo = $this->database->fetch('SELECT * FROM reports WHERE id = :id LIMIT 1', [':id' => $id]);
+        } else {
+          $this->reportInfo = $this->database->fetch('SELECT * FROM reports WHERE shareid = :id LIMIT 1', [':id' => $id]);
+        }
 
         if(!isset($this->reportInfo['id'])) {
           return header('Location: /manage/reports');
