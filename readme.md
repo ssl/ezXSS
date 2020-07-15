@@ -1,5 +1,6 @@
 # ezXSS docker-compose with traefik
 ezXSS is an easy way for penetration testers and bug bounty hunters to test (blind) Cross Site Scripting.
+
 Now even better running inside two containers (app+db) for easy deployment!
 
 ## Current features
