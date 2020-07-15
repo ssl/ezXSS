@@ -1,5 +1,6 @@
-# ezXSS
+# ezXSS docker-compose with traefik
 ezXSS is an easy way for penetration testers and bug bounty hunters to test (blind) Cross Site Scripting.
+Now even better running inside two containers (app+db) for easy deployment!
 
 ## Current features
 Some features ezXSS has
@@ -29,17 +30,17 @@ Some features ezXSS has
 * its just ez :-)
 
 ## Required
-* A host with PHP 7.1 or up
+* A host with docker and docker-compose
 * A domain name (consider a short one)
-* An SSL if you want to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL)
+* traefik for reverse proxy stuff
 
 ## Installation
-ezXSS is ez to install
+ezXSS is now even easier to use:
 
-* Clone the repository and put the files in the document root
-* Create an empty database and provide your database information in 'src/Database.php'
-* Visit /manage/install in your browser and setup a password and email
-* Done! That was ez right?
+* Clone the repository 
+* docker-compose up
+* ?
+* Profit!
 
 ## Demo
 For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.
