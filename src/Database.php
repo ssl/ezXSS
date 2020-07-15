@@ -2,10 +2,10 @@
 
   class Database {
 
-    private $databaseHost = '127.0.0.1';
-    private $databaseUser = '';
-    private $databasePassword = '';
-    private $databaseName = '';
+    private $databaseHost = getenv('DATABASE_HOST');
+    private $databaseUser = getenv('DATABASE_USERT');
+    private $databasePassword = getenv('DATABASE_PASSWORD');
+    private $databaseName = getenv('DATABASE_NAME');
     private $DB;
 
     /**
