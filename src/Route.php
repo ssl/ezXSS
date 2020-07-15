@@ -76,7 +76,7 @@
         $setting[$settings['setting']] = $settings['value'];
       }
 
-      $userIp = isset($json->shared) ? $json->ip : (isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']);
+      $userIp = isset($json->shared) ? $json->ip : (isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : (isset($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : $_SERVER['REMOTE_ADDR']));
       $domain = htmlspecialchars($_SERVER['SERVER_NAME']);
       $json->origin = str_replace(['https://', 'http://'], '', $json->origin);
       
