@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  ezxssdb:
+    container_name: ezxssdb
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=example
+      - MYSQL_DATABASE=database
+    volumes:
+      - ./ezxssdb:/var/lib/mysql
+  ezxss:
+    image: romeoz/docker-apache-php:latest
+    container_name: ezxss
+    expose: 
+      - "80"
+    volumes:
+      - .:/var/www/app
+    environment:
+      - DATABASE_HOST=ezxssdb
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=example
+      - DATABASE_NAME=database
+    depends_on:
+      - ezxssdb
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ezxss.tls=true"
+      - "traefik.http.routers.ezxss.rule=Host(`host.tld`)"
+      - "traefik.http.routers.ezxss.entrypoints=websecure"
+      - "traefik.http.services.ezxss.loadbalancer.server.port=80"
