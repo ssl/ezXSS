@@ -12,14 +12,11 @@ services:
     volumes:
       - ./ezxssdb:/var/lib/mysql
   ezxss:
-    image: romeoz/docker-apache-php:latest
-    container_name: ezxss
-    expose: 
-      - "80"
+    build: ./php
     ports:
       - "80:80"
     volumes:
-      - .:/var/www/app
+      - .:/var/www/html
     environment:
       - DATABASE_HOST=ezxssdb
       - DATABASE_USER=root
