@@ -16,6 +16,8 @@ services:
     container_name: ezxss
     expose: 
       - "80"
+    ports:
+      - "80:80"
     volumes:
       - .:/var/www/app
     environment:
