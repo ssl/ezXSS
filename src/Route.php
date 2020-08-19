@@ -127,10 +127,9 @@
             $this->basic->htmlBlocks('mail')
           );
 
-          $headers[] = 'From: ezXSS';
           $headers[] = 'MIME-Version: 1.0';
           $headers[] = 'Content-type: text/html; charset=iso-8859-1';
-          mail($setting['email'], '[ezXSS] XSS on ' . htmlspecialchars($json->uri), $htmlTemplate, implode("\r\n", $headers));
+          mail($setting['email'], 'XSS on ' . htmlspecialchars($json->uri), $htmlTemplate, implode("\r\n", $headers));
         }
       }
 
