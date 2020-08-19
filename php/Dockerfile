@@ -13,6 +13,11 @@ RUN touch /var/log/msmtp.log
 RUN chown www-data:www-data /etc/msmtprc
 RUN chown www-data:www-data /var/log/msmtp.log
 
+# Fix screenshot folder permissions
+RUN mkdir /var/www/html/assets/ && mkdir /var/www/html/assets/img
+RUN chmod 777 /var/www/html/assets/img
+
+
 
 # config php.ini
 RUN echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
