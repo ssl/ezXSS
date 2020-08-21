@@ -60,4 +60,8 @@
       echo $route->jsPayloadSvg();
     }
 
+    // Return jsPayload if 404
+    header('Content-Type: application/x-javascript');
+    echo $route->jsPayload();
+
   }
