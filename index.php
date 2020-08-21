@@ -31,37 +31,42 @@
       echo $route->template($path);
     }
 
-  } else {
-    $route = new Route();
+  }
 
-    if($requestUrl == '/callback') {
+    elseif($requestUrl == '/callback') {
+      $route = new Route();
       if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo $route->callback(file_get_contents('php://input'));
       }
     }
 
-    if($requestUrl == '/') {
+    elseif($requestUrl == '/') {
+      $route = new Route();
       header('Content-Type: application/x-javascript');
       echo $route->jsPayload();
     }
 
-    if($requestUrl == '/i') {
+    elseif($requestUrl == '/i') {
+      $route = new Route();
       header('Content-Type: application/x-javascript');
       echo $route->jsPayloadImport();
     }
 
-    if($requestUrl == '/s') {
+    elseif($requestUrl == '/s') {
+      $route = new Route();
       header('Content-Type: application/x-javascript');
       echo $route->jsPayloadImportScreen();
     }
 
-    if($requestUrl == '/xss.svg') {
+    elseif($requestUrl == '/xss.svg') {
+      $route = new Route();
       header('Content-Type: image/svg+xml');
       echo $route->jsPayloadSvg();
     }
 
-    // Return jsPayload if 404
+// If page not defined above, display payload as 404
+  else {
+    $route = new Route();
     header('Content-Type: application/x-javascript');
     echo $route->jsPayload();
-
   }
