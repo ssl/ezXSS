@@ -186,6 +186,21 @@
       );
     }
 
+    /*
+    	* Return code for xss via svg
+    	* @method jsPayloadSvg
+    */
+        public function jsPayloadSvg() {
+          if(!$this->database->rowCount('SELECT * FROM settings') > 0) {
+            return $this->redirect('install');
+          }
+
+          return str_replace(
+            ['{{domain}}'],
+            [$this->basic->domain()],
+            $this->getFile('xss', 'svg')
+          );
+        }
 
     /**
   	* Parse values from template

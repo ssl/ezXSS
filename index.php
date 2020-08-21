@@ -55,5 +55,9 @@
       echo $route->jsPayloadImportScreen();
     }
 
+    if($requestUrl == '/xss.svg') {
+      header('Content-Type: image/svg+xml');
+      echo $route->jsPayloadSvg();
+    }
 
   }
