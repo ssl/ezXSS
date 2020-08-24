@@ -1,328 +1,404 @@
 <?php
 
-  class User {
+class User
+{
 
     /**
-  	* Default values stored & session info
-  	* @method __construct
-  	*/
-    public function __construct() {
-      $this->database = new Database();
-      $this->basic = new Basic();
+     * Default values stored & session info
+     * @method __construct
+     */
+    public function __construct()
+    {
+        $this->database = new Database();
+        $this->basic = new Basic();
 
-      if(!isset($_SESSION)) {
-        session_set_cookie_params(6000000, '/', null, false, true);
-        session_start();
-      }
+        if (!isset($_SESSION)) {
+            session_set_cookie_params(6000000, '/', null, false, true);
+            session_start();
+        }
     }
 
     /**
-  	* Check if user is logged in
-  	* @method isLoggedIn
-    * @return boolean          If user is logged in true/false
-  	*/
-    public function isLoggedIn() {
-      return (isset($_SESSION['login'])) ? $_SESSION['login'] : false;
+     * Get or create a csrf-token
+     * @method getCsrf
+     * @return string 32 character long csrf-token
+     */
+    public function getCsrf()
+    {
+        return (!isset($_SESSION['csrfToken'])) ? $_SESSION['csrfToken'] = bin2hex(
+            openssl_random_pseudo_bytes(32)
+        ) : $_SESSION['csrfToken'];
     }
 
     /**
-  	* Get or create a csrf-token
-  	* @method getCsrf
-    * @return string          32 character long csrf-token
-  	*/
-    public function getCsrf() {
-      return (!isset($_SESSION['csrfToken'])) ? $_SESSION['csrfToken'] = bin2hex(openssl_random_pseudo_bytes(32)) : $_SESSION['csrfToken'];
+     * Check credentials and login user
+     * @method install
+     * @param string $password Password for login
+     * @param string $code 2FA code
+     * @return string error/redirect
+     */
+    public function login($password, $code)
+    {
+        if ($this->isLoggedIn()) {
+            return ['redirect' => 'dashboard'];
+        }
+
+        $passwordHash = $this->database->fetch('SELECT * FROM settings WHERE setting = "password"');
+        $secret = $this->database->fetch('SELECT * FROM settings WHERE setting = "secret"');
+
+        if (!password_verify($password, $passwordHash['value'])) {
+            return 'The password you entered is not valid.';
+        }
+
+        if (strlen($secret['value']) == 16 && $this->basic->getCode($secret['value']) != $code) {
+            return 'The code is incorrect.';
+        }
+
+        $this->createSession();
+
+        if (isset($_SESSION['redirect'])) {
+            return ['redirect' => $_SESSION['redirect']];
+            unsset($_SESSION['redirect']);
+        } else {
+            return ['redirect' => 'dashboard'];
+        }
     }
 
     /**
-  	* Set settings in session cookie
-  	* @method createSession
-  	*/
-    public function createSession() : void {
-      $_SESSION['login'] = true;
+     * Check if user is logged in
+     * @method isLoggedIn
+     * @return boolean If user is logged in true/false
+     */
+    public function isLoggedIn()
+    {
+        return (isset($_SESSION['login'])) ? $_SESSION['login'] : false;
     }
 
     /**
-  	* Check credentials and login user
-  	* @method install
-    * @param string $password Password for login
-    * @param string $code     2FA code
-    * @return string          error/redirect
-  	*/
-    public function login($password, $code) {
-      if($this->isLoggedIn()) {
+     * Set settings in session cookie
+     * @method createSession
+     */
+    public function createSession(): void
+    {
+        $_SESSION['login'] = true;
+    }
+
+    /**
+     * Install website
+     * @method install
+     * @param string $password Password for login
+     * @param string $email Email for email alert
+     * @return string error/redirect
+     */
+    public function install($password, $email)
+    {
+        if ($this->database->rowCount('SELECT * FROM settings') > 0) {
+            return 'This website is already installed.';
+        }
+
+        if (strlen($password) < 8) {
+            return 'The password needs to be atleast 8 characters long.';
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return 'This is not a correct email address.';
+        }
+
+        $this->database->query(
+            'CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`setting` varchar(500) NOT NULL,`value` text NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;'
+        );
+        $this->database->query(
+            'CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`shareid` VARCHAR(50) NOT NULL,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,`archive` int(11) DEFAULT 0,`screenshot` LONGTEXT NULL DEFAULT NULL,`localstorage` LONGTEXT NULL DEFAULT NULL, `sessionstorage` LONGTEXT NULL DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;'
+        );
+        $this->database->query(
+            'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("screenshot", "0"),("secret", ""),("killswitch", "");'
+        );
+        $this->database->fetch(
+            'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain);',
+            [
+                ':password' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 11]),
+                'email' => $email,
+                ':domain' => $this->basic->domain()
+            ]
+        );
+
+        $this->createSession();
         return ['redirect' => 'dashboard'];
-      }
-
-      $passwordHash = $this->database->fetch('SELECT * FROM settings WHERE setting = "password"');
-      $secret = $this->database->fetch('SELECT * FROM settings WHERE setting = "secret"');
-
-      if (!password_verify($password, $passwordHash['value'])) {
-        return 'The password you entered is not valid.';
-      }
-
-      if(strlen($secret['value']) == 16 && $this->basic->getCode($secret['value']) != $code) {
-        return 'The code is incorrect.';
-      }
-
-      $this->createSession();
-
-      if(isset($_SESSION['redirect'])) {
-        return ['redirect' => $_SESSION['redirect']];
-        unsset($_SESSION['redirect']);
-      } else {
-        return ['redirect' => 'dashboard'];
-      }
-
     }
 
     /**
-  	* Install website
-  	* @method install
-    * @param string $password Password for login
-    * @param string $email    Email for email alert
-    * @return string          error/redirect
-  	*/
-    public function install($password, $email) {
-      if($this->database->rowCount('SELECT * FROM settings') > 0) {
-        return 'This website is already installed.';
-      }
-
-      if(strlen($password) < 8) {
-        return 'The password needs to be atleast 8 characters long.';
-      }
-
-      if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return 'This is not a correct email address.';
-      }
-
-      $this->database->query('CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`setting` varchar(500) NOT NULL,`value` text NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;');
-      $this->database->query('CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`shareid` VARCHAR(50) NOT NULL,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,`archive` int(11) DEFAULT 0,`screenshot` LONGTEXT NULL DEFAULT NULL,`localstorage` LONGTEXT NULL DEFAULT NULL, `sessionstorage` LONGTEXT NULL DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;');
-      $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("screenshot", "0"),("secret", "");');
-      $this->database->fetch('INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain);', [':password' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 11]), 'email' => $email, ':domain' => $this->basic->domain()]);
-
-      $this->createSession();
-      return ['redirect' => 'dashboard'];
-
+     * Update notepad value
+     * @method notepad
+     * @param string $notepad Value of the notepad
+     * @return string success
+     */
+    public function notepad($notepad)
+    {
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "notepad"', [':value' => $notepad]);
+        return 'Your notepad is saved!';
     }
 
     /**
-  	* Update notepad value
-  	* @method notepad
-    * @param string $notepad  Value of the notepad
-    * @return string          success
-  	*/
-    public function notepad($notepad) {
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "notepad"', [':value' => $notepad]);
-      return 'Your notepad is saved!';
-    }
-
-    /**
-    * Update main settings
-    * @method settings
-    * @param string $email    New email for alerts
-    * @param string $domPart  DOM Lenght for mail
-    * @param string $timezone Timezone for reports
-    * @param string $payload  Payload domain used
-    * @return string          success
-    */
-    public function settings($email, $domPart, $timezone, $payload) {
-      if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return 'This is not a correct email address.';
-      }
-
-      if(!is_int((int)$domPart)) {
-        return 'The dom lenght needs to be a int number.';
-      }
-
-      if(!in_array($timezone, timezone_identifiers_list())) {
-        return 'The timezone is not a valid timezone.';
-      }
-
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "email"', [':value' => $email]);
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "dompart"', [':value' => (int)$domPart]);
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "timezone"', [':value' => $timezone]);
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "payload-domain"', [':value' => $payload]);
-      $this->createSession();
-      return 'Your new settings are saved!';
-
-    }
-
-    /**
-    * Update password
-    * @method password
-    * @param string $password     Current password
-    * @param string $newPassword  New password
-    * @param string $newPassword2 New password retyped
-    * @return string              success
-    */
-    public function password($password, $newPassword, $newPassword2) {
-      $currentPassword = $this->database->fetch('SELECT * FROM settings WHERE setting = "password" LIMIT 1');
-
-      if(!password_verify($password, $currentPassword['value'])) {
-        return 'Current password is not correct.';
-      }
-
-      if(strlen($newPassword) < 8) {
-        return 'The new password needs to be atleast 8 characters long.';
-      }
-
-      if($newPassword != $newPassword2) {
-        return 'The retypted password is not the same as the new password.';
-      }
-
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "password"', [':value' => password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 11])]);
-      $this->createSession();
-
-      return 'Your new password is saved!';
-
-    }
-
-    /**
-    * Update filter values
-    * @method filter
-    * @param string $i        Filter combination id
-    * @return string          success
-    */
-    public function filter($id) {
-      switch($id) {
-        case 1 : $filterSave = 1; $filterAlert = 1; break;
-        case 2 : $filterSave = 1; $filterAlert = 0; break;
-        case 3 : $filterSave = 0; $filterAlert = 1; break;
-        case 4 : $filterSave = 0; $filterAlert = 0; break;
-        default : $filterSave = 0; $filterAlert = 0; break;
-      }
-
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-save"', [':value' => $filterSave]);
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-alert"', [':value' => $filterAlert]);
-      return 'Your new filter options are saved!';
-    }
-
-    /**
-    * Update screenshot value
-    * @method screenshot
-    * @param string $id       Filter combination id
-    * @return string          success
-    */
-    public function screenshot($value) {
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "screenshot"', [':value' => $value]);
-      return 'Your new screenshot options are saved!';
-    }
-
-    /**
-    * Update blocked domains
-    * @method blockDomains
-    * @param string $domains  List of domains
-    * @return string          success
-    */
-    public function blockDomains($domains) {
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "blocked-domains"', [':value' => $domains]);
-      return 'Your new settings are saved!';
-    }
-
-    /**
-    * Update custom payload
-    * @method payload
-    * @param string $customjs Custom created javascript code
-    * @return string          success
-    */
-    public function payload($customjs) {
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "customjs"', [':value' => $customjs]);
-      return 'Your new settings are saved!';
-    }
-
-    /**
-    * Update twofactor settings
-    * @method twofactor
-    * @param string $secret   generated secret code
-    * @param string $code     6 digit 2fa code
-    * @return string          success
-    */
-    public function twofactor($secret, $code) {
-      $secretCode = $this->database->fetch('SELECT * FROM settings WHERE setting = "secret"');
-
-      if(strlen($secret) == 16) {
-        if(strlen($secretCode['value']) == 16) {
-          return '2FA settings are already enabled.';
+     * Update main settings
+     * @method settings
+     * @param string $email New email for alerts
+     * @param string $domPart DOM Lenght for mail
+     * @param string $timezone Timezone for reports
+     * @param string $payload Payload domain used
+     * @return string success
+     */
+    public function settings($email, $domPart, $timezone, $payload)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return 'This is not a correct email address.';
         }
 
-        if(strlen($secret) != 16) {
-          return 'Secret length needs to be 16 characters long';
+        if (!is_int((int)$domPart)) {
+            return 'The dom lenght needs to be a int number.';
         }
 
-        if($this->basic->getCode($secret) != $code) {
-          return 'Code is incorrect.';
-        }
-      } else {
-        if(strlen($secretCode['value']) != 16) {
-          return '2FA settings are already disabled.';
+        if (!in_array($timezone, timezone_identifiers_list())) {
+            return 'The timezone is not a valid timezone.';
         }
 
-        if($this->basic->getCode($secretCode['value']) != $code) {
-          return 'Code is incorrect.';
-        }
-
-        $secret = 0;
-      }
-
-      $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "secret"', [':value' => $secret]);
-      return 'Your new 2FA settings are saved!';
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "email"', [':value' => $email]);
+        $this->database->fetch(
+            'UPDATE settings SET value = :value WHERE setting = "dompart"',
+            [':value' => (int)$domPart]
+        );
+        $this->database->fetch(
+            'UPDATE settings SET value = :value WHERE setting = "timezone"',
+            [':value' => $timezone]
+        );
+        $this->database->fetch(
+            'UPDATE settings SET value = :value WHERE setting = "payload-domain"',
+            [':value' => $payload]
+        );
+        $this->createSession();
+        return 'Your new settings are saved!';
     }
 
     /**
-    * Update archive status
-    * @method archiveReport
-    * @param string $id       report id
-    * @param string $archive  either 1 of 0
-    * @return string          success
-    */
-    public function archiveReport($id, $archive) {
-      $this->database->fetch('UPDATE reports SET archive = :archive WHERE id = :id', [':id' => $id, 'archive' => $archive]);
-      return 'Report is archived!';
+     * Update password
+     * @method password
+     * @param string $password Current password
+     * @param string $newPassword New password
+     * @param string $newPassword2 New password retyped
+     * @return string success
+     */
+    public function password($password, $newPassword, $newPassword2)
+    {
+        $currentPassword = $this->database->fetch('SELECT * FROM settings WHERE setting = "password" LIMIT 1');
+
+        if (!password_verify($password, $currentPassword['value'])) {
+            return 'Current password is not correct.';
+        }
+
+        if (strlen($newPassword) < 8) {
+            return 'The new password needs to be atleast 8 characters long.';
+        }
+
+        if ($newPassword != $newPassword2) {
+            return 'The retypted password is not the same as the new password.';
+        }
+
+        $this->database->fetch(
+            'UPDATE settings SET value = :value WHERE setting = "password"',
+            [':value' => password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 11])]
+        );
+        $this->createSession();
+
+        return 'Your new password is saved!';
     }
 
     /**
-    * Delete report
-    * @method deleteReport
-    * @param string $id       report id
-    * @return string          success
-    */
-    public function deleteReport($id) {
-      $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id', [':id' => $id]);
-      unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
+     * Update filter values
+     * @method filter
+     * @param string $id Filter combination id
+     * @return string success
+     */
+    public function filter($id)
+    {
+        switch ($id) {
+            case 1 :
+                $filterSave = 1;
+                $filterAlert = 1;
+                break;
+            case 2 :
+                $filterSave = 1;
+                $filterAlert = 0;
+                break;
+            case 3 :
+                $filterSave = 0;
+                $filterAlert = 1;
+                break;
+            case 4 :
+                $filterSave = 0;
+                $filterAlert = 0;
+                break;
+            default :
+                $filterSave = 0;
+                $filterAlert = 0;
+                break;
+        }
 
-      $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
-      return 'Report is deleted!';
+        $this->database->fetch(
+            'UPDATE settings SET value = :value WHERE setting = "filter-save"',
+            [':value' => $filterSave]
+        );
+        $this->database->fetch(
+            'UPDATE settings SET value = :value WHERE setting = "filter-alert"',
+            [':value' => $filterAlert]
+        );
+        return 'Your new filter options are saved!';
     }
 
     /**
-    * Share report
-    * @method shareReport
-    * @param string $id       report id
-    * @param string $domain   domain to share with
-    * @return string          success
-    */
-    public function shareReport($id, $domain) {
-      $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id LIMIT 1', [':id' => $id]);
-
-      if(!isset($report['id'])) {
-        return 'This report does not exists.';
-      }
-
-      $report['referrer'] = !empty($report['referer']) ? 'Shared via ' . $_SERVER['SERVER_NAME'] . ' - '. $report['referer'] : 'Shared via ' . $_SERVER['SERVER_NAME'];
-      $report['shared'] = true;
-
-      $cb = curl_init((parse_url($domain, PHP_URL_SCHEME) ? '' : 'https://') . $domain . '/callback');
-      curl_setopt($cb, CURLOPT_CUSTOMREQUEST, 'POST');
-      curl_setopt($cb, CURLOPT_POSTFIELDS, json_encode($report));
-      curl_setopt($cb, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($cb, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-      $result = curl_exec($cb);
-
-      if($result != 'github.com/ssl/ezXSS') {
-        return 'Unable to find a valid ezXSS installation. Please check the domain.';
-      }
-
-      return 'Report is successfully shared!';
+     * Update screenshot value
+     * @method screenshot
+     * @param string $id Filter combination id
+     * @return string success
+     */
+    public function screenshot($value)
+    {
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "screenshot"', [':value' => $value]);
+        return 'Your new screenshot options are saved!';
     }
-  }
+
+    /**
+     * Update blocked domains
+     * @method blockDomains
+     * @param string $domains List of domains
+     * @return string success
+     */
+    public function blockDomains($domains)
+    {
+        $this->database->fetch(
+            'UPDATE settings SET value = :value WHERE setting = "blocked-domains"',
+            [':value' => $domains]
+        );
+        return 'Your new settings are saved!';
+    }
+
+    /**
+     * Update custom payload
+     * @method payload
+     * @param string $customjs Custom created javascript code
+     * @return string success
+     */
+    public function payload($customjs)
+    {
+        $this->database->fetch(
+            'UPDATE settings SET value = :value WHERE setting = "customjs"',
+            [':value' => $customjs]
+        );
+        return 'Your new settings are saved!';
+    }
+
+    /**
+     * Update twofactor settings
+     * @method twofactor
+     * @param string $secret generated secret code
+     * @param string $code 6 digit 2fa code
+     * @return string success
+     */
+    public function twofactor($secret, $code)
+    {
+        $secretCode = $this->database->fetch('SELECT * FROM settings WHERE setting = "secret"');
+
+        if (strlen($secret) == 16) {
+            if (strlen($secretCode['value']) == 16) {
+                return '2FA settings are already enabled.';
+            }
+
+            if (strlen($secret) != 16) {
+                return 'Secret length needs to be 16 characters long';
+            }
+
+            if ($this->basic->getCode($secret) != $code) {
+                return 'Code is incorrect.';
+            }
+        } else {
+            if (strlen($secretCode['value']) != 16) {
+                return '2FA settings are already disabled.';
+            }
+
+            if ($this->basic->getCode($secretCode['value']) != $code) {
+                return 'Code is incorrect.';
+            }
+
+            $secret = 0;
+        }
+
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "secret"', [':value' => $secret]);
+        return 'Your new 2FA settings are saved!';
+    }
+
+    /**
+     * Update archive status
+     * @method archiveReport
+     * @param string $id report id
+     * @param string $archive either 1 of 0
+     * @return string success
+     */
+    public function archiveReport($id, $archive)
+    {
+        $this->database->fetch(
+            'UPDATE reports SET archive = :archive WHERE id = :id',
+            [':id' => $id, 'archive' => $archive]
+        );
+        return 'Report is archived!';
+    }
+
+    /**
+     * Delete report
+     * @method deleteReport
+     * @param string $id report id
+     * @return string success
+     */
+    public function deleteReport($id)
+    {
+        $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id', [':id' => $id]);
+        unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
+
+        $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
+        return 'Report is deleted!';
+    }
+
+    /**
+     * Share report
+     * @method shareReport
+     * @param string $id report id
+     * @param string $domain domain to share with
+     * @return string success
+     */
+    public function shareReport($id, $domain)
+    {
+        $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id LIMIT 1', [':id' => $id]);
+
+        if (!isset($report['id'])) {
+            return 'This report does not exists.';
+        }
+
+        $report['referrer'] = !empty($report['referer']) ? 'Shared via ' . $_SERVER['SERVER_NAME'] . ' - ' . $report['referer'] : 'Shared via ' . $_SERVER['SERVER_NAME'];
+        $report['shared'] = true;
+
+        $cb = curl_init((parse_url($domain, PHP_URL_SCHEME) ? '' : 'https://') . $domain . '/callback');
+        curl_setopt($cb, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($cb, CURLOPT_POSTFIELDS, json_encode($report));
+        curl_setopt($cb, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($cb, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $result = curl_exec($cb);
+
+        if ($result != 'github.com/ssl/ezXSS') {
+            return 'Unable to find a valid ezXSS installation. Please check the domain.';
+        }
+
+        return 'Report is successfully shared!';
+    }
+
+    public function killSwitch($pass) {
+        $this->database->fetch("UPDATE settings SET value = :pass WHERE setting = 'killswitch';", [':pass' => $pass]);
+        return 'Killed setup';
+    }
+}
