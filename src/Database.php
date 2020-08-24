@@ -10,11 +10,7 @@ class Database
     public function __construct()
     {
         try {
-            $this->DB = new PDO(
-                'mysql:host='. getenv('DATABASE_HOST') .';
-                dbname='. getenv('DATABASE_NAME'),
-                getenv('DATABASE_USER'),
-                getenv('DATABASE_PASSWORD'));
+            $this->DB = new PDO('mysql:host='. getenv('DATABASE_HOST') .';dbname='. getenv('DATABASE_NAME'), getenv('DATABASE_USER'), getenv('DATABASE_PASSWORD'));
         } catch (PDOException $e) {
             if (debug == true) {
                 print $e->getMessage();
