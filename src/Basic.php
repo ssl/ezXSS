@@ -112,6 +112,7 @@ HTML;
             <link rel="stylesheet" href="https://ssl.github.io/cdn/ezXSS/css/font-awesome.css" integrity="sha384-CA7nicOiG9xLJZ8K81i/oOvxFmpce86FdhD3mkdgvfuGMigwTwBElOMVQvEjkV9X" crossorigin="anonymous">
             <link rel="stylesheet" href="https://ssl.github.io/cdn/ezXSS/css/bootstrap.css" integrity="sha384-GdlB5PJOMUfj80P5h0H9An3utYRUtyihpjksDyocWu1+XptBb/QB/sPgCrgYJCuZ" crossorigin="anonymous">
             <link rel="stylesheet" href="https://ssl.github.io/cdn/ezXSS/css/3.0/style.css" integrity="sha384-Iny6sL805ZtFOrZ5JEzmYazKDtzoxw0CRXvMw7jLE/FqN3ehYg+RM2BTb1G2q+XY" crossorigin="anonymous">
+            <link rel="stylesheet" href="/assets/css/new.css">
             <link rel="icon" href="/assets/img/favicon.ico" type="image/x-icon" />
             <meta name="MobileOptimized" content="width">
             <meta name="HandheldFriendly" content="true">
@@ -187,7 +188,7 @@ HTML;
         <tr id="{{report[id]}}">
           <th scope=row style="width:50px;max-width:50px;border-color:#5b6187">
              <label class="checkbox-label">
-                <input type="checkbox" name="selected" value="{{report[id]}}" report-id="{{report[id]}}">
+                <input class="chkbox" type="checkbox" name="selected" value="{{report[id]}}" id="chk_{{report[id]}}" report-id="{{report[id]}}">
                 <span class="checkbox-custom rectangular"></span>
             </label>           
           </th>

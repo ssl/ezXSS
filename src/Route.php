@@ -165,7 +165,7 @@ class Route
         $doubleReport = false;
         if ($setting['filter-save'] == 0 || $setting['filter-alert'] == 0) {
             $searchCommonReport = $this->database->fetch(
-                'SELECT * FROM reports WHERE cookies = :cookies AND dom = :dom AND origin = :origin AND referer = :referer AND uri = :uri AND `user-agent` = :userAgent AND ip = :ip LIMIT 1',
+                'SELECT id FROM reports WHERE cookies = :cookies AND dom = :dom AND origin = :origin AND referer = :referer AND uri = :uri AND `user-agent` = :userAgent AND ip = :ip LIMIT 1',
                 [
                     ':cookies' => $json->cookies,
                     ':dom' => $json->dom,

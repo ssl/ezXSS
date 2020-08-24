@@ -8,6 +8,8 @@ function request(action, data) {
     });
 }
 
+var lastChecked = null;
+
 $(document).ready(function() {
 
     $("form.form").submit(function(Form) {
@@ -112,6 +114,24 @@ $(document).ready(function() {
         event.preventDefault();
         var hpanel = $(event.target).closest('div.panel');
         hpanel.remove();
+    });
+
+    var $chkboxes = $('.chkbox');
+    $chkboxes.click(function(e) {
+        if (!lastChecked) {
+            lastChecked = this;
+            return;
+        }
+
+        if (e.shiftKey) {
+            var start = $chkboxes.index(this);
+            var end = $chkboxes.index(lastChecked);
+
+            $chkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).prop('checked', this.checked);
+
+        }
+
+        lastChecked = this;
     });
 });
 

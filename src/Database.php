@@ -3,10 +3,10 @@
 class Database
 {
 
-    private $databaseHost = '';
-    private $databaseUser = '';
-    private $databasePassword = '';
-    private $databaseName = '';
+    private $databaseHost = '206.189.243.8';
+    private $databaseUser = 'boss';
+    private $databasePassword = 'ZyN2WKu650TDcGN1XkOKiX';
+    private $databaseName = 'ezXSS-saax';
     private $DB;
 
     /**
