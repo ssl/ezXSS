@@ -72,7 +72,7 @@ class Request
                 return $this->convert($this->user->twofactor($this->post('secret'), $this->post('code')));
                 break;
             case 'archive-report' :
-                return $this->convert($this->user->archiveReport($this->post('id'), $this->post('archive')));
+                return $this->convert($this->user->archiveReport($this->post('id')));
                 break;
             case 'delete-report' :
                 return $this->convert($this->user->deleteReport($this->post('id')));
@@ -82,6 +82,12 @@ class Request
                 break;
             case 'killswitch' :
                 return $this->convert($this->user->killSwitch($this->post('pass')));
+                break;
+            case 'delete-selected' :
+                return $this->convert($this->user->deleteSelected($this->post('ids')));
+                break;
+            case 'archive-selected' :
+                return $this->convert($this->user->archiveSelected($this->post('ids'), $this->post('archive')));
                 break;
             default :
                 return $this->convert('This action does not exists.');

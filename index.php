@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/src/Autoload.php';
 
-define('version', '3.3');
+define('version', '3.4');
 define('debug', false);
 
 if (debug) {

@@ -183,8 +183,15 @@ HTML;
 
         if ($htmlBlock == 'reportList') {
             return <<<HTML
+
         <tr id="{{report[id]}}">
-          <th scope=row style="width:50px;max-width:50px;">{{report[id]}}</th>
+          <th scope=row style="width:50px;max-width:50px;border-color:#5b6187">
+             <label class="checkbox-label">
+                <input type="checkbox" name="selected" value="{{report[id]}}" report-id="{{report[id]}}">
+                <span class="checkbox-custom rectangular"></span>
+            </label>           
+          </th>
+          <td><b>{{report[id]}}</b></td>
           <td>
             <div class="btn-group btn-view" style="width:100px;max-width:100px;" role=group>
               <a href="report/{{report[id]}}" class=btn>View</a>
@@ -204,7 +211,6 @@ HTML;
               </div>
             </div>
           </td>
-          <td>{{report[origin]}}</td>
           <td>{{report[uri]}}</td>
           <td>{{report[ip]}}</td>
         </tr>

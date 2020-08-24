@@ -3,7 +3,7 @@ function request(action, data) {
     return $.ajax({
         type: "post",
         dataType: "json",
-        url: "request",
+        url: "/manage/request",
         data: data
     });
 }
@@ -30,20 +30,49 @@ $(document).ready(function() {
         });
     });
 
+    $(".delete-selected").click(function() {
+        var ids = [];
+        $.each($("input[name='selected']:checked"), function(){
+            ids.push($(this).val());
+        });
+        request("delete-selected", {ids:ids,csrf:csrf}).then(function(r) {
+            $.each( ids, function( i, val ) {
+                $("#" + val).fadeOut( "slow", function() {});
+            });
+        });
+    });
+
+    $(".archive-selected").click(function() {
+        var ids = [];
+        $.each($("input[name='selected']:checked"), function(){
+            ids.push($(this).val());
+        });
+        var archive = 0;
+        if(location.toString().split('/').pop() == 'reports') {
+            var archive = 1;
+        }
+        request("archive-selected", {ids:ids,csrf:csrf,archive:archive}).then(function(r) {
+            $.each( ids, function( i, val ) {
+                $("#" + val).fadeOut( "slow", function() {});
+            });
+        });
+    });
+
     $(".delete").click(function() {
       var id = $(this).attr('report-id');
       request("delete-report", {id:id,csrf:csrf}).then(function(r) {
-        $("#"+id).fadeOut( "slow", function() {});
+          var loc = location.toString().split('/').pop();
+          if(loc == 'reports' || loc == 'archive') {
+              $("#"+id).fadeOut( "slow", function() {});
+          } else {
+              window.location.href = '/manage/reports';
+          }
       });
     });
 
     $(".archive").click(function() {
       var id = $(this).attr('report-id');
-      var archive = 0;
-      if(location.toString().split('/').pop() == 'reports') {
-        var archive = 1;
-      }
-      request("archive-report", {id:id,archive:archive,csrf:csrf}).then(function(r) {
+      request("archive-report", {id:id,csrf:csrf}).then(function(r) {
         $("#"+id).fadeOut( "slow", function() {});
       });
     });
@@ -89,4 +118,17 @@ $(document).ready(function() {
 
 $("#alert").on("click", ".close", function() {
     $("#alert").slideUp();
+});
+
+$('#select-all').click(function(event) {
+    if(this.checked) {
+        // Iterate each checkbox
+        $(':checkbox').each(function() {
+            this.checked = true;
+        });
+    } else {
+        $(':checkbox').each(function() {
+            this.checked = false;
+        });
+    }
 });
