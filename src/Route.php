@@ -309,7 +309,7 @@ class Route
                     $this->basic->htmlBlocks('mail')
                 );
 
-                $headers[] = 'From: ezXSS';
+                $headers[] = 'From:' . $setting['email'];
                 $headers[] = 'MIME-Version: 1.0';
                 $headers[] = 'Content-type: text/html; charset=iso-8859-1';
                 mail(
