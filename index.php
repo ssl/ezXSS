@@ -1,34 +1,35 @@
 <?php
 
-  require_once __DIR__ . '/src/Autoload.php';
+require_once __DIR__ . '/src/Autoload.php';
 
-  define('debug', false);
+define('version', '3.3');
+define('debug', false);
 
-  if(debug) {
+if (debug) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
-  }
+}
 
-  if (version_compare(phpversion(), '7.1', '<')) {
+if (PHP_VERSION_ID < 70100) {
     echo 'PHP 7.1 or up is required to use ezXSS';
     exit();
-  }
+}
 
-  $requestUrl = explode('?', $_SERVER['REQUEST_URI'])[0];
+$requestUrl = explode('?', $_SERVER['REQUEST_URI'])[0];
 
-  if(strpos($requestUrl, '/manage/') === 0 || strpos($requestUrl, '/manage') === 0) {
+if (strpos($requestUrl, '/manage/') === 0 || strpos($requestUrl, '/manage') === 0) {
     $path = str_replace('/manage/', '', explode('?', $_SERVER['REQUEST_URI'])[0]);
 
-    if(explode('/', $path)[0] == 'report') {
-      $path = explode('/', $path)[0];
+    if (explode('/', $path)[0] == 'report') {
+        $path = explode('/', $path)[0];
     }
 
-    if($path == 'request') {
-      $request = new Request();
-      echo $request->json();
+    if ($path == 'request') {
+        $request = new Request();
+        echo $request->json();
     } else {
-      $route = new Route();
-      echo $route->template($path);
+        $route = new Route();
+        echo $route->template($path);
     }
 
   }

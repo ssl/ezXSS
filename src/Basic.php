@@ -1,48 +1,55 @@
 <?php
 
-  class Basic {
+class Basic
+{
 
-    public function __construct() {
-      $this->base32Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    public function __construct()
+    {
+        $this->base32Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     }
 
-    public function domain() {
-      return htmlspecialchars($_SERVER['SERVER_NAME']);
+    public function screenshotPath($screenshotName)
+    {
+        return '<img src="http://' . $this->domain() . '/assets/img/report-' . $screenshotName . '.png">';
     }
 
-    public function screenshotPath($screenshotName) {
-      return '<img src="http://' . $this->domain() . '/assets/img/report-' . $screenshotName . '.png">';
+    public function domain()
+    {
+        return htmlspecialchars($_SERVER['SERVER_NAME']);
     }
 
-    public function getCode($secret) {
-      $secretKey = $this->baseDecode($secret);
-      $hash = hash_hmac('SHA1', chr(0) . chr(0) . chr(0) . chr(0) . pack('N*', floor(time() / 30)), $secretKey, true);
-      $value = unpack('N', substr($hash, ord(substr($hash, -1)) & 0x0F, 4));
-      $value = $value[1] & 0x7FFFFFFF;
-      return str_pad($value % pow(10, 6), 6, '0', STR_PAD_LEFT);
+    public function getCode($secret)
+    {
+        $secretKey = $this->baseDecode($secret);
+        $hash = hash_hmac('SHA1', chr(0) . chr(0) . chr(0) . chr(0) . pack('N*', floor(time() / 30)), $secretKey, true);
+        $value = unpack('N', substr($hash, ord(substr($hash, -1)) & 0x0F, 4));
+        $value = $value[1] & 0x7FFFFFFF;
+        return str_pad($value % pow(10, 6), 6, '0', STR_PAD_LEFT);
     }
 
-    private function baseDecode($data) {
-      $characters = $this->base32Characters;
-      $buffer = 0;
-      $bufferSize = 0;
-      $result = '';
-      for ($i = 0; $i < strlen($data); $i++) {
-        $position = strpos($characters, $data[$i]);
-        $buffer = ($buffer << 5) | $position;
-        $bufferSize += 5;
-        if ($bufferSize > 7) {
-          $bufferSize -= 8;
-          $position = ($buffer & (0xff << $bufferSize)) >> $bufferSize;
-          $result .= chr($position);
+    private function baseDecode($data)
+    {
+        $characters = $this->base32Characters;
+        $buffer = 0;
+        $bufferSize = 0;
+        $result = '';
+        for ($i = 0; $i < strlen($data); $i++) {
+            $position = strpos($characters, $data[$i]);
+            $buffer = ($buffer << 5) | $position;
+            $bufferSize += 5;
+            if ($bufferSize > 7) {
+                $bufferSize -= 8;
+                $position = ($buffer & (0xff << $bufferSize)) >> $bufferSize;
+                $result .= chr($position);
+            }
         }
-      }
-      return $result;
+        return $result;
     }
 
-    public function htmlBlocks($htmlBlock) {
-      if($htmlBlock == 'menu') {
-        return <<<HTML
+    public function htmlBlocks($htmlBlock)
+    {
+        if ($htmlBlock == 'menu') {
+            return <<<HTML
         <div class="navbar-header">
           <div id="mobile-menu">
             <div class="left-nav-toggle"><a href="#"><i class="fa fa-bars"></i></a></div>
@@ -55,7 +62,7 @@
 
               <li class="nav-info">
                 <i class="pe pe-7s-shield text-accent"></i>
-                <div class="m-t-xs"><span class="c-white">ezXSS v3.2</span> github.com/ssl/ezxss</div>
+                <div class="m-t-xs"><span class="c-white">ezXSS v{{version}}</span> github.com/ssl/ezxss</div>
               </li>
 
               <li class="nav-category">Main</li>
@@ -70,10 +77,10 @@
           </nav>
         </aside>
 HTML;
-      }
+        }
 
-      if($htmlBlock == 'menuHidden') {
-        return <<<HTML
+        if ($htmlBlock == 'menuHidden') {
+            return <<<HTML
         <div class="navbar-header">
           <div id="mobile-menu">
             <div class="left-nav-toggle"><a href="#"><i class="fa fa-bars"></i></a></div>
@@ -86,17 +93,17 @@ HTML;
 
               <li class="nav-info">
                 <i class="pe pe-7s-shield text-accent"></i>
-                <div class="m-t-xs"><span class="c-white">ezXSS v3.2</span> github.com/ssl/ezxss</div>
+                <div class="m-t-xs"><span class="c-white">ezXSS v{{version}}</span> github.com/ssl/ezxss</div>
               </li>
 
             </ul>
           </nav>
         </aside>
 HTML;
-      }
+        }
 
-      if($htmlBlock == 'main') {
-        return <<<HTML
+        if ($htmlBlock == 'main') {
+            return <<<HTML
         <!DOCTYPE html>
         <html>
           <head>
@@ -119,19 +126,19 @@ HTML;
           </body>
         </html>
 HTML;
-      }
+        }
 
-      if($htmlBlock == 'searchBar') {
-        return <<<HTML
+        if ($htmlBlock == 'searchBar') {
+            return <<<HTML
         <form method="get" action="../reports">
           <input type="text" value="{{searchQuery}}" name="search" placeholder="Search for domain, IP or URL" class="form-control" style="float: left;width: 260px;">
           <button type="submit" class="btn" style="float:right;">Search</button>
         </form>
 HTML;
-      }
+        }
 
-      if($htmlBlock == 'twofactorEnable') {
-        return <<<HTML
+        if ($htmlBlock == 'twofactorEnable') {
+            return <<<HTML
         <div class="form-group">
           <label class="control-label" for="secret">Secret code</label>
           <div class="input-group">
@@ -147,10 +154,10 @@ HTML;
 
         <button class="btn">Save</button>
 HTML;
-      }
+        }
 
-      if($htmlBlock == 'twofactorDisable') {
-        return <<<HTML
+        if ($htmlBlock == 'twofactorDisable') {
+            return <<<HTML
         <div class="form-group">
           <p>You already enabled 2FA. Enter the code to disable it.</p>
         </div>
@@ -163,19 +170,19 @@ HTML;
 
         <button class="btn">Save</button>
 HTML;
-      }
+        }
 
-      if($htmlBlock == 'twofactorLogin') {
-        return <<<HTML
+        if ($htmlBlock == 'twofactorLogin') {
+            return <<<HTML
         <div class="form-group">
           <label class="control-label" for="password">2FA Code</label>
           <input type="text" name="code" id="code" class="form-control">
         </div>
 HTML;
-      }
+        }
 
-      if($htmlBlock == 'reportList') {
-        return <<<HTML
+        if ($htmlBlock == 'reportList') {
+            return <<<HTML
         <tr id="{{report[id]}}">
           <th scope=row style="width:50px;max-width:50px;">{{report[id]}}</th>
           <td>
@@ -202,10 +209,10 @@ HTML;
           <td>{{report[ip]}}</td>
         </tr>
 HTML;
-      }
+        }
 
-      if($htmlBlock == 'mail') {
-        return <<<HTML
+        if ($htmlBlock == 'mail') {
+            return <<<HTML
         <!DOCTYPE html>
         <html>
           <head>
@@ -288,7 +295,8 @@ HTML;
           </body>
         </html>
 HTML;
-      }
+        }
 
+        return '';
     }
-  }
+}
