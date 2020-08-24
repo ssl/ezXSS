@@ -1,7 +1,7 @@
 # ezXSS docker-compose
 ezXSS is an easy way for penetration testers and bug bounty hunters to test (blind) Cross Site Scripting.
 
-Now even better running inside two containers (app+db) for easy deployment!
+Now even better running inside two docker containers (app+db) for easy deployment!
 
 ## Current features
 Some features ezXSS has
@@ -34,7 +34,7 @@ Some features ezXSS has
 ## Required
 * A host with docker and docker-compose
 * A domain name (consider a short one)
-* nginx-proxy-manager for reverse proxy stuff
+* An SSL Certificate if you want to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL) and pairing with nginx-proxy-manager
 
 ## Installation
 ezXSS is now even easier to use:
@@ -53,11 +53,10 @@ docker-compose build
 docker-compose up -d
 ```
 
+### Complete the setup
 
 Visit `/manage/install` in your browser and setup a password and email
 
-
-Make sure you have Apache with headers, rewrite and curl modules enabled (with a2enmod, apt-get curl+php-curl) and that .htaccess file is correctly uploaded and allowed in vhost config (AllowOverride All).
 
 ## Demo
 For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.
