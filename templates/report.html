@@ -41,6 +41,10 @@
                         <tr><td>Screenshot</td><td><img src="/assets/img/report-{{report[screenshot]}}.png" onerror="this.parentElement.innerHTML = '';"></td></tr>
                     </thead>
                   </table>
+
+                    <button class="btn delete" report-id="{{report[id]}}">Delete</button>
+                    <button class="btn archive" report-id="{{report[id]}}">Archive</button>
+                    <button class="btn share" report-id="{{report[id]}}" share-id="{{report[shareid]}}" data-toggle="modal" data-target="#shareModal">Share</button>
                 </div>
               </div>
             </div>
@@ -49,5 +53,44 @@
       </div>
     </div>
   </section>
+
+    <div class="modal fade" id="shareModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="m-b-xs">Share</h3>
+                    <small>Share your reports using direct link or with other ezXSS users</small>
+                </div>
+                <div class="modal-body">
+                    <div id="alert"></div>
+                    <form class="form" id="share-report">
+                        {{csrf[]}}
+                        <input type=hidden hidden id="reportid" value="0">
+
+                        <div class="form-group">
+                            <label class="control-label" for="domain">Direct share link</label>
+                            <input type="text" id="shareid" value="" class="form-control">
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label class="control-label" for="domain">Domain</label>
+                            <input type="text" name="domain" id="domain" value="" class="form-control">
+                        </div>
+                        <button class="btn">Share</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var csrf = "{{csrf[true]}}";
+    </script>
 
 </div>

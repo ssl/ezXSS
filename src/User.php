@@ -341,8 +341,11 @@ class User
      * @param string $archive either 1 of 0
      * @return string success
      */
-    public function archiveReport($id, $archive)
+    public function archiveReport($id)
     {
+        $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id', [':id' => $id]);
+        $archive = $report['archive'] == '0' ? '1' : '0';
+
         $this->database->fetch(
             'UPDATE reports SET archive = :archive WHERE id = :id',
             [':id' => $id, 'archive' => $archive]
@@ -397,8 +400,47 @@ class User
         return 'Report is successfully shared!';
     }
 
+    /**
+     * Kills ezXSS setup
+     * @method killSwitch
+     * @param string $pass password to re-enable
+     * @return string success
+     */
     public function killSwitch($pass) {
         $this->database->fetch("UPDATE settings SET value = :pass WHERE setting = 'killswitch';", [':pass' => $pass]);
-        return 'Killed setup';
+        return 'Killed switch activated.';
+    }
+
+    /**
+     * Delete selected reports
+     * @method deleteSelected
+     * @param string $ids report ids
+     * @return string success
+     */
+    public function deleteSelected($ids) {
+        foreach($ids as $id) {
+            $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id', [':id' => $id]);
+            unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
+
+            $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
+        }
+        return 'Reports are deleted.';
+    }
+
+    /**
+     * Update archive status on selected
+     * @method archiveSelected
+     * @param string $ids report ids
+     * @param string $archive either 1 of 0
+     * @return string success
+     */
+    public function archiveSelected($ids, $archive) {
+        foreach($ids as $id) {
+            $this->database->fetch(
+                'UPDATE reports SET archive = :archive WHERE id = :id',
+                [':id' => $id, 'archive' => $archive]
+            );
+        }
+        return 'Reports are archived.';
     }
 }

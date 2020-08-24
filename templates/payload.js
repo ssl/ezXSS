@@ -23,6 +23,7 @@ If you have stumbled upon this inside your website please contact hello (at) gli
 -GlitchWitch.io
 */
 // Source code forked from
+// ezXSS {{version}}
 // github.com/ssl/ezXSS
 // Find the fork at
 // github.com/glitchwitchsec/ezXSS-docker
