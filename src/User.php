@@ -343,7 +343,7 @@ class User
      */
     public function archiveReport($id)
     {
-        $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id', [':id' => $id]);
+        $report = $this->database->fetch('SELECT archive FROM reports WHERE id = :id', [':id' => $id]);
         $archive = $report['archive'] == '0' ? '1' : '0';
 
         $this->database->fetch(
@@ -361,7 +361,7 @@ class User
      */
     public function deleteReport($id)
     {
-        $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id', [':id' => $id]);
+        $report = $this->database->fetch('SELECT screenshot FROM reports WHERE id = :id', [':id' => $id]);
         unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
 
         $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
@@ -419,7 +419,7 @@ class User
      */
     public function deleteSelected($ids) {
         foreach($ids as $id) {
-            $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id', [':id' => $id]);
+            $report = $this->database->fetch('SELECT screenshot FROM reports WHERE id = :id', [':id' => $id]);
             unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
 
             $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
