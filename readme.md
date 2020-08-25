@@ -39,13 +39,14 @@ Some features ezXSS has
 ezXSS is ez to install
 
 * Clone the repository and put the files in the document root
-* Create an empty database and provide your database information in 'src/Database.php'
+* Rename `.env.example` to `.env`
+* Create an empty database and provide your database information in `.env`
 * Visit /manage/install in your browser and setup a password and email
 * Done! That was ez right?
 
 # Installation with docker-compose
 * Clone the repository and cd into it
-* Rename `.env.example` to `.env` and update set a secure password
+* Rename `.env.example` to `.env` and update it with secure randomly generated password
 * Update SMTP info in `php/msmtprc`
 * run `docker-compose build && docker-compose up -d`
 * Visit /manage/install in your browser and setup a password and email
