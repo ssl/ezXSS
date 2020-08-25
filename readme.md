@@ -8,6 +8,7 @@ Some features ezXSS has
 * Payload generator
 * Instant email alert on payload
 * Custom javascript payload
+* Custom payload links to distinguish insert points
 * Enable/Disable screenshots
 * Prevent double payloads from saving or alerting
 * Block domains
