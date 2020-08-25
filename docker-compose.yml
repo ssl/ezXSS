@@ -19,7 +19,5 @@ services:
     volumes:
       - .:/var/www/html
     restart: always
-    env_file:
-     - .env
     depends_on:
       - ezxssdb

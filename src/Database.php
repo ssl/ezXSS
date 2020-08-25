@@ -1,5 +1,23 @@
 <?php
 
+require_once(__DIR__ . '/DotEnv.php');
+$dot_env = Orbisius_Dot_Env::getInstance();
+
+// make the class look for the file.
+//$data = $dot_env->read();
+
+// or specify the .env file directly.
+$data = $dot_env->read(__DIR__ . '/../.env');
+
+// Updates env, $_ENV, $_SERVER if the value doesn't exist already
+$dot_env->updateEnv($data);
+
+// override any existing values
+$dot_env->updateEnv($data, true);
+
+//
+$dot_env->defineConsts($data);
+
 class Database
 {
     private $DB;
