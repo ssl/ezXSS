@@ -2,13 +2,7 @@
 
 class Database
 {
-
-    private $databaseHost = '';
-    private $databaseUser = '';
-    private $databasePassword = '';
-    private $databaseName = '';
     private $DB;
-
     /**
      * Try to connect to database
      * @method __construct
@@ -16,11 +10,7 @@ class Database
     public function __construct()
     {
         try {
-            $this->DB = new PDO(
-                'mysql:host=' . $this->databaseHost . ';dbname=' . $this->databaseName,
-                $this->databaseUser,
-                $this->databasePassword
-            );
+            $this->DB = new PDO('mysql:host='. getenv('DATABASE_HOST') .';dbname='. getenv('DATABASE_NAME'), getenv('DATABASE_USER'), getenv('DATABASE_PASSWORD'));
         } catch (PDOException $e) {
             if (debug == true) {
                 print $e->getMessage();

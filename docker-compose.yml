@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  ezxssdb:
+    container_name: ezxssdb
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=changeme
+      - MYSQL_DATABASE=database
+    volumes:
+      - ./ezxssdb:/var/lib/mysql
+  ezxss:
+    build: ./php
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www/html
+    restart: always
+    environment:
+      - DATABASE_HOST=ezxssdb
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=changeme
+      - DATABASE_NAME=database
+    depends_on:
+      - ezxssdb
