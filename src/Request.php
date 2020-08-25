@@ -23,7 +23,7 @@ class Request
             return $this->convert('CSRF token is not valid');
         }
 
-        if (!$this->user->isLoggedIn() && $this->post('action') != 'login' && $this->post('action') != 'install') {
+        if (!$this->user->isLoggedIn() && $this->post('action') != 'login' && $this->post('action') != 'install' && $this->post('action') != 'update') {
             return $this->convert('You need to be logged in to perform this action.');
         }
 
