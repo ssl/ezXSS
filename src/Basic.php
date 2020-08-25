@@ -186,12 +186,12 @@ HTML;
             return <<<HTML
 
         <tr id="{{report[id]}}">
-          <th scope=row style="width:50px;max-width:50px;border-color:#5b6187">
+          <td scope=row style="width:50px;max-width:50px;border-color:#5b6187">
              <label class="checkbox-label">
                 <input class="chkbox" type="checkbox" name="selected" value="{{report[id]}}" id="chk_{{report[id]}}" report-id="{{report[id]}}">
                 <span class="checkbox-custom rectangular"></span>
             </label>           
-          </th>
+          </td>
           <td><b>{{report[id]}}</b></td>
           <td>
             <div class="btn-group btn-view" style="width:100px;max-width:100px;" role=group>
@@ -260,6 +260,10 @@ HTML;
                       <tr>
                         <td>Referer</td>
                         <td style="color: #5e648b;">{{referer}}</td>
+                      </tr>
+                      <tr>
+                        <td>Payload</td>
+                        <td style="color: #5e648b;">{{payload}}</td>
                       </tr>
                       <tr>
                         <td>User Agent</td>

@@ -1,177 +1,186 @@
 <div class="wrapper">
 
-  {{menu}}
+    {{menu}}
 
-  <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="view-header">
-              <div class="header-title">
-                <h3 class="m-b-xs">Settings</h3>
-                <small>Change your main settings or password</small>
-              </div>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Settings</h3>
+                            <small>Change your main settings or password</small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
             </div>
-            <hr>
-          </div>
-        </div>
 
-        <div class="row">
+            <div class="row">
 
-          <div class="col-lg-12"><div id="alert"></div></div>
+                <div class="col-lg-12">
+                    <div id="alert"></div>
+                </div>
 
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">Main settings</div>
-              <div class="panel-body">
-                <form class="form" id="main-settings">
-                  <div class="form-group">
-                    {{csrf[]}}
-                    <label class="control-label" for="email">Email alert mail</label>
-                    <input type="email" name="email" id="email" value="{{setting[email]}}" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label class="control-label" for="dompart">DOM Length in email</label>
-                    <input type="text" name="dompart" id="dompart" value="{{setting[dompart]}}" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label class="control-label" for="timezone">Timezone</label>
-                    <input type="text" name="timezone" id="timezone" value="{{setting[timezone]}}" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label class="control-label" for="timezone">Payload domain</label>
-                    <input type="text" name="payload" id="payload" value="{{setting[payload-domain]}}" class="form-control">
-                  </div>
-                  <button class="btn">Save</button>
-                </form>
-              </div>
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Main settings</div>
+                        <div class="panel-body">
+                            <form class="form" id="main-settings">
+                                <div class="form-group">
+                                    {{csrf[]}}
+                                    <label class="control-label" for="email">Email alert mail</label>
+                                    <input class="form-control" id="email" name="email" type="email"
+                                           value="{{setting[email]}}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="dompart">DOM Length in email</label>
+                                    <input class="form-control" id="dompart" name="dompart" type="text"
+                                           value="{{setting[dompart]}}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="timezone">Timezone</label>
+                                    <input class="form-control" id="timezone" name="timezone" type="text"
+                                           value="{{setting[timezone]}}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="timezone">Payload domain</label>
+                                    <input class="form-control" id="payload" name="payload" type="text"
+                                           value="{{setting[payload-domain]}}">
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Password settings</div>
+                        <div class="panel-body">
+                            <form class="form" id="password-settings" method="post">
+                                {{csrf[]}}
+                                <div class="form-group">
+                                    <label class="control-label" for="password">Old password</label>
+                                    <input class="form-control" id="password" name="password" type="password">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="newpassword">New password</label>
+                                    <input class="form-control" id="newpassword" name="newpassword" type="password">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="newpassword2">Re-enter new password</label>
+                                    <input class="form-control" id="newpassword2" name="newpassword2" type="password">
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">Password settings</div>
-              <div class="panel-body">
-                <form class="form" id="password-settings" method="post">
-                  {{csrf[]}}
-                  <div class="form-group">
-                    <label class="control-label" for="password">Old password</label>
-                    <input type="password" name="password" id="password" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label class="control-label" for="newpassword">New password</label>
-                    <input type="password" name="newpassword" id="newpassword" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label class="control-label" for="newpassword2">Re-enter new password</label>
-                    <input type="password" name="newpassword2" id="newpassword2" class="form-control">
-                  </div>
-                  <button class="btn">Save</button>
-                </form>
-              </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Filters</div>
+                        <div class="panel-body">
+                            <p>You can stop a double report from saving or alerting. If all information in report is the
+                                same it will ignore it.</p>
+                            <form class="form" id="filter-settings" method="post">
+                                <div class="form-group">
+                                    {{csrf[]}}
+                                    <label class="control-label" for="filter">When an report is already known</label>
+                                    <select class="form-control" id="filter">
+                                        <option value="1" {{filterSelected[1]}}>Both save report and send alert</option>
+                                        <option value="2" {{filterSelected[2]}}>Only save report</option>
+                                        <option value="3" {{filterSelected[3]}}>Only send alert</option>
+                                        <option value="4" {{filterSelected[4]}}>Don't save report or send alert</option>
+                                    </select>
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Block domains</div>
+                        <div class="panel-body">
+                            <p>If you get too many reports from a domain, you can block the domain. Seperate multiple
+                                domains with a comma.</p>
+                            <form class="form" id="block-settings" method="post">
+                                <div class="form-group">
+                                    {{csrf[]}}
+                                    <label class="control-label" for="domains">Blocked domains</label>
+                                    <input class="form-control" id="domains" name="domains" type="text"
+                                           value="{{setting[blocked-domains]}}">
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <div class="row">
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">Filters</div>
-              <div class="panel-body">
-                <p>You can stop a double report from saving or alerting. If all information in report is the same it will ignore it.</p>
-                <form class="form" id="filter-settings" method="post">
-                  <div class="form-group">
-                    {{csrf[]}}
-                    <label class="control-label" for="filter">When an report is already known</label>
-                    <select class="form-control" id="filter">
-                      <option {{filterSelected[1]}} value="1">Both save report and send alert</option>
-                      <option {{filterSelected[2]}} value="2">Only save report</option>
-                      <option {{filterSelected[3]}} value="3">Only send alert</option>
-                      <option {{filterSelected[4]}} value="4">Don't save report or send alert</option>
-                    </select>
-                  </div>
-                  <button class="btn">Save</button>
-                </form>
-              </div>
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">2FA login</div>
+                        <div class="panel-body">
+                            <p>You can activate Google Authenticator 2FA for extra protection or disable it.</p>
+                            <form class="form" id="twofactor-settings" method="post">
+                                {{csrf[]}}
+                                {{twofactorSettings[]}}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Killswitch</div>
+                        <div class="panel-body">
+                            <p>Turn's off the ezXSS platform. Can be re-activated by visiting
+                                https://{{domain[]}}/?pass=</p>
+                            <form class="form" id="killswitch" method="post">
+                                <div class="form-group">
+                                    {{csrf[]}}
+                                    <label class="control-label" for="pass">Passcode to re-activate</label>
+                                    <input class="form-control" id="pass" name="pass" type="text">
+                                </div>
+                                <button class="btn">Kill</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-          </div>
 
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">Block domains</div>
-              <div class="panel-body">
-                <p>If you get too many reports from a domain, you can block the domain. Seperate multiple domains with a comma.</p>
-                <form class="form" id="block-settings" method="post">
-                  <div class="form-group">
-                    {{csrf[]}}
-                    <label class="control-label" for="domains">Blocked domains</label>
-                    <input type="text" name="domains" id="domains" value="{{setting[blocked-domains]}}" class="form-control">
-                  </div>
-                  <button class="btn">Save</button>
-                </form>
-              </div>
+            <div class="row">
+
+
             </div>
-          </div>
+
         </div>
+    </section>
 
-        <div class="row">
-
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">2FA login</div>
-              <div class="panel-body">
-                <p>You can activate Google Authenticator 2FA for extra protection or disable it.</p>
-                <form class="form" id="twofactor-settings" method="post">
-                  {{csrf[]}}
-                  {{twofactorSettings[]}}
-                </form>
-              </div>
+    <div class="modal fade" id="openQRcode" role="dialog">
+        <div class="modal-dialog" style="width:430px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h3 class="m-b-xs">Twofactor QR code</h3>
+                    <small>Scan this code in your 2FA app</small>
+                </div>
+                <div class="modal-body">
+                    <img src="https://chart.googleapis.com/chart?chs=400x400&chld=M|0&cht=qr&chl=otpauth://totp/ezXSS:ezXSS%3Fsecret%3D{{setting[temp-secret]}}%26issuer%3DezXSS">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" type="button">Close</button>
+                </div>
             </div>
-          </div>
-
-          <div class="col-lg-6">
-            <div class="panel panel-filled">
-              <div class="panel-heading">Killswitch</div>
-              <div class="panel-body">
-                <p>Turn's off the ezXSS platform. Can be re-activated by visiting https://{{setting[payload-domain]}}/?pass=</p>
-                <form class="form" id="killswitch" method="post">
-                  <div class="form-group">
-                    {{csrf[]}}
-                    <label class="control-label" for="pass">Passcode to re-activate</label>
-                    <input type="text" name="pass" id="pass" class="form-control">
-                  </div>
-                  <button class="btn">Kill</button>
-                </form>
-              </div>
-            </div>
-          </div>
-
         </div>
-
-        <div class="row">
-
-
-
-        </div>
-
-      </div>
-  </section>
-
-  <div class="modal fade" id="openQRcode" role="dialog">
-    <div class="modal-dialog" style="width:430px;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h3 class="m-b-xs">Twofactor QR code</h3>
-          <small>Scan this code in your 2FA app</small>
-        </div>
-        <div class="modal-body">
-          <img src="https://chart.googleapis.com/chart?chs=400x400&chld=M|0&cht=qr&chl=otpauth://totp/ezXSS:ezXSS%3Fsecret%3D{{setting[temp-secret]}}%26issuer%3DezXSS">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn" data-dismiss="modal">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
 </div>

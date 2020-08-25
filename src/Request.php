@@ -39,7 +39,7 @@ class Request
                 break;
             case 'main-settings' :
                 return $this->convert(
-                    (array)$this->user->settings(
+                    $this->user->settings(
                         $this->post('email'),
                         $this->post('dompart'),
                         $this->post('timezone'),
@@ -88,6 +88,9 @@ class Request
                 break;
             case 'archive-selected' :
                 return $this->convert($this->user->archiveSelected($this->post('ids'), $this->post('archive')));
+                break;
+            case 'update' :
+                return $this->convert($this->user->update());
                 break;
             default :
                 return $this->convert('This action does not exists.');

@@ -108,22 +108,39 @@ class User
             'CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`setting` varchar(500) NOT NULL,`value` text NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;'
         );
         $this->database->query(
-            'CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`shareid` VARCHAR(50) NOT NULL,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,`archive` int(11) DEFAULT 0,`screenshot` LONGTEXT NULL DEFAULT NULL,`localstorage` LONGTEXT NULL DEFAULT NULL, `sessionstorage` LONGTEXT NULL DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;'
+            'CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`shareid` VARCHAR(50) NOT NULL,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`payload` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,`archive` int(11) DEFAULT 0,`screenshot` LONGTEXT NULL DEFAULT NULL,`localstorage` LONGTEXT NULL DEFAULT NULL, `sessionstorage` LONGTEXT NULL DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;'
         );
         $this->database->query(
             'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("screenshot", "0"),("secret", ""),("killswitch", "");'
         );
         $this->database->fetch(
-            'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain);',
+            'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain),("version", :version);',
             [
                 ':password' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 11]),
-                'email' => $email,
-                ':domain' => $this->basic->domain()
+                ':email' => $email,
+                ':domain' => $this->basic->domain(),
+                ':version' => version
             ]
         );
 
         $this->createSession();
         return ['redirect' => 'dashboard'];
+    }
+
+    public function update() {
+        if($this->database->fetchSetting('version') === version) {
+            return 'You are already up-to-date.';
+        }
+
+        if(version === '3.5') {
+            $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("killswitch", "");');
+            $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("version", "3.5");');
+            $this->database->query('ALTER TABLE `reports` ADD `payload` VARCHAR(500) NULL AFTER `referer`;');
+
+            return ['redirect' => 'dashboard'];
+        }
+
+        return 'Something went wrong..';
     }
 
     /**
@@ -407,7 +424,10 @@ class User
      * @return string success
      */
     public function killSwitch($pass) {
-        $this->database->fetch("UPDATE settings SET value = :pass WHERE setting = 'killswitch';", [':pass' => $pass]);
+        $this->database->fetch(
+            "UPDATE settings SET value = :pass WHERE setting = 'killswitch';",
+            [':pass' => $pass]
+        );
         return 'Killed switch activated.';
     }
 

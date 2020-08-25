@@ -367,4 +367,13 @@ class Component
         return $html;
     }
 
+    /**
+     * Provides current domain name
+     * @method domain
+     * @return string
+     */
+    public function domain() {
+        return $this->basic->domain();
+    }
+
 }

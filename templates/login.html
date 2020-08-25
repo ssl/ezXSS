@@ -1,15 +1,15 @@
 <section id="content">
-  <h1>ezXSS</h1>
-  <div class="login">
-    <form class="form" id="login" method="post">
-      <div id="alert"></div>
-      {{csrf[]}}
-      <div class="form-group">
-        <label class="control-label" for="password">Password</label>
-        <input type="password" name="password" id="password" class="form-control">
-      </div>
-      {{twofactorLogin[]}}
-      <button class="btn">Login</button>
-    </form>
-  </div>
+    <h1>ezXSS</h1>
+    <div class="login">
+        <form class="form" id="login" method="post">
+            <div id="alert"></div>
+            {{csrf[]}}
+            <div class="form-group">
+                <label class="control-label" for="password">Password</label>
+                <input class="form-control" id="password" name="password" type="password">
+            </div>
+            {{twofactorLogin[]}}
+            <button class="btn">Login</button>
+        </form>
+    </div>
 </section>

@@ -1,18 +1,18 @@
 <section id="content">
-  <h1>ezXSS Install</h1>
-  <div class="login">
-    <form class="form" id="install" method="post">
-      <div id="alert"></div>
-      {{csrf[]}}
-      <div class="form-group">
-        <label class="control-label" for="password">Password</label>
-        <input type="password" name="password" id="password" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="control-label" for="Email">Email</label>
-        <input type="email" name="email" id="email" class="form-control">
-      </div>
-      <button class="btn">Install</button>
-    </form>
-  </div>
+    <h1>ezXSS Install</h1>
+    <div class="login">
+        <form class="form" id="install" method="post">
+            <div id="alert"></div>
+            {{csrf[]}}
+            <div class="form-group">
+                <label class="control-label" for="password">Password</label>
+                <input class="form-control" id="password" name="password" type="password">
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="Email">Email</label>
+                <input class="form-control" id="email" name="email" type="email">
+            </div>
+            <button class="btn">Install</button>
+        </form>
+    </div>
 </section>

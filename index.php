@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/src/Autoload.php';
 
-define('version', '3.4');
+define('version', '3.5');
 define('debug', false);
 
 if (debug) {
@@ -38,9 +38,7 @@ if (strpos($requestUrl, '/manage/') === 0 || strpos($requestUrl, '/manage') === 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo $route->callback(file_get_contents('php://input'));
         }
-    }
-
-    if ($requestUrl == '/') {
+    } else {
         header('Content-Type: application/x-javascript');
         echo $route->jsPayload();
     }

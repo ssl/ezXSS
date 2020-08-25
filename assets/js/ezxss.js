@@ -8,8 +8,6 @@ function request(action, data) {
     });
 }
 
-var lastChecked = null;
-
 $(document).ready(function() {
 
     $("form.form").submit(function(Form) {
@@ -61,27 +59,27 @@ $(document).ready(function() {
     });
 
     $(".delete").click(function() {
-      var id = $(this).attr('report-id');
-      request("delete-report", {id:id,csrf:csrf}).then(function(r) {
-          var loc = location.toString().split('/').pop();
-          if(loc == 'reports' || loc == 'archive') {
-              $("#"+id).fadeOut( "slow", function() {});
-          } else {
-              window.location.href = '/manage/reports';
-          }
-      });
+        var id = $(this).attr('report-id');
+        request("delete-report", {id:id,csrf:csrf}).then(function(r) {
+            var loc = location.toString().split('/').pop();
+            if(loc == 'reports' || loc == 'archive') {
+                $("#"+id).fadeOut( "slow", function() {});
+            } else {
+                window.location.href = '/manage/reports';
+            }
+        });
     });
 
     $(".archive").click(function() {
-      var id = $(this).attr('report-id');
-      request("archive-report", {id:id,csrf:csrf}).then(function(r) {
-        $("#"+id).fadeOut( "slow", function() {});
-      });
+        var id = $(this).attr('report-id');
+        request("archive-report", {id:id,csrf:csrf}).then(function(r) {
+            $("#"+id).fadeOut( "slow", function() {});
+        });
     });
 
     $(".share").click(function() {
-      $('#reportid').val( $(this).attr('report-id') );
-      $('#shareid').val("https://" + window.location.hostname + "/manage/report/" + $(this).attr('share-id') );
+        $('#reportid').val( $(this).attr('report-id') );
+        $('#shareid').val("https://" + window.location.hostname + "/manage/report/" + $(this).attr('share-id') );
     });
 
     $('.left-nav-toggle a').on('click', function(event){
@@ -116,6 +114,7 @@ $(document).ready(function() {
         hpanel.remove();
     });
 
+    var lastChecked = null;
     var $chkboxes = $('.chkbox');
     $chkboxes.click(function(e) {
         if (!lastChecked) {
@@ -128,7 +127,6 @@ $(document).ready(function() {
             var end = $chkboxes.index(lastChecked);
 
             $chkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).prop('checked', this.checked);
-
         }
 
         lastChecked = this;
@@ -142,7 +140,6 @@ $("#alert").on("click", ".close", function() {
 
 $('#select-all').click(function(event) {
     if(this.checked) {
-        // Iterate each checkbox
         $(':checkbox').each(function() {
             this.checked = true;
         });

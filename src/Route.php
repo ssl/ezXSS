@@ -19,7 +19,8 @@ class Route
             'payload',
             'reports',
             'archive',
-            'report'
+            'report',
+            'update'
         ];
 
         $this->user = new User();
@@ -27,20 +28,7 @@ class Route
         $this->component = new Component();
         $this->basic = new Basic();
 
-        if(!empty($this->database->fetchSetting('killswitch'))) {
-            if(isset($_GET['pass']) && $_GET['pass'] === $this->database->fetchSetting('killswitch')) {
-                $this->database->query("UPDATE settings SET value = '' WHERE setting = 'killswitch';");
-            } else {
-                http_response_code(404);
-                exit();
-            }
-        }
-
-        if (!empty($this->database->fetchSetting('timezone'))) {
-            date_default_timezone_set($this->database->fetchSetting('timezone'));
-        } else {
-            date_default_timezone_set('Europe/Amsterdam');
-        }
+        $this->verifySettings();
     }
 
     /**
@@ -63,7 +51,7 @@ class Route
             return $this->redirect('dashboard');
         }
 
-        if (!$this->user->isLoggedIn() && $file != 'login' && $file != 'install' && $file != 'report') {
+        if (!$this->user->isLoggedIn() && $file != 'login' && $file != 'install' && $file != 'report' && $file != 'update') {
             return $this->redirect('login');
         }
 
@@ -77,6 +65,14 @@ class Route
         }
 
         if ($this->database->rowCount('SELECT * FROM settings') > 0 && $file == 'install') {
+            return $this->redirect('login');
+        }
+
+        if($file != 'update' && $file != 'install' && $this->database->fetchSetting('version') !== version) {
+            return $this->redirect('update');
+        }
+
+        if($file == 'update' && $this->database->fetchSetting('version') === version) {
             return $this->redirect('login');
         }
 
@@ -205,7 +201,7 @@ class Route
 
             $shareId = sha1(bin2hex(openssl_random_pseudo_bytes(32)) . time());
             $reportId = $this->database->lastInsertId(
-                'INSERT INTO reports (`shareid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`) VALUES (:shareid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage)',
+                'INSERT INTO reports (`shareid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`, `payload`) VALUES (:shareid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage, :payload)',
                 [
                     'shareid' => $shareId,
                     ':cookies' => $json->cookies,
@@ -218,7 +214,8 @@ class Route
                     ':time' => time(),
                     ':screenshot' => ((isset($screenshotName)) ? $screenshotName : ''),
                     ':localstorage' => json_encode($json->localstorage),
-                    ':sessionstorage' => json_encode($json->sessionstorage)
+                    ':sessionstorage' => json_encode($json->sessionstorage),
+                    ':payload' => $json->payload
                 ]
             );
 
@@ -234,6 +231,7 @@ class Route
                         '{{url}}',
                         '{{ip}}',
                         '{{referer}}',
+                        '{{payload}}',
                         '{{user-agent}}',
                         '{{cookies}}',
                         '{{localstorage}}',
@@ -249,6 +247,7 @@ class Route
                         htmlspecialchars($json->uri),
                         htmlspecialchars($userIp),
                         htmlspecialchars($json->referrer),
+                        htmlspecialchars($json->payload),
                         htmlspecialchars($json->{'user-agent'}),
                         htmlspecialchars($json->cookies),
                         htmlspecialchars(json_encode($json->localstorage)),
@@ -283,19 +282,53 @@ class Route
      */
     public function jsPayload()
     {
-        if (!$this->database->rowCount('SELECT * FROM settings') > 0) {
+        if ((!$this->database->rowCount('SELECT * FROM settings')) > 0) {
             return $this->redirect('install');
         }
 
+        $payload = $_SERVER['REQUEST_URI'];
+        $payloadFile = 'payload';
+
+        if(!in_array($payload, ['', '/'], true)) {
+            $payload = preg_replace('/[^a-zA-Z0-9]/', '', $payload);
+            if(file_exists(__DIR__ . "/../templates/{$payload}.js")) {
+                $payloadFile = $payload;
+            }
+        }
+
         return str_replace(
-            ['{{domain}}', '{{screenshot}}', '{{customjs}}', '{{version}}'],
+            ['{{domain}}', '{{screenshot}}', '{{customjs}}', '{{version}}', '{{payload}}', '{{payloadFile}}'],
             [
                 $this->basic->domain(),
                 (($this->database->fetchSetting('screenshot')) ? $this->getFile('screenshot', 'js') : ''),
                 $this->database->fetchSetting('customjs'),
-                version
+                version,
+                htmlspecialchars("//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"),
+                $payloadFile
             ],
-            $this->getFile('payload', 'js')
+            $this->getFile($payloadFile, 'js')
         );
+    }
+
+    /**
+     * Verify settings before doing anything else
+     * @method verifySettings
+     */
+    private function verifySettings(): void
+    {
+        if(!empty($this->database->fetchSetting('killswitch'))) {
+            if(isset($_GET['pass']) && $_GET['pass'] === $this->database->fetchSetting('killswitch')) {
+                $this->database->query("UPDATE settings SET value = '' WHERE setting = 'killswitch';");
+            } else {
+                http_response_code(404);
+                exit();
+            }
+        }
+
+        if (!empty($this->database->fetchSetting('timezone'))) {
+            date_default_timezone_set($this->database->fetchSetting('timezone'));
+        } else {
+            date_default_timezone_set('Europe/Amsterdam');
+        }
     }
 }
