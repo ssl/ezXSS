@@ -7,8 +7,8 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=changeme
-      - MYSQL_DATABASE=database
+      - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD}
+      - MYSQL_DATABASE=${DATABASE_NAME}
     volumes:
       - ./ezxssdb:/var/lib/mysql
   ezxss:
@@ -19,10 +19,7 @@ services:
     volumes:
       - .:/var/www/html
     restart: always
-    environment:
-      - DATABASE_HOST=ezxssdb
-      - DATABASE_USER=root
-      - DATABASE_PASSWORD=changeme
-      - DATABASE_NAME=database
+    env_file:
+     - .env
     depends_on:
       - ezxssdb
