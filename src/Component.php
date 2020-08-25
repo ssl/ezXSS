@@ -54,7 +54,7 @@ class Component
             return $this->secret;
         }
 
-        $setting = $this->database->fetch('SELECT * FROM settings WHERE setting = :name LIMIT 1', [':name' => $name]);
+        $setting = $this->database->fetch('SELECT value FROM settings WHERE setting = :name LIMIT 1', [':name' => $name]);
         return htmlspecialchars($setting['value'], ENT_QUOTES);
     }
 
@@ -94,7 +94,7 @@ class Component
         }
 
         if ($branch == 'last') {
-            $last = $this->database->fetch('SELECT * FROM reports ORDER BY id DESC LIMIT 1');
+            $last = $this->database->fetch('SELECT id,time FROM reports ORDER BY id DESC LIMIT 1');
             if (isset($last['id'])) {
                 $time = time() - $last['time'];
                 $syntaxText = 's';
@@ -351,7 +351,7 @@ class Component
      */
     public function twofactorSettings()
     {
-        $secretCheck = $this->database->fetch('SELECT * FROM settings WHERE setting = "secret"');
+        $secretCheck = $this->database->fetch('SELECT value FROM settings WHERE setting = "secret"');
 
         if (strlen($secretCheck['value']) !== 16) {
             if ($this->secret == '') {
