@@ -43,6 +43,14 @@ ezXSS is ez to install
 * Visit /manage/install in your browser and setup a password and email
 * Done! That was ez right?
 
+# Installation with docker-compose
+* Clone the repository and cd into it
+* Rename `.env.example` to `.env` and update set a secure password
+* Update SMTP info in `php/msmtprc`
+* run `docker-compose build && docker-compose up -d`
+* Visit /manage/install in your browser and setup a password and email
+* Done! That was ez right?
+
 Make sure you have Apache with headers, rewrite and curl modules enabled (with a2enmod, apt-get curl+php-curl) and that .htaccess file is correctly uploaded and allowed in vhost config (AllowOverride All).
 
 ## Demo
