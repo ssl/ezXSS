@@ -44,9 +44,9 @@ ezXSS is ez to install
 * Visit /manage/install in your browser and setup a password and email
 * Done! That was ez right?
 
-# Installation with docker-compose
+## Installation with docker-compose
 * Clone the repository and cd into it
-* Rename `.env.example` to `.env` and update it with secure randomly generated password
+* Rename `.env.example` to `.env` and update it with a secure randomly generated password
 * Update SMTP info in `php/msmtprc`
 * run `docker-compose build && docker-compose up -d`
 * Visit /manage/install in your browser and setup a password and email
