@@ -45,11 +45,11 @@ if (PHP_VERSION_ID < 70100) {
 
 require_once __DIR__ . '/src/Autoload.php';
 
-if(!file_exists('config.ini')) {
+if(!file_exists('.env')) {
     error('You did not setup your config file. Rename config.ini.example to config.ini.', true);
 }
 
-$config = parse_ini_file('config.ini');
+$config = parse_ini_file('.env');
 
 if ($config === false) {
     error('There is something wrong with your config file.', true);
