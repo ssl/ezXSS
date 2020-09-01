@@ -2,7 +2,7 @@ version: '3'
 
 services:
   ezxssdb:
-    container_name: ezxssdb
+    container_name: ${dbHost}
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: always
