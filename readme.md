@@ -39,7 +39,8 @@ Some features ezXSS has
 ezXSS is ez to install
 
 * Clone the repository and put the files in the document root
-* Create an empty database and provide your database information in 'src/Database.php'
+* Rename config.ini.example to config.ini
+* Create an empty database and provide your database information in config.ini
 * Visit /manage/install in your browser and setup a password and email
 * Done! That was ez right?
 
