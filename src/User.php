@@ -141,6 +141,11 @@ class User
         }
 
         if(version === '3.6') {
+            if($this->database->fetchSetting('version') !== '3.5') {
+                $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("killswitch", "");');
+                $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("version", "3.5");');
+                $this->database->query('ALTER TABLE `reports` ADD `payload` VARCHAR(500) NULL AFTER `referer`;');
+            }
             $this->database->query('UPDATE settings SET value = "3.6" WHERE setting = "version"');
             $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("emailfrom", "ezXSS");');
 
