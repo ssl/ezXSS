@@ -12,7 +12,7 @@ services:
     volumes:
       - ./ezxssdb:/var/lib/mysql
   ezxss:
-    build: ./php
+    build: ./docker-php
     ports:
       - "80:80"
       - "443:443"

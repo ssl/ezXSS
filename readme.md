@@ -50,7 +50,7 @@ Make sure you have Apache with headers, rewrite and curl modules enabled (with a
 ## Installation with docker-compose
 * Clone the repository and cd into it
 * Rename `.env.example` to `.env` and update it with a secure randomly generated password
-* Update SMTP info in `php/msmtprc`
+* Update SMTP info in `docker-php/msmtprc`
 * run `docker-compose build && docker-compose up -d`
 * Visit /manage/install in your browser and setup a password and email
 * Done! That was ez right?
