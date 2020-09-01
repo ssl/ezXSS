@@ -2,11 +2,6 @@
 
 class Database
 {
-
-    private $databaseHost = '';
-    private $databaseUser = '';
-    private $databasePassword = '';
-    private $databaseName = '';
     private $DB;
 
     /**
@@ -17,14 +12,15 @@ class Database
     {
         try {
             $this->DB = new PDO(
-                'mysql:host=' . $this->databaseHost . ';dbname=' . $this->databaseName,
-                $this->databaseUser,
-                $this->databasePassword
+                'mysql:host=' . config['dbHost'] . ';dbname=' . config['dbName'],
+                config['dbUser'],
+                config['dbPassword']
             );
         } catch (PDOException $e) {
-            if (debug == true) {
+            if (debug === true) {
                 print $e->getMessage();
             }
+            error('Database connection failed. Check your config file.', true);
         }
     }
 

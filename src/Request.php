@@ -41,6 +41,7 @@ class Request
                 return $this->convert(
                     $this->user->settings(
                         $this->post('email'),
+                        $this->post('emailfrom'),
                         $this->post('dompart'),
                         $this->post('timezone'),
                         $this->post('payload')
