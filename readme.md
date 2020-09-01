@@ -55,6 +55,8 @@ Make sure you have Apache with headers, rewrite and curl modules enabled (with a
 * Visit /manage/install in your browser and setup a password and email
 * Done! That was ez right?
 
+Make sure you are using docker-compose version 1.26.0 or newer. Visit https://docs.docker.com/compose/install/ for installation instructions.
+
 ## Demo
 For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.
 
