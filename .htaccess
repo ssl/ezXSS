@@ -6,4 +6,4 @@ Options -Indexes
 
 RewriteEngine On
 RewriteCond %{REQUEST_URI} !assets
-RewriteRule ^(.*)$ index.php [L]
+RewriteRule ^(.*)$ init.php [L]
