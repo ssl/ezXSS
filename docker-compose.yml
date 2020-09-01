@@ -7,8 +7,10 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
       - MYSQL_DATABASE=${dbName}
-      - MYSQL_ROOT_PASSWORD=${dbPassword}
+      - MYSQL_USER=${dbUser}
+      - MYSQL_PASSWORD=${dbPassword}
     volumes:
       - ./ezxssdb:/var/lib/mysql
   ezxss:
