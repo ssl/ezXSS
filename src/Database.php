@@ -28,11 +28,16 @@ class Database
     public function __construct()
     {
         try {
-            $this->DB = new PDO('mysql:host='. getenv('DATABASE_HOST') .';dbname='. getenv('DATABASE_NAME'), getenv('DATABASE_USER'), getenv('DATABASE_PASSWORD'));
+            $this->DB = new PDO(
+                'mysql:host=' . config['dbHost'] . ';dbname=' . config['dbName'],
+                config['dbUser'],
+                config['dbPassword']
+            );
         } catch (PDOException $e) {
-            if (debug == true) {
+            if (debug === true) {
                 print $e->getMessage();
             }
+            error('Database connection failed. Check your config file.', true);
         }
     }
 

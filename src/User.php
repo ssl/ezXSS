@@ -140,6 +140,18 @@ class User
             return ['redirect' => 'dashboard'];
         }
 
+        if(version === '3.6') {
+            if($this->database->fetchSetting('version') !== '3.5') {
+                $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("killswitch", "");');
+                $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("version", "3.5");');
+                $this->database->query('ALTER TABLE `reports` ADD `payload` VARCHAR(500) NULL AFTER `referer`;');
+            }
+            $this->database->query('UPDATE settings SET value = "3.6" WHERE setting = "version"');
+            $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("emailfrom", "ezXSS");');
+
+            return ['redirect' => 'dashboard'];
+        }
+
         return 'Something went wrong..';
     }
 
@@ -159,12 +171,13 @@ class User
      * Update main settings
      * @method settings
      * @param string $email New email for alerts
-     * @param string $domPart DOM Lenght for mail
+     * @param string $emailFrom Send email from
+     * @param string $domPart DOM Length for mail
      * @param string $timezone Timezone for reports
      * @param string $payload Payload domain used
      * @return string success
      */
-    public function settings($email, $domPart, $timezone, $payload)
+    public function settings($email, $emailFrom, $domPart, $timezone, $payload)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'This is not a correct email address.';
@@ -179,6 +192,7 @@ class User
         }
 
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "email"', [':value' => $email]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "emailfrom"', [':value' => $emailFrom]);
         $this->database->fetch(
             'UPDATE settings SET value = :value WHERE setting = "dompart"',
             [':value' => (int)$domPart]
@@ -379,7 +393,9 @@ class User
     public function deleteReport($id)
     {
         $report = $this->database->fetch('SELECT screenshot FROM reports WHERE id = :id', [':id' => $id]);
-        unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
+        if($report['screenshot'] != '') {
+            unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
+        }
 
         $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
         return 'Report is deleted!';

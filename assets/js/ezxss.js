@@ -61,8 +61,7 @@ $(document).ready(function() {
     $(".delete").click(function() {
         var id = $(this).attr('report-id');
         request("delete-report", {id:id,csrf:csrf}).then(function(r) {
-            var loc = location.toString().split('/').pop();
-            if(loc == 'reports' || loc == 'archive') {
+            if(location.toString().split('/').slice(-2)[0] !== 'report') {
                 $("#"+id).fadeOut( "slow", function() {});
             } else {
                 window.location.href = '/manage/reports';
