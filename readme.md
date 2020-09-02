@@ -38,7 +38,7 @@ Some features ezXSS has
 ## Installation
 ezXSS is ez to install with Apache, NGINX or docker
 
-visit the [wiki](https://github.com/ssl/ezXSS/wiki/Installation) for installation instructions
+visit the [wiki](https://github.com/ssl/ezXSS/wiki/Installation) for installation instructions.
 
 ## Demo
 For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.
