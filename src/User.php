@@ -128,31 +128,33 @@ class User
     }
 
     public function update() {
-        if($this->database->fetchSetting('version') === version) {
+        $currentVersion = $this->database->fetchSetting('version');
+
+        if($currentVersion === version) {
             return 'You are already up-to-date.';
         }
 
-        if(version === '3.5') {
-            $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("killswitch", "");');
-            $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("version", "3.5");');
-            $this->database->query('ALTER TABLE `reports` ADD `payload` VARCHAR(500) NULL AFTER `referer`;');
+        $updateQuerys = [
+            '3.5' => [
+                'INSERT INTO `settings` (`setting`, `value`) VALUES ("killswitch", "");',
+                'ALTER TABLE `reports` ADD `payload` VARCHAR(500) NULL AFTER `referer`;'
+            ],
+            '3.6' => [
+                'INSERT INTO `settings` (`setting`, `value`) VALUES ("emailfrom", "ezXSS");'
+            ]
+        ];
 
-            return ['redirect' => 'dashboard'];
-        }
-
-        if(version === '3.6') {
-            if($this->database->fetchSetting('version') !== '3.5') {
-                $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("killswitch", "");');
-                $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("version", "3.5");');
-                $this->database->query('ALTER TABLE `reports` ADD `payload` VARCHAR(500) NULL AFTER `referer`;');
+        foreach($updateQuerys as $version => $sqlQuerys) {
+            if($version > $currentVersion) {
+                foreach ($sqlQuerys as $sqlQuery) {
+                    $this->database->query($sqlQuery);
+                }
             }
-            $this->database->query('UPDATE settings SET value = "3.6" WHERE setting = "version"');
-            $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("emailfrom", "ezXSS");');
-
-            return ['redirect' => 'dashboard'];
         }
 
-        return 'Something went wrong..';
+        $this->database->query('UPDATE settings SET value = "' . version . '" WHERE setting = "version"');
+
+        return ['redirect' => 'dashboard'];
     }
 
     /**
