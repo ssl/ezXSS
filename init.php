@@ -10,7 +10,7 @@
 |
 */
 
-define('version', '3.6');
+define('version', '3.7');
 define('debug', false);
 
 if (debug) {
@@ -46,7 +46,7 @@ if (PHP_VERSION_ID < 70100) {
 require_once __DIR__ . '/src/Autoload.php';
 
 if(!file_exists('.env')) {
-    error('You did not setup your config file. Rename .env.example to .env and fill in your database information.', true);
+    error('You did not setup your config file yet.', true);
 }
 
 $config = parse_ini_file('.env');
@@ -105,7 +105,7 @@ if (strpos($requestUrl, '/manage/') === 0 || strpos($requestUrl, '/manage') === 
 */
 
 function error($message, $wiki = false) {
-    $message .= ($wiki === true ? ' Visit the <a href="https://github.com/ssl/ezXSS">wiki</a> for more information.' : '');
+    $message .= ($wiki === true ? ' Visit the <a href="https://github.com/ssl/ezXSS/wiki">wiki</a> for more information.' : '');
     echo "<h1>Error</h1><p>$message</p>";
     exit();
 }
