@@ -39,12 +39,23 @@ Some features ezXSS has
 ezXSS is ez to install
 
 * Clone the repository and put the files in the document root
-* Rename config.ini.example to config.ini
-* Create an empty database and provide your database information in config.ini
+* Rename `.env.example` to `.env`
+* Create an empty database and provide your database information in `.env`
 * Visit /manage/install in your browser and setup a password and email
 * Done! That was ez right?
 
 Make sure you have Apache with headers, rewrite and curl modules enabled (with a2enmod, apt-get curl+php-curl) and that .htaccess file is correctly uploaded and allowed in vhost config (AllowOverride All).
+
+
+## Installation with docker-compose
+* Clone the repository and cd into it
+* Rename `.env.example` to `.env` and update it with a secure randomly generated password
+* Update SMTP info in `docker-php/msmtprc`
+* run `docker-compose build && docker-compose up -d`
+* Visit /manage/install in your browser and setup a password and email
+* Done! That was ez right?
+
+Make sure you are using docker-compose version 1.26.0 or newer. Visit https://docs.docker.com/compose/install/ for installation instructions.
 
 ## Demo
 For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.

@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  ezxssdb:
+    container_name: ${dbHost}
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_DATABASE=${dbName}
+      - MYSQL_USER=${dbUser}
+      - MYSQL_PASSWORD=${dbPassword}
+    volumes:
+      - ./ezxssdb:/var/lib/mysql
+  ezxss:
+    build: ./docker-php
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www/html
+    restart: always
+    depends_on:
+      - ezxssdb
