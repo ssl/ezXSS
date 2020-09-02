@@ -40,6 +40,8 @@ class Component
         if (strlen($this->setting('secret')) == 16) {
             return $this->basic->htmlBlocks('twofactorLogin');
         }
+
+        return '';
     }
 
     /**
