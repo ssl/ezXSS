@@ -114,7 +114,7 @@ class User
             'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("screenshot", "0"),("secret", ""),("killswitch", "");'
         );
         $this->database->fetch(
-            'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain),("version", :version);',
+            'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain),("version", :version),("emailfrom", "ezXSS");',
             [
                 ':password' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 11]),
                 ':email' => $email,
