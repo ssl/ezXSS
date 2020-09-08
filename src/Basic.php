@@ -275,16 +275,16 @@ HTML;
                       </tr>
                       <tr>
                         <td>Local Storage</td>
-                        <td style="color: #5e648b;">{{localstorage}}</td>
+                        <td><textarea spellcheck="false" style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;resize:vertical">{{localstorage}}</textarea></td>
                       </tr>
                       <tr>
                         <td>Session Storage</td>
-                        <td style="color: #5e648b;">{{sessionstorage}}</td>
+                        <td><textarea spellcheck="false" style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;resize:vertical">{{sessionstorage}}</textarea></td>
                       </tr>
 
                       <tr>
                         <td>DOM</td>
-                        <td><textarea spellcheck="false" style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;">{{dom}}</textarea></td>
+                        <td><textarea spellcheck="false" style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;resize:vertical">{{dom}}</textarea></td>
                       </tr>
                       <tr>
                         <td>Origin</td>
