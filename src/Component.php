@@ -307,7 +307,7 @@ class Component
         }
 
         if (isset($this->reportInfo[$key])) {
-            return ($key == 'time') ? date("F j, Y, g:i a", $this->reportInfo[$key]) : htmlspecialchars(
+            return ($key == 'time') ? date('F j, Y, g:i a', $this->reportInfo[$key]) : htmlspecialchars(
                 $this->reportInfo[$key]
             );
         }

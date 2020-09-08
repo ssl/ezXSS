@@ -79,7 +79,7 @@ class Request
                 return $this->convert($this->user->deleteReport($this->post('id')));
                 break;
             case 'share-report' :
-                return $this->convert($this->user->shareReport($this->post('reportid'), $this->post('domain')));
+                return $this->convert($this->user->shareReport($this->post('reportid'), $this->post('domain'), $this->post('email')));
                 break;
             case 'killswitch' :
                 return $this->convert($this->user->killSwitch($this->post('pass')));

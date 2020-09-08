@@ -408,9 +408,10 @@ class User
      * @method shareReport
      * @param string $id report id
      * @param string $domain domain to share with
+     * @param string $email email to share with
      * @return string success
      */
-    public function shareReport($id, $domain)
+    public function shareReport($id, $domain, $email)
     {
         $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id LIMIT 1', [':id' => $id]);
 
@@ -418,21 +419,85 @@ class User
             return 'This report does not exists.';
         }
 
-        $report['referrer'] = !empty($report['referer']) ? 'Shared via ' . $_SERVER['SERVER_NAME'] . ' - ' . $report['referer'] : 'Shared via ' . $_SERVER['SERVER_NAME'];
-        $report['shared'] = true;
-
-        $cb = curl_init((parse_url($domain, PHP_URL_SCHEME) ? '' : 'https://') . $domain . '/callback');
-        curl_setopt($cb, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($cb, CURLOPT_POSTFIELDS, json_encode($report));
-        curl_setopt($cb, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($cb, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        $result = curl_exec($cb);
-
-        if ($result != 'github.com/ssl/ezXSS') {
-            return 'Unable to find a valid ezXSS installation. Please check the domain.';
+        if(empty($domain) && empty($email)) {
+            return 'No domain or email submitted.';
         }
 
-        return 'Report is successfully shared!';
+        if(!empty($domain)) {
+            $report['referrer'] = !empty($report['referer']) ? 'Shared via ' . $_SERVER['SERVER_NAME'] . ' - ' . $report['referer'] : 'Shared via ' . $_SERVER['SERVER_NAME'];
+            $report['shared'] = true;
+
+            $cb = curl_init((parse_url($domain, PHP_URL_SCHEME) ? '' : 'https://') . $domain . '/callback');
+            curl_setopt($cb, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($cb, CURLOPT_POSTFIELDS, json_encode($report));
+            curl_setopt($cb, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($cb, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            $result = curl_exec($cb);
+
+            if ($result != 'github.com/ssl/ezXSS') {
+                return 'Unable to find a valid ezXSS installation. Please check the domain.';
+            }
+
+            return 'Report is successfully shared via domain!';
+        }
+
+        if(!empty($email)) {
+            if (!empty($report['screenshot'])) {
+                $report['screenshot'] = $this->basic->screenshotPath($report['screenshot']);
+            }
+
+            $htmlTemplate = str_replace(
+                [
+                    '{{id}}',
+                    '{{domain}}',
+                    '{{url}}',
+                    '{{ip}}',
+                    '{{referer}}',
+                    '{{payload}}',
+                    '{{user-agent}}',
+                    '{{cookies}}',
+                    '{{localstorage}}',
+                    '{{sessionstorage}}',
+                    '{{dom}}',
+                    '{{origin}}',
+                    '{{time}}',
+                    '{{screenshot}}'
+                ],
+                [
+                    $report['shareid'],
+                    htmlspecialchars($this->basic->domain()),
+                    htmlspecialchars($report['uri']),
+                    htmlspecialchars($report['ip']),
+                    htmlspecialchars($report['referer']),
+                    htmlspecialchars($report['payload']),
+                    htmlspecialchars($report['user-agent']),
+                    htmlspecialchars($report['cookies']),
+                    htmlspecialchars($report['localstorage']),
+                    htmlspecialchars($report['sessionstorage']),
+                    htmlspecialchars($report['dom']),
+                    htmlspecialchars($report['origin']),
+                    date('F j, Y, g:i a', $report['time']),
+                    $report['screenshot']
+                ],
+                $this->basic->htmlBlocks('mail')
+            );
+
+            $emailfrom = $this->database->fetch('SELECT * FROM settings WHERE setting = "emailfrom"');
+
+            $headers[] = 'From: ' . $emailfrom['value'];
+            $headers[] = 'MIME-Version: 1.0';
+            $headers[] = 'Content-type: text/html; charset=iso-8859-1';
+            mail(
+                $email,
+                '[ezXSS] Shared XSS on ' . htmlspecialchars($report['uri']),
+                $htmlTemplate,
+                implode("\r\n", $headers)
+            );
+
+            return 'Report is successfully shared via email!';
+        }
+
+        return 'Something went wrong..';
     }
 
     /**
