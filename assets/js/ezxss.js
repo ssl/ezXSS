@@ -81,6 +81,30 @@ $(document).ready(function() {
         $('#shareid').val("https://" + window.location.hostname + "/manage/report/" + $(this).attr('share-id') );
     });
 
+    $(".copycookies").click(function() {
+        var cookies = $("#cookies").text();
+        var split = cookies.split('; ');
+        var json = '[';
+        var origin = $(this).attr('report-origin');
+
+        $.each( split, function( index, value ) {
+            var cookieData = value.split('=');
+            var cookieName = cookieData[0];
+            var cookieValue = cookieData[1];
+
+            json += '{"domain":"'+origin+'","expirationDate":'+(Date.now() / 1000 + 31556926)+',"hostOnly":true,"httpOnly":false,"name":"'+cookieName+'","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId": "0","value":"'+cookieValue+'","id":"'+(index+1)+'"},';
+        });
+
+        json = json.substring(0, json.length - 1);
+        json += ']';
+
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val(json).select();
+        document.execCommand("copy");
+        $temp.remove();
+    });
+
     $('.left-nav-toggle a').on('click', function(event){
         event.preventDefault();
         $("body").toggleClass("nav-toggle");

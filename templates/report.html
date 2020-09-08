@@ -50,7 +50,7 @@
                                         </tr>
                                         <tr>
                                             <td>Cookies</td>
-                                            <td>{{report[cookies]}}</td>
+                                            <td id="cookies">{{report[cookies]}}</td>
                                         </tr>
                                         <tr>
                                             <td>Local Storage</td>
@@ -85,6 +85,7 @@
                                     <button class="btn share" data-target="#shareModal" data-toggle="modal"
                                             report-id="{{report[id]}}" share-id="{{report[shareid]}}">Share
                                     </button>
+                                    <button class="btn copycookies" report-origin="{{report[origin]}}">Copy cookies as JSON</button>
                                 </div>
                             </div>
                         </div>
