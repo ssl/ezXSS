@@ -36,7 +36,7 @@ Some features ezXSS has
 * An SSL if you want to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL)
 
 ## Installation
-ezXSS is ez to install with Apache, NGINX or docker
+ezXSS is ez to install with Apache, NGINX or Docker
 
 visit the [wiki](https://github.com/ssl/ezXSS/wiki/Installation) for installation instructions.
 
