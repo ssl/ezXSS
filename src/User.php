@@ -152,7 +152,11 @@ class User
             }
         }
 
-        $this->database->query('UPDATE settings SET value = "' . version . '" WHERE setting = "version"');
+        if(empty($currentVersion)) {
+          $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("version", "' . version . '");');
+        } else {
+          $this->database->query('UPDATE settings SET value = "' . version . '" WHERE setting = "version"');
+        }
 
         return ['redirect' => 'dashboard'];
     }
