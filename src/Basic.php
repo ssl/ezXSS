@@ -10,7 +10,7 @@ class Basic
 
     public function screenshotPath($screenshotName)
     {
-        return '<img src="http://' . $this->domain() . '/assets/img/report-' . $screenshotName . '.png">';
+        return '<img style="max-width: 100%;" src="http://' . $this->domain() . '/assets/img/report-' . $screenshotName . '.png">';
     }
 
     public function domain()
