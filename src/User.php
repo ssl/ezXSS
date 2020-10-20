@@ -270,7 +270,7 @@ class User
     {
         $this->database->fetch(
             'UPDATE settings SET value = :value WHERE setting = "customjs"',
-            [':value' => $customjs]
+            [':value' => base64_decode($customjs)]
         );
         return 'Your new settings are saved!';
     }

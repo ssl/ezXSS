@@ -15,7 +15,10 @@ $(document).ready(function() {
         Form.preventDefault();
         var inputs = {};
         $("form#" + this.id + " :input").each(function() {
-            if (this.id) {
+            if(this.id === 'customjs') {
+                inputs[this.id] = btoa(this.value);
+            }
+            else if (this.id) {
                 inputs[this.id] = this.value;
             }
         });
