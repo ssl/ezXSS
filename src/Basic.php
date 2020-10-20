@@ -109,10 +109,7 @@ HTML;
           <head>
             <meta charset="utf-8">
             <title>ezXSS ~ {{title}}</title>
-            <link rel="stylesheet" href="https://ssl.github.io/cdn/ezXSS/css/font-awesome.css" integrity="sha384-CA7nicOiG9xLJZ8K81i/oOvxFmpce86FdhD3mkdgvfuGMigwTwBElOMVQvEjkV9X" crossorigin="anonymous">
-            <link rel="stylesheet" href="https://ssl.github.io/cdn/ezXSS/css/bootstrap.css" integrity="sha384-GdlB5PJOMUfj80P5h0H9An3utYRUtyihpjksDyocWu1+XptBb/QB/sPgCrgYJCuZ" crossorigin="anonymous">
-            <link rel="stylesheet" href="https://ssl.github.io/cdn/ezXSS/css/3.0/style.css" integrity="sha384-Iny6sL805ZtFOrZ5JEzmYazKDtzoxw0CRXvMw7jLE/FqN3ehYg+RM2BTb1G2q+XY" crossorigin="anonymous">
-            <link rel="stylesheet" href="/assets/css/new.css">
+            <link rel="stylesheet" href="/assets/css/classic.css">
             <link rel="icon" href="/assets/img/favicon.ico" type="image/x-icon" />
             <meta name="MobileOptimized" content="width">
             <meta name="HandheldFriendly" content="true">
