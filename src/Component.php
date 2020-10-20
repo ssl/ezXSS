@@ -11,6 +11,7 @@ class Component
 
         $this->releases = [];
         $this->settings = [];
+        $this->statisticsCache = [];
         $this->filterSave = '';
         $this->filterAlert = '';
         $this->reportInfo = [];
@@ -91,37 +92,43 @@ class Component
      */
     public function statistics($branch)
     {
-        switch ($branch) {
-            case 'total' :
-                return ($this->database->fetch('SELECT COUNT(DISTINCT id) FROM reports', []))[0];
-                break;
-            case 'week' :
-                return ($this->database->fetch(
-                    'SELECT COUNT(DISTINCT id) FROM reports WHERE time > :time',
-                    [':time' => time() - 604800]
-                ))[0];
-                break;
-            case 'totaldomains' :
-                return ($this->database->fetch('SELECT COUNT(DISTINCT origin) FROM reports', []))[0];
-                break;
-            case 'weekdomains' :
-                return ($this->database->fetch(
-                    'SELECT COUNT(DISTINCT origin) FROM reports WHERE time > :time',
-                    [':time' => time() - 604800]
-                ))[0];
-                break;
-            case 'totalshared' :
-                return ($this->database->fetch(
-                    'SELECT COUNT(DISTINCT id) FROM reports WHERE referer LIKE "Shared via %"',
-                    []
-                ))[0];
-                break;
-        }
+        if($this->statisticsCache === []) {
+            $this->statisticsCache = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'totalshared' => 0, 'last' => 'never'];
 
-        if ($branch == 'last') {
-            $last = $this->database->fetch('SELECT id,time FROM reports ORDER BY id DESC LIMIT 1');
-            if (isset($last['id'])) {
-                $time = time() - $last['time'];
+            $allReports = $this->database->fetchAll('SELECT origin,time,referer FROM reports', []);
+
+            $this->statisticsCache['total'] = count($allReports);
+
+            $uniqueDomains = [];
+            $uniqueDomainsWeek = [];
+            foreach($allReports as $report) {
+
+                // Counts report from last week
+                if($report['time'] > time() - 604800) {
+                    $this->statisticsCache['week']++;
+
+                    // Counts unique domains from last week
+                    if(!in_array($report['origin'], $uniqueDomainsWeek, true)) {
+                        $uniqueDomainsWeek[] = $report['origin'];
+                        $this->statisticsCache['weekdomains']++;
+                    }
+                }
+
+                // Counts unique domains
+                if(!in_array($report['origin'], $uniqueDomains, true)) {
+                    $uniqueDomains[] = $report['origin'];
+                    $this->statisticsCache['totaldomains']++;
+                }
+
+                // Counts amount of shared reports
+                if(strpos($report['referer'], "Shared via ") === 0) {
+                    $this->statisticsCache['totalshared']++;
+                }
+            }
+
+            $lastReport = end($allReports);
+            if(isset($lastReport['time'])) {
+                $time = time() - $lastReport['time'];
                 $syntaxText = 's';
                 if ($time > 60) {
                     $time /= 60;
@@ -135,11 +142,13 @@ class Component
                     $time /= 24;
                     $syntaxText = 'd';
                 }
-                return floor($time) . $syntaxText;
+                $this->statisticsCache['last'] = floor($time) . $syntaxText;
             } else {
-                return 'never';
+                $this->statisticsCache['last'] = 'never';
             }
         }
+
+        return $this->statisticsCache[$branch];
     }
 
     /**
