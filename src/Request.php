@@ -44,7 +44,9 @@ class Request
                         $this->post('emailfrom'),
                         $this->post('dompart'),
                         $this->post('timezone'),
-                        $this->post('payload')
+                        $this->post('payload'),
+                        $this->post('filter'),
+                        $this->post('domains')
                     )
                 );
                 break;
@@ -57,14 +59,8 @@ class Request
                     )
                 );
                 break;
-            case 'filter-settings' :
-                return $this->convert($this->user->filter($this->post('filter')));
-                break;
             case 'screenshot-settings' :
                 return $this->convert($this->user->screenshot($this->post('screenshot')));
-                break;
-            case 'block-settings' :
-                return $this->convert($this->user->blockDomains($this->post('domains')));
                 break;
             case 'payload-settings' :
                 return $this->convert($this->user->payload($this->post('customjs')));

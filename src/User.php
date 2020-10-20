@@ -181,36 +181,36 @@ class User
      * @param string $domPart DOM Length for mail
      * @param string $timezone Timezone for reports
      * @param string $payload Payload domain used
+     * @param string $filterId
+     * @param string $domains
      * @return string success
      */
-    public function settings($email, $emailFrom, $domPart, $timezone, $payload)
+    public function settings($email, $emailFrom, $domPart, $timezone, $payload, $filterId, $domains)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'This is not a correct email address.';
         }
 
         if (!is_int((int)$domPart)) {
-            return 'The dom lenght needs to be a int number.';
+            return 'The dom length needs to be a int number.';
         }
 
         if (!in_array($timezone, timezone_identifiers_list())) {
             return 'The timezone is not a valid timezone.';
         }
 
+        $filterSave = ($filterId == 1 || $filterId == 2) ? 1 : 0;
+        $filterAlert = ($filterId == 1 || $filterId == 3) ? 1 : 0;
+
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "email"', [':value' => $email]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "emailfrom"', [':value' => $emailFrom]);
-        $this->database->fetch(
-            'UPDATE settings SET value = :value WHERE setting = "dompart"',
-            [':value' => (int)$domPart]
-        );
-        $this->database->fetch(
-            'UPDATE settings SET value = :value WHERE setting = "timezone"',
-            [':value' => $timezone]
-        );
-        $this->database->fetch(
-            'UPDATE settings SET value = :value WHERE setting = "payload-domain"',
-            [':value' => $payload]
-        );
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "dompart"', [':value' => (int)$domPart]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "timezone"', [':value' => $timezone]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "payload-domain"', [':value' => $payload]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "blocked-domains"', [':value' => $domains]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-save"', [':value' => $filterSave]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-alert"', [':value' => $filterAlert]);
+
         $this->createSession();
         return 'Your new settings are saved!';
     }
@@ -249,48 +249,6 @@ class User
     }
 
     /**
-     * Update filter values
-     * @method filter
-     * @param string $id Filter combination id
-     * @return string success
-     */
-    public function filter($id)
-    {
-        switch ($id) {
-            case 1 :
-                $filterSave = 1;
-                $filterAlert = 1;
-                break;
-            case 2 :
-                $filterSave = 1;
-                $filterAlert = 0;
-                break;
-            case 3 :
-                $filterSave = 0;
-                $filterAlert = 1;
-                break;
-            case 4 :
-                $filterSave = 0;
-                $filterAlert = 0;
-                break;
-            default :
-                $filterSave = 0;
-                $filterAlert = 0;
-                break;
-        }
-
-        $this->database->fetch(
-            'UPDATE settings SET value = :value WHERE setting = "filter-save"',
-            [':value' => $filterSave]
-        );
-        $this->database->fetch(
-            'UPDATE settings SET value = :value WHERE setting = "filter-alert"',
-            [':value' => $filterAlert]
-        );
-        return 'Your new filter options are saved!';
-    }
-
-    /**
      * Update screenshot value
      * @method screenshot
      * @param string $id Filter combination id
@@ -300,21 +258,6 @@ class User
     {
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "screenshot"', [':value' => $value]);
         return 'Your new screenshot options are saved!';
-    }
-
-    /**
-     * Update blocked domains
-     * @method blockDomains
-     * @param string $domains List of domains
-     * @return string success
-     */
-    public function blockDomains($domains)
-    {
-        $this->database->fetch(
-            'UPDATE settings SET value = :value WHERE setting = "blocked-domains"',
-            [':value' => $domains]
-        );
-        return 'Your new settings are saved!';
     }
 
     /**

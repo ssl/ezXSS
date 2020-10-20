@@ -53,6 +53,20 @@
                                     <input class="form-control" id="payload" name="payload" type="text"
                                            value="{{setting[payload-domain]}}">
                                 </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="filter">When an report is already known</label>
+                                    <select class="form-control" id="filter">
+                                        <option value="1" {{filterSelected[1]}}>Both save report and send alert</option>
+                                        <option value="2" {{filterSelected[2]}}>Only save report</option>
+                                        <option value="3" {{filterSelected[3]}}>Only send alert</option>
+                                        <option value="4" {{filterSelected[4]}}>Don't save report or send alert</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="domains">Blocked domains</label>
+                                    <input class="form-control" id="domains" name="domains" type="text"
+                                           value="{{setting[blocked-domains]}}">
+                                </div>
                                 <button class="btn">Save</button>
                             </form>
                         </div>
@@ -82,56 +96,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Filters</div>
-                        <div class="panel-body">
-                            <p>You can stop a double report from saving or alerting. If all information in report is the
-                                same it will ignore it.</p>
-                            <form class="form" id="filter-settings" method="post">
-                                <div class="form-group">
-                                    {{csrf[]}}
-                                    <label class="control-label" for="filter">When an report is already known</label>
-                                    <select class="form-control" id="filter">
-                                        <option value="1" {{filterSelected[1]}}>Both save report and send alert</option>
-                                        <option value="2" {{filterSelected[2]}}>Only save report</option>
-                                        <option value="3" {{filterSelected[3]}}>Only send alert</option>
-                                        <option value="4" {{filterSelected[4]}}>Don't save report or send alert</option>
-                                    </select>
-                                </div>
-                                <button class="btn">Save</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="col-lg-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Block domains</div>
-                        <div class="panel-body">
-                            <p>If you get too many reports from a domain, you can block the domain. Seperate multiple
-                                domains with a comma.</p>
-                            <form class="form" id="block-settings" method="post">
-                                <div class="form-group">
-                                    {{csrf[]}}
-                                    <label class="control-label" for="domains">Blocked domains</label>
-                                    <input class="form-control" id="domains" name="domains" type="text"
-                                           value="{{setting[blocked-domains]}}">
-                                </div>
-                                <button class="btn">Save</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-
-                <div class="col-lg-6">
-                    <div class="panel panel-filled">
+                     <div class="panel panel-filled" style="margin-top:-7px">
                         <div class="panel-heading">2FA login</div>
                         <div class="panel-body">
                             <p>You can activate Google Authenticator 2FA for extra protection or disable it.</p>
@@ -142,6 +109,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="row">
 
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
