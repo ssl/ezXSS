@@ -56,18 +56,70 @@
                 </div>
 
                 <div class="col-lg-6">
-
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Screenshot</div>
+                        <div class="panel-heading">Collecting</div>
                         <div class="panel-body">
-                            <form class="form" id="screenshot-settings">
-                                <div class="form-group">
-                                    {{csrf[]}}
-                                    <label class="control-label" for="screenshot">Screenshot</label>
-                                    <select class="form-control" id="screenshot">
-                                        <option value="1" {{screenshotSelected[1]}}>Enable screenshots</option>
-                                        <option value="0" {{screenshotSelected[0]}}>Disable screenshots</option>
-                                    </select>
+                            <form class="form" id="collecting" method="post">
+                                {{csrf[]}}
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[uri]" {{collectSelected[uri]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">URL</p>
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[ip]" {{collectSelected[ip]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">IP</p>
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[referer]" {{collectSelected[referer]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Referer</p>
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[user-agent]" {{collectSelected[user-agent]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">User Agent</p>
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[cookies]" {{collectSelected[cookies]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Cookies</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[localstorage]" {{collectSelected[localstorage]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Local Storage</p>
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[sessionstorage]" {{collectSelected[sessionstorage]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Session Storage</p>
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[dom]" {{collectSelected[dom]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">DOM</p>
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[origin]" {{collectSelected[origin]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Origin</p>
+                                            <label class="checkbox-label" style="display:inline">
+                                                <input class="chkbox" type="checkbox" name="selected" id="select[screenshot]" {{collectSelected[screenshot]}}>
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Screenshot</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <button class="btn">Save</button>
                             </form>

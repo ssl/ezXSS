@@ -10,6 +10,7 @@ class Component
         $this->basic = new Basic();
 
         $this->releases = [];
+        $this->settings = [];
         $this->filterSave = '';
         $this->filterAlert = '';
         $this->reportInfo = [];
@@ -56,10 +57,20 @@ class Component
             return $this->secret;
         }
 
-        $setting = $this->database->fetch('SELECT value FROM settings WHERE setting = :name LIMIT 1', [':name' => $name]);
-        return htmlspecialchars($setting['value'], ENT_QUOTES);
+        if ($this->settings === []) {
+            foreach ($this->database->fetchAll('SELECT setting,value FROM settings', []) as $setting) {
+                $this->settings[$setting['setting']] = $setting['value'];
+            }
+        }
+
+        return htmlspecialchars($this->settings[$name], ENT_QUOTES);
     }
 
+    /**
+     * Get select list with all timezones
+     * @method timezones
+     * @return string html with all timezones
+     */
     public function timezones() {
         $current = $this->setting('timezone');
         $html = '<select class="form-control" id="timezone" name="timezone">';
@@ -196,21 +207,14 @@ class Component
     }
 
     /**
-     * Returns selected if that are current screenshot options
-     * @method screenshotSelected
-     * @param string $id selected value
-     * @return string selected
+     * Returns checked if that option is active
+     * @method collectSelected
+     * @param string $name selected value
+     * @return string checked
      */
-    public function screenshotSelected($id)
-    {
-        $screenshot = $this->setting('screenshot');
-
-        if ($id == 1 && $screenshot == 1) {
-            return 'selected';
-        }
-
-        if ($id == 0 && $screenshot == 0) {
-            return 'selected';
+    public function collectSelected($name) {
+        if($this->setting('collect_' . $name) === '1') {
+            return 'checked';
         }
 
         return '';

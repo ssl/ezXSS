@@ -111,7 +111,7 @@ class User
             'CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`shareid` VARCHAR(50) NOT NULL,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`payload` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,`archive` int(11) DEFAULT 0,`screenshot` LONGTEXT NULL DEFAULT NULL,`localstorage` LONGTEXT NULL DEFAULT NULL, `sessionstorage` LONGTEXT NULL DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;'
         );
         $this->database->query(
-            'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("screenshot", "0"),("secret", ""),("killswitch", "");'
+            'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("secret", ""),("killswitch", ""),("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0");'
         );
         $this->database->fetch(
             'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain),("version", :version),("emailfrom", "ezXSS");',
@@ -141,6 +141,11 @@ class User
             ],
             '3.6' => [
                 'INSERT INTO `settings` (`setting`, `value`) VALUES ("emailfrom", "ezXSS");'
+            ],
+            '3.9' => [
+                'INSERT INTO `settings` (`setting`, `value`) VALUES ("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1");',
+                'INSERT INTO `settings` (`setting`, `value`) VALUES ("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0");',
+                'DELETE FROM `settings` WHERE `setting` = "screenshot"'
             ]
         ];
 
@@ -260,6 +265,30 @@ class User
         return 'Your new screenshot options are saved!';
     }
 
+    public function collecting($select) {
+        $options = ['uri', 'ip', 'referer', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'screenshot'];
+        foreach($options as $option) {
+            if (isset($select[$option])) {
+                $this->database->fetch(
+                    'UPDATE settings SET value = :value WHERE setting = :setting',
+                    [
+                        'setting' => "collect_{$option}",
+                        ':value' => '1'
+                    ]
+                );
+            } else {
+                $this->database->fetch(
+                    'UPDATE settings SET value = :value WHERE setting = :setting',
+                    [
+                        'setting' => "collect_{$option}",
+                        ':value' => '0'
+                    ]
+                );
+            }
+        }
+        return 'Collecting settings are saved.';
+    }
+
     /**
      * Update custom payload
      * @method payload
@@ -371,7 +400,7 @@ class User
         }
 
         if(!empty($domain)) {
-            $report['referrer'] = !empty($report['referer']) ? 'Shared via ' . $_SERVER['SERVER_NAME'] . ' - ' . $report['referer'] : 'Shared via ' . $_SERVER['SERVER_NAME'];
+            $report['referer'] = !empty($report['referer']) ? 'Shared via ' . $_SERVER['SERVER_NAME'] . ' - ' . $report['referer'] : 'Shared via ' . $_SERVER['SERVER_NAME'];
             $report['shared'] = true;
 
             $cb = curl_init((parse_url($domain, PHP_URL_SCHEME) ? '' : 'https://') . $domain . '/callback');

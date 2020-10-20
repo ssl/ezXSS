@@ -18,6 +18,14 @@ $(document).ready(function() {
             if(this.id === 'customjs') {
                 inputs[this.id] = btoa(this.value);
             }
+            else if(this.name == 'selected') {
+                $.each($("input[name='selected']:checked"), function(){
+                    inputs[this.id] = this.value;
+                });
+                if(this.id == 'csrf') {
+                    inputs[this.id] = this.value;
+                }
+            }
             else if (this.id) {
                 inputs[this.id] = this.value;
             }

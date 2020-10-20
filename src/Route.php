@@ -149,7 +149,7 @@ class Route
             $setting[$settings['setting']] = $settings['value'];
         }
 
-        $userIp = isset($json->shared) ? $json->ip : (isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']);
+        $userIp = $json->ip ?? $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'];
         $domain = htmlspecialchars($_SERVER['SERVER_NAME']);
         $json->origin = str_replace(['https://', 'http://'], '', $json->origin);
 
@@ -169,7 +169,7 @@ class Route
                     ':cookies' => $json->cookies,
                     ':dom' => $json->dom,
                     ':origin' => $json->origin,
-                    ':referer' => $json->referrer,
+                    ':referer' => $json->referer,
                     ':uri' => $json->uri,
                     ':userAgent' => $json->{'user-agent'},
                     ':ip' => $userIp
@@ -210,7 +210,7 @@ class Route
                     ':cookies' => $json->cookies,
                     ':dom' => $json->dom,
                     ':origin' => $json->origin,
-                    ':referer' => $json->referrer,
+                    ':referer' => $json->referer,
                     ':uri' => $json->uri,
                     ':userAgent' => $json->{'user-agent'},
                     ':ip' => $userIp,
@@ -249,7 +249,7 @@ class Route
                         htmlspecialchars($domain),
                         htmlspecialchars($json->uri),
                         htmlspecialchars($userIp),
-                        htmlspecialchars($json->referrer),
+                        htmlspecialchars($json->referer),
                         htmlspecialchars($json->payload),
                         htmlspecialchars($json->{'user-agent'}),
                         htmlspecialchars($json->cookies),
@@ -299,15 +299,23 @@ class Route
             }
         }
 
+        $noCollect = '';
+        foreach ($this->database->fetchAll('SELECT setting,value FROM settings WHERE setting LIKE "%collect_%"', []) as $setting) {
+            if($setting['value'] === '0' && $setting['setting'] !== 'collect_screenshot') {
+                $noCollect .= "'" . str_replace('collect_', '', $setting['setting']) . "',";
+            }
+        }
+
         return str_replace(
-            ['{{domain}}', '{{screenshot}}', '{{customjs}}', '{{version}}', '{{payload}}', '{{payloadFile}}'],
+            ['{{domain}}', '{{screenshot}}', '{{customjs}}', '{{version}}', '{{payload}}', '{{payloadFile}}', '{{noCollect}}'],
             [
                 $this->basic->domain(),
-                (($this->database->fetchSetting('screenshot')) ? $this->getFile('screenshot', 'js') : ''),
+                (($this->database->fetchSetting('collect_screenshot')) ? $this->getFile('screenshot', 'js') : ''),
                 $this->database->fetchSetting('customjs'),
                 version,
                 htmlspecialchars("//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"),
-                $payloadFile
+                $payloadFile,
+                rtrim($noCollect, ',')
             ],
             $this->getFile($payloadFile, 'js')
         );

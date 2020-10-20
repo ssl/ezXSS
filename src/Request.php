@@ -89,6 +89,9 @@ class Request
             case 'update' :
                 return $this->convert($this->user->update());
                 break;
+            case 'collecting' :
+                return $this->convert($this->user->collecting($this->post('select')));
+                break;
             default :
                 return $this->convert('This action does not exists.');
                 break;

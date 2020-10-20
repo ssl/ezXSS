@@ -273,6 +273,7 @@ th{color:#ffffff}
 .checkbox-label .checkbox-custom::after{position:absolute;content:"";left:12px;top:12px;height:0px;width:0px;border-radius:5px;border:solid #009BFF;border-width:0 3px 3px 0;-webkit-transform:rotate(0deg) scale(0);-ms-transform:rotate(0deg) scale(0);transform:rotate(0deg) scale(0);opacity:1;transition:all 0.3s ease-out;-webkit-transition:all 0.3s ease-out;-moz-transition:all 0.3s ease-out;-ms-transition:all 0.3s ease-out;-o-transition:all 0.3s ease-out}
 .checkbox-label input:checked ~ .checkbox-custom::after{-webkit-transform:rotate(45deg) scale(1);-ms-transform:rotate(45deg) scale(1);transform:rotate(45deg) scale(1);opacity:1;left:8px;top:3px;width:6px;height:12px;border:solid #23284b;border-width:0 2px 2px 0;background-color:transparent;border-radius:0}
 .float-left{float:left}
+.checkbox-text{padding-left:35px;padding-top:2px;}
 ::-moz-selection{color:#2c3256;background:white}
 ::selection{color:#2c3256;background:white}
 ::placeholder{color:#686d9375!important;opacity:1}
