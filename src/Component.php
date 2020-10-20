@@ -60,6 +60,18 @@ class Component
         return htmlspecialchars($setting['value'], ENT_QUOTES);
     }
 
+    public function timezones() {
+        $current = $this->setting('timezone');
+        $html = '<select class="form-control" id="timezone" name="timezone">';
+        foreach (timezone_identifiers_list() as $key => $name) {
+            $html .= '<option value="'.$name.'"';
+            $html .= ($name === $current ? ' selected' : '');
+            $html .= '>'.$name.'</option>';
+        }
+        $html .= '</select>';
+        return $html;
+    }
+
     /**
      * Get statistics of amount of reports
      * @method statistics
@@ -231,14 +243,10 @@ class Component
         foreach ($this->database->fetchAll($query, $array) as $report) {
             $report['uri'] = strlen($report['uri']) > 80 ? substr($report['uri'], 0, 80) . '..' : $report['uri'];
             $report['ip'] = strlen($report['ip']) > 15 ? substr($report['ip'], 0, 15) . '..' : $report['ip'];
-            $report['origin'] = strlen($report['origin']) > 20 ? substr(
-                    $report['origin'],
-                    0,
-                    20
-                ) . '..' : $report['origin'];
+            $report['origin'] = strlen($report['origin']) > 20 ? substr($report['origin'], 0, 20) . '..' : $report['origin'];
 
             $tempHtml = $htmlTemplate;
-            preg_match_all('/{{(.*?)\[(.*?)\]}}/', $tempHtml, $matches);
+            preg_match_all('/{{(.*?)\[(.*?)]}}/', $tempHtml, $matches);
             foreach ($matches[1] as $key => $value) {
                 $tempHtml = str_replace($matches[0][$key], htmlspecialchars($report["{$matches[2][$key]}"]), $tempHtml);
             }

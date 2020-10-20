@@ -60,7 +60,7 @@ class Route
             return $this->redirect('login');
         }
 
-        if (!$this->database->rowCount('SELECT * FROM settings') > 0 && $file != 'install') {
+        if ((!$this->database->rowCount('SELECT * FROM settings')) > 0 && $file != 'install') {
             return $this->redirect('install');
         }
 
@@ -83,11 +83,13 @@ class Route
      * Redirect browser to link
      * @method redirect
      * @param string $page Page link to redirect to
+     * @return string
      */
     private function redirect($page)
     {
         $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
         header("Location: /manage/{$page}");
+        return 'Redirect';
     }
 
     /**
@@ -153,7 +155,8 @@ class Route
 
         if ($json->origin == $setting['blocked-domains'] || in_array(
                 $json->origin,
-                explode(',', $setting['blocked-domains'])
+                explode(',', $setting['blocked-domains']),
+                true
             )) {
             return 'github.com/ssl/ezXSS';
         }
@@ -212,7 +215,7 @@ class Route
                     ':userAgent' => $json->{'user-agent'},
                     ':ip' => $userIp,
                     ':time' => time(),
-                    ':screenshot' => ((isset($screenshotName)) ? $screenshotName : ''),
+                    ':screenshot' => ($screenshotName ?? ''),
                     ':localstorage' => json_encode($json->localstorage),
                     ':sessionstorage' => json_encode($json->sessionstorage),
                     ':payload' => $json->payload

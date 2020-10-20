@@ -103,7 +103,7 @@ class Request
      */
     private function post($key)
     {
-        return (isset($_POST[$key])) ? $_POST[$key] : '';
+        return $_POST[$key] ?? '';
     }
 
     /**
@@ -118,8 +118,8 @@ class Request
             return json_encode(['echo' => $array]);
         }
 
-        $array['echo'] = (isset($array['echo'])) ? $array['echo'] : false;
-        $array['redirect'] = (isset($array['redirect'])) ? $array['redirect'] : false;
+        $array['echo'] = $array['echo'] ?? false;
+        $array['redirect'] = $array['redirect'] ?? false;
         return json_encode($array);
     }
 

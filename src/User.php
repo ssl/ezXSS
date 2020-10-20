@@ -25,9 +25,9 @@ class User
      */
     public function getCsrf()
     {
-        return (!isset($_SESSION['csrfToken'])) ? $_SESSION['csrfToken'] = bin2hex(
-            openssl_random_pseudo_bytes(32)
-        ) : $_SESSION['csrfToken'];
+        return $_SESSION['csrfToken'] ?? $_SESSION['csrfToken'] = bin2hex(
+                openssl_random_pseudo_bytes(32)
+            );
     }
 
     /**
@@ -381,7 +381,7 @@ class User
             curl_setopt($cb, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
             $result = curl_exec($cb);
 
-            if ($result != 'github.com/ssl/ezXSS') {
+            if ($result !== 'github.com/ssl/ezXSS') {
                 return 'Unable to find a valid ezXSS installation. Please check the domain.';
             }
 
