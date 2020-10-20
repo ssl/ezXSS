@@ -11,7 +11,7 @@
 */
 
 define('version', '3.9');
-define('debug', true);
+define('debug', false);
 
 if (debug) {
     error_reporting(E_ALL);

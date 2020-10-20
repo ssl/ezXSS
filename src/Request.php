@@ -59,9 +59,6 @@ class Request
                     )
                 );
                 break;
-            case 'screenshot-settings' :
-                return $this->convert($this->user->screenshot($this->post('screenshot')));
-                break;
             case 'payload-settings' :
                 return $this->convert($this->user->payload($this->post('customjs')));
                 break;
