@@ -155,7 +155,7 @@ HTML;
 
         if ($htmlBlock == 'twofactorDisable') {
             return <<<HTML
-        <div class="form-group">
+        <div class="form-group" style="margin-top:35px;margin-bottom:30px">
           <p>You already enabled 2FA. Enter the code to disable it.</p>
         </div>
 
