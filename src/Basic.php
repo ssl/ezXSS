@@ -117,9 +117,8 @@ HTML;
           </head>
           <body>
             {{template}}
-
-            <script src="https://ssl.github.io/cdn/ezXSS/js/jquery.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
-            <script src="https://ssl.github.io/cdn/ezXSS/js/bootstrap.js" integrity="sha384-hFgRcCfdoHZzpNxRIokVxKLVvuKCFoY3CNDrnFkk7pGwsQNKvflHATtmGxcYcgbs" crossorigin="anonymous"></script>
+            <script src="/assets/js/jquery.js" charset="utf-8"></script>
+            <script src="/assets/js/bootstrap.js" charset="utf-8"></script>
             <script src="/assets/js/ezxss.js" charset="utf-8"></script>
           </body>
         </html>
