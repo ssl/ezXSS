@@ -275,7 +275,7 @@ th{color:#ffffff}
 .float-left{float:left}
 ::-moz-selection{color:#2c3256;background:white}
 ::selection{color:#2c3256;background:white}
-::placeholder{color:#5e648b!important;opacity:1}
+::placeholder{color:#686d9375!important;opacity:1}
 
 @media print{
     *,*:before,*:after{color:#000!important;text-shadow:none!important;background:transparent!important;-webkit-box-shadow:none!important;box-shadow:none!important}
