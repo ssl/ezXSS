@@ -164,17 +164,23 @@ class Component
      */
     public function reportsList($archive)
     {
+        $limit = (isset($_GET['limit']) && is_numeric($_GET['limit'])) ? (int)$_GET['limit'] : 50;
         if (isset($_GET['search'])) {
-            $query = 'SELECT id,shareid,uri,ip,origin FROM reports WHERE uri LIKE :uri OR ip LIKE :ip OR origin LIKE :origin LIMIT :limit,50';
+            $query = 'SELECT id,shareid,uri,ip,origin FROM reports WHERE uri LIKE :uri OR ip LIKE :ip OR origin LIKE :origin LIMIT :page,:limit';
             $array = [
                 ':uri' => '%' . $_GET['search'] . '%',
                 ':ip' => '%' . $_GET['search'] . '%',
                 ':origin' => '%' . $_GET['search'] . '%',
-                ':limit' => $this->page() * 50
+                ':page' => isset($_GET['limit']) ? 0 : $this->page() * 50,
+                ':limit' => $limit
             ];
         } else {
-            $query = 'SELECT id,shareid,uri,ip,origin FROM reports WHERE archive = :archive ORDER BY id DESC LIMIT :limit,50';
-            $array = [':archive' => $archive, ':limit' => $this->page() * 50];
+            $query = 'SELECT id,shareid,uri,ip,origin FROM reports WHERE archive = :archive ORDER BY id DESC LIMIT :page,:limit';
+            $array = [
+                ':archive' => $archive,
+                ':page' => isset($_GET['limit']) ? 0 : $this->page() * 50,
+                ':limit' => $limit
+            ];
         }
 
         $htmlTemplate = $this->basic->htmlBlocks('reportList');
