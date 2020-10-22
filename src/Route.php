@@ -39,40 +39,40 @@ class Route
      */
     public function template($file)
     {
-        if (!in_array($file, $this->validTemplates) || $file == '') {
+        if (!in_array($file, $this->validTemplates, true)) {
             return $this->redirect('login');
         }
 
-        if ($file == 'report' && isset(explode('/', $_SERVER['REQUEST_URI'])[4])) {
+        if ($file === 'report' && isset(explode('/', $_SERVER['REQUEST_URI'])[4])) {
             return $this->redirect('reports');
         }
 
-        if ($this->user->isLoggedIn() && ($file == 'login' || $file == 'install')) {
+        if ($this->user->isLoggedIn() && ($file === 'login' || $file === 'install')) {
             return $this->redirect('dashboard');
         }
 
-        if (!$this->user->isLoggedIn() && $file != 'login' && $file != 'install' && $file != 'report' && $file != 'update') {
+        if (!$this->user->isLoggedIn() && $file !== 'login' && $file !== 'install' && $file !== 'report' && $file !== 'update') {
             return $this->redirect('login');
         }
 
-        if ($file == 'report' && ((is_numeric(explode('/', $_SERVER['REQUEST_URI'])[3]) && !$this->user->isLoggedIn(
+        if ($file === 'report' && ((is_numeric(explode('/', $_SERVER['REQUEST_URI'])[3]) && !$this->user->isLoggedIn(
                     )) || empty(explode('/', $_SERVER['REQUEST_URI'])[3]))) {
             return $this->redirect('login');
         }
 
-        if ((!$this->database->rowCount('SELECT * FROM settings')) > 0 && $file != 'install') {
+        if ($file !== 'install' && !$this->database->isInstalled()) {
             return $this->redirect('install');
         }
 
-        if ($this->database->rowCount('SELECT * FROM settings') > 0 && $file == 'install') {
+        if ($file === 'install' && $this->database->isInstalled()) {
             return $this->redirect('login');
         }
 
-        if($file != 'update' && $file != 'install' && $this->database->fetchSetting('version') !== version) {
+        if($file !== 'update' && $file !== 'install' && $this->database->fetchSetting('version') !== version) {
             return $this->redirect('update');
         }
 
-        if($file == 'update' && $this->database->fetchSetting('version') === version) {
+        if($file === 'update' && $this->database->fetchSetting('version') === version) {
             return $this->redirect('login');
         }
 
@@ -111,11 +111,11 @@ class Route
             $this->basic->htmlBlocks('main')
         );
 
-        preg_match_all('/{{(.*?)\[(.*?)\]}}/', $html, $matches);
+        preg_match_all('/{{(.*?)\[(.*?)]}}/', $html, $matches);
         foreach ($matches[1] as $key => $value) {
             $html = str_replace(
                 $matches[0][$key],
-                $this->component->$value("{$matches[2][$key]}"),
+                $this->component->$value((string)($matches[2][$key])),
                 $html
             );
         }
@@ -127,6 +127,7 @@ class Route
      * Return html of provided template
      * @method parseTemplate
      * @param string $file Requested template
+     * @param string $extension
      * @return string HTML of template
      */
     private function getFile($file, $extension = 'html')
@@ -142,7 +143,7 @@ class Route
      */
     public function callback($phpInput)
     {
-        $json = json_decode($phpInput);
+        $json = json_decode($phpInput, false);
 
         $setting = [];
         foreach ($this->database->query('SELECT * FROM settings') as $settings) {
@@ -285,7 +286,7 @@ class Route
      */
     public function jsPayload()
     {
-        if ((!$this->database->rowCount('SELECT * FROM settings')) > 0) {
+        if (!$this->database->isInstalled()) {
             return $this->redirect('install');
         }
 
@@ -334,12 +335,6 @@ class Route
                 http_response_code(404);
                 exit();
             }
-        }
-
-        if (!empty($this->database->fetchSetting('timezone'))) {
-            date_default_timezone_set($this->database->fetchSetting('timezone'));
-        } else {
-            date_default_timezone_set('Europe/Amsterdam');
         }
     }
 }

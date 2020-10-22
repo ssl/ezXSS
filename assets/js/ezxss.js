@@ -10,6 +10,14 @@ function request(action, data) {
 
 $(document).ready(function() {
 
+    if(location.toString().split('/').pop() == 'dashboard') {
+        request('statistics', {csrf:csrf}).then(function(r) {
+            $.each( r, function( key, value ) {
+                $("#"+key).html(value);
+            });
+        });
+    }
+
     $("form.form").submit(function(Form) {
         $("#alert").slideUp();
         Form.preventDefault();

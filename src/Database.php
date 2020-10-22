@@ -3,6 +3,7 @@
 class Database
 {
     private $DB;
+    private $settingsCache = [];
 
     /**
      * Try to connect to database
@@ -81,13 +82,17 @@ class Database
     /**
      * Return value of setting
      * @method fetchSetting
-     * @param string $setting Setting name
+     * @param string $name Setting name
      * @return string Setting value
      */
-    public function fetchSetting($setting)
+    public function fetchSetting($name)
     {
-        $query = $this->fetch('SELECT value FROM settings WHERE setting = :setting LIMIT 1', [':setting' => $setting]);
-        return $query[0];
+        if($this->settingsCache === []) {
+            foreach($this->fetchAll('SELECT setting,value FROM settings', []) as $setting) {
+                $this->settingsCache[$setting['setting']] = $setting['value'];
+            }
+        }
+        return $this->settingsCache[$name];
     }
 
     /**
@@ -102,6 +107,11 @@ class Database
         $fetch = $this->DB->prepare($query);
         $fetch->execute($array);
         return $fetch->fetch();
+    }
+
+    public function isInstalled() {
+        $rowCount = $this->rowCount('SELECT id FROM settings');
+        return $rowCount > 0;
     }
 
 }

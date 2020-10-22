@@ -54,17 +54,11 @@ class Component
      */
     public function setting($name)
     {
-        if ($name == 'temp-secret') {
+        if ($name === 'temp-secret') {
             return $this->secret;
         }
 
-        if ($this->settings === []) {
-            foreach ($this->database->fetchAll('SELECT setting,value FROM settings', []) as $setting) {
-                $this->settings[$setting['setting']] = $setting['value'];
-            }
-        }
-
-        return htmlspecialchars($this->settings[$name], ENT_QUOTES);
+        return htmlspecialchars($this->database->fetchSetting($name), ENT_QUOTES);
     }
 
     /**
@@ -82,73 +76,6 @@ class Component
         }
         $html .= '</select>';
         return $html;
-    }
-
-    /**
-     * Get statistics of amount of reports
-     * @method statistics
-     * @param string $branch which branch
-     * @return string count
-     */
-    public function statistics($branch)
-    {
-        if($this->statisticsCache === []) {
-            $this->statisticsCache = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'totalshared' => 0, 'last' => 'never'];
-
-            $allReports = $this->database->fetchAll('SELECT origin,time,referer FROM reports', []);
-
-            $this->statisticsCache['total'] = count($allReports);
-
-            $uniqueDomains = [];
-            $uniqueDomainsWeek = [];
-            foreach($allReports as $report) {
-
-                // Counts report from last week
-                if($report['time'] > time() - 604800) {
-                    $this->statisticsCache['week']++;
-
-                    // Counts unique domains from last week
-                    if(!in_array($report['origin'], $uniqueDomainsWeek, true)) {
-                        $uniqueDomainsWeek[] = $report['origin'];
-                        $this->statisticsCache['weekdomains']++;
-                    }
-                }
-
-                // Counts unique domains
-                if(!in_array($report['origin'], $uniqueDomains, true)) {
-                    $uniqueDomains[] = $report['origin'];
-                    $this->statisticsCache['totaldomains']++;
-                }
-
-                // Counts amount of shared reports
-                if(strpos($report['referer'], "Shared via ") === 0) {
-                    $this->statisticsCache['totalshared']++;
-                }
-            }
-
-            $lastReport = end($allReports);
-            if(isset($lastReport['time'])) {
-                $time = time() - $lastReport['time'];
-                $syntaxText = 's';
-                if ($time > 60) {
-                    $time /= 60;
-                    $syntaxText = 'm';
-                }
-                if ($time > 60) {
-                    $time /= 60;
-                    $syntaxText = 'h';
-                }
-                if ($time > 24) {
-                    $time /= 24;
-                    $syntaxText = 'd';
-                }
-                $this->statisticsCache['last'] = floor($time) . $syntaxText;
-            } else {
-                $this->statisticsCache['last'] = 'never';
-            }
-        }
-
-        return $this->statisticsCache[$branch];
     }
 
     /**
@@ -328,6 +255,7 @@ class Component
         }
 
         if (isset($this->reportInfo[$key])) {
+            date_default_timezone_set($this->setting('timezone'));
             return ($key == 'time') ? date('F j, Y, g:i a', $this->reportInfo[$key]) : htmlspecialchars(
                 $this->reportInfo[$key]
             );
@@ -374,9 +302,9 @@ class Component
      */
     public function twofactorSettings()
     {
-        $secretCheck = $this->database->fetch('SELECT value FROM settings WHERE setting = "secret"');
+        $secretCheck = $this->setting('secret');
 
-        if (strlen($secretCheck['value']) !== 16) {
+        if (strlen($secretCheck) !== 16) {
             if ($this->secret == '') {
                 for ($i = 0; $i < 16; $i++) {
                     $this->secret .= $this->base32Characters[rand(0, 31)];

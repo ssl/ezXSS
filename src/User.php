@@ -43,14 +43,14 @@ class User
             return ['redirect' => 'dashboard'];
         }
 
-        $passwordHash = $this->database->fetch('SELECT * FROM settings WHERE setting = "password"');
-        $secret = $this->database->fetch('SELECT * FROM settings WHERE setting = "secret"');
+        $passwordHash = $this->database->fetchSetting('password');
+        $secret = $this->database->fetchSetting('secret');
 
-        if (!password_verify($password, $passwordHash['value'])) {
+        if (!password_verify($password, $passwordHash)) {
             return 'The password you entered is not valid.';
         }
 
-        if (strlen($secret['value']) == 16 && $this->basic->getCode($secret['value']) != $code) {
+        if (strlen($secret) === 16 && $this->basic->getCode($secret) != $code) {
             return 'The code is incorrect.';
         }
 
@@ -58,10 +58,9 @@ class User
 
         if (isset($_SESSION['redirect'])) {
             return ['redirect' => $_SESSION['redirect']];
-            unsset($_SESSION['redirect']);
-        } else {
-            return ['redirect' => 'dashboard'];
         }
+
+        return ['redirect' => 'dashboard'];
     }
 
     /**
@@ -71,7 +70,7 @@ class User
      */
     public function isLoggedIn()
     {
-        return (isset($_SESSION['login'])) ? $_SESSION['login'] : false;
+        return isset($_SESSION['login']) ? true : false;
     }
 
     /**
@@ -230,18 +229,18 @@ class User
      */
     public function password($password, $newPassword, $newPassword2)
     {
-        $currentPassword = $this->database->fetch('SELECT * FROM settings WHERE setting = "password" LIMIT 1');
+        $currentPassword = $this->database->fetchSetting('password');
 
-        if (!password_verify($password, $currentPassword['value'])) {
+        if (!password_verify($password, $currentPassword)) {
             return 'Current password is not correct.';
         }
 
         if (strlen($newPassword) < 8) {
-            return 'The new password needs to be atleast 8 characters long.';
+            return 'The new password needs to be at least 8 characters long.';
         }
 
-        if ($newPassword != $newPassword2) {
-            return 'The retypted password is not the same as the new password.';
+        if ($newPassword !== $newPassword2) {
+            return 'The retyped password is not the same as the new password.';
         }
 
         $this->database->fetch(
@@ -313,14 +312,14 @@ class User
      */
     public function twofactor($secret, $code)
     {
-        $secretCode = $this->database->fetch('SELECT * FROM settings WHERE setting = "secret"');
+        $secretCode = $this->database->fetchSetting('secret');
 
         if (strlen($secret) == 16) {
-            if (strlen($secretCode['value']) == 16) {
+            if (strlen($secretCode) === 16) {
                 return '2FA settings are already enabled.';
             }
 
-            if (strlen($secret) != 16) {
+            if (strlen($secret) !== 16) {
                 return 'Secret length needs to be 16 characters long';
             }
 
@@ -328,11 +327,11 @@ class User
                 return 'Code is incorrect.';
             }
         } else {
-            if (strlen($secretCode['value']) != 16) {
+            if (strlen($secretCode) !== 16) {
                 return '2FA settings are already disabled.';
             }
 
-            if ($this->basic->getCode($secretCode['value']) != $code) {
+            if ($this->basic->getCode($secretCode) != $code) {
                 return 'Code is incorrect.';
             }
 
@@ -347,7 +346,6 @@ class User
      * Update archive status
      * @method archiveReport
      * @param string $id report id
-     * @param string $archive either 1 of 0
      * @return string success
      */
     public function archiveReport($id)
@@ -458,9 +456,9 @@ class User
                 $this->basic->htmlBlocks('mail')
             );
 
-            $emailfrom = $this->database->fetch('SELECT * FROM settings WHERE setting = "emailfrom"');
+            $emailfrom = $this->database->fetchSetting('emailform');
 
-            $headers[] = 'From: ' . $emailfrom['value'];
+            $headers[] = 'From: ' . $emailfrom;
             $headers[] = 'MIME-Version: 1.0';
             $headers[] = 'Content-type: text/html; charset=iso-8859-1';
             mail(
@@ -521,5 +519,67 @@ class User
             );
         }
         return 'Reports are archived.';
+    }
+
+    /**
+     * Get statistics of amount of reports
+     * @method statistics
+     * @return string count
+     */
+    public function statistics()
+    {
+            $statistics = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'totalshared' => 0, 'last' => 'never'];
+
+            $allReports = $this->database->fetchAll('SELECT origin,time,referer FROM reports', []);
+
+            $statistics['total'] = count($allReports);
+
+            $uniqueDomains = [];
+            $uniqueDomainsWeek = [];
+            foreach($allReports as $report) {
+
+                // Counts report from last week
+                if($report['time'] > time() - 604800) {
+                    $statistics['week']++;
+
+                    // Counts unique domains from last week
+                    if(!in_array($report['origin'], $uniqueDomainsWeek, true)) {
+                        $uniqueDomainsWeek[] = $report['origin'];
+                        $statistics['weekdomains']++;
+                    }
+                }
+
+                // Counts unique domains
+                if(!in_array($report['origin'], $uniqueDomains, true)) {
+                    $uniqueDomains[] = $report['origin'];
+                    $statistics['totaldomains']++;
+                }
+
+                // Counts amount of shared reports
+                if(strpos($report['referer'], "Shared via ") === 0) {
+                    $statistics['totalshared']++;
+                }
+            }
+
+            $lastReport = end($allReports);
+            if(isset($lastReport['time'])) {
+                $time = time() - $lastReport['time'];
+                $syntaxText = 's';
+                if ($time > 60) {
+                    $time /= 60;
+                    $syntaxText = 'm';
+                }
+                if ($time > 60) {
+                    $time /= 60;
+                    $syntaxText = 'h';
+                }
+                if ($time > 24) {
+                    $time /= 24;
+                    $syntaxText = 'd';
+                }
+                $statistics['last'] = floor($time) . $syntaxText;
+            }
+
+        return json_encode($statistics);
     }
 }

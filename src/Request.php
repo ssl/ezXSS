@@ -19,11 +19,11 @@ class Request
      */
     public function json()
     {
-        if ($this->user->getCsrf() != $this->post('csrf')) {
+        if ($this->user->getCsrf() !== $this->post('csrf')) {
             return $this->convert('CSRF token is not valid');
         }
 
-        if (!$this->user->isLoggedIn() && $this->post('action') != 'login' && $this->post('action') != 'install' && $this->post('action') != 'update') {
+        if (!$this->user->isLoggedIn() && $this->post('action') !== 'login' && $this->post('action') !== 'install' && $this->post('action') !== 'update') {
             return $this->convert('You need to be logged in to perform this action.');
         }
 
@@ -89,6 +89,8 @@ class Request
             case 'collecting' :
                 return $this->convert($this->user->collecting($this->post('select')));
                 break;
+            case 'statistics':
+                return $this->user->statistics();
             default :
                 return $this->convert('This action does not exists.');
                 break;
