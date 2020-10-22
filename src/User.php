@@ -528,57 +528,57 @@ class User
      */
     public function statistics()
     {
-            $statistics = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'totalshared' => 0, 'last' => 'never'];
+        $statistics = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'totalshared' => 0, 'last' => 'never'];
 
-            $allReports = $this->database->fetchAll('SELECT origin,time,referer FROM reports', []);
+        $allReports = $this->database->fetchAll('SELECT origin,time,referer FROM reports', []);
 
-            $statistics['total'] = count($allReports);
+        $statistics['total'] = count($allReports);
 
-            $uniqueDomains = [];
-            $uniqueDomainsWeek = [];
-            foreach($allReports as $report) {
+        $uniqueDomains = [];
+        $uniqueDomainsWeek = [];
+        foreach($allReports as $report) {
 
-                // Counts report from last week
-                if($report['time'] > time() - 604800) {
-                    $statistics['week']++;
+            // Counts report from last week
+            if($report['time'] > time() - 604800) {
+                $statistics['week']++;
 
-                    // Counts unique domains from last week
-                    if(!in_array($report['origin'], $uniqueDomainsWeek, true)) {
-                        $uniqueDomainsWeek[] = $report['origin'];
-                        $statistics['weekdomains']++;
-                    }
-                }
-
-                // Counts unique domains
-                if(!in_array($report['origin'], $uniqueDomains, true)) {
-                    $uniqueDomains[] = $report['origin'];
-                    $statistics['totaldomains']++;
-                }
-
-                // Counts amount of shared reports
-                if(strpos($report['referer'], "Shared via ") === 0) {
-                    $statistics['totalshared']++;
+                // Counts unique domains from last week
+                if(!in_array($report['origin'], $uniqueDomainsWeek, true)) {
+                    $uniqueDomainsWeek[] = $report['origin'];
+                    $statistics['weekdomains']++;
                 }
             }
 
-            $lastReport = end($allReports);
-            if(isset($lastReport['time'])) {
-                $time = time() - $lastReport['time'];
-                $syntaxText = 's';
-                if ($time > 60) {
-                    $time /= 60;
-                    $syntaxText = 'm';
-                }
-                if ($time > 60) {
-                    $time /= 60;
-                    $syntaxText = 'h';
-                }
-                if ($time > 24) {
-                    $time /= 24;
-                    $syntaxText = 'd';
-                }
-                $statistics['last'] = floor($time) . $syntaxText;
+            // Counts unique domains
+            if(!in_array($report['origin'], $uniqueDomains, true)) {
+                $uniqueDomains[] = $report['origin'];
+                $statistics['totaldomains']++;
             }
+
+            // Counts amount of shared reports
+            if(strpos($report['referer'], "Shared via ") === 0) {
+                $statistics['totalshared']++;
+            }
+        }
+
+        $lastReport = end($allReports);
+        if(isset($lastReport['time'])) {
+            $time = time() - $lastReport['time'];
+            $syntaxText = 's';
+            if ($time > 60) {
+                $time /= 60;
+                $syntaxText = 'm';
+            }
+            if ($time > 60) {
+                $time /= 60;
+                $syntaxText = 'h';
+            }
+            if ($time > 24) {
+                $time /= 24;
+                $syntaxText = 'd';
+            }
+            $statistics['last'] = floor($time) . $syntaxText;
+        }
 
         return json_encode($statistics);
     }
