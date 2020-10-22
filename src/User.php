@@ -530,7 +530,7 @@ class User
     {
         $statistics = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'totalshared' => 0, 'last' => 'never'];
 
-        $allReports = $this->database->fetchAll('SELECT origin,time,referer FROM reports', []);
+        $allReports = $this->database->fetchAll('SELECT origin,time,referer FROM reports ORDER BY id ASC', []);
 
         $statistics['total'] = count($allReports);
 
