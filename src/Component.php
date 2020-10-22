@@ -287,7 +287,7 @@ class Component
     public function searchQuery($navigation)
     {
         if (isset($_GET['search'])) {
-            if ($navigation === true) {
+            if ($navigation == true) {
                 return '&search=' . htmlspecialchars($_GET['search']);
             }
 
