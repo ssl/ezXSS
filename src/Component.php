@@ -79,6 +79,39 @@ class Component
     }
 
     /**
+     * Get select list with all themes
+     * @method themes
+     * @return string html with all themes
+     */
+    public function themes() {
+        $current = $this->setting('theme');
+        $html = '<select class="form-control" id="theme" name="theme">';
+        $files = array_diff(scandir(__DIR__ . '/../assets/css'), array('.', '..'));
+        foreach($files as $file) {
+            $theme = htmlspecialchars(str_replace('.css', '', $file));
+            $html .= '<option value="'.$theme.'"';
+            $html .= ($theme === $current ? ' selected' : '');
+            $html .= '>'.ucwords($theme).'</option>';
+        }
+        $html .= '</select>';
+        return $html;
+    }
+
+    /**
+     * Checks if there is a custom theme
+     * @method theme
+     * @return string html with stylesheet
+     */
+    public function theme() {
+        $theme = $this->setting('theme');
+        if($theme !== 'classic') {
+            return '<link rel="stylesheet" href="/assets/css/'. $theme .'.css">';
+        }
+
+        return '';
+    }
+
+    /**
      * Get ezXSS version
      * @method version
      * @return string version number

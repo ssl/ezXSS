@@ -328,8 +328,9 @@ class Route
      */
     private function verifySettings(): void
     {
-        if(!empty($this->database->fetchSetting('killswitch'))) {
-            if(isset($_GET['pass']) && $_GET['pass'] === $this->database->fetchSetting('killswitch')) {
+        $killSwitchPassowrd = $this->database->fetchSetting('killswitch');
+        if(!empty($killSwitchPassowrd)) {
+            if(isset($_GET['pass']) && $_GET['pass'] === $killSwitchPassowrd) {
                 $this->database->query("UPDATE settings SET value = '' WHERE setting = 'killswitch';");
             } else {
                 http_response_code(404);

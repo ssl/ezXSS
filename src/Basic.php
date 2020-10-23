@@ -110,13 +110,15 @@ HTML;
             <meta charset="utf-8">
             <title>ezXSS ~ {{title}}</title>
             <link rel="stylesheet" href="/assets/css/classic.css">
+            {{theme[]}}
             <link rel="icon" href="/assets/img/favicon.ico" type="image/x-icon" />
             <meta name="MobileOptimized" content="width">
             <meta name="HandheldFriendly" content="true">
             <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
           </head>
-          <body>
+          <body class="theme">
             {{template}}
+            <script type="text/javascript">const csrf = "{{csrf[true]}}";</script>
             <script src="/assets/js/jquery.js" charset="utf-8"></script>
             <script src="/assets/js/bootstrap.js" charset="utf-8"></script>
             <script src="/assets/js/ezxss.js" charset="utf-8"></script>

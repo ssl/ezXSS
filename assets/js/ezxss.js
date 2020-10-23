@@ -1,5 +1,6 @@
 function request(action, data) {
     data["action"] = action;
+    data["csrf"] = csrf;
     return $.ajax({
         type: "post",
         dataType: "json",
@@ -11,7 +12,7 @@ function request(action, data) {
 $(document).ready(function() {
 
     if(location.toString().split('/').pop() == 'dashboard') {
-        request('statistics', {csrf:csrf}).then(function(r) {
+        request('statistics', {}).then(function(r) {
             $.each( r, function( key, value ) {
                 $("#"+key).html(value);
             });
@@ -54,7 +55,7 @@ $(document).ready(function() {
         $.each($("input[name='selected']:checked"), function(){
             ids.push($(this).val());
         });
-        request("delete-selected", {ids:ids,csrf:csrf}).then(function(r) {
+        request("delete-selected", {ids:ids}).then(function(r) {
             $.each( ids, function( i, val ) {
                 $("#" + val).fadeOut( "slow", function() {});
             });
@@ -70,7 +71,7 @@ $(document).ready(function() {
         if(location.toString().split('/').pop() == 'reports') {
             var archive = 1;
         }
-        request("archive-selected", {ids:ids,csrf:csrf,archive:archive}).then(function(r) {
+        request("archive-selected", {ids:ids,archive:archive}).then(function(r) {
             $.each( ids, function( i, val ) {
                 $("#" + val).fadeOut( "slow", function() {});
             });
@@ -79,7 +80,7 @@ $(document).ready(function() {
 
     $(".delete").click(function() {
         var id = $(this).attr('report-id');
-        request("delete-report", {id:id,csrf:csrf}).then(function(r) {
+        request("delete-report", {id:id}).then(function(r) {
             if(location.toString().split('/').slice(-2)[0] !== 'report') {
                 $("#"+id).fadeOut( "slow", function() {});
             } else {
@@ -90,7 +91,7 @@ $(document).ready(function() {
 
     $(".archive").click(function() {
         var id = $(this).attr('report-id');
-        request("archive-report", {id:id,csrf:csrf}).then(function(r) {
+        request("archive-report", {id:id}).then(function(r) {
             $("#"+id).fadeOut( "slow", function() {});
         });
     });

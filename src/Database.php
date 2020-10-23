@@ -92,7 +92,7 @@ class Database
                 $this->settingsCache[$setting['setting']] = $setting['value'];
             }
         }
-        return $this->settingsCache[$name];
+        return $this->settingsCache[$name] ?? null;
     }
 
     /**

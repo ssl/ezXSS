@@ -28,7 +28,6 @@
                         <div class="panel-body">
                             <form class="form" id="main-settings">
                                 <div class="form-group">
-                                    {{csrf[]}}
                                     <label class="control-label" for="email">Email alert mail</label>
                                     <input class="form-control" id="email" name="email" type="email"
                                            value="{{setting[email]}}">
@@ -48,9 +47,8 @@
                                     {{timezones[]}}
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label" for="payload">Payload domain</label>
-                                    <input class="form-control" id="payload" name="payload" type="text"
-                                           value="{{setting[payload-domain]}}">
+                                    <label class="control-label" for="theme">Theme</label>
+                                    {{themes[]}}
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label" for="filter">On callback if report is duplicate</label>
@@ -77,7 +75,6 @@
                         <div class="panel-heading">Password settings</div>
                         <div class="panel-body">
                             <form class="form" id="password-settings" method="post">
-                                {{csrf[]}}
                                 <div class="form-group">
                                     <label class="control-label" for="password">Old password</label>
                                     <input class="form-control" id="password" name="password" type="password">
@@ -102,7 +99,6 @@
                         <div class="panel-body">
                             <p>You can activate Google Authenticator 2FA for extra protection or disable it.</p>
                             <form class="form" id="twofactor-settings" method="post">
-                                {{csrf[]}}
                                 {{twofactorSettings[]}}
                             </form>
                         </div>

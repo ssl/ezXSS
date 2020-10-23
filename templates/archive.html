@@ -91,7 +91,6 @@
                 <div class="modal-body">
                     <div id="alert"></div>
                     <form class="form" id="share-report">
-                        {{csrf[]}}
                         <input hidden id="reportid" type=hidden value="0">
 
                         <div class="form-group">
@@ -114,8 +113,4 @@
             </div>
         </div>
     </div>
-
-    <script type="text/javascript">
-        var csrf = "{{csrf[true]}}";
-    </script>
 </div>

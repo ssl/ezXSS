@@ -44,7 +44,7 @@ class Request
                         $this->post('emailfrom'),
                         $this->post('dompart'),
                         $this->post('timezone'),
-                        $this->post('payload'),
+                        $this->post('theme'),
                         $this->post('filter'),
                         $this->post('domains')
                     )

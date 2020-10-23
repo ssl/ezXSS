@@ -24,7 +24,7 @@
                 <div class="col-lg-2 col-xs-6">
                     <div class="panel panel-filled">
                         <div class="panel-body">
-                            <h2 class="m-b-none" id="total"><div class="sk-fading-circle"><div class="load1 load"></div><div class="load2 load"></div><div class="load3 load"></div><div class="load4 load"></div><div class="load5 load"></div><div class="load6 load"></div><div class="load7 load"></div><div class="load8 load"></div><div class="load9 load"></div><div class="load10 load"></div><div class="load11 load"></div><div class="load12 load"></div></div></h2>
+                            <h2 class="m-b-none" id="total"><div class="loader"></div></h2>
                             <div class="small">total reports</div>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
                 <div class="col-lg-2 col-xs-6">
                     <div class="panel panel-filled">
                         <div class="panel-body">
-                            <h2 class="m-b-none" id="week"><div class="sk-fading-circle"><div class="load1 load"></div><div class="load2 load"></div><div class="load3 load"></div><div class="load4 load"></div><div class="load5 load"></div><div class="load6 load"></div><div class="load7 load"></div><div class="load8 load"></div><div class="load9 load"></div><div class="load10 load"></div><div class="load11 load"></div><div class="load12 load"></div></div></h2>
+                            <h2 class="m-b-none" id="week"><div class="loader"></div></h2>
                             <div class="small">reports last week</div>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                 <div class="col-lg-2 col-xs-6">
                     <div class="panel panel-filled">
                         <div class="panel-body">
-                            <h2 class="m-b-none" id="last"><div class="sk-fading-circle"><div class="load1 load"></div><div class="load2 load"></div><div class="load3 load"></div><div class="load4 load"></div><div class="load5 load"></div><div class="load6 load"></div><div class="load7 load"></div><div class="load8 load"></div><div class="load9 load"></div><div class="load10 load"></div><div class="load11 load"></div><div class="load12 load"></div></div></h2>
+                            <h2 class="m-b-none" id="last"><div class="loader"></div></h2>
                             <div class="small">last report</div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                 <div class="col-lg-2 col-xs-6">
                     <div class="panel panel-filled">
                         <div class="panel-body">
-                            <h2 class="m-b-none" id="totaldomains"><div class="sk-fading-circle"><div class="load1 load"></div><div class="load2 load"></div><div class="load3 load"></div><div class="load4 load"></div><div class="load5 load"></div><div class="load6 load"></div><div class="load7 load"></div><div class="load8 load"></div><div class="load9 load"></div><div class="load10 load"></div><div class="load11 load"></div><div class="load12 load"></div></div></h2>
+                            <h2 class="m-b-none" id="totaldomains"><div class="loader"></div></h2>
                             <div class="small">total domains</div>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                 <div class="col-lg-2 col-xs-6">
                     <div class="panel panel-filled">
                         <div class="panel-body">
-                            <h2 class="m-b-none" id="weekdomains"><div class="sk-fading-circle"><div class="load1 load"></div><div class="load2 load"></div><div class="load3 load"></div><div class="load4 load"></div><div class="load5 load"></div><div class="load6 load"></div><div class="load7 load"></div><div class="load8 load"></div><div class="load9 load"></div><div class="load10 load"></div><div class="load11 load"></div><div class="load12 load"></div></div></h2>
+                            <h2 class="m-b-none" id="weekdomains"><div class="loader"></div></h2>
                             <div class="small">domains last week</div>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                 <div class="col-lg-2 col-xs-6">
                     <div class="panel panel-filled">
                         <div class="panel-body">
-                            <h2 class="m-b-none" id="totalshared"><div class="sk-fading-circle"><div class="load1 load"></div><div class="load2 load"></div><div class="load3 load"></div><div class="load4 load"></div><div class="load5 load"></div><div class="load6 load"></div><div class="load7 load"></div><div class="load8 load"></div><div class="load9 load"></div><div class="load10 load"></div><div class="load11 load"></div><div class="load12 load"></div></div></h2>
+                            <h2 class="m-b-none" id="totalshared"><div class="loader"></div></h2>
                             <div class="small">shared with you</div>
                         </div>
                     </div>
@@ -101,7 +101,6 @@
                             <div class="panel-body">
                                 <form class="form" id="notepad-settings" method="post">
                                     <div class="form-group">
-                                        {{csrf[]}}
                                         <textarea class="form-control" id="notepad" name="notepad" rows=6>{{setting[notepad]}}</textarea>
                                     </div>
                                     <button class="btn">Save</button>
@@ -116,7 +115,6 @@
                                 <p>Completely kills the platform. Can be reverted by visiting https://{{domain[]}}/?pass=</p>
                                 <form class="form" id="killswitch" method="post">
                                     <div class="form-group">
-                                        {{csrf[]}}
                                         <label class="control-label" for="pass">Password to revert</label>
                                         <input class="form-control" id="pass" name="pass" type="text">
                                     </div>
@@ -129,7 +127,3 @@
         </div>
     </section>
 </div>
-
-<script type="text/javascript">
-    var csrf = "{{csrf[true]}}";
-</script>

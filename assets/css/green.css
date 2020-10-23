@@ -1,0 +1,27 @@
+.theme * {color: hsl(90, 66.66666666666666%, 80%) !important;background-color: hsl(0, 0%, 25%) !important;border-color: hsl(0, 0%, 35%) !important;}
+.theme img {visibility: visible !important;}
+.theme button {color: hsl(68, 80%, 80%) !important;}
+.theme textarea,
+.theme input {background-color:#404040!important;}
+.theme pre,
+.theme code,
+.theme code span {background-color: hsl(0, 0%, 35%) !important;}
+.theme a, .theme a * {color: hsl(68, 80%, 80%) !important;background-color: hsl(0, 0%, 25%) !important;}
+.theme a:hover, .theme a:hover * {color: hsl(128, 100%, 90%) !important;}
+.theme a:active, .theme a:active * {color: hsl(68, 80%, 50%) !important;}
+.theme a:visited, .theme a:visited * {color: hsl(68, 80%, 50%) !important;}
+.content:before {background-color: #404040;}
+.navigation:before {background-color: #404040;border-right: 1px solid #595959;}
+.ezxss-nav {border-right: 1px solid #595959;}
+.loader {border: 5px solid hsl(0, 0%, 35%) !important;border-top: 5px solid hsl(90, 66.66666666666666%, 80%) !important;}
+.checkbox-label input:checked ~ .checkbox-custom::after {border: solid #c7e31c;border-width: 0 2px 2px 0;}
+.login {background-color: #525151 !important;}
+.login .form {background-color: #525151 !important;}
+.login .form-group {background-color: #525151 !important;}
+.login .control-label {background-color: #525151 !important;}
+.transparent{background-color: transparent!important;}
+body, html {background: #404040;}
+*::-webkit-scrollbar-track{background-color:#404040;border-radius:0px 3px 3px 0px}
+*::-webkit-scrollbar{width:6px;background-color:hsl(0, 0%, 35%)}
+*::-webkit-scrollbar-thumb{background-color:hsl(90, 66.66666666666666%, 80%)}
+::placeholder{color:hsl(90, 66.66666666666666%, 90%)!important;opacity:1}

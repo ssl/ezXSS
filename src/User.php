@@ -110,7 +110,7 @@ class User
             'CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`shareid` VARCHAR(50) NOT NULL,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`payload` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,`archive` int(11) DEFAULT 0,`screenshot` LONGTEXT NULL DEFAULT NULL,`localstorage` LONGTEXT NULL DEFAULT NULL, `sessionstorage` LONGTEXT NULL DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;'
         );
         $this->database->query(
-            'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("secret", ""),("killswitch", ""),("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0");'
+            'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("secret", ""),("killswitch", ""),("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0"),("theme", "classic");'
         );
         $this->database->fetch(
             'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain),("version", :version),("emailfrom", "ezXSS");',
@@ -142,9 +142,9 @@ class User
                 'INSERT INTO `settings` (`setting`, `value`) VALUES ("emailfrom", "ezXSS");'
             ],
             '3.9' => [
-                'INSERT INTO `settings` (`setting`, `value`) VALUES ("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1");',
+                'INSERT INTO `settings` (`setting`, `value`) VALUES ("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("theme", "classic");',
                 'INSERT INTO `settings` (`setting`, `value`) VALUES ("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0");',
-                'DELETE FROM `settings` WHERE `setting` = "screenshot"'
+                'DELETE FROM `settings` WHERE `setting` = "screenshot"',
             ]
         ];
 
@@ -189,7 +189,7 @@ class User
      * @param string $domains
      * @return string success
      */
-    public function settings($email, $emailFrom, $domPart, $timezone, $payload, $filterId, $domains)
+    public function settings($email, $emailFrom, $domPart, $timezone, $theme, $filterId, $domains)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'This is not a correct email address.';
@@ -203,19 +203,28 @@ class User
             return 'The timezone is not a valid timezone.';
         }
 
+        $theme = preg_replace('/[^a-zA-Z0-9]/', '', $theme);
+        if(!file_exists(__DIR__ . "/../assets/css/{$theme}.css")) {
+            return 'This theme is not installed.';
+        }
+
         $filterSave = ($filterId == 1 || $filterId == 2) ? 1 : 0;
         $filterAlert = ($filterId == 1 || $filterId == 3) ? 1 : 0;
+        $currentTheme = $this->database->fetchSetting('theme');
 
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "email"', [':value' => $email]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "emailfrom"', [':value' => $emailFrom]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "dompart"', [':value' => (int)$domPart]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "timezone"', [':value' => $timezone]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "payload-domain"', [':value' => $payload]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "theme"', [':value' => $theme]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "blocked-domains"', [':value' => $domains]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-save"', [':value' => $filterSave]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-alert"', [':value' => $filterAlert]);
 
-        $this->createSession();
+        if($theme !== $currentTheme) {
+            return ['redirect' => 'settings'];
+        }
+
         return 'Your new settings are saved!';
     }
 
