@@ -1,6 +1,6 @@
 # ezXSS
 
-ezXSS is the swiss army knife for penetration testers and bug bounty hunters to test (blind) Cross Site Scripting. 
+ezXSS is an easy way for penetration testers and bug bounty hunters to test (blind) Cross Site Scripting. 
 
 ## Features
 * The following information can be collected on a vulnerable page:
