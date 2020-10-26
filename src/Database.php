@@ -4,6 +4,7 @@ class Database
 {
     private $DB;
     private $settingsCache = [];
+    private $isInstalled = null;
 
     /**
      * Try to connect to database
@@ -113,9 +114,17 @@ class Database
         return $fetch->fetch();
     }
 
+    /**
+     * Returns true of false if ezXSS is installed
+     * @return bool
+     */
     public function isInstalled() {
-        $rowCount = $this->rowCount('SELECT id FROM settings');
-        return $rowCount > 0;
+        if($this->isInstalled === null) {
+            $rowCount = $this->rowCount('SELECT id FROM settings');
+            $this->isInstalled = $rowCount > 0;
+        }
+
+        return $this->isInstalled;
     }
 
 }
