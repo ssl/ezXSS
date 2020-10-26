@@ -87,6 +87,10 @@ class Database
      */
     public function fetchSetting($name)
     {
+        if(!$this->isInstalled()) {
+            return null;
+        }
+
         if($this->settingsCache === []) {
             foreach($this->fetchAll('SELECT setting,value FROM settings', []) as $setting) {
                 $this->settingsCache[$setting['setting']] = $setting['value'];
