@@ -10,7 +10,7 @@
 |
 */
 
-define('version', '3.9');
+define('version', '3.10');
 define('debug', false);
 
 if (debug) {
