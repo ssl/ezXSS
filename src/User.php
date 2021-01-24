@@ -207,6 +207,14 @@ class User
             return 'The dom length needs to be a int number.';
         }
 
+        if(!preg_match('/^[a-zA-Z0-9:_]+$/', $bottoken)) {
+            return 'This does not look like an valid token';
+        }
+
+        if (!is_int((int)$chatid)) {
+            return 'The chat id needs to be a int number.';
+        }
+
         $filterSave = ($filterId == 1 || $filterId == 2) ? 1 : 0;
         $filterAlert = ($filterId == 1 || $filterId == 3) ? 1 : 0;
 
@@ -571,6 +579,10 @@ class User
      */
     public function getChatId($bottoken)
     {
+        if(!preg_match('/^[a-zA-Z0-9:_]+$/', $bottoken)) {
+            return 'This does not look like an valid token';
+        }
+
         $api = curl_init("https://api.telegram.org/bot{$bottoken}/getUpdates");
         curl_setopt($api, CURLOPT_RETURNTRANSFER, true);
         $results = json_decode(curl_exec($api), true);
