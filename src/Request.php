@@ -40,13 +40,26 @@ class Request
             case 'main-settings' :
                 return $this->convert(
                     $this->user->settings(
+                        $this->post('timezone'),
+                        $this->post('theme')
+                    )
+                );
+                break;
+            case 'alert-settings':
+                return $this->convert(
+                    $this->user->alertSettings(
+                        $this->post('filter'),
+                        $this->post('blocked_domains'),
+                        $this->post('whitelist_domains'),
                         $this->post('email'),
                         $this->post('emailfrom'),
                         $this->post('dompart'),
-                        $this->post('timezone'),
-                        $this->post('theme'),
-                        $this->post('filter'),
-                        $this->post('domains')
+                        $this->post('telegram_bottoken'),
+                        $this->post('telegram_chatid'),
+                        $this->post('callback_url'),
+                        $this->post('mailon'),
+                        $this->post('telegramon'),
+                        $this->post('callbackon')
                     )
                 );
                 break;
@@ -91,6 +104,8 @@ class Request
                 break;
             case 'statistics':
                 return $this->user->statistics();
+            case 'getchatid':
+                return $this->convert($this->user->getChatId($this->post('bottoken')));
             default :
                 return $this->convert('This action does not exists.');
                 break;
@@ -111,7 +126,7 @@ class Request
     /**
      * Convert a string or array to a JSON string
      * @method post
-     * @param array $array array or string
+     * @param array|string $array array or string
      * @return string json value
      */
     private function convert($array)

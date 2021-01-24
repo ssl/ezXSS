@@ -8,9 +8,14 @@ class Basic
         $this->base32Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     }
 
-    public function screenshotPath($screenshotName)
+    public function screenshotPathImg($screenshotName)
     {
         return '<img style="max-width: 100%;" src="http://' . $this->domain() . '/assets/img/report-' . $screenshotName . '.png">';
+    }
+
+    public function screenshotPath($screenshotName)
+    {
+        return 'http://' . $this->domain() . '/assets/img/report-' . $screenshotName . '.png';
     }
 
     public function domain()
@@ -214,6 +219,51 @@ HTML;
           <td>{{report[ip]}}</td>
         </tr>
 HTML;
+        }
+
+        if ($htmlBlock == 'telegram') {
+            return <<<HTML
+***XSS Report #{{id}}***
+Get a fast view below or view the whole report on https://{{domain}}/manage/report/{{id}}
+
+***URL***
+```
+{{url}}```
+***IP***
+```
+{{ip}}```
+***Referer***
+```
+{{referer}}```
+***Payload***
+```
+{{payload}}```
+***User Agent***
+```
+{{user-agent}}```
+***Cookies***
+```
+{{cookies}}```
+***Local Storage***
+```
+{{localstorage}}```
+***Session Storage***
+```
+{{sessionstorage}}```
+***DOM***
+```
+{{dom}}```
+***Origin***
+```
+{{origin}}```
+***Time***
+```
+{{time}}```
+***Screenshot***
+```
+{{screenshot}}```
+HTML;
+
         }
 
         if ($htmlBlock == 'mail') {

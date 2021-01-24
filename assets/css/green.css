@@ -24,4 +24,4 @@ body, html {background: #404040;}
 *::-webkit-scrollbar-track{background-color:#404040;border-radius:0px 3px 3px 0px}
 *::-webkit-scrollbar{width:6px;background-color:hsl(0, 0%, 35%)}
 *::-webkit-scrollbar-thumb{background-color:hsl(90, 66.66666666666666%, 80%)}
-::placeholder{color:hsl(90, 66.66666666666666%, 90%)!important;opacity:1}
+::placeholder{color:hsl(90deg 20% 60%) !important;opacity:1}

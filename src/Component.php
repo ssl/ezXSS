@@ -190,6 +190,20 @@ class Component
     }
 
     /**
+     * Returns checked if that option is active
+     * @method collectSelected
+     * @param string $name selected value
+     * @return string checked
+     */
+    public function alertTypeSelected($name) {
+        if($this->setting('alert-' . $name) === '1') {
+            return 'checked';
+        }
+
+        return '';
+    }
+
+    /**
      * Returns all reports of that page/search
      * @method reportsList
      * @param string $archive true/false

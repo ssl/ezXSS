@@ -9,7 +9,7 @@
                     <div class="view-header">
                         <div class="header-title">
                             <h3 class="m-b-xs">Settings</h3>
-                            <small>Change your main settings or password</small>
+                            <small>Change your settings, password and 2FA login. Visit the <a target=_blank href="https://github.com/ssl/ezXSS/wiki">wiki</a> for documentation.</small>
                         </div>
                     </div>
                     <hr>
@@ -24,24 +24,9 @@
 
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Main settings</div>
+                        <div class="panel-heading">Application settings</div>
                         <div class="panel-body">
                             <form class="form" id="main-settings">
-                                <div class="form-group">
-                                    <label class="control-label" for="email">Email alert mail</label>
-                                    <input class="form-control" id="email" name="email" type="email"
-                                           value="{{setting[email]}}">
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" for="emailfrom">Email sends from</label>
-                                    <input class="form-control" id="emailfrom" name="emailfrom" type="text"
-                                           value="{{setting[emailfrom]}}">
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" for="dompart">DOM Length in email</label>
-                                    <input class="form-control" id="dompart" name="dompart" type="text"
-                                           value="{{setting[dompart]}}">
-                                </div>
                                 <div class="form-group">
                                     <label class="control-label" for="timezone">Timezone</label>
                                     {{timezones[]}}
@@ -50,27 +35,11 @@
                                     <label class="control-label" for="theme">Theme</label>
                                     {{themes[]}}
                                 </div>
-                                <div class="form-group">
-                                    <label class="control-label" for="filter">On callback if report is duplicate</label>
-                                    <select class="form-control" id="filter">
-                                        <option value="1" {{filterSelected[1]}}>Both save report and send alert</option>
-                                        <option value="2" {{filterSelected[2]}}>Only save report</option>
-                                        <option value="3" {{filterSelected[3]}}>Only send alert</option>
-                                        <option value="4" {{filterSelected[4]}}>Don't save report or send alert</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" for="domains">Blocked domains</label>
-                                    <input class="form-control" id="domains" name="domains" type="text"
-                                           value="{{setting[blocked-domains]}}" placeholder="domain1.com,domain2.com">
-                                </div>
                                 <button class="btn">Save</button>
                             </form>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-lg-6">
                     <div class="panel panel-filled">
                         <div class="panel-heading">Password settings</div>
                         <div class="panel-body">
@@ -91,10 +60,8 @@
                             </form>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-lg-6">
-                     <div class="panel panel-filled" style="margin-top:-7px">
+                    <div class="panel panel-filled">
                         <div class="panel-heading">2FA login</div>
                         <div class="panel-body">
                             <p>You can activate Google Authenticator 2FA for extra protection or disable it.</p>
@@ -103,6 +70,90 @@
                             </form>
                         </div>
                     </div>
+
+                </div>
+
+                <div class="col-lg-6">
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Alert settings</div>
+                        <div class="panel-body">
+                            <form class="form" id="alert-settings">
+                                <div class="form-group">
+                                    <label class="control-label" for="filter">On callback if report is duplicate</label>
+                                    <select class="form-control" id="filter">
+                                        <option value="1" {{filterSelected[1]}}>Both save report and send alert</option>
+                                        <option value="2" {{filterSelected[2]}}>Only save report</option>
+                                        <option value="3" {{filterSelected[3]}}>Only send alert</option>
+                                        <option value="4" {{filterSelected[4]}}>Don't save report or send alert</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="blocked_domains">Blocked domains</label>
+                                    <input class="form-control" id="blocked_domains" name="blocked_domains" type="text"
+                                           value="{{setting[blocked-domains]}}" placeholder="domain1.com,domain2.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="whitelist_domains">Whitelist only domains</label>
+                                    <input class="form-control" id="whitelist_domains" name="whitelist_domains" type="text"
+                                           value="{{setting[whitelist-domains]}}" placeholder="domain1.com,domain2.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="dompart">DOM Length in email or Telegram alert</label>
+                                    <input class="form-control" id="dompart" name="dompart" type="text"
+                                           value="{{setting[dompart]}}">
+                                </div>
+                                <hr>
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" type="checkbox" name="selected" id="mailon" {{alertTypeSelected[mail]}}>
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Send alert via email</p>
+                                <div class="form-group">
+                                    <label class="control-label" for="email">Email alerts to</label>
+                                    <input class="form-control" id="email" name="email" type="email"
+                                           value="{{setting[email]}}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="emailfrom">Email sends from</label>
+                                    <input class="form-control" id="emailfrom" name="emailfrom" type="text"
+                                           value="{{setting[emailfrom]}}">
+                                </div>
+                                <hr>
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" type="checkbox" name="selected" id="telegramon" {{alertTypeSelected[telegram]}}>
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Send alert via Telegram</p>
+                                <div class="form-group">
+                                    <label class="control-label" for="telegram_bottoken">Bot Token</label>
+                                    <div class="input-group">
+                                        <input type="text" name="telegram_bottoken" id="telegram_bottoken" value="{{setting[telegram-bottoken]}}" placeholder="1234567890:AAbcd1234qZylg5bEzXsSjCGqro_Vb8XcM" class="form-control">
+                                        <span class="input-group-addon"><a id="openGetChatId" style="cursor:pointer">get Chat ID</a></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="telegram_chatid">Chat ID</label>
+                                    <input class="form-control" id="telegram_chatid" name="telegram_chatid" type="text" value="{{setting[telegram-chatid]}}" placeholder="123456789">
+                                </div>
+                                <hr>
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" type="checkbox" name="selected" id="callbackon" {{alertTypeSelected[callback]}}>
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Send alert to callback</p>
+                                <div class="form-group">
+                                    <label class="control-label" for="callback_url">Callback url</label>
+                                    <input class="form-control" id="callback_url" name="callback_url" type="text" value="{{setting[callback-url]}}" placeholder="https://someproject.com/callback.php">
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+
                 </div>
             </div>
             <div class="row"></div>
@@ -119,6 +170,24 @@
                 </div>
                 <div class="modal-body">
                     <img src="https://chart.googleapis.com/chart?chs=400x400&chld=M|0&cht=qr&chl=otpauth://totp/ezXSS:ezXSS%3Fsecret%3D{{setting[temp-secret]}}%26issuer%3DezXSS">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" type="button">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="getChatId" role="dialog">
+        <div class="modal-dialog" style="width:430px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h3 class="m-b-xs">Get Telegram Chat ID</h3>
+                    <small>Start an chat with your bot to get chat id</small>
+                </div>
+                <div class="modal-body" id="getChatIdBody">
+                    Loading...
                 </div>
                 <div class="modal-footer">
                     <button class="btn" data-dismiss="modal" type="button">Close</button>

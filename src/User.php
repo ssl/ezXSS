@@ -110,7 +110,7 @@ class User
             'CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`shareid` VARCHAR(50) NOT NULL,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`payload` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,`archive` int(11) DEFAULT 0,`screenshot` LONGTEXT NULL DEFAULT NULL,`localstorage` LONGTEXT NULL DEFAULT NULL, `sessionstorage` LONGTEXT NULL DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;'
         );
         $this->database->query(
-            'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("secret", ""),("killswitch", ""),("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0"),("theme", "classic");'
+            'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("secret", ""),("killswitch", ""),("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0"),("theme", "classic"),("whitelist-domains", ""), ("telegram-bottoken", ""), ("telegram-chatid", ""), ("callback-url", ""), ("alert-mail", "1"), ("alert-telegram", "0"), ("alert-callback", "0");'
         );
         $this->database->fetch(
             'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain),("version", :version),("emailfrom", "ezXSS");',
@@ -145,6 +145,9 @@ class User
                 'INSERT INTO `settings` (`setting`, `value`) VALUES ("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("theme", "classic");',
                 'INSERT INTO `settings` (`setting`, `value`) VALUES ("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0");',
                 'DELETE FROM `settings` WHERE `setting` = "screenshot"',
+            ],
+            '3.10' => [
+                'INSERT INTO `settings` (`setting`, `value`) VALUES ("whitelist-domains", ""), ("telegram-bottoken", ""), ("telegram-chatid", ""), ("callback-url", ""), ("alert-mail", "1"), ("alert-telegram", "0"), ("alert-callback", "0");'
             ]
         ];
 
@@ -180,26 +183,64 @@ class User
     /**
      * Update main settings
      * @method settings
-     * @param string $email New email for alerts
-     * @param string $emailFrom Send email from
-     * @param string $domPart DOM Length for mail
-     * @param string $timezone Timezone for reports
-     * @param string $payload Payload domain used
-     * @param string $filterId
-     * @param string $domains
+     * @param string $filterId The id of the used filter
+     * @param string $blocked A list of blocked domains
+     * @param string $whitelist A list of whitelist only domains
+     * @param string $email Send email to
+     * @param string $emailfrom Send email from
+     * @param string $dompart DOM Length for mail
+     * @param string $bottoken The API token of the used Telegram bot
+     * @param string $chatid Telegram Chat ID to send reports to
+     * @param string $url Callback url to redirect report to
+     * @param string $mailOn Either on or empty to tell if selected
+     * @param string $telegramOn Either on or empty to tell if selected
+     * @param string $callbackOn Either on or empty to tell if selected
      * @return string success
      */
-    public function settings($email, $emailFrom, $domPart, $timezone, $theme, $filterId, $domains)
+    public function alertSettings($filterId, $blocked, $whitelist, $email, $emailfrom, $dompart, $bottoken, $chatid, $url, $mailOn, $telegramOn, $callbackOn)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'This is not a correct email address.';
         }
 
-        if (!is_int((int)$domPart)) {
+        if (!is_int((int)$dompart)) {
             return 'The dom length needs to be a int number.';
         }
 
-        if (!in_array($timezone, timezone_identifiers_list())) {
+        $filterSave = ($filterId == 1 || $filterId == 2) ? 1 : 0;
+        $filterAlert = ($filterId == 1 || $filterId == 3) ? 1 : 0;
+
+        $alertMail = ($mailOn === 'on') ? 1 : 0;
+        $alertTelegram = ($telegramOn === 'on') ? 1 : 0;
+        $alertCallback = ($callbackOn === 'on') ? 1 : 0;
+
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "email"', [':value' => $email]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "emailfrom"', [':value' => $emailfrom]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "dompart"', [':value' => (int)$dompart]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "blocked-domains"', [':value' => $blocked]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "whitelist-domains"', [':value' => $whitelist]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-save"', [':value' => $filterSave]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-alert"', [':value' => $filterAlert]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "telegram-bottoken"', [':value' => $bottoken]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "telegram-chatid"', [':value' => $chatid]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "callback-url"', [':value' => $url]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "alert-mail"', [':value' => $alertMail]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "alert-telegram"', [':value' => $alertTelegram]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "alert-callback"', [':value' => $alertCallback]);
+
+        return 'New alerts settings are saved.';
+    }
+
+    /**
+     * Update main settings
+     * @method settings
+     * @param string $timezone Timezone for reports
+     * @param string $theme Theme name
+     * @return string success
+     */
+    public function settings($timezone, $theme)
+    {
+        if (!in_array($timezone, timezone_identifiers_list(), true)) {
             return 'The timezone is not a valid timezone.';
         }
 
@@ -208,18 +249,10 @@ class User
             return 'This theme is not installed.';
         }
 
-        $filterSave = ($filterId == 1 || $filterId == 2) ? 1 : 0;
-        $filterAlert = ($filterId == 1 || $filterId == 3) ? 1 : 0;
         $currentTheme = $this->database->fetchSetting('theme');
 
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "email"', [':value' => $email]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "emailfrom"', [':value' => $emailFrom]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "dompart"', [':value' => (int)$domPart]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "timezone"', [':value' => $timezone]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "theme"', [':value' => $theme]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "blocked-domains"', [':value' => $domains]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-save"', [':value' => $filterSave]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-alert"', [':value' => $filterAlert]);
 
         if($theme !== $currentTheme) {
             return ['redirect' => 'settings'];
@@ -528,6 +561,29 @@ class User
             );
         }
         return 'Reports are archived.';
+    }
+
+    /**
+     * Try to get the chatId of Telegram
+     * @method getChatId
+     * @param string $bottoken The API token of the used Telegram bot
+     * @return string chatId or error
+     */
+    public function getChatId($bottoken)
+    {
+        $api = curl_init("https://api.telegram.org/bot{$bottoken}/getUpdates");
+        curl_setopt($api, CURLOPT_RETURNTRANSFER, true);
+        $results = json_decode(curl_exec($api), true);
+
+        if($results['ok'] !== true) {
+            return 'Something went wrong. Your bot token is probably invalid.';
+        }
+
+        if(isset($results['result'][0]['message']['chat']['id'])) {
+            return 'chatId:' . $results['result'][0]['message']['chat']['id'];
+        }
+
+        return 'Your bot token seems valid, but I cannot find a chat. Start a chat with your bot by sending /start';
     }
 
     /**

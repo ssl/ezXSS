@@ -221,7 +221,7 @@ th{width:150px}
 .navigation:before{transition:left 0.3s ease-out;-webkit-transition:left 0.3s ease-out;content:'';position:fixed;top:0;bottom:0;z-index:-1;left:0;background-color:#2b3157;width:200px}
 a{color:#f6a821;text-decoration:none}
 a:hover,a:focus{color:#fff;outline:none}
-hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #2b3157}
+hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #686d93}
 .row{margin-left:-10px;margin-right:-10px}
 .col-lg-12{padding-left:10px;padding-right:10px}
 .left-nav-toggle{float:left;padding:9px 10px 8px 25px}
