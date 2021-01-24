@@ -12,10 +12,10 @@
 ## Features
 * Easy to use dashboard with statistics, payloads, view/share/search reports
 * Payload generator
-* Instant email alerts
+* Instant alerts via mail, Telegram or custom callback URL
 * Custom javascript payloads
 * Custom payload links to distinguish insert points
-* Block domains and other filters
+* Block, whitelist and other filters
 * Share reports with a direct link, via email or with other ezXSS users
 * Secure your login with Two-factor (2FA)
 * The following information can be collected on a vulnerable page:
