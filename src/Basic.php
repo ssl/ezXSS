@@ -298,52 +298,52 @@ HTML;
                     </thead>
                     <tbody>
                       <tr>
-                        <td>URL</td>
+                        <td style="color: #5e648b;">URL</td>
                         <td style="color: #5e648b;">{{url}}</td>
                       </tr>
                       <tr>
-                        <td>IP</td>
-                        <td>{{ip}}</td>
+                        <td style="color: #5e648b;">IP</td>
+                        <td style="color: #5e648b;">{{ip}}</td>
                       </tr>
                       <tr>
-                        <td>Referer</td>
+                        <td style="color: #5e648b;">Referer</td>
                         <td style="color: #5e648b;">{{referer}}</td>
                       </tr>
                       <tr>
-                        <td>Payload</td>
+                        <td style="color: #5e648b;">Payload</td>
                         <td style="color: #5e648b;">{{payload}}</td>
                       </tr>
                       <tr>
-                        <td>User Agent</td>
-                        <td>{{user-agent}}</td>
+                        <td style="color: #5e648b;">User Agent</td>
+                        <td style="color: #5e648b;">{{user-agent}}</td>
                       </tr>
                       <tr>
-                        <td>Cookies</td>
+                        <td style="color: #5e648b;">Cookies</td>
                         <td style="color: #5e648b;">{{cookies}}</td>
                       </tr>
                       <tr>
-                        <td>Local Storage</td>
+                        <td style="color: #5e648b;">Local Storage</td>
                         <td><textarea spellcheck="false" style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;resize:vertical">{{localstorage}}</textarea></td>
                       </tr>
                       <tr>
-                        <td>Session Storage</td>
+                        <td style="color: #5e648b;">Session Storage</td>
                         <td><textarea spellcheck="false" style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;resize:vertical">{{sessionstorage}}</textarea></td>
                       </tr>
 
                       <tr>
-                        <td>DOM</td>
+                        <td style="color: #5e648b;">DOM</td>
                         <td><textarea spellcheck="false" style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;resize:vertical">{{dom}}</textarea></td>
                       </tr>
                       <tr>
-                        <td>Origin</td>
-                        <td>{{origin}}</td>
+                        <td style="color: #5e648b;">Origin</td>
+                        <td style="color: #5e648b;">{{origin}}</td>
                       </tr>
                       <tr>
-                        <td>Time</td>
-                        <td>{{time}}</td>
+                        <td style="color: #5e648b;">Time</td>
+                        <td style="color: #5e648b;">{{time}}</td>
                       </tr>
                       <tr>
-                        <td>Screenshot</td>
+                        <td style="color: #5e648b;">Screenshot</td>
                         <td>{{screenshot}}</td>
                       </tr>
                     </tbody>
