@@ -120,8 +120,12 @@ class Database
      */
     public function isInstalled() {
         if($this->isInstalled === null) {
-            $rowCount = $this->rowCount('SELECT id FROM settings');
-            $this->isInstalled = $rowCount > 0;
+            try {
+                $rowCount = $this->rowCount('SELECT id FROM settings');
+                $this->isInstalled = $rowCount > 0;
+            } catch (PDOException $exception) {
+                $this->isInstalled = false;
+            }
         }
 
         return $this->isInstalled;
