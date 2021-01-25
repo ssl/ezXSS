@@ -181,8 +181,8 @@ class User
     }
 
     /**
-     * Update main settings
-     * @method settings
+     * Update alert settings
+     * @method alertSettings
      * @param string $filterId The id of the used filter
      * @param string $blocked A list of blocked domains
      * @param string $whitelist A list of whitelist only domains
