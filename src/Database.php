@@ -22,7 +22,7 @@ class Database
             if (debug === true) {
                 print $e->getMessage();
             }
-            error('Database connection failed. Check your config file.', true);
+            error('Database connection failed. Wait 30s or check your config file.', true);
         }
     }
 
