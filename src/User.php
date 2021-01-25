@@ -91,8 +91,20 @@ class User
      */
     public function install($password, $email)
     {
-        if ($this->database->rowCount('SELECT * FROM settings') > 0) {
-            return 'This website is already installed.';
+        try {
+            if ($this->database->rowCount('SELECT * FROM settings') > 0) {
+                return 'This website is already installed.';
+            }
+        } catch (PDOException $ex) {
+            if (str_contains($ex->getMessage(), "SQLSTATE[42S02]")) { // Table or view doesn't exist
+                $this->createSettingsTable($password, $email);
+
+                $this->createSession();
+                return ['redirect' => 'dashboard'];
+            }
+            else {
+                return $ex->getMessage();
+            }
         }
 
         if (strlen($password) < 8) {
@@ -102,7 +114,10 @@ class User
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'This is not a correct email address.';
         }
+        
+    }
 
+    private function createSettingsTable($password, $email) {
         $this->database->query(
             'CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`setting` varchar(500) NOT NULL,`value` text NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;'
         );
@@ -121,9 +136,6 @@ class User
                 ':version' => version
             ]
         );
-
-        $this->createSession();
-        return ['redirect' => 'dashboard'];
     }
 
     public function update() {
