@@ -91,7 +91,7 @@ class User
      */
     public function install($password, $email)
     {
-        if ($this->database->rowCount('SELECT * FROM settings') > 0) {
+        if ($this->database->isInstalled() === true) {
             return 'This website is already installed.';
         }
 
