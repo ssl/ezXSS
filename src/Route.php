@@ -167,7 +167,7 @@ class Route
                 explode(',', $setting['whitelist-domains']),
                 true) === false
         ) {
-            return 'github.com/ssl/ezXSS2';
+            return 'github.com/ssl/ezXSS';
         }
 
         $doubleReport = false;
