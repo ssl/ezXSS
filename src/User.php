@@ -152,7 +152,7 @@ class User
         ];
 
         foreach($updateQuerys as $version => $sqlQuerys) {
-            if($version > $currentVersion) {
+            if(version_compare($version, $currentVersion, '>')) {
                 foreach ($sqlQuerys as $sqlQuery) {
                     $this->database->query($sqlQuery);
                 }
