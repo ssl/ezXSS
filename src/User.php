@@ -157,7 +157,7 @@ class User
                     $this->database->query($sqlQuery);
                 }
             }
-        }
+        }  
 
         if(empty($currentVersion)) {
           $this->database->query('INSERT INTO `settings` (`setting`, `value`) VALUES ("version", "' . version . '");');
@@ -207,8 +207,8 @@ class User
             return 'The dom length needs to be a int number.';
         }
 
-        if(!preg_match('/^[a-zA-Z0-9:_]+$/', $bottoken)) {
-            return 'This does not look like an valid token';
+        if($bottoken !== '' && !preg_match('/^[a-zA-Z0-9:_]+$/', $bottoken)) {
+            return 'This does not look like an valid Telegram bot token';
         }
 
         if (!is_int((int)$chatid)) {
@@ -580,7 +580,7 @@ class User
     public function getChatId($bottoken)
     {
         if(!preg_match('/^[a-zA-Z0-9:_]+$/', $bottoken)) {
-            return 'This does not look like an valid token';
+            return 'This does not look like an valid Telegram bot token';
         }
 
         $api = curl_init("https://api.telegram.org/bot{$bottoken}/getUpdates");
