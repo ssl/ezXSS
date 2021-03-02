@@ -9,7 +9,7 @@ class Route
      * Default values stored
      * @method __construct
      */
-    function __construct()
+    public function __construct()
     {
         $this->validTemplates = [
             'login',
@@ -37,7 +37,7 @@ class Route
      * @param string $file Requested file link
      * @return string HTML for page
      */
-    public function template($file)
+    public function template($file): string
     {
         if (!in_array($file, $this->validTemplates, true)) {
             return $this->redirect('login');
@@ -85,7 +85,7 @@ class Route
      * @param string $page Page link to redirect to
      * @return string
      */
-    private function redirect($page)
+    private function redirect($page): string
     {
         $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
         header("Location: /manage/{$page}");
@@ -98,7 +98,7 @@ class Route
      * @param string $file Requested file link
      * @return string HTML for page
      */
-    private function parseTemplate($file)
+    private function parseTemplate($file): string
     {
         $html = str_replace(
             ['{{template}}', '{{menu}}', '{{title}}', '{{version}}'],
@@ -130,7 +130,7 @@ class Route
      * @param string $extension
      * @return string HTML of template
      */
-    private function getFile($file, $extension = 'html')
+    private function getFile($file, $extension = 'html'): string
     {
         return file_get_contents(__DIR__ . "/../templates/{$file}.{$extension}");
     }
@@ -141,7 +141,7 @@ class Route
      * @param string $phpInput POST information
      * @return string github.com/ssl/ezXSS
      */
-    public function callback($phpInput)
+    public function callback($phpInput): string
     {
         $json = json_decode($phpInput, false);
 
@@ -159,7 +159,7 @@ class Route
                 explode(',', $setting['blocked-domains']),
                 true
             )) {
-            return 'github.com/ssl/ezXSS1';
+            return 'github.com/ssl/ezXSS';
         }
 
         if ($setting['whitelist-domains'] !== '' && $json->origin !== $setting['whitelist-domains'] && in_array(
@@ -330,7 +330,7 @@ class Route
      * @method jsPayload
      * @return string Javascript payload code
      */
-    public function jsPayload()
+    public function jsPayload(): string
     {
         if (!$this->database->isInstalled()) {
             return $this->redirect('install');

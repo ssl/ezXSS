@@ -19,11 +19,11 @@ class User
     }
 
     /**
-     * Get or create a csrf-token
+     * Get or create a CSRF token
      * @method getCsrf
-     * @return string 32 character long csrf-token
+     * @return string 32 character CSRF token
      */
-    public function getCsrf()
+    public function getCsrf(): string
     {
         return $_SESSION['csrfToken'] ?? $_SESSION['csrfToken'] = bin2hex(
                 openssl_random_pseudo_bytes(32)
@@ -35,7 +35,7 @@ class User
      * @method install
      * @param string $password Password for login
      * @param string $code 2FA code
-     * @return string error/redirect
+     * @return array|string
      */
     public function login($password, $code)
     {
@@ -68,7 +68,7 @@ class User
      * @method isLoggedIn
      * @return boolean If user is logged in true/false
      */
-    public function isLoggedIn()
+    public function isLoggedIn(): bool
     {
         return isset($_SESSION['login']) ? true : false;
     }
@@ -87,7 +87,7 @@ class User
      * @method install
      * @param string $password Password for login
      * @param string $email Email for email alert
-     * @return string error/redirect
+     * @return array|string
      */
     public function install($password, $email)
     {
@@ -126,6 +126,10 @@ class User
         return ['redirect' => 'dashboard'];
     }
 
+    /**
+     * Update database
+     * @return array|string
+     */
     public function update() {
         $currentVersion = $this->database->fetchSetting('version');
 
@@ -174,7 +178,7 @@ class User
      * @param string $notepad Value of the notepad
      * @return string success
      */
-    public function notepad($notepad)
+    public function notepad($notepad): string
     {
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "notepad"', [':value' => $notepad]);
         return 'Your notepad is saved!';
@@ -186,18 +190,10 @@ class User
      * @param string $filterId The id of the used filter
      * @param string $blocked A list of blocked domains
      * @param string $whitelist A list of whitelist only domains
-     * @param string $email Send email to
-     * @param string $emailfrom Send email from
      * @param string $dompart DOM Length for mail
-     * @param string $bottoken The API token of the used Telegram bot
-     * @param string $chatid Telegram Chat ID to send reports to
-     * @param string $url Callback url to redirect report to
-     * @param string $mailOn Either on or empty to tell if selected
-     * @param string $telegramOn Either on or empty to tell if selected
-     * @param string $callbackOn Either on or empty to tell if selected
      * @return string success
      */
-    public function alertSettings($filterId, $blocked, $whitelist, $dompart)
+    public function alertSettings($filterId, $blocked, $whitelist, $dompart): string
     {
         if (!is_int((int)$dompart)) {
             return 'The dom length needs to be a int number.';
@@ -215,7 +211,15 @@ class User
         return 'Alerts settings are saved.';
     }
 
-    public function emailAlertSettings($mailOn, $email, $emailfrom)
+    /**
+     * Update email alert settings
+     * @method emailAlertSettings
+     * @param string $email Send email to
+     * @param string $emailfrom Send email from
+     * @param string $mailOn Either on or empty to tell if selected
+     * @return string success
+     */
+    public function emailAlertSettings($mailOn, $email, $emailfrom): string
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'This is not a correct email address.';
@@ -229,9 +233,17 @@ class User
         return 'E-mail alerts settings are saved.';
     }
 
-    public function telegramAlertSettings($telegramOn, $bottoken, $chatid)
+    /**
+     * Update Telegram alert settings
+     * @method telegramAlertSettings
+     * @param string $bottoken The API token of the used Telegram bot
+     * @param string $chatid Telegram Chat ID to send reports to
+     * @param string $telegramOn Either on or empty to tell if selected
+     * @return string success
+     */
+    public function telegramAlertSettings($telegramOn, $bottoken, $chatid): string
     {
-        if($bottoken !== '' && !preg_match('/^[a-zA-Z0-9:_]+$/', $bottoken)) {
+        if($bottoken !== '' && !preg_match('/^[a-zA-Z0-9:_-]+$/', $bottoken)) {
             return 'This does not look like an valid Telegram bot token';
         }
 
@@ -247,7 +259,14 @@ class User
         return 'Telegram alerts settings are saved.';
     }
 
-    public function callbackAlertSettings($callbackOn, $url)
+    /**
+     * Update callback alert settings
+     * @method callbackAlertSettings
+     * @param string $url Callback url to redirect report to
+     * @param string $callbackOn Either on or empty to tell if selected
+     * @return string success
+     */
+    public function callbackAlertSettings($callbackOn, $url): string
     {
         $alertCallback = ($callbackOn === 'on') ? 1 : 0;
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "callback-url"', [':value' => $url]);
@@ -261,7 +280,7 @@ class User
      * @method settings
      * @param string $timezone Timezone for reports
      * @param string $theme Theme name
-     * @return string success
+     * @return array|string
      */
     public function settings($timezone, $theme)
     {
@@ -294,7 +313,7 @@ class User
      * @param string $newPassword2 New password retyped
      * @return string success
      */
-    public function password($password, $newPassword, $newPassword2)
+    public function password($password, $newPassword, $newPassword2): string
     {
         $currentPassword = $this->database->fetchSetting('password');
 
@@ -322,10 +341,10 @@ class User
     /**
      * Update screenshot value
      * @method screenshot
-     * @param string $id Filter combination id
+     * @param $value
      * @return string success
      */
-    public function screenshot($value)
+    public function screenshot($value): string
     {
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "screenshot"', [':value' => $value]);
         return 'Your new screenshot options are saved!';
@@ -361,7 +380,7 @@ class User
      * @param string $customjs Custom created javascript code
      * @return string success
      */
-    public function payload($customjs)
+    public function payload($customjs): string
     {
         $this->database->fetch(
             'UPDATE settings SET value = :value WHERE setting = "customjs"',
@@ -371,13 +390,13 @@ class User
     }
 
     /**
-     * Update twofactor settings
+     * Update two factor settings
      * @method twofactor
      * @param string $secret generated secret code
      * @param string $code 6 digit 2fa code
      * @return string success
      */
-    public function twofactor($secret, $code)
+    public function twofactor($secret, $code): string
     {
         $secretCode = $this->database->fetchSetting('secret');
 
@@ -415,7 +434,7 @@ class User
      * @param string $id report id
      * @return string success
      */
-    public function archiveReport($id)
+    public function archiveReport($id): string
     {
         $report = $this->database->fetch('SELECT archive FROM reports WHERE id = :id', [':id' => $id]);
         $archive = $report['archive'] == '0' ? '1' : '0';
@@ -433,7 +452,7 @@ class User
      * @param string $id report id
      * @return string success
      */
-    public function deleteReport($id)
+    public function deleteReport($id): string
     {
         $report = $this->database->fetch('SELECT screenshot FROM reports WHERE id = :id', [':id' => $id]);
         if($report['screenshot'] != '') {
@@ -452,7 +471,7 @@ class User
      * @param string $email email to share with
      * @return string success
      */
-    public function shareReport($id, $domain, $email)
+    public function shareReport($id, $domain, $email): string
     {
         $report = $this->database->fetch('SELECT * FROM reports WHERE id = :id LIMIT 1', [':id' => $id]);
 
@@ -547,7 +566,8 @@ class User
      * @param string $pass password to re-enable
      * @return string success
      */
-    public function killSwitch($pass) {
+    public function killSwitch($pass): string
+    {
         $this->database->fetch(
             "UPDATE settings SET value = :pass WHERE setting = 'killswitch';",
             [':pass' => $pass]
@@ -561,7 +581,8 @@ class User
      * @param string $ids report ids
      * @return string success
      */
-    public function deleteSelected($ids) {
+    public function deleteSelected($ids): string
+    {
         foreach($ids as $id) {
             $report = $this->database->fetch('SELECT screenshot FROM reports WHERE id = :id', [':id' => $id]);
             unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
@@ -578,7 +599,8 @@ class User
      * @param string $archive either 1 of 0
      * @return string success
      */
-    public function archiveSelected($ids, $archive) {
+    public function archiveSelected($ids, $archive): string
+    {
         foreach($ids as $id) {
             $this->database->fetch(
                 'UPDATE reports SET archive = :archive WHERE id = :id',
@@ -594,7 +616,7 @@ class User
      * @param string $bottoken The API token of the used Telegram bot
      * @return string chatId or error
      */
-    public function getChatId($bottoken)
+    public function getChatId($bottoken): string
     {
         if(!preg_match('/^[a-zA-Z0-9:_-]+$/', $bottoken)) {
             return 'This does not look like an valid Telegram bot token';
@@ -620,7 +642,7 @@ class User
      * @method statistics
      * @return string count
      */
-    public function statistics()
+    public function statistics(): string
     {
         $statistics = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'totalshared' => 0, 'last' => 'never'];
 
@@ -650,7 +672,7 @@ class User
             }
 
             // Counts amount of shared reports
-            if(strpos($report['referer'], "Shared via ") === 0) {
+            if(strpos($report['referer'], 'Shared via ') === 0) {
                 $statistics['totalshared']++;
             }
         }

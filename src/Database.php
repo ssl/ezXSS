@@ -44,7 +44,7 @@ class Database
      * @param array $array Array with bind values
      * @return string result of query
      */
-    public function lastInsertId($query, $array = [])
+    public function lastInsertId($query, $array = []): string
     {
         $lastInsertId = $this->DB->prepare($query);
         $lastInsertId->execute($array);
@@ -58,7 +58,7 @@ class Database
      * @param array $array Array with bind values
      * @return array            result of query
      */
-    public function fetchAll($query, $array = [])
+    public function fetchAll($query, $array = []): array
     {
         $this->DB->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $fetchAll = $this->DB->prepare($query);
@@ -73,7 +73,7 @@ class Database
      * @param array $array Array with bind values
      * @return int result of query
      */
-    public function rowCount($query, $array = [])
+    public function rowCount($query, $array = []): int
     {
         $rowCount = $this->DB->prepare($query);
         $rowCount->execute($array);
@@ -86,7 +86,7 @@ class Database
      * @param string $name Setting name
      * @return string Setting value
      */
-    public function fetchSetting($name)
+    public function fetchSetting($name): string
     {
         if(!$this->isInstalled()) {
             return null;
@@ -107,7 +107,7 @@ class Database
      * @param array $array Array with bind values
      * @return array result of query
      */
-    public function fetch($query, $array = [])
+    public function fetch($query, $array = []): array
     {
         $fetch = $this->DB->prepare($query);
         $fetch->execute($array);
@@ -118,7 +118,8 @@ class Database
      * Returns true of false if ezXSS is installed
      * @return bool
      */
-    public function isInstalled() {
+    public function isInstalled(): bool
+    {
         if($this->isInstalled === null) {
             try {
                 $rowCount = $this->rowCount('SELECT id FROM settings');

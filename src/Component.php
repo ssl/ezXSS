@@ -25,7 +25,7 @@ class Component
      * @param boolean $plain true/false
      * @return string CSRF token
      */
-    public function csrf($plain = false)
+    public function csrf($plain = false): string
     {
         $csrf = $this->user->getCsrf();
 
@@ -37,7 +37,7 @@ class Component
      * @method twofactorLogin
      * @return string html
      */
-    public function twofactorLogin()
+    public function twofactorLogin(): string
     {
         if (strlen($this->setting('secret')) == 16) {
             return $this->basic->htmlBlocks('twofactorLogin');
@@ -52,7 +52,7 @@ class Component
      * @param string $name setting name
      * @return string setting value
      */
-    public function setting($name)
+    public function setting($name): string
     {
         if ($name === 'temp-secret') {
             return $this->secret;
@@ -66,7 +66,8 @@ class Component
      * @method timezones
      * @return string html with all timezones
      */
-    public function timezones() {
+    public function timezones(): string
+    {
         $current = $this->setting('timezone');
         $html = '<select class="form-control" id="timezone" name="timezone">';
         foreach (timezone_identifiers_list() as $key => $name) {
@@ -83,7 +84,8 @@ class Component
      * @method themes
      * @return string html with all themes
      */
-    public function themes() {
+    public function themes(): string
+    {
         $current = $this->setting('theme');
         $html = '<select class="form-control" id="theme" name="theme">';
         $files = array_diff(scandir(__DIR__ . '/../assets/css'), array('.', '..'));
@@ -102,7 +104,8 @@ class Component
      * @method theme
      * @return string html with stylesheet
      */
-    public function theme() {
+    public function theme(): string
+    {
         $theme = $this->setting('theme');
         if($theme !== 'classic') {
             return '<link rel="stylesheet" href="/assets/css/'. $theme .'.css">';
@@ -116,17 +119,18 @@ class Component
      * @method version
      * @return string version number
      */
-    public function version() {
+    public function version(): string
+    {
         return version;
     }
 
     /**
-     * Get information about latests ezXSS release
+     * Get information about latest ezXSS release
      * @method repoinfo
      * @param string $key key
      * @return string value
      */
-    public function repoInfo($key)
+    public function repoInfo($key): string
     {
         if ($this->releases === []) {
             try {
@@ -149,7 +153,7 @@ class Component
      * @param string $id selected value
      * @return string selected
      */
-    public function filterSelected($id)
+    public function filterSelected($id): string
     {
         if ($this->filterSave == '') {
             $this->filterSave = $this->setting('filter-save');
@@ -181,7 +185,8 @@ class Component
      * @param string $name selected value
      * @return string checked
      */
-    public function collectSelected($name) {
+    public function collectSelected($name): string
+    {
         if($this->setting('collect_' . $name) === '1') {
             return 'checked';
         }
@@ -195,7 +200,8 @@ class Component
      * @param string $name selected value
      * @return string checked
      */
-    public function alertTypeSelected($name) {
+    public function alertTypeSelected($name): string
+    {
         if($this->setting('alert-' . $name) === '1') {
             return 'checked';
         }
@@ -209,7 +215,7 @@ class Component
      * @param string $archive true/false
      * @return string HTML of reports
      */
-    public function reportsList($archive)
+    public function reportsList($archive): string
     {
         $limit = (isset($_GET['limit']) && is_numeric($_GET['limit'])) ? (int)$_GET['limit'] : 50;
         if (isset($_GET['search'])) {
@@ -256,7 +262,7 @@ class Component
      * @param bool $navigation true/false
      * @return string page number
      */
-    public function page($navigation = false)
+    public function page($navigation = false): string
     {
         $page = (isset($_GET['page'])) ? (int)trim(htmlspecialchars($_GET['page'])) : 0;
 
@@ -282,7 +288,7 @@ class Component
      * @param string $key key of what is needed
      * @return string value of key
      */
-    public function report($key)
+    public function report($key): ?string
     {
         if ($this->reportInfo === []) {
             $id = explode('/', $_SERVER['REQUEST_URI'])[3];
@@ -320,7 +326,7 @@ class Component
      * @method searchBar
      * @return string search bar html
      */
-    public function searchBar()
+    public function searchBar(): string
     {
         if ($this->user->isLoggedIn()) {
             $html = str_replace('{{searchQuery}}', $this->searchQuery(0), $this->basic->htmlBlocks('searchBar'));
@@ -337,7 +343,7 @@ class Component
      * @param string $navigation true/false
      * @return string search query
      */
-    public function searchQuery($navigation)
+    public function searchQuery($navigation): ?string
     {
         if (isset($_GET['search'])) {
             if ($navigation == true) {
@@ -353,7 +359,7 @@ class Component
      * @method twofactorSettings
      * @return string html
      */
-    public function twofactorSettings()
+    public function twofactorSettings(): string
     {
         $secretCheck = $this->setting('secret');
 
@@ -376,7 +382,8 @@ class Component
      * @method domain
      * @return string
      */
-    public function domain() {
+    public function domain(): string
+    {
         return $this->basic->domain();
     }
 

@@ -17,7 +17,7 @@ class Request
      * @method json
      * @return string converted json value
      */
-    public function json()
+    public function json(): ?string
     {
         if ($this->user->getCsrf() !== $this->post('csrf')) {
             return $this->convert('CSRF token is not valid');
@@ -130,7 +130,7 @@ class Request
      * @param string $key key
      * @return string value
      */
-    private function post($key)
+    private function post($key): string
     {
         return $_POST[$key] ?? '';
     }
@@ -141,7 +141,7 @@ class Request
      * @param array|string $array array or string
      * @return string json value
      */
-    private function convert($array)
+    private function convert($array): string
     {
         if (!is_array($array)) {
             return json_encode(['echo' => $array]);

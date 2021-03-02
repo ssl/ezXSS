@@ -8,22 +8,22 @@ class Basic
         $this->base32Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     }
 
-    public function screenshotPathImg($screenshotName)
+    public function screenshotPathImg($screenshotName): string
     {
         return '<img style="max-width: 100%;" src="http://' . $this->domain() . '/assets/img/report-' . $screenshotName . '.png">';
     }
 
-    public function screenshotPath($screenshotName)
+    public function screenshotPath($screenshotName): string
     {
         return 'http://' . $this->domain() . '/assets/img/report-' . $screenshotName . '.png';
     }
 
-    public function domain()
+    public function domain(): string
     {
         return htmlspecialchars($_SERVER['SERVER_NAME']);
     }
 
-    public function getCode($secret)
+    public function getCode($secret): string
     {
         $secretKey = $this->baseDecode($secret);
         $hash = hash_hmac('SHA1', chr(0) . chr(0) . chr(0) . chr(0) . pack('N*', floor(time() / 30)), $secretKey, true);
@@ -32,7 +32,7 @@ class Basic
         return str_pad($value % (10 ** 6), 6, '0', STR_PAD_LEFT);
     }
 
-    private function baseDecode($data)
+    private function baseDecode($data): string
     {
         $characters = $this->base32Characters;
         $buffer = 0;
@@ -51,7 +51,7 @@ class Basic
         return $result;
     }
 
-    public function htmlBlocks($htmlBlock)
+    public function htmlBlocks($htmlBlock): string
     {
         if ($htmlBlock == 'menu') {
             return <<<HTML
