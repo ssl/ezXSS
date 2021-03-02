@@ -19,6 +19,11 @@ class Component
         $this->base32Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     }
 
+    public function adminURL()
+    {
+        return adminURL;
+    }
+
     /**
      * Get csrf-token of user
      * @method csrf
@@ -295,7 +300,7 @@ class Component
 
             if (is_numeric($id)) {
                 if (!$this->user->isLoggedIn()) {
-                    return header('Location: /manage/login');
+                    return header('Location: /'.adminURL.'/login');
                 }
                 $this->reportInfo = $this->database->fetch(
                     'SELECT * FROM reports WHERE id = :id LIMIT 1',
@@ -309,7 +314,7 @@ class Component
             }
 
             if (!isset($this->reportInfo['id'])) {
-                return header('Location: /manage/reports');
+                return header('Location: /'.adminURL.'/reports');
             }
         }
 

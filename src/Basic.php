@@ -71,13 +71,13 @@ class Basic
               </li>
 
               <li class="nav-category">Main</li>
-              <li><a href="/manage/dashboard">Dashboard</a></li>
-              <li><a href="/manage/settings">Settings</a></li>
-              <li><a href="/manage/payload">Payload</a></li>
+              <li><a href="/{{adminURL[]}}/dashboard">Dashboard</a></li>
+              <li><a href="/{{adminURL[]}}/settings">Settings</a></li>
+              <li><a href="/{{adminURL[]}}/payload">Payload</a></li>
 
               <li class="nav-category">Reports</li>
-              <li><a href="/manage/reports">Reports</a></li>
-              <li><a href="/manage/archive">Archived reports</a></li>
+              <li><a href="/{{adminURL[]}}/reports">Reports</a></li>
+              <li><a href="/{{adminURL[]}}/archive">Archived reports</a></li>
             </ul>
           </nav>
         </aside>
@@ -224,7 +224,7 @@ HTML;
         if ($htmlBlock == 'telegram') {
             return <<<HTML
 ***XSS Report #{{id}}***
-Get a fast view below or view the whole report on https://{{domain}}/manage/report/{{id}}
+Get a fast view below or view the whole report on https://{{domain}}/{{adminURL}}/report/{{id}}
 
 ***URL***
 ```
@@ -282,7 +282,7 @@ HTML;
               <div class="view-header">
                 <div class="header-title">
                   <h3 class="h">XSS Report #{{id}}</h3>
-                  <small>Get a fast view below or view the whole report on https://{{domain}}/manage/report/{{id}}</small>
+                  <small>Get a fast view below or view the whole report on https://{{domain}}/{{adminURL}}/report/{{id}}</small>
                 </div>
               </div>
               <hr>

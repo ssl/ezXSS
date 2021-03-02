@@ -41,7 +41,8 @@ class Request
                 return $this->convert(
                     $this->user->settings(
                         $this->post('timezone'),
-                        $this->post('theme')
+                        $this->post('theme'),
+                        $this->post('adminurl')
                     )
                 );
                 break;

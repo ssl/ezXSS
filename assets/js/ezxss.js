@@ -4,9 +4,16 @@ function request(action, data) {
     return $.ajax({
         type: "post",
         dataType: "json",
-        url: "/manage/request",
+        url: "/"+adminURL()+"/request",
         data: data
     });
+}
+
+function adminURL() {
+    var path = $(location).attr('pathname');
+    path.indexOf(1);
+    path.toLowerCase();
+    return path.split("/")[1];
 }
 
 $(document).ready(function() {
@@ -84,7 +91,7 @@ $(document).ready(function() {
             if(location.toString().split('/').slice(-2)[0] !== 'report') {
                 $("#"+id).fadeOut( "slow", function() {});
             } else {
-                window.location.href = '/manage/reports';
+                window.location.href = '/'+adminURL()+'/reports';
             }
         });
     });
@@ -98,7 +105,7 @@ $(document).ready(function() {
 
     $(".share").click(function() {
         $('#reportid').val( $(this).attr('report-id') );
-        $('#shareid').val("https://" + window.location.hostname + "/manage/report/" + $(this).attr('share-id') );
+        $('#shareid').val("https://" + window.location.hostname + "/"+adminURL()+"/report/" + $(this).attr('share-id') );
     });
 
     $("#openGetChatId").click(function() {

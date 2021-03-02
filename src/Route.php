@@ -88,7 +88,7 @@ class Route
     private function redirect($page): string
     {
         $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
-        header("Location: /manage/{$page}");
+        header("Location: /".adminURL."/{$page}");
         return 'Redirect';
     }
 
@@ -248,12 +248,12 @@ class Route
 
                     $markdownTemplate = str_replace(
                         [
-                            '{{id}}', '{{domain}}', '{{url}}', '{{ip}}',
+                            '{{adminURL}}', '{{id}}', '{{domain}}', '{{url}}', '{{ip}}',
                             '{{referer}}', '{{payload}}', '{{user-agent}}', '{{cookies}}', '{{localstorage}}',
                             '{{sessionstorage}}', '{{dom}}', '{{origin}}', '{{time}}', '{{screenshot}}'
                         ],
                         [
-                            $reportId, $domain, $json->uri, $userIp, $json->referer !== '' ? $json->referer : ' ', $json->payload,
+                            adminURL, $reportId, $domain, $json->uri, $userIp, $json->referer !== '' ? $json->referer : ' ', $json->payload,
                             $json->{'user-agent'}, $json->cookies, json_encode($json->localstorage), json_encode($json->sessionstorage),
                             substr($json->dom, 0, $setting['dompart']) . $domExtra, $json->origin, date('F j Y, g:i a'), $json->screenshot !== '' ? $json->screenshot : ' '
                         ],
@@ -275,6 +275,7 @@ class Route
 
                     $htmlTemplate = str_replace(
                         [
+                            '{{adminURL}}',
                             '{{id}}',
                             '{{domain}}',
                             '{{url}}',
@@ -291,6 +292,7 @@ class Route
                             '{{screenshot}}'
                         ],
                         [
+                            adminURL,
                             $reportId,
                             htmlspecialchars($domain),
                             htmlspecialchars($json->uri),
