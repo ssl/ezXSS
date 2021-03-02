@@ -51,17 +51,29 @@ class Request
                         $this->post('filter'),
                         $this->post('blocked_domains'),
                         $this->post('whitelist_domains'),
-                        $this->post('email'),
-                        $this->post('emailfrom'),
-                        $this->post('dompart'),
-                        $this->post('telegram_bottoken'),
-                        $this->post('telegram_chatid'),
-                        $this->post('callback_url'),
-                        $this->post('mailon'),
-                        $this->post('telegramon'),
-                        $this->post('callbackon')
+                        $this->post('dompart')
                     )
                 );
+                break;
+            case 'email-alert-settings':
+                return $this->convert($this->user->emailAlertSettings(
+                    $this->post('mailon'),
+                    $this->post('email'),
+                    $this->post('emailfrom')
+                ));
+                break;
+            case 'telegram-alert-settings':
+                return $this->convert($this->user->telegramAlertSettings(
+                    $this->post('telegramon'),
+                    $this->post('telegram_bottoken'),
+                    $this->post('telegram_chatid')
+                ));
+                break;
+            case 'callback-alert-settings':
+                return $this->convert($this->user->callbackAlertSettings(
+                    $this->post('callbackon'),
+                    $this->post('callback_url')
+                ));
                 break;
             case 'password-settings' :
                 return $this->convert(

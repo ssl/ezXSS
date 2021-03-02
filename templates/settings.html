@@ -35,6 +35,10 @@
                                     <label class="control-label" for="theme">Theme</label>
                                     {{themes[]}}
                                 </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="adminurl">Admin URL</label>
+                                    <input class="form-control" id="adminurl" name="adminurl" type="text" value="manage">
+                                </div>
                                 <button class="btn">Save</button>
                             </form>
                         </div>
@@ -71,6 +75,20 @@
                         </div>
                     </div>
 
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Kill Switch</div>
+                        <div class="panel-body">
+                            <p>Completely kills the platform. Can be reverted by visiting https://{{domain[]}}/?pass=</p>
+                            <form class="form" id="killswitch" method="post">
+                                <div class="form-group">
+                                    <label class="control-label" for="pass">Password to revert</label>
+                                    <input class="form-control" id="pass" name="pass" type="text">
+                                </div>
+                                <button class="btn">Kill</button>
+                            </form>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="col-lg-6">
@@ -103,14 +121,22 @@
                                     <input class="form-control" id="dompart" name="dompart" type="text"
                                            value="{{setting[dompart]}}">
                                 </div>
-                                <hr>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">E-mail alert settings</div>
+                        <div class="panel-body">
+                            <form class="form" id="email-alert-settings">
                                 <label class="checkbox-label" style="display:inline">
                                     <input class="chkbox" type="checkbox" name="selected" id="mailon" {{alertTypeSelected[mail]}}>
                                     <span class="checkbox-custom rectangular"></span>
                                 </label>
                                 <p class="checkbox-text" style="padding-bottom: 5px;">Send alert via email</p>
                                 <div class="form-group">
-                                    <label class="control-label" for="email">Email alerts to</label>
+                                    <label class="control-label" for="email">Email sends to</label>
                                     <input class="form-control" id="email" name="email" type="email"
                                            value="{{setting[email]}}">
                                 </div>
@@ -119,7 +145,15 @@
                                     <input class="form-control" id="emailfrom" name="emailfrom" type="text"
                                            value="{{setting[emailfrom]}}">
                                 </div>
-                                <hr>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Telegram alert settings</div>
+                        <div class="panel-body">
+                            <form class="form" id="telegram-alert-settings">
                                 <label class="checkbox-label" style="display:inline">
                                     <input class="chkbox" type="checkbox" name="selected" id="telegramon" {{alertTypeSelected[telegram]}}>
                                     <span class="checkbox-custom rectangular"></span>
@@ -136,7 +170,15 @@
                                     <label class="control-label" for="telegram_chatid">Chat ID</label>
                                     <input class="form-control" id="telegram_chatid" name="telegram_chatid" type="text" value="{{setting[telegram-chatid]}}" placeholder="123456789">
                                 </div>
-                                <hr>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Callback alert settings</div>
+                        <div class="panel-body">
+                            <form class="form" id="callback-alert-settings">
                                 <label class="checkbox-label" style="display:inline">
                                     <input class="chkbox" type="checkbox" name="selected" id="callbackon" {{alertTypeSelected[callback]}}>
                                     <span class="checkbox-custom rectangular"></span>
@@ -144,12 +186,15 @@
                                 <p class="checkbox-text" style="padding-bottom: 5px;">Send alert to callback</p>
                                 <div class="form-group">
                                     <label class="control-label" for="callback_url">Callback url</label>
-                                    <input class="form-control" id="callback_url" name="callback_url" type="text" value="{{setting[callback-url]}}" placeholder="https://someproject.com/callback.php">
+                                    <input class="form-control" id="callback_url" name="callback_url" type="text" value="{{setting[callback-url]}}" placeholder="https://example.com/callback.php">
                                 </div>
                                 <button class="btn">Save</button>
                             </form>
                         </div>
                     </div>
+
+
+
                 </div>
 
                 <div class="col-lg-6">

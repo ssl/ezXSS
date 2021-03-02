@@ -197,16 +197,40 @@ class User
      * @param string $callbackOn Either on or empty to tell if selected
      * @return string success
      */
-    public function alertSettings($filterId, $blocked, $whitelist, $email, $emailfrom, $dompart, $bottoken, $chatid, $url, $mailOn, $telegramOn, $callbackOn)
+    public function alertSettings($filterId, $blocked, $whitelist, $dompart)
+    {
+        if (!is_int((int)$dompart)) {
+            return 'The dom length needs to be a int number.';
+        }
+
+        $filterSave = ($filterId == 1 || $filterId == 2) ? 1 : 0;
+        $filterAlert = ($filterId == 1 || $filterId == 3) ? 1 : 0;
+
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "dompart"', [':value' => (int)$dompart]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "blocked-domains"', [':value' => $blocked]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "whitelist-domains"', [':value' => $whitelist]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-save"', [':value' => $filterSave]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-alert"', [':value' => $filterAlert]);
+
+        return 'Alerts settings are saved.';
+    }
+
+    public function emailAlertSettings($mailOn, $email, $emailfrom)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'This is not a correct email address.';
         }
 
-        if (!is_int((int)$dompart)) {
-            return 'The dom length needs to be a int number.';
-        }
+        $alertMail = ($mailOn === 'on') ? 1 : 0;
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "alert-mail"', [':value' => $alertMail]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "email"', [':value' => $email]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "emailfrom"', [':value' => $emailfrom]);
 
+        return 'E-mail alerts settings are saved.';
+    }
+
+    public function telegramAlertSettings($telegramOn, $bottoken, $chatid)
+    {
         if($bottoken !== '' && !preg_match('/^[a-zA-Z0-9:_]+$/', $bottoken)) {
             return 'This does not look like an valid Telegram bot token';
         }
@@ -215,28 +239,21 @@ class User
             return 'The chat id needs to be a int number.';
         }
 
-        $filterSave = ($filterId == 1 || $filterId == 2) ? 1 : 0;
-        $filterAlert = ($filterId == 1 || $filterId == 3) ? 1 : 0;
-
-        $alertMail = ($mailOn === 'on') ? 1 : 0;
         $alertTelegram = ($telegramOn === 'on') ? 1 : 0;
-        $alertCallback = ($callbackOn === 'on') ? 1 : 0;
-
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "email"', [':value' => $email]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "emailfrom"', [':value' => $emailfrom]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "dompart"', [':value' => (int)$dompart]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "blocked-domains"', [':value' => $blocked]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "whitelist-domains"', [':value' => $whitelist]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-save"', [':value' => $filterSave]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-alert"', [':value' => $filterAlert]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "telegram-bottoken"', [':value' => $bottoken]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "telegram-chatid"', [':value' => $chatid]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "callback-url"', [':value' => $url]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "alert-mail"', [':value' => $alertMail]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "alert-telegram"', [':value' => $alertTelegram]);
+
+        return 'Telegram alerts settings are saved.';
+    }
+
+    public function callbackAlertSettings($callbackOn, $url)
+    {
+        $alertCallback = ($callbackOn === 'on') ? 1 : 0;
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "callback-url"', [':value' => $url]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "alert-callback"', [':value' => $alertCallback]);
 
-        return 'New alerts settings are saved.';
+        return 'Callback alerts settings are saved.';
     }
 
     /**
