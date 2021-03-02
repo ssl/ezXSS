@@ -54,15 +54,21 @@
                                         </tr>
                                         <tr>
                                             <td>Local Storage</td>
-                                            <td style="padding-right:0px"><textarea style="resize:vertical" spellcheck=false>{{report[localstorage]}}</textarea></td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                                                    style="resize:vertical">{{report[localstorage]}}</textarea>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Session Storage</td>
-                                            <td style="padding-right:0px"><textarea style="resize:vertical" spellcheck=false>{{report[sessionstorage]}}</textarea></td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                                                    style="resize:vertical">{{report[sessionstorage]}}</textarea>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>DOM</td>
-                                            <td style="padding-right:0px"><textarea style="resize:vertical" spellcheck=false>{{report[dom]}}</textarea></td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                                                    style="resize:vertical">{{report[dom]}}</textarea>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Origin</td>
@@ -74,8 +80,9 @@
                                         </tr>
                                         <tr>
                                             <td>Screenshot</td>
-                                            <td><img style="max-width: 100%;" onerror="this.parentElement.innerHTML = '';"
-                                                     src="/assets/img/report-{{report[screenshot]}}.png"></td>
+                                            <td><img onerror="this.parentElement.innerHTML = '';"
+                                                     src="/assets/img/report-{{report[screenshot]}}.png"
+                                                     style="max-width: 100%;"></td>
                                         </tr>
                                         </thead>
                                     </table>
@@ -85,7 +92,9 @@
                                     <button class="btn share" data-target="#shareModal" data-toggle="modal"
                                             report-id="{{report[id]}}" share-id="{{report[shareid]}}">Share
                                     </button>
-                                    <button class="btn copycookies" report-origin="{{report[origin]}}">Copy cookies as JSON</button>
+                                    <button class="btn copycookies" report-origin="{{report[origin]}}">Copy cookies as
+                                        JSON
+                                    </button>
                                 </div>
                             </div>
                         </div>

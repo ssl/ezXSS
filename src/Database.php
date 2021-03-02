@@ -44,7 +44,7 @@ class Database
      * @param array $array Array with bind values
      * @return string result of query
      */
-    public function lastInsertId($query, $array = []): string
+    public function lastInsertId($query, $array = [])
     {
         $lastInsertId = $this->DB->prepare($query);
         $lastInsertId->execute($array);
@@ -58,7 +58,7 @@ class Database
      * @param array $array Array with bind values
      * @return array            result of query
      */
-    public function fetchAll($query, $array = []): array
+    public function fetchAll($query, $array = [])
     {
         $this->DB->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $fetchAll = $this->DB->prepare($query);
@@ -86,7 +86,7 @@ class Database
      * @param string $name Setting name
      * @return string Setting value
      */
-    public function fetchSetting($name): string
+    public function fetchSetting($name)
     {
         if(!$this->isInstalled()) {
             return null;
@@ -107,7 +107,7 @@ class Database
      * @param array $array Array with bind values
      * @return array result of query
      */
-    public function fetch($query, $array = []): array
+    public function fetch($query, $array = [])
     {
         $fetch = $this->DB->prepare($query);
         $fetch->execute($array);

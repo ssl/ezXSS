@@ -130,7 +130,7 @@ class Request
      * @param string $key key
      * @return string value
      */
-    private function post($key): string
+    private function post($key)
     {
         return $_POST[$key] ?? '';
     }

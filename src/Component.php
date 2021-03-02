@@ -352,6 +352,8 @@ class Component
 
             return htmlspecialchars($_GET['search']);
         }
+
+        return '';
     }
 
     /**
