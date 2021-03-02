@@ -596,7 +596,7 @@ class User
      */
     public function getChatId($bottoken)
     {
-        if(!preg_match('/^[a-zA-Z0-9:_]+$/', $bottoken)) {
+        if(!preg_match('/^[a-zA-Z0-9:_-]+$/', $bottoken)) {
             return 'This does not look like an valid Telegram bot token';
         }
 
