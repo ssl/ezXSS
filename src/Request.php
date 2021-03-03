@@ -42,16 +42,8 @@ class Request
                     $this->user->settings(
                         $this->post('timezone'),
                         $this->post('theme'),
-                        $this->post('adminurl')
-                    )
-                );
-                break;
-            case 'alert-settings':
-                return $this->convert(
-                    $this->user->alertSettings(
+                        $this->post('adminurl'),
                         $this->post('filter'),
-                        $this->post('blocked_domains'),
-                        $this->post('whitelist_domains'),
                         $this->post('dompart')
                     )
                 );
@@ -119,6 +111,14 @@ class Request
                 return $this->user->statistics();
             case 'getchatid':
                 return $this->convert($this->user->getChatId($this->post('bottoken')));
+            case 'remove-domain':
+                return $this->convert($this->user->removeDomain($this->post('type'), $this->post('id')));
+            case 'blacklist-domains':
+                return $this->convert($this->user->addDomain('blacklist', $this->post('blacklist-domain')));
+            case 'whitelist-domains':
+                return $this->convert($this->user->addDomain('whitelist', $this->post('whitelist-domain')));
+            case 'extract-pages':
+                return $this->convert($this->user->addDomain('page', $this->post('path')));
             default :
                 return $this->convert('This action does not exists.');
                 break;

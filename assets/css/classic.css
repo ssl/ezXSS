@@ -18,6 +18,7 @@ input,button,select{font-family:inherit;font-size:inherit;line-height:inherit}
 img{vertical-align:middle}
 p{margin:0 0 10px}
 .col-lg-6,.col-lg-12{position:relative;min-height:1px;padding-right:15px;padding-left:15px}
+.col-lg-4{position: relative;min-height: 1px;padding-right: 10px;padding-left: 10px;}
 .input-group{position:relative;display:table;border-collapse:separate}
 .input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}
 .input-group .form-control:focus{z-index:3}
@@ -299,9 +300,10 @@ th{color:#ffffff}
 
 @media (min-width: 1200px){
     .col-lg-12{width:100%}
-    .col-lg-2,.col-lg-6,.col-lg-12{float:left}
+    .col-lg-2,.col-lg-6,.col-lg-12,.col-lg-4{float:left}
     .col-lg-6{width:50%}
     .col-lg-2{width:16.66666667%}
+    .col-lg-4 {width: 33.33333333%;}
 }
 
 @media screen and (max-width: 767px){

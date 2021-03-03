@@ -42,6 +42,21 @@
                                     <input class="form-control" id="adminurl" name="adminurl" type="text"
                                            value="{{adminURL[]}}">
                                 </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="filter">On callback if report is duplicate</label>
+                                    <select class="form-control" id="filter">
+                                        <option value="1" {{filterSelected[1]}}>Both save report and send alert</option>
+                                        <option value="2" {{filterSelected[2]}}>Only save report</option>
+                                        <option value="3" {{filterSelected[3]}}>Only send alert</option>
+                                        <option value="4" {{filterSelected[4]}}>Don't save report or send alert</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="dompart">DOM Length in email or Telegram
+                                        alert</label>
+                                    <input class="form-control" id="dompart" name="dompart" type="text"
+                                           value="{{setting[dompart]}}">
+                                </div>
                                 <button class="btn">Save</button>
                             </form>
                         </div>
@@ -78,59 +93,12 @@
                         </div>
                     </div>
 
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Kill Switch</div>
-                        <div class="panel-body">
-                            <p>Completely kills the platform. Can be reverted by visiting
-                                https://{{domain[]}}/?pass=...</p>
-                            <form class="form" id="killswitch" method="post">
-                                <div class="form-group">
-                                    <label class="control-label" for="pass">Password to revert</label>
-                                    <input class="form-control" id="pass" name="pass" type="text">
-                                </div>
-                                <button class="btn">Kill</button>
-                            </form>
-                        </div>
-                    </div>
 
                 </div>
 
                 <div class="col-lg-6">
 
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Alert settings</div>
-                        <div class="panel-body">
-                            <form class="form" id="alert-settings">
-                                <div class="form-group">
-                                    <label class="control-label" for="filter">On callback if report is duplicate</label>
-                                    <select class="form-control" id="filter">
-                                        <option value="1" {{filterSelected[1]}}>Both save report and send alert</option>
-                                        <option value="2" {{filterSelected[2]}}>Only save report</option>
-                                        <option value="3" {{filterSelected[3]}}>Only send alert</option>
-                                        <option value="4" {{filterSelected[4]}}>Don't save report or send alert</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" for="blocked_domains">Blocked domains</label>
-                                    <input class="form-control" id="blocked_domains" name="blocked_domains" placeholder="domain1.com,domain2.com"
-                                           type="text" value="{{setting[blocked-domains]}}">
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" for="whitelist_domains">Whitelist only domains</label>
-                                    <input class="form-control" id="whitelist_domains" name="whitelist_domains"
-                                           placeholder="domain1.com,domain2.com"
-                                           type="text" value="{{setting[whitelist-domains]}}">
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" for="dompart">DOM Length in email or Telegram
-                                        alert</label>
-                                    <input class="form-control" id="dompart" name="dompart" type="text"
-                                           value="{{setting[dompart]}}">
-                                </div>
-                                <button class="btn">Save</button>
-                            </form>
-                        </div>
-                    </div>
+
 
                     <div class="panel panel-filled">
                         <div class="panel-heading">E-mail alert settings</div>
@@ -204,6 +172,21 @@
                                            value="{{setting[callback-url]}}">
                                 </div>
                                 <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Kill Switch</div>
+                        <div class="panel-body">
+                            <p>Completely kills the platform. Can be reverted by visiting
+                                https://{{domain[]}}/?pass=...</p>
+                            <form class="form" id="killswitch" method="post">
+                                <div class="form-group">
+                                    <label class="control-label" for="pass">Password to revert</label>
+                                    <input class="form-control" id="pass" name="pass" type="text">
+                                </div>
+                                <button class="btn">Kill</button>
                             </form>
                         </div>
                     </div>

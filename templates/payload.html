@@ -9,7 +9,7 @@
                     <div class="view-header">
                         <div class="header-title">
                             <h3 class="m-b-xs">Payload</h3>
-                            <small>Get an payload or update your custom payload</small>
+                            <small>Get an payload or update your custom payload and domain filters</small>
                         </div>
                     </div>
                     <hr>
@@ -17,7 +17,6 @@
             </div>
 
             <div class="row">
-
                 <div class="col-lg-12">
                     <div id="alert"></div>
                 </div>
@@ -150,6 +149,62 @@
                     </div>
                 </div>
 
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Extract additional pages</div>
+                        <div class="panel-body">
+                            <form class="form" id="extract-pages">
+                                <div class="form-group">
+                                    <label class="control-label" for="path">Add new path</label>
+                                    <input class="form-control" id="path" name="path" placeholder="/robots.txt">
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                            <hr>
+                            <p><b>Pages:</b></p>
+                            {{listInputs[pages]}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Blocked domains (blacklist)</div>
+                        <div class="panel-body">
+                            <form class="form" id="blacklist-domains">
+                                <div class="form-group">
+                                    <label class="control-label" for="blacklist-domain">Add new domain</label>
+                                    <input class="form-control" id="blacklist-domain" name="domain" placeholder="example.com">
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                            <hr>
+                            <p><b>Domains:</b></p>
+                            {{listInputs[blacklist]}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Allowed only domains (whitelist)</div>
+                        <div class="panel-body">
+                            <form class="form" id="whitelist-domains">
+                                <div class="form-group">
+                                    <label class="control-label" for="whitelist-domain">Add new domain</label>
+                                    <input class="form-control" id="whitelist-domain" name="domain" placeholder="example.com">
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                            <hr>
+                            <p><b>Domains:</b></p>
+                            {{listInputs[whitelist]}}
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>

@@ -121,6 +121,39 @@ $(document).ready(function() {
         });
     });
 
+    $(".remove-whitelist").click(function() {
+        var id = $(this).attr('d');
+        var divid = $(this).attr('divid');
+        request("remove-domain", {id:id,type:'whitelist'}).then(function(r) {
+            $("#"+divid).fadeOut( "slow", function() {});
+            if (r.redirect) {
+                window.location.href = r.redirect;
+            }
+        });
+    });
+
+    $(".remove-blacklist").click(function() {
+        var id = $(this).attr('d');
+        var divid = $(this).attr('divid');
+        request("remove-domain", {id:id,type:'blacklist'}).then(function(r) {
+            $("#"+divid).fadeOut( "slow", function() {});
+            if (r.redirect) {
+                window.location.href = r.redirect;
+            }
+        });
+    });
+
+    $(".remove-page").click(function() {
+        var id = $(this).attr('d');
+        var divid = $(this).attr('divid');
+        request("remove-domain", {id:id,type:'page'}).then(function(r) {
+            $("#"+divid).fadeOut( "slow", function() {});
+            if (r.redirect) {
+                window.location.href = r.redirect;
+            }
+        });
+    });
+
     $(".copycookies").click(function() {
         var cookies = $("#cookies").text();
         var split = cookies.split('; ');

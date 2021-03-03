@@ -29,7 +29,9 @@
     * Full HTML DOM source of the page
     * Page origin
     * Time of execution
+    * Payload URL
     * Screenshot of the page
+    * Extract additional defined pages
 * its just ez :-)
 
 ## Required

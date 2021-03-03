@@ -67,6 +67,43 @@ class Component
     }
 
     /**
+     * Get html string of inputs
+     * @method listInputs
+     * @param string $type list type
+     * @return string html with all inputs
+     */
+    public function listInputs($type): string
+    {
+        switch($type) {
+            case 'pages': $data = ['extract-pages', '|||', 'p', 'page']; break;
+            case 'blacklist': $data = ['blocked-domains', ',', 'b', 'blacklist']; break;
+            default: $data = ['whitelist-domains', ',', 'w', 'whitelist'];
+        }
+
+        $settings = $this->setting($data[0]);
+        $settings = explode($data[1], $settings);
+        $html = '';
+        $id = 0;
+
+        foreach($settings as $d) {
+            $id++;
+            if(empty($d)) {
+                continue;
+            }
+            $html .= '<div id="'.$data[2].$id.'" class="input-group" style="margin-bottom:15px">
+                                        <input class="form-control" disabled type="text" value="'.$d.'">
+                                        <span class="input-group-addon"><a class="remove-'.$data[3].'" d="'.$d.'" divid="'.$data[2].$id.'" style="cursor:pointer">Remove</a></span>
+                                    </div>';
+        }
+
+        if(empty($html)) {
+            $html = '0 found in list';
+        }
+
+        return $html;
+    }
+
+    /**
      * Get select list with all timezones
      * @method timezones
      * @return string html with all timezones
@@ -293,7 +330,7 @@ class Component
      * @param string $key key of what is needed
      * @return string value of key
      */
-    public function report($key): ?string
+    public function report($key)
     {
         if ($this->reportInfo === []) {
             $id = explode('/', $_SERVER['REQUEST_URI'])[3];

@@ -96,7 +96,7 @@ class User
         }
 
         if (strlen($password) < 8) {
-            return 'The password needs to be atleast 8 characters long.';
+            return 'The password needs to be at least 8 characters long.';
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -110,7 +110,7 @@ class User
             'CREATE TABLE IF NOT EXISTS `reports` (`id` int(11) NOT NULL AUTO_INCREMENT,`shareid` VARCHAR(50) NOT NULL,`cookies` text,`dom` longtext,`origin` varchar(500) DEFAULT NULL,`referer` varchar(500) DEFAULT NULL,`payload` varchar(500) DEFAULT NULL,`uri` varchar(500) DEFAULT NULL,`user-agent` varchar(500) DEFAULT NULL,`ip` varchar(50) DEFAULT NULL,`time` int(11) DEFAULT NULL,`archive` int(11) DEFAULT 0,`screenshot` LONGTEXT NULL DEFAULT NULL,`localstorage` LONGTEXT NULL DEFAULT NULL, `sessionstorage` LONGTEXT NULL DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;'
         );
         $this->database->query(
-            'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("secret", ""),("killswitch", ""),("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0"),("theme", "green"),("whitelist-domains", ""), ("telegram-bottoken", ""), ("telegram-chatid", ""), ("callback-url", ""), ("alert-mail", "1"), ("alert-telegram", "0"), ("alert-callback", "0"), ("adminurl", "manage");'
+            'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("secret", ""),("killswitch", ""),("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0"),("theme", "classic"),("whitelist-domains", ""), ("telegram-bottoken", ""), ("telegram-chatid", ""), ("callback-url", ""), ("alert-mail", "1"), ("alert-telegram", "0"), ("alert-callback", "0"), ("adminurl", "manage"), ("extract-pages", "");'
         );
         $this->database->fetch(
             'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain),("version", :version),("emailfrom", "ezXSS");',
@@ -151,7 +151,7 @@ class User
                 'DELETE FROM `settings` WHERE `setting` = "screenshot"',
             ],
             '3.10' => [
-                'INSERT INTO `settings` (`setting`, `value`) VALUES ("whitelist-domains", ""), ("telegram-bottoken", ""), ("telegram-chatid", ""), ("callback-url", ""), ("alert-mail", "1"), ("alert-telegram", "0"), ("alert-callback", "0"), ("adminurl", "manage");'
+                'INSERT INTO `settings` (`setting`, `value`) VALUES ("whitelist-domains", ""), ("telegram-bottoken", ""), ("telegram-chatid", ""), ("callback-url", ""), ("alert-mail", "1"), ("alert-telegram", "0"), ("alert-callback", "0"), ("adminurl", "manage"), ("extract-pages", "");'
             ]
         ];
 
@@ -182,33 +182,6 @@ class User
     {
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "notepad"', [':value' => $notepad]);
         return 'Your notepad is saved!';
-    }
-
-    /**
-     * Update alert settings
-     * @method alertSettings
-     * @param string $filterId The id of the used filter
-     * @param string $blocked A list of blocked domains
-     * @param string $whitelist A list of whitelist only domains
-     * @param string $dompart DOM Length for mail
-     * @return string success
-     */
-    public function alertSettings($filterId, $blocked, $whitelist, $dompart): string
-    {
-        if (!is_int((int)$dompart)) {
-            return 'The dom length needs to be a int number.';
-        }
-
-        $filterSave = ($filterId == 1 || $filterId == 2) ? 1 : 0;
-        $filterAlert = ($filterId == 1 || $filterId == 3) ? 1 : 0;
-
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "dompart"', [':value' => (int)$dompart]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "blocked-domains"', [':value' => $blocked]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "whitelist-domains"', [':value' => $whitelist]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-save"', [':value' => $filterSave]);
-        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-alert"', [':value' => $filterAlert]);
-
-        return 'Alerts settings are saved.';
     }
 
     /**
@@ -281,9 +254,11 @@ class User
      * @param string $timezone Timezone for reports
      * @param string $theme Theme name
      * @param string $adminurl Admin URL
+     * @param string $filterId The id of the used filter
+     * @param string $dompart DOM Length for mail
      * @return array|string
      */
-    public function settings($timezone, $theme, $adminurl)
+    public function settings($timezone, $theme, $adminurl, $filterId, $dompart)
     {
         if (!in_array($timezone, timezone_identifiers_list(), true)) {
             return 'The timezone is not a valid timezone.';
@@ -298,8 +273,18 @@ class User
             return 'The admin URL contains invalid characters';
         }
 
+        if (!is_int((int)$dompart)) {
+            return 'The dom length needs to be a int number.';
+        }
+
         $currentTheme = $this->database->fetchSetting('theme');
 
+        $filterSave = ($filterId == 1 || $filterId == 2) ? 1 : 0;
+        $filterAlert = ($filterId == 1 || $filterId == 3) ? 1 : 0;
+
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "dompart"', [':value' => (int)$dompart]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-save"', [':value' => $filterSave]);
+        $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "filter-alert"', [':value' => $filterAlert]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "timezone"', [':value' => $timezone]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "theme"', [':value' => $theme]);
         $this->database->fetch('UPDATE settings SET value = :value WHERE setting = "adminurl"', [':value' => $adminurl]);
@@ -461,9 +446,11 @@ class User
     public function deleteReport($id): string
     {
         $report = $this->database->fetch('SELECT screenshot FROM reports WHERE id = :id', [':id' => $id]);
-        if($report['screenshot'] != '') {
-            unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
-        }
+        if(($report['screenshot'] != '') && file_exists(
+                __DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png'
+            )) {
+                unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
+            }
 
         $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
         return 'Report is deleted!';
@@ -591,9 +578,9 @@ class User
     {
         foreach($ids as $id) {
             $report = $this->database->fetch('SELECT screenshot FROM reports WHERE id = :id', [':id' => $id]);
-            try {
+            if(file_exists(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png')) {
                 unlink(__DIR__ . '/../assets/img/report-' . $report['screenshot'] . '.png');
-            } catch(Exception $e) {}
+            }
 
             $this->database->fetch('DELETE FROM reports WHERE id = :id', [':id' => $id]);
         }
@@ -616,6 +603,97 @@ class User
             );
         }
         return 'Reports are archived.';
+    }
+
+    /**
+     * Remove domain or page from list
+     * @method removeDomain
+     * @param string $type list type
+     * @param string $domain domain or path value
+     * @return array|string
+     */
+    public function removeDomain($type, $domain) {
+        if($type === 'whitelist') {
+            $whitelist = $this->database->fetchSetting('whitelist-domains');
+            $whitelist = str_replace(array($domain . ',', ',' . $domain, $domain), '', $whitelist);
+            $this->database->fetch(
+                "UPDATE settings SET value = :list WHERE setting = 'whitelist-domains';",
+                [':list' => $whitelist]
+            );
+
+            if($whitelist === '') {
+                return ['redirect' => 'payload'];
+            }
+        }
+
+        if($type === 'blacklist') {
+            $blacklist = $this->database->fetchSetting('blocked-domains');
+            $blacklist = str_replace(array($domain . ',', ',' . $domain, $domain), '', $blacklist);
+            $this->database->fetch(
+                "UPDATE settings SET value = :list WHERE setting = 'blocked-domains';",
+                [':list' => $blacklist]
+            );
+
+            if($blacklist === '') {
+                return ['redirect' => 'payload'];
+            }
+        }
+
+        if($type === 'page') {
+            $pages = $this->database->fetchSetting('extract-pages');
+            $pages = str_replace(array($domain . '|||', '|||' . $domain, $domain), '', $pages);
+            $this->database->fetch(
+                "UPDATE settings SET value = :list WHERE setting = 'extract-pages';",
+                [':list' => $pages]
+            );
+
+            if($pages === '') {
+                return ['redirect' => 'payload'];
+            }
+        }
+
+        return 'Updated list';
+    }
+
+    /**
+     * Add domain or page from list
+     * @method addDomain
+     * @param string $type list type
+     * @param string $domain domain or path value
+     * @return array|string
+     */
+    public function addDomain($type, $domain) {
+        if($type === 'whitelist') {
+            $whitelist = $this->database->fetchSetting('whitelist-domains');
+            $whitelist .= ',' . $domain;
+            $this->database->fetch(
+                "UPDATE settings SET value = :list WHERE setting = 'whitelist-domains';",
+                [':list' => $whitelist]
+            );
+        }
+
+        if($type === 'blacklist') {
+            $blacklist = $this->database->fetchSetting('blocked-domains');
+            $blacklist .= ',' . $domain;
+            $this->database->fetch(
+                "UPDATE settings SET value = :list WHERE setting = 'blocked-domains';",
+                [':list' => $blacklist]
+            );
+        }
+
+        if($type === 'page') {
+            if (strpos($domain, '/') !== 0) {
+                $domain = '/' . $domain;
+            }
+            $pages = $this->database->fetchSetting('extract-pages');
+            $pages .= '|||' . $domain;
+            $this->database->fetch(
+                "UPDATE settings SET value = :list WHERE setting = 'extract-pages';",
+                [':list' => $pages]
+            );
+        }
+
+        return ['redirect' => 'payload'];
     }
 
     /**
@@ -652,9 +730,9 @@ class User
      */
     public function statistics(): string
     {
-        $statistics = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'totalshared' => 0, 'last' => 'never'];
+        $statistics = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'collected' => 0, 'last' => 'never'];
 
-        $allReports = $this->database->fetchAll('SELECT origin,time,referer FROM reports ORDER BY id ASC', []);
+        $allReports = $this->database->fetchAll('SELECT origin,time,payload FROM reports ORDER BY id ASC', []);
 
         $statistics['total'] = count($allReports);
 
@@ -680,8 +758,8 @@ class User
             }
 
             // Counts amount of shared reports
-            if(strpos($report['referer'], 'Shared via ') === 0) {
-                $statistics['totalshared']++;
+            if(strpos($report['payload'], 'Collected page via ') === 0) {
+                $statistics['collected']++;
             }
         }
 

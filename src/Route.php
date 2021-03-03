@@ -144,6 +144,7 @@ class Route
     public function callback($phpInput): string
     {
         $json = json_decode($phpInput, false);
+        $json->screenshot = $json->screenshot ?? '';
 
         $setting = [];
         foreach ($this->database->query('SELECT * FROM settings') as $settings) {
@@ -355,8 +356,18 @@ class Route
             }
         }
 
+        $pages = $this->database->fetchSetting('extract-pages');
+        $pages = explode('|||', $pages);
+        $pagesString = '';
+        foreach($pages as $page) {
+            if(empty($page)) {
+                continue;
+            }
+            $pagesString .= "'".htmlspecialchars($page, ENT_QUOTES)."',";
+        }
+
         return str_replace(
-            ['{{domain}}', '{{screenshot}}', '{{customjs}}', '{{version}}', '{{payload}}', '{{payloadFile}}', '{{noCollect}}'],
+            ['{{domain}}', '{{screenshot}}', '{{customjs}}', '{{version}}', '{{payload}}', '{{payloadFile}}', '{{noCollect}}', '{{pages}}'],
             [
                 $this->basic->domain(),
                 (($this->database->fetchSetting('collect_screenshot')) ? $this->getFile('screenshot', 'js') : ''),
@@ -364,7 +375,8 @@ class Route
                 version,
                 htmlspecialchars("//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"),
                 $payloadFile,
-                rtrim($noCollect, ',')
+                rtrim($noCollect, ','),
+                rtrim($pagesString, ',')
             ],
             $this->getFile($payloadFile, 'js')
         );
