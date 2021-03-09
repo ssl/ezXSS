@@ -1,4 +1,4 @@
-FROM php:apache as partial
+FROM php:8-apache as partial
 
 # Load extra Apache modules
 RUN a2enmod rewrite headers
