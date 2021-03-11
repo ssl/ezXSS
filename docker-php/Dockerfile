@@ -21,13 +21,18 @@ RUN chmod 777 /var/www/html/assets/img
 RUN echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
 
 FROM partial
+ENV PUID=2000
+ENV PGID=2000
+COPY ./docker-php/init.sh /init.sh
 COPY ./.htaccess /var/www/html/
 COPY ./index.html /var/www/html/
 COPY ./init.php /var/www/html/
 COPY ./assets/ /var/www/html/assets/
 COPY ./templates/ /var/www/html/templates/
 COPY ./src/ /var/www/html/src/
-RUN find . -type f -exec sed -i 's/\r$//' {} \;
+RUN find . -type f -exec sed -i 's/\r$//' {} \; && \
+    chmod +x /init.sh && \
+    sed -i -e 's/\r$//' /init.sh
 
-ENTRYPOINT ["docker-php-entrypoint"]
-CMD ["apache2-foreground"]
+ENTRYPOINT ["/bin/bash"]
+CMD ["/init.sh"]
