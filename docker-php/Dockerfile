@@ -1,5 +1,7 @@
 FROM php:8-apache as partial
 
+# Use production PHP settings
+RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 # Load extra Apache modules
 RUN a2enmod rewrite headers
 # Installs sendmail
