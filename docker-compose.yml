@@ -2,7 +2,6 @@ version: '3'
 
 services:
   ezxssdb:
-    container_name: ${dbHost}
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: always
@@ -14,7 +13,10 @@ services:
     volumes:
       - ./ezxssdb:/var/lib/mysql
   ezxss:
-    build: ./docker-php
+    build:
+      context: .
+      dockerfile: ./docker-php/Dockerfile
+      target: partial
     ports:
       - "80:80"
       - "443:443"
