@@ -81,7 +81,7 @@ class Component
         }
 
         $settings = $this->setting($data[0]);
-        $settings = explode($data[1], $settings);
+        $settings = array_reverse(explode($data[1], $settings));
         $html = '';
         $id = 0;
 
