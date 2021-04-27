@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  ezxss.db:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_DATABASE=${dbName}
+      - MYSQL_USER=${dbUser}
+      - MYSQL_PASSWORD=${dbPassword}
+    volumes:
+      - ./ezxssdb:/var/lib/mysql
+
+  ezxss.app:
+    image: 42elyesa/ezxss:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    volumes:
+      - ./.env:/var/www/html/.env:ro
+      - assets:/var/www/html/assets/
+    depends_on:
+      - ezxssdb
+
+volumes:
+  assets:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /absolute/path/to/host/directory/where/assets/should/be/mounted/
