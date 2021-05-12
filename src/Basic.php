@@ -229,36 +229,47 @@ Get a fast view below or view the whole report on https://{{domain}}/{{adminURL}
 ***URL***
 ```
 {{url}}```
+
 ***IP***
 ```
 {{ip}}```
+
 ***Referer***
 ```
 {{referer}}```
+
 ***Payload***
 ```
 {{payload}}```
+
 ***User Agent***
 ```
 {{user-agent}}```
+
 ***Cookies***
 ```
 {{cookies}}```
+
 ***Local Storage***
 ```
 {{localstorage}}```
+
 ***Session Storage***
 ```
 {{sessionstorage}}```
+
 ***DOM***
 ```
 {{dom}}```
+
 ***Origin***
 ```
 {{origin}}```
+
 ***Time***
 ```
 {{time}}```
+
 ***Screenshot***
 ```
 {{screenshot}}```
