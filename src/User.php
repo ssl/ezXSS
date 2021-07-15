@@ -152,6 +152,10 @@ class User
             ],
             '3.10' => [
                 'INSERT INTO `settings` (`setting`, `value`) VALUES ("whitelist-domains", ""), ("telegram-bottoken", ""), ("telegram-chatid", ""), ("callback-url", ""), ("alert-mail", "1"), ("alert-telegram", "0"), ("alert-callback", "0"), ("adminurl", "manage"), ("extract-pages", "");'
+            ],
+            '3.11' => [
+                'ALTER TABLE `reports` CHANGE `uri` `uri` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;',
+                'ALTER TABLE `reports` CHANGE `referer` `referer` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;'
             ]
         ];
 

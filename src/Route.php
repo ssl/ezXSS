@@ -155,6 +155,12 @@ class Route
         $domain = htmlspecialchars($_SERVER['SERVER_NAME']);
         $json->origin = str_replace(['https://', 'http://'], '', $json->origin);
 
+        $json->uri = substr($json->uri, 0, 1000);
+        $json->referer = substr($json->referer, 0, 1000);
+        $json->origin = substr($json->origin, 0, 500);
+        $json->payload = substr($json->payload, 0, 500);
+        $json->{'user-agent'} = substr($json->{'user-agent'}, 0, 500);
+
         $blockedDomains = explode(',', $setting['blocked-domains']);
         $whitelistDomains = explode(',', $setting['whitelist-domains']);
 
