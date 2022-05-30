@@ -112,6 +112,9 @@ class User
         $this->database->query(
             'INSERT INTO `settings` (`setting`, `value`) VALUES ("filter-save", "0"),("filter-alert", "0"),("dompart", "500"),("timezone", "Europe/Amsterdam"),("customjs", ""),("blocked-domains", ""),("notepad", "Welcome :-)"),("secret", ""),("killswitch", ""),("collect_uri", "1"), ("collect_ip", "1"), ("collect_referer", "1"), ("collect_user-agent", "1"), ("collect_cookies", "1"),("collect_localstorage", "1"), ("collect_sessionstorage", "1"), ("collect_dom", "1"), ("collect_origin", "1"), ("collect_screenshot", "0"),("theme", "classic"),("whitelist-domains", ""), ("telegram-bottoken", ""), ("telegram-chatid", ""), ("callback-url", ""), ("alert-mail", "1"), ("alert-telegram", "0"), ("alert-callback", "0"), ("adminurl", "manage"), ("extract-pages", "");'
         );
+        $this->database->query(
+            'ALTER DATABASE `'. config['dbName'] .'` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci; ALTER TABLE `reports` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;'
+        );
         $this->database->fetch(
             'INSERT INTO `settings` (`setting`, `value`) VALUES ("password", :password),("email", :email),("payload-domain", :domain),("version", :version),("emailfrom", "ezXSS");',
             [
@@ -155,7 +158,9 @@ class User
             ],
             '3.11' => [
                 'ALTER TABLE `reports` CHANGE `uri` `uri` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;',
-                'ALTER TABLE `reports` CHANGE `referer` `referer` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;'
+                'ALTER TABLE `reports` CHANGE `referer` `referer` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;',
+                'ALTER DATABASE `'. config['dbName'] .'` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;',
+                'ALTER TABLE `reports` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;'
             ]
         ];
 
