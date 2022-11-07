@@ -1,10 +1,9 @@
 function request(action, data) {
-    data["action"] = action;
     data["csrf"] = csrf;
     return $.ajax({
         type: "post",
         dataType: "json",
-        url: "/"+adminURL()+"/request",
+        url: "/"+adminURL()+"/"+action,
         data: data
     });
 }
@@ -19,14 +18,14 @@ function adminURL() {
 $(document).ready(function() {
 
     if(location.toString().split('/').pop() == 'dashboard') {
-        request('statistics', {}).then(function(r) {
+        request('dashboard/statistics', {}).then(function(r) {
             $.each( r, function( key, value ) {
                 $("#"+key).html(value);
             });
         });
     }
 
-    $("form.form").submit(function(Form) {
+    /*$("form.form").submit(function(Form) {
         $("#alert").slideUp();
         Form.preventDefault();
         var inputs = {};
@@ -55,7 +54,7 @@ $(document).ready(function() {
                 window.location.href = r.redirect;
             }
         });
-    });
+    });*/
 
     $(".delete-selected").click(function() {
         var ids = [];

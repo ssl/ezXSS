@@ -1,0 +1,93 @@
+<div class="wrapper">
+
+    {menu}
+
+    <section class="content">
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title float-left">
+                            <h3 class="m-b-xs">Users</h3>
+                            <small>Users</small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            {message}
+
+            <div class="row">
+
+                <div class="col-lg-8">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Users</div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+
+                                <table class="table" style="white-space: nowrap;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:6%">ID</th>
+                                            <th style="width:10%">Username</th>
+                                            <th>Rank</th>
+                                            <th>Payloads</th>
+                                            <th>Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reports-list">
+                                        {%foreach user}
+                                        <tr>
+                                            <td scope="row"><b>{user->id}</b></td>
+                                            <td>{user->username}</td>
+                                            <td>{user->rank}</td>
+                                            <td>example.com, user.example.com, example.com/123</td> <!-- todo -->
+                                            <td><a href="/manage/users/edit/{account->id}">Edit</a></td>
+                                        </tr>
+                                        {%/foreach}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Create User</div>
+                        <div class="panel-body">
+                            <form class="form" id="createUser" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                
+                                <div class="form-group">
+                                    <label class="control-label" for="username">Username</label>
+                                    <input class="form-control" id="username" name="username" type="text">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="control-label" for="password">Password</label>
+                                    <input class="form-control" id="password" name="password" type="text">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="control-label" for="rank">Rank</label>
+                                    <select class="form-control" id="rank" name="rank">
+                                        <option value="1">User</option>
+                                        <option value="7">Admin</option>
+                                        <option value="0">Banned</option>
+                                    </select>
+                                </div>
+                                
+                                <button type="submit" class="btn">Create</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

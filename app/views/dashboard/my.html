@@ -1,6 +1,6 @@
 <div class="wrapper">
 
-    {{menu}}
+    {menu}
 
     <section class="content">
         <div class="container-fluid">
@@ -9,7 +9,7 @@
                     <div class="view-header">
                         <div class="header-title">
                             <h3 class="m-b-xs">Dashboard</h3>
-                            <small>Statistics of your ezXSS</small>
+                            <small>Your personal dashboard with statistics and information</small>
                         </div>
                     </div>
                     <hr>
@@ -89,40 +89,7 @@
 
             </div>
 
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="panel panel-filled" style="height:493px">
-                        <div class="panel-heading">Version Status</div>
-                        <div class="panel-body">
-                            <div class="form-group">
-                                <label class="control-label">Your version</label>
-                                <input class="form-control" disabled value="v{{version[]}}">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">Changelog of v{{repoInfo[release]}} (latest
-                                    release)</label>
-                                <textarea class="form-control" disabled rows=13>{{repoInfo[body]}}</textarea>
-                            </div>
-                            <a class="btn" href="{{repoInfo[zipball_url]}}">Download v{{repoInfo[release]}}</a>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-lg-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Notepad</div>
-                        <div class="panel-body">
-                            <form class="form" id="notepad-settings" method="post">
-                                <div class="form-group">
-                                    <textarea class="form-control" id="notepad" name="notepad" rows=18>{{setting[notepad]}}</textarea>
-                                </div>
-                                <button class="btn">Save</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
         </div>
     </section>
 </div>
