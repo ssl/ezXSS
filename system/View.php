@@ -61,7 +61,7 @@ class View
      *
      * @param string $param
      * @param string $value
-     * @param string $plain
+     * @param bool $plain
      * @return void
      */
     public function renderData($param, $value, $plain = false)

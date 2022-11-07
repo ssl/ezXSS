@@ -48,7 +48,7 @@ class Dashboard extends Controller
 
         $this->view->renderData('notepad', $this->model('Setting')->get('notepad'));
 
-        return $this->view->showContent();
+        return $this->showContent();
     }
 
     public function statistics()

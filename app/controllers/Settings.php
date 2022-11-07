@@ -55,20 +55,20 @@ class Settings extends Controller
         foreach ($files as $file) {
             $themeName = e(str_replace('.css', '', $file));
             $selected = $theme == $themeName ? 'selected' : '';
-            $themes[$themeName]['html'] = "<option $selected value=\"$themeName\">$themeName</option>";
+            $themes[$themeName]['html'] = "<option $selected value=\"$themeName\">" . ucfirst($themeName) . "</option>";
         }
         $this->view->renderDataset('theme', $themes, true);
 
         $filterSave = $this->model('Setting')->get('filter-save');
         $filterAlert = $this->model('Setting')->get('filter-alert');
 
-        $this->view->renderData('filter1', ($filterSave == 1 && $filterAlert) == 1 ? 'selected' : '');
-        $this->view->renderData('filter2', ($filterSave == 1 && $filterAlert) == 0 ? 'selected' : '');
-        $this->view->renderData('filter3', ($filterSave == 0 && $filterAlert) == 1 ? 'selected' : '');
-        $this->view->renderData('filter4', ($filterSave == 0 && $filterAlert) == 0 ? 'selected' : '');
+        $this->view->renderData('filter1', $filterSave == 1 && $filterAlert == 1 ? 'selected' : '');
+        $this->view->renderData('filter2', $filterSave == 1 && $filterAlert == 0 ? 'selected' : '');
+        $this->view->renderData('filter3', $filterSave == 0 && $filterAlert == 1 ? 'selected' : '');
+        $this->view->renderData('filter4', $filterSave == 0 && $filterAlert == 0 ? 'selected' : '');
 
         $this->view->renderData('dompart', $this->model('Setting')->get('dompart'));
 
-        return $this->view->showContent();
+        return $this->showContent();
     }
 }
