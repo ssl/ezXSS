@@ -13,7 +13,7 @@ class Account extends Controller
         $this->isLoggedInOrExit();
         $this->view->setTitle('Account');
         $this->view->renderTemplate('account/index');
-        return $this->view->showContent();
+        return $this->showContent();
     }
 
     /**
@@ -42,6 +42,6 @@ class Account extends Controller
             }
         }
 
-        return $this->view->showContent();
+        return $this->showContent();
     }
 }

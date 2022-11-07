@@ -30,7 +30,7 @@
                                     <label class="control-label" for="timezone">Timezone</label>
                                     <select class="form-control" id="timezone" name="timezone">
                                         {%foreach timezone}
-                                            {timezone->html}
+                                        {timezone->html}
                                         {%/foreach}
                                     </select>
                                 </div>
@@ -38,7 +38,7 @@
                                     <label class="control-label" for="theme">Theme</label>
                                     <select class="form-control" id="theme" name="theme">
                                         {%foreach theme}
-                                            {theme->html}
+                                        {theme->html}
                                         {%/foreach}
                                     </select>
                                 </div>
@@ -60,11 +60,6 @@
                             </form>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-lg-6">
-
-                    <!-- todo: settings like alerts -->
 
                     <div class="panel panel-filled">
                         <div class="panel-heading">Kill Switch</div>
@@ -80,8 +75,104 @@
                             </form>
                         </div>
                     </div>
+                </div>
 
+                <div class="col-lg-6">
 
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">E-mail alert settings</div>
+                        <div class="panel-body">
+                            <form class="form" id="email-alert-settings">
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" id="mailon" name="selected" type="checkbox" checked>
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Enable email alerts</p>
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" id="mailusers" name="selected" type="checkbox" checked>
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Users can setup their own email to alert on their payloads</p>
+                                <div class="form-group">
+                                    <label class="control-label" for="emailfrom">Email sends from</label>
+                                    <input class="form-control" id="emailfrom" name="emailfrom" type="text"
+                                        value="ezXSS">
+                                </div>
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" id="allmail" name="selected" type="checkbox" checked>
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Send alert to mail for all
+                                    payloads</p>
+                                <div class="form-group">
+                                    <label class="control-label" for="email">Email sends to</label>
+                                    <input class="form-control" id="email" name="email" type="email" value="el@za.ax">
+                                </div>
+                               
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Telegram alert settings</div>
+                        <div class="panel-body">
+                            <form class="form" id="telegram-alert-settings">
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" id="telegramon" name="selected" type="checkbox">
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Enable Telegram alerts</p>
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" id="mailusers" name="selected" type="checkbox" checked>
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Users can setup their own Telegram ChatID to alert on their payloads</p>
+                                <div class="form-group">
+                                    <label class="control-label" for="telegram_bottoken">Bot Token</label>
+                                    <div class="input-group">
+                                        <input class="form-control" id="telegram_bottoken" name="telegram_bottoken"
+                                            placeholder="1234567890:AAbcd1234qZylg5bEzXsSjCGqro_Vb8XcM" type="text"
+                                            value="">
+                                        <span class="input-group-addon"><a id="openGetChatId" style="cursor:pointer">Get bot data</a></span>
+                                    </div>
+                                </div>
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" id="allmail" name="selected" type="checkbox" checked>
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Send alert to Telegram for all
+                                    payloads</p>
+                                <div class="form-group">
+                                    <label class="control-label" for="telegram_chatid">Chat ID</label>
+                                    <input class="form-control" id="telegram_chatid" name="telegram_chatid"
+                                        placeholder="123456789" type="text" value="">
+                                </div>
+                                
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Callback alert settings</div>
+                        <div class="panel-body">
+                            <form class="form" id="callback-alert-settings">
+                                <label class="checkbox-label" style="display:inline">
+                                    <input class="chkbox" id="callbackon" name="selected" type="checkbox">
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text" style="padding-bottom: 5px;">Enable custom callback alert</p>
+                                <div class="form-group">
+                                    <label class="control-label" for="callback_url">Callback url</label>
+                                    <small>ezXSS will post the report in JSON format to the URL</small>
+                                    <input class="form-control" id="callback_url" name="callback_url"
+                                        placeholder="https://example.com/callback.php" type="text" value="">
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -43,7 +43,7 @@ class Users extends Controller
             $users[$key]['rank'] = $this->ranks[intval($users[$key]['rank'])];
             
             $payloads = $this->model('Payload')->getAllByUserId($users[$key]['id']);
-            $payloadString = '';
+            $payloadString = $users[$key]['rank'] == 'Admin' ? '*, ' : '';
             foreach($payloads as $payload) {
                 $payloadString .= e($payload['payload']) . ', ';
             }
@@ -53,7 +53,7 @@ class Users extends Controller
         }
         $this->view->renderDataset('user', $users);
 
-        return $this->view->showContent();
+        return $this->showContent();
     }
 
     public function edit($id)
@@ -118,7 +118,7 @@ class Users extends Controller
             return $this->view->renderErrorPage($e->getMessage());
         }
 
-        return $this->view->showContent();
+        return $this->showContent();
     }
 
     public function delete($id)
@@ -141,7 +141,7 @@ class Users extends Controller
             header('Location: /manage/users');
         }
 
-        return $this->view->showContent();
+        return $this->showContent();
     }
 
     public function deletePayload($id)

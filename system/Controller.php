@@ -39,6 +39,17 @@ class Controller
         return $this->model;
     }
 
+    public function showContent() {
+        try {
+            $theme = $this->model('Setting')->get('theme');
+        } catch (Exception $e) {
+            $theme = 'classic';
+        }
+        $content = $this->view->showContent();
+        $content = str_replace('{theme}', '<link rel="stylesheet" href="/assets/css/'. e($theme) .'.css">', $content);
+        return $content;
+    }
+
     /**
      * Validate if the posted csrf token is valid
      *
