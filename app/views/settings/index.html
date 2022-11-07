@@ -30,7 +30,7 @@
                                     <label class="control-label" for="timezone">Timezone</label>
                                     <select class="form-control" id="timezone" name="timezone">
                                         {%foreach timezone}
-                                        <option value="{timezone->name}">{timezone->name}</option>
+                                            {timezone->html}
                                         {%/foreach}
                                     </select>
                                 </div>
@@ -38,24 +38,23 @@
                                     <label class="control-label" for="theme">Theme</label>
                                     <select class="form-control" id="theme" name="theme">
                                         {%foreach theme}
-                                        <option value="{theme->name}">{theme->name}</option>
+                                            {theme->html}
                                         {%/foreach}
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label" for="filter">On callback if report is duplicate</label>
-                                    <select class="form-control" id="filter">
-                                        <option value="1">Both save report and send alert</option>
-                                        <option value="2">Only save report</option>
-                                        <option value="3">Only send alert</option>
-                                        <option value="4">Don't save report or send alert</option>
-                                        <!-- todo: current selected filter -->
+                                    <select class="form-control" id="filter" name="filter">
+                                        <option {%data filter1} value="1">Both save report and send alert</option>
+                                        <option {%data filter2} value="2">Only save report</option>
+                                        <option {%data filter3} value="3">Only send alert</option>
+                                        <option {%data filter4} value="4">Don't save report or send alert</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label" for="dompart">Max DOM length in alerts</label>
                                     <input class="form-control" id="dompart" name="dompart" type="text"
-                                        value="{{setting[dompart]}}">
+                                        value="{%data dompart}">
                                 </div>
                                 <button type="submit" class="btn">Save</button>
                             </form>

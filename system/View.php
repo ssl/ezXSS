@@ -114,9 +114,10 @@ class View
      *
      * @param string $name
      * @param array $data
+     * @param bool $plain
      * @return void
      */
-    public function renderDataset($name, $data)
+    public function renderDataset($name, $data, $plain = false)
     {
         $content = $this->getContent();
 
@@ -135,7 +136,7 @@ class View
                     // Replace all parameters with the correct values from $data
                     $template = str_replace(
                         $templateMatches[0][$templateKey],
-                        e($item[$templateMatches[1][$templateKey]]),
+                        $plain ? $item[$templateMatches[1][$templateKey]] : e($item[$templateMatches[1][$templateKey]]),
                         $template
                     );
                 }

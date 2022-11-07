@@ -24,9 +24,6 @@
     * Application settings
     * Fix kill switch
     * Add alerting settings
-* Users
-    * Edit users
-    * Show right payloads
 
 # Persistence
 - 
