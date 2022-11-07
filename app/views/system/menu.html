@@ -1,0 +1,36 @@
+<div class="navbar-header">
+    <div id="mobile-menu">
+        <div class="left-nav-toggle"><a href="#"><i class="fa fa-bars"></i></a></div>
+    </div>
+</div>
+<aside class="navigation">
+    <nav>
+        <ul class="nav ezxss-nav">
+            <li class="nav-info">
+                <i class="pe pe-7s-shield text-accent"></i>
+                <div class="m-t-xs"><span class="c-white">ezXSS v{version[]}</span> github.com/ssl/ezxss</div>
+            </li>
+
+            <li class="nav-category">Main</li>
+            <li class="{currentPage[dashboard/my]}"><a href="/manage/dashboard/my">My Dashboard</a></li>
+            <li class="{currentPage[account]}"><a href="/manage/account">Account</a></li>
+            <li class="{currentPage[payload]}"><a href="/manage/payload">Payload</a></li>
+
+            {%if userIsAdmin}
+            <li class="nav-category">Admin</li>
+            <li class="{currentPage[dashboard]}"><a href="/manage/dashboard">Dashboard</a></li>
+            <li class="{currentPage[settings]}"><a href="/manage/settings">Settings</a></li>
+            <li class="{currentPage[users]}"><a href="/manage/users">Users</a></li>
+            {%/if}
+
+            <li class="nav-category">PersistenceX</li>
+            <li class="{currentPage[persistence/online]}"><a href="/manage/persistence/online">Online</a></li>
+            <li class="{currentPage[persistence/offline]}"><a href="/manage/persistence/offline">Offline</a></li>
+
+
+            <li class="nav-category">My Reports</li>
+            <li class="{currentPage[reports]}"><a href="/manage/reports">All reports</a></li>
+            <li class="{currentPage[archive]}"><a href="/manage/archive">Archived reports</a></li>
+        </ul>
+    </nav>
+</aside>
