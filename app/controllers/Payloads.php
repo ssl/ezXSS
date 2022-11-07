@@ -17,6 +17,7 @@ class Payloads extends Controller
         $this->view->renderData('pages', '');
         $this->view->renderData('screenshot', '');
         $this->view->renderData('customjs', '//test');
+        $this->view->renderData('payload', e("//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"));
 
         return $this->view->getContent();
     }
@@ -28,13 +29,13 @@ class Payloads extends Controller
      */
     public function custom($name)
     {
-
-        // todo: Check if custom exists
-
-        $this->view->renderPayload($name);
-        $this->view->setContentType('application/x-javascript');
-
-        return $this->view->getContent();
+        try {
+            $this->view->renderPayload($name);
+            $this->view->setContentType('application/x-javascript');
+            return $this->view->getContent();
+        } catch (Exception $e) {
+            return $this->index();
+        }
     }
 
     /**

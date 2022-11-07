@@ -28,6 +28,10 @@ class User_model extends Model
             throw new Exception("Login combination not found");
         }
 
+        if ($user['rank'] == 0) {
+            throw new Exception("Login combination not found");
+        }
+
         return $user;
     }
 
@@ -52,6 +56,47 @@ class User_model extends Model
         $database->prepare('UPDATE `users` SET password = :password WHERE id = :id');
         $database->bindValue(':id', $id);
         $database->bindValue(':password', password_hash($password, PASSWORD_BCRYPT));
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return true;
+    }
+
+    public function updateUsername($id, $username) {
+        $database = Database::openConnection();
+        $database->getByUsername($this->table, $username);
+
+        if ($database->countRows() >= 1) {
+            throw new Exception("Username is already taken");
+        }
+
+        if (preg_match('/[^A-Za-z0-9]/', $username)) {
+            throw new Exception("Invalid characters in the username. Use a-Z0-9");
+        }
+
+        if (strlen($username) < 3 || strlen($username) > 25) {
+            throw new Exception("Username needs to be between 3-25 long");
+        }
+
+        $database->prepare('UPDATE `users` SET username = :username WHERE id = :id');
+        $database->bindValue(':id', $id);
+        $database->bindValue(':username', $username);
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return true;
+    }
+
+    public function updateRank($id, $rank) {
+        $database = Database::openConnection();
+
+        $database->prepare('UPDATE `users` SET rank = :rank WHERE id = :id');
+        $database->bindValue(':id', $id);
+        $database->bindValue(':rank', $rank);
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");

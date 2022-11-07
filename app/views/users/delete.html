@@ -1,0 +1,11 @@
+<section id="content">
+    <center>
+        <h1>ezXSS</h1>
+    </center>
+    {message}
+    <p>Are you sure you want to delete user <b>{%data username}</b>?</p>
+    <form class="form" method="post">
+        <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+        <center><button type="submit" class="btn">Delete</button></center>
+    </form>
+</section>

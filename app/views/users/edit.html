@@ -1,0 +1,110 @@
+<div class="wrapper">
+
+    {menu}
+
+    <section class="content">
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title float-left">
+                            <h3 class="m-b-xs">Edit user</h3>
+                            <small>You are editing {%data username}</small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            {message}
+
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Edit User</div>
+                        <div class="panel-body">
+                            <form class="form" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+
+                                <div class="form-group">
+                                    <label class="control-label" for="username">Username</label>
+                                    <input class="form-control" id="username" name="username" type="text"
+                                        value="{%data username}">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label" for="password">Password</label>
+                                    <input class="form-control" id="password" name="password" type="text">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label" for="rank">Rank</label>
+                                    <select class="form-control" id="rank" name="rank">
+                                        {%data rankOptions}
+                                    </select>
+                                </div>
+
+                                <button type="submit" name="edit" class="btn">Update</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Payloads</div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+
+                                <table class="table" style="white-space: nowrap;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:10%">ID</th>
+                                            <th>Payload</th>
+                                            <th style="width:10%">Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reports-list">
+                                        {%foreach payload}
+                                        <tr>
+                                            <td scope="row"><b>{payload->id}</b></td>
+                                            <td>{payload->payload}</td>
+                                            <td><a method="post" href="/manage/users/deletepayload/{payload->id}">Delete</a></td>
+                                        </tr>
+                                        {%/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Add payloads</div>
+                        <div class="panel-body">
+                            <form class="form" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+
+                                <div class="form-group">
+                                    <label class="control-label" for="payload">Payload domain/URI</label>
+                                    <small>This can be any (sub)domain and/or path linked to your ezXSS
+                                        platform.</small>
+                                    <input class="form-control" id="payload" name="payload" type="text"
+                                        placeholder="example.{domain[]}/example">
+                                </div>
+
+                                <button type="submit" name="add" class="btn">Add</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
