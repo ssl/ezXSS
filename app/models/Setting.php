@@ -15,6 +15,20 @@ class Setting_model extends Model
         return $data;
     }
 
+    public function set($setting, $value) {
+        $database = Database::openConnection();
+
+        $database->prepare('UPDATE `settings` SET value = :value WHERE setting = :setting');
+        $database->bindValue(':setting', $setting);
+        $database->bindValue(':value', $value);
+        
+        if(!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return true;
+    }
+
     public function get($setting)
     {
         $database = Database::openConnection();
