@@ -3,7 +3,7 @@ function request(action, data) {
     return $.ajax({
         type: "post",
         dataType: "json",
-        url: "/"+adminURL()+"/"+action,
+        url: action,
         data: data
     });
 }
@@ -18,7 +18,7 @@ function adminURL() {
 $(document).ready(function() {
 
     if(location.toString().split('/').pop() == 'dashboard') {
-        request('dashboard/statistics', {}).then(function(r) {
+        request('/manage/dashboard/statistics', {}).then(function(r) {
             $.each( r, function( key, value ) {
                 $("#"+key).html(value);
             });
@@ -55,6 +55,14 @@ $(document).ready(function() {
             }
         });
     });*/
+
+    $("a[method='post']").click(function(e) {
+        e.preventDefault();
+        request($(this).attr('href'), {}).then(function(r) {
+            location.reload();
+        });
+        
+    });
 
     $(".delete-selected").click(function() {
         var ids = [];

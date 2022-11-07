@@ -32,10 +32,11 @@
                                     <thead>
                                         <tr>
                                             <th style="width:6%">ID</th>
-                                            <th style="width:10%">Username</th>
-                                            <th>Rank</th>
+                                            <th style="width:20%">Username</th>
+                                            <th style="width:10%">Rank</th>
                                             <th>Payloads</th>
-                                            <th>Edit</th>
+                                            <th style="width:10%">Edit</th>
+                                            <th style="width:10%">Delete</th>
                                         </tr>
                                     </thead>
                                     <tbody id="reports-list">
@@ -44,8 +45,9 @@
                                             <td scope="row"><b>{user->id}</b></td>
                                             <td>{user->username}</td>
                                             <td>{user->rank}</td>
-                                            <td>example.com, user.example.com, example.com/123</td> <!-- todo -->
-                                            <td><a href="/manage/users/edit/{account->id}">Edit</a></td>
+                                            <td>{user->payloads}</td>
+                                            <td><a href="/manage/users/edit/{user->id}">Edit</a></td>
+                                            <td><a href="/manage/users/delete/{user->id}">Delete</a></td>
                                         </tr>
                                         {%/foreach}
                                     </tbody>

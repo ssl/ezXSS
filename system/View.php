@@ -61,13 +61,18 @@ class View
      *
      * @param string $param
      * @param string $value
+     * @param string $plain
      * @return void
      */
-    public function renderData($param, $value)
+    public function renderData($param, $value, $plain = false)
     {
         $content = $this->getContent();
 
-        $content = str_replace('{%data ' . $param . '}', e($value), $content);
+        if($plain) {
+            $content = str_replace('{%data ' . $param . '}', $value, $content);
+        } else {
+            $content = str_replace('{%data ' . $param . '}', e($value), $content);
+        }
 
         $this->content = $content;
     }
@@ -196,10 +201,10 @@ class View
     public function getPayload($payload)
     {
         $file = __DIR__ . "/../app/views/payloads/$payload.js";
-        if (is_file($file)) {
-            return file_get_contents($file);
+        if (!is_file($file)) {
+            throw new Exception('Payload not found');
         }
-        return $this->getPayload('index');
+        return file_get_contents($file);
     }
 
     /**
