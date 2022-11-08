@@ -5,6 +5,8 @@
 * Fix wiki
 * Callback
 * Update
+* Install
+* Gen password button
 
 # Main
 * My Dashboard
@@ -16,6 +18,8 @@
 * Payload
     * Manage/show payloads
     * Create payloads?
+    * Add custom JS
+    * Add global JS for admins?
 
 # Admin
 * Dashboard
