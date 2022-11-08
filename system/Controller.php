@@ -15,6 +15,8 @@ class Controller
     {
         $this->session = new Session();
         $this->view = new View();
+
+        $this->killSwitcher();
     }
 
     /**
@@ -26,27 +28,28 @@ class Controller
     public function model($name)
     {
         // Check if model has already been set
-        if (!is_object($this->model) || get_class($this->model) !== $name . '_model') {
+        if (!isset($this->model[$name])) {
             $file = __DIR__ . "/../app/models/$name.php";
             if (file_exists($file)) {
                 // Load model
                 require $file;
                 $modelName = $name . '_model';
-                $this->model = new $modelName();
+                $this->model[$name] = new $modelName();
             }
         }
 
-        return $this->model;
+        return $this->model[$name];
     }
 
-    public function showContent() {
+    public function showContent()
+    {
         try {
             $theme = $this->model('Setting')->get('theme');
         } catch (Exception $e) {
             $theme = 'classic';
         }
         $content = $this->view->showContent();
-        $content = str_replace('{theme}', '<link rel="stylesheet" href="/assets/css/'. e($theme) .'.css">', $content);
+        $content = str_replace('{theme}', '<link rel="stylesheet" href="/assets/css/' . e($theme) . '.css">', $content);
         return $content;
     }
 
@@ -167,5 +170,34 @@ class Controller
     public function getPostValue($param)
     {
         return isset($_POST[$param]) ? $_POST[$param] : null;
+    }
+
+    /**
+     * Returns get value
+     *
+     * @param string $param
+     * @return string|null
+     */
+    public function getGetValue($param)
+    {
+        return isset($_GET[$param]) ? $_GET[$param] : null;
+    }
+
+    private function killSwitcher()
+    {
+        try {
+            $killswitch = $this->model('Setting')->get("killswitch");
+
+            if (!empty($killswitch)) {
+                if ($this->getGetValue('pass') === $killswitch) {
+                    $this->model('Setting')->set('killswitch', '');
+                    header('Location: /');
+                } else {
+                    http_response_code(404);
+                    exit();
+                }
+            }
+        } catch (Exception $e) {
+        }
     }
 }
