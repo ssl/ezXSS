@@ -109,6 +109,18 @@ class View
         $this->content = $content;
     }
 
+    public function renderChecked($name, $checked) {
+        $content = $this->getContent();
+
+        $content = str_replace('{%checked ' . $name . '}', $checked ? 'checked' : '', $content);
+
+        $this->content = $content;
+    }
+    
+    public function renderOptions() {
+        //todo?
+    }
+
     /**
      * Renders a dataset in a foreach block, for example for in tables
      *
