@@ -53,8 +53,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label" for="dompart">Max DOM length in alerts</label>
-                                    <input class="form-control" name="dompart" type="text"
-                                        value="{%data dompart}">
+                                    <input class="form-control" name="dompart" type="text" value="{%data dompart}">
                                 </div>
                                 <button name="application" type="submit" class="btn">Save</button>
                             </form>
@@ -71,28 +70,30 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="uri" type="checkbox" {%checked cUri}>
+                                                <input {%checked cUri} class="chkbox" name="uri" type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">URL</p>
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="ip" type="checkbox" {%checked cIP}>
+                                                <input {%checked cIP} class="chkbox" name="ip" type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">IP</p>
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="referer" type="checkbox" {%checked cReferer}>
+                                                <input {%checked cReferer} class="chkbox" name="referer"
+                                                    type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Referer</p>
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="user-agent" type="checkbox"
-                                                    {%checked cUserAgent}>
+                                                <input {%checked cUserAgent} class="chkbox" name="user-agent"
+                                                    type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">User Agent</p>
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="cookies" type="checkbox" {%checked cCookies}>
+                                                <input {%checked cCookies} class="chkbox" name="cookies"
+                                                    type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Cookies</p>
@@ -101,30 +102,30 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="localstorage" type="checkbox"
-                                                    {%checked cLocalStorage}>
+                                                <input {%checked cLocalStorage} class="chkbox" name="localstorage"
+                                                    type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Local Storage</p>
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="sessionstorage" type="checkbox"
-                                                    {%checked cSessionStorage}>
+                                                <input {%checked cSessionStorage} class="chkbox" name="sessionstorage"
+                                                    type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Session Storage</p>
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="dom" type="checkbox" {%checked cDOM}>
+                                                <input {%checked cDOM} class="chkbox" name="dom" type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">DOM</p>
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="origin" type="checkbox" {%checked cOrigin}>
+                                                <input {%checked cOrigin} class="chkbox" name="origin" type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Origin</p>
                                             <label class="checkbox-label">
-                                                <input class="chkbox" name="screenshot" type="checkbox"
-                                                    {%checked cScreenshot}>
+                                                <input {%checked cScreenshot} class="chkbox" name="screenshot"
+                                                    type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Screenshot</p>
@@ -167,80 +168,148 @@
                 <div class="col-lg-6">
 
                     <div class="panel panel-filled">
-                        <div class="panel-heading">E-mail alert settings</div>
+                        <div class="panel-heading">Global alert settings</div>
                         <div class="panel-body">
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-                                <label class="checkbox-label">
-                                    <input class="chkbox" name="mailon" type="checkbox" {%checked mailOn}>
-                                    <span class="checkbox-custom rectangular"></span>
-                                </label>
-                                <p class="checkbox-text">Enable email alerts</p>
-                                <label class="checkbox-label">
-                                    <input class="chkbox" name="mailusers" type="checkbox" {%checked mailUsers}>
-                                    <span class="checkbox-custom rectangular"></span>
-                                </label>
-                                <p class="checkbox-text">Users can setup their own email to alert on their payloads</p>
                                 <div class="form-group">
-                                    <label class="control-label" for="emailfrom">Email sends from</label>
-                                    <input class="form-control" name="emailfrom" type="text"
-                                        value="{%data emailfrom}">
-                                </div>
-                                <label class="checkbox-label">
-                                    <input class="chkbox" name="mailall" type="checkbox" {%checked mailAll}>
-                                    <span class="checkbox-custom rectangular"></span>
-                                </label>
-                                <p class="checkbox-text">Send alert to mail for all
-                                    payloads</p>
-                                <div class="form-group">
-                                    <label class="control-label" for="email">Email sends to</label>
-                                    <input class="form-control" name="email" type="email"
-                                        value="{%data email}">
+                                    <label class="control-label" for="method">How do you want to receive alerts for all
+                                        payloads</label>
+                                    <select class="form-control" id="method" name="method">
+                                        <option selected></option>
+                                        <option value="1">E-mail</option>
+                                        <option value="2">Telegram</option>
+                                        <option value="3">Slack</option>
+                                        <option value="4">Discord</option>
+                                    </select>
                                 </div>
 
-                                <button name="email-alert" type="submit" class="btn">Save</button>
+                                <div id="method-loading">
+                                    Pick an option
+                                </div>
+
+                                <div id="method-content-1" style="display:none">
+
+                                    <label class="checkbox-label">
+                                        <input {%checked mailAll} class="chkbox" name="mailon" type="checkbox">
+                                        <span class="checkbox-custom rectangular"></span>
+                                    </label>
+                                    <p class="checkbox-text">Enable global email alerts</p>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Send mail to</label>
+                                        <input type="text" name="mail" class="form-control" value="{%data email}">
+                                    </div>
+                                    <button name="global-alert" type="submit" class="btn">Save</button>
+
+                                </div>
+
+                                <div id="method-content-2" style="display:none">
+
+                                    <label class="checkbox-label">
+                                        <input {%checked telegramAll} class="chkbox" name="telegramon" type="checkbox">
+                                        <span class="checkbox-custom rectangular"></span>
+                                    </label>
+                                    <p class="checkbox-text">Enable global Telegram alerts</p>
+
+                                    <div class="form-group">
+                                        <label class="control-label" for="telegram_bottoken">Bot Token</label>
+                                        <div class="input-group">
+                                            <input class="form-control" name="telegram_bottoken"
+                                                placeholder="1234567890:AAbcd1234qZylg5bEzXsSjCGqro_Vb8XcM" type="text"
+                                                value="{%data telegramToken}">
+                                            <span class="input-group-addon"><a id="openGetChatId"
+                                                    style="cursor:pointer">Get
+                                                    chatID</a></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Chat ID</label>
+                                        <input type="text" name="chatid" class="form-control" placeholder="123456789"
+                                            value="{%data telegramChatID}">
+                                    </div>
+                                    <button name="global-alert" type="submit" class="btn">Save</button>
+
+                                </div>
+
+                                <div id="method-content-3" style="display:none">
+
+                                    <label class="checkbox-label">
+                                        <input {%checked slackAll} class="chkbox" name="slackon" type="checkbox">
+                                        <span class="checkbox-custom rectangular"></span>
+                                    </label>
+                                    <p class="checkbox-text">Enable global Slack alerts</p>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Webhook URL</label>
+                                        <input type="text" name="slack_webhook" class="form-control"
+                                            placeholder="https://hooks.slack.com/services/T00000000/B00000000/XXXX..." value="{%data slackWebhook}">
+                                    </div>
+                                    <button name="global-alert" type="submit" class="btn">Save</button>
+
+                                </div>
+
+                                <div id="method-content-4" style="display:none">
+
+                                    <label class="checkbox-label">
+                                        <input {%checked discordAll} class="chkbox" name="discordon" type="checkbox">
+                                        <span class="checkbox-custom rectangular"></span>
+                                    </label>
+                                    <p class="checkbox-text">Enable global Discord alerts</p>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Webhook URL</label>
+                                        <input type="text" name="discord_webhook" class="form-control"
+                                            placeholder="https://discordapp.com/api/webhooks/1038928198292..." value="{%data discordWebhook}">
+                                    </div>
+
+                                    <button name="global-alert" type="submit" class="btn">Save</button>
+
+                                </div>
+
+                                <div id="method-disabled" style="display:none">
+
+                                    <p>This alerting option is currently not enabled, first enable this.
+                                    </p>
+
+                                </div>
                             </form>
                         </div>
                     </div>
 
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Telegram alert settings</div>
+                        <div class="panel-heading">Enable alerting methods</div>
                         <div class="panel-body">
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+
                                 <label class="checkbox-label">
-                                    <input class="chkbox" name="telegramon" type="checkbox" {%checked telegramOn}>
+                                    <input {%checked mailOn} class="chkbox" name="mailon" type="checkbox">
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text">Enable email alerts</p>
+
+                                <label class="checkbox-label">
+                                    <input {%checked telegramOn} class="chkbox" name="telegramon" type="checkbox">
                                     <span class="checkbox-custom rectangular"></span>
                                 </label>
                                 <p class="checkbox-text">Enable Telegram alerts</p>
-                                <label class="checkbox-label">
-                                    <input class="chkbox" name="telegramusers" type="checkbox" {%checked telegramUsers}>
-                                    <span class="checkbox-custom rectangular"></span>
-                                </label>
-                                <p class="checkbox-text">Users can setup their own Telegram ChatID to alert on their
-                                    payloads</p>
-                                <div class="form-group">
-                                    <label class="control-label" for="telegram_bottoken">Bot Token</label>
-                                    <div class="input-group">
-                                        <input class="form-control" name="telegram_bottoken"
-                                            placeholder="1234567890:AAbcd1234qZylg5bEzXsSjCGqro_Vb8XcM" type="text"
-                                            value="{%data telegram-bottoken}">
-                                        <span class="input-group-addon"><a id="openGetChatId" style="cursor:pointer">Get
-                                                bot data</a></span>
-                                    </div>
-                                </div>
-                                <label class="checkbox-label">
-                                    <input class="chkbox" name="telegramall" type="checkbox" {%checked telegramAll}>
-                                    <span class="checkbox-custom rectangular"></span>
-                                </label>
-                                <p class="checkbox-text">Send alert to Telegram for all payloads</p>
-                                <div class="form-group">
-                                    <label class="control-label" for="telegram_chatid">Chat ID</label>
-                                    <input class="form-control" name="telegram_chatid"
-                                        placeholder="123456789" type="text" value="{%data telegram-chatid}">
-                                </div>
 
-                                <button name="telegram-alert" type="submit" class="btn">Save</button>
+                                <label class="checkbox-label">
+                                    <input {%checked slackOn} class="chkbox" name="slackon" type="checkbox">
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text">Enable Slack alerts</p>
+
+                                <label class="checkbox-label">
+                                    <input {%checked discordOn} class="chkbox" name="discordon" type="checkbox">
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text">Enable Discord alerts</p>
+
+
+                                <button name="alert-methods" type="submit" class="btn">Save</button>
                             </form>
                         </div>
                     </div>
@@ -251,16 +320,17 @@
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <label class="checkbox-label">
-                                    <input class="chkbox" name="callbackon" type="checkbox" {%checked callbackOn}>
+                                    <input {%checked callbackOn} class="chkbox" name="callbackon" type="checkbox">
                                     <span class="checkbox-custom rectangular"></span>
                                 </label>
                                 <p class="checkbox-text">Enable custom callback alert</p>
                                 <div class="form-group">
                                     <label class="control-label" for="callback_url">Callback url</label>
-                                    <small>ezXSS will post the report in JSON format to the URL</small>
+                                    <small>ezXSS will post forward
+                                        all reports in JSON format to the URL</small>
                                     <input class="form-control" name="callback_url"
                                         placeholder="https://example.com/callback.php" type="text"
-                                        value="{%data callback-url}">
+                                        value="{%data callbackURL}">
                                 </div>
                                 <button name="callback-alert" type="submit" class="btn">Save</button>
                             </form>
