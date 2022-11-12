@@ -14,32 +14,26 @@ class Settings extends Controller
             try {
                 $this->validateCsrfToken();
 
-                // Application settings
                 if ($this->getPostValue('application') !== null) {
                     $this->applicationSettings();
                 }
 
-                // Payload settings
                 if ($this->getPostValue('global-payload') !== null) {
-                    $this->PayloadSettings();
+                    $this->payloadSettings();
                 }
 
-                // Killswitch
+                if ($this->getPostValue('global-alert') !== null) {
+                    $this->alertSettings();
+                }
+
                 if ($this->getPostValue('killswitch') !== null) {
                     $this->killSwitch();
                 }
 
-                // Email alert
-                if ($this->getPostValue('email-alert') !== null) {
-                    $this->emailAlertSettings();
+                if ($this->getPostValue('alert-methods') !== null) {
+                    $this->alertMethods();
                 }
 
-                // Telegram alert
-                if ($this->getPostValue('telegram-alert') !== null) {
-                    $this->telegramAlertSettings();
-                }
-
-                // Callback alert
                 if ($this->getPostValue('callback-alert') !== null) {
                     $this->callbackAlertSettings();
                 }
@@ -70,40 +64,46 @@ class Settings extends Controller
         $filterSave = $settings->get('filter-save');
         $filterAlert = $settings->get('filter-alert');
 
-        // This is just one big mess of rendering trying to make this work with original database
+        // This is just one big mess of rendering trying to make this work
         $this->view->renderData('filter1', $filterSave == 1 && $filterAlert == 1 ? 'selected' : '');
         $this->view->renderData('filter2', $filterSave == 1 && $filterAlert == 0 ? 'selected' : '');
         $this->view->renderData('filter3', $filterSave == 0 && $filterAlert == 1 ? 'selected' : '');
         $this->view->renderData('filter4', $filterSave == 0 && $filterAlert == 0 ? 'selected' : '');
 
-        $this->view->renderData('dompart', $settings->get('dompart'));
-        $this->view->renderData('customjs', $settings->get('customjs'));
-        $this->view->renderData('emailfrom', $settings->get('emailfrom'));
-        $this->view->renderData('email', $settings->get('email'));
-        $this->view->renderData('telegram-bottoken', $settings->get('telegram-bottoken'));
-        $this->view->renderData('telegram-chatid', $settings->get('telegram-chatid'));
-        $this->view->renderData('callback-url', $settings->get('callback-url'));
-
-        $this->view->renderChecked('mailOn', $settings->get('alert-mail') == 1);
-        $this->view->renderChecked('telegramOn', $settings->get('alert-telegram') == 1);
-        $this->view->renderChecked('callbackOn', $settings->get('alert-callback') == 1);
-
-        $this->view->renderChecked('mailUsers', $settings->get('alert-mailUsers') == 1);
-        $this->view->renderChecked('mailAll', $settings->get('alert-mailAll') == 1);
-        $this->view->renderChecked('telegramUsers', $settings->get('alert-telegramUsers') == 1);
-        $this->view->renderChecked('telegramAll', $settings->get('alert-telegramAll') == 1);
-
+        // Global payload settings
         $this->view->renderChecked('cUri', $settings->get('collect_uri') == 1);
         $this->view->renderChecked('cIP', $settings->get('collect_ip') == 1);
         $this->view->renderChecked('cReferer', $settings->get('collect_referer') == 1);
         $this->view->renderChecked('cUserAgent', $settings->get('collect_user-agent') == 1);
         $this->view->renderChecked('cCookies', $settings->get('collect_cookies') == 1);
-
         $this->view->renderChecked('cLocalStorage', $settings->get('collect_localstorage') == 1);
         $this->view->renderChecked('cSessionStorage', $settings->get('collect_sessionstorage') == 1);
         $this->view->renderChecked('cDOM', $settings->get('collect_dom') == 1);
         $this->view->renderChecked('cOrigin', $settings->get('collect_origin') == 1);
         $this->view->renderChecked('cScreenshot', $settings->get('collect_screenshot') == 1);
+        $this->view->renderData('customjs', $settings->get('customjs'));
+
+        // Settings
+        $this->view->renderData('dompart', $settings->get('dompart'));
+        $this->view->renderChecked('mailOn', $settings->get('alert-mail') == 1);
+        $this->view->renderChecked('telegramOn', $settings->get('alert-telegram') == 1);
+        $this->view->renderChecked('slackOn', $settings->get('alert-slack') == 1);
+        $this->view->renderChecked('discordOn', $settings->get('alert-discord') == 1);
+        $this->view->renderChecked('callbackOn', $settings->get('alert-callback') == 1);
+        $this->view->renderData('callbackURL', $settings->get('callback-url'));
+
+        // Alerts
+        $alerts = $this->model('Alert');
+        $this->view->renderChecked('mailAll', $alerts->get(0, 1, 'enabled'));
+        $this->view->renderChecked('telegramAll', $alerts->get(0, 2, 'enabled'));
+        $this->view->renderChecked('slackAll', $alerts->get(0, 3, 'enabled'));
+        $this->view->renderChecked('discordAll', $alerts->get(0, 4, 'enabled'));
+
+        $this->view->renderData('email', $alerts->get(0, 1, 'value1'));
+        $this->view->renderData('telegramToken', $alerts->get(0, 2, 'value1'));
+        $this->view->renderData('telegramChatID', $alerts->get(0, 2, 'value2'));
+        $this->view->renderData('slackWebhook', $alerts->get(0, 3, 'value1'));
+        $this->view->renderData('discordWebhook', $alerts->get(0, 4, 'value1'));
 
         return $this->showContent();
     }
@@ -142,7 +142,7 @@ class Settings extends Controller
     {
         $options = ['uri', 'ip', 'referer', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'screenshot'];
 
-        foreach($options as $option) {
+        foreach ($options as $option) {
             if ($this->getPostValue($option) !== null) {
                 $this->model('Setting')->set("collect_{$option}", '1');
             } else {
@@ -153,53 +153,74 @@ class Settings extends Controller
         $this->model('Setting')->set("customjs", $this->getPostValue('customjs'));
     }
 
+    private function alertSettings()
+    {
+        $alerts = $this->model('Alert');
+
+        // Mail
+        $mailOn = $this->getPostValue('mailon');
+        $mail = $this->getPostValue('mail');
+        if (!filter_var($mail, FILTER_VALIDATE_EMAIL) && !empty($mail)) {
+            throw new Exception('This is not a correct email address.');
+        }
+        $alerts->set(0, 1, $mailOn !== null, $mail);
+
+        // Telegram
+        $telegramOn = $this->getPostValue('telegramon');
+        $telegramToken = $this->getPostValue('telegram_bottoken');
+        $telegramChatID = $this->getPostValue('chatid');
+        if (!empty($telegramToken) || !empty($telegramChatID)) {
+            if (!preg_match('/^[a-zA-Z0-9:_-]+$/', $telegramToken)) {
+                throw new Exception('This does not look like an valid Telegram bot token');
+            }
+
+            if (!ctype_digit($telegramChatID)) {
+                throw new Exception('The chat id needs to be a digits');
+            }
+        }
+        $alerts->set(0, 2, $telegramOn !== null, $telegramToken, $telegramChatID);
+
+        // Slack
+        $slackOn = $this->getPostValue('slackon');
+        $slackWebhook = $this->getPostValue('slack_webhook');
+        if (!empty($slackWebhook)) {
+            if (!preg_match('/https:\/\/hooks\.slack\.com\/services\/([a-zA-Z0-9]+)\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)$/', $slackWebhook)) {
+                throw new Exception('This does not look like an valid Slack webhook URL');
+            }
+        }
+        $alerts->set(0, 3, $slackOn !== null, $slackWebhook);
+
+        // Discord
+        $discordOn = $this->getPostValue('discordon');
+        $discordWebhook = $this->getPostValue('discord_webhook');
+        if (!empty($discordWebhook)) {
+            if (!preg_match('/https:\/\/(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-zA-Z0-9_-]+)$/', $discordWebhook)) {
+                throw new Exception('This does not look like an valid Discord webhook URL');
+            }
+        }
+        $alerts->set(0, 4, $discordOn !== null, $discordWebhook);
+    }
+
     private function killSwitch()
     {
         $password = $this->getPostValue('password');
         $this->model('Setting')->set("killswitch", $password);
-        $this->view->renderErrorPage('ezXSS is now killed with password ' . e($password));
+        $this->view->renderErrorPage("ezXSS is now killed with password $password");
     }
 
-    private function emailAlertSettings()
+    private function alertMethods()
     {
         $mailOn = $this->getPostValue('mailon') !== null ? '1' : '0';
         $this->model('Setting')->set("alert-mail", $mailOn);
-        
-        $mailUsers = $this->getPostValue('mailusers') !== null ? '1' : '0';
-        $this->model('Setting')->set("alert-mailUsers", $mailUsers);
 
-        $mailAll = $this->getPostValue('mailall') !== null ? '1' : '0';
-        $this->model('Setting')->set("alert-mailAll", $mailAll);
-
-        $email = $this->getPostValue('email');
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new Exception('This is not a correct email address.');
-        }
-
-        $this->model('Setting')->set("email", $email);
-        $this->model('Setting')->set("emailfrom", $this->getPostValue('emailfrom'));
-    }
-
-    private function telegramAlertSettings()
-    {
         $telegramOn = $this->getPostValue('telegramon') !== null ? '1' : '0';
         $this->model('Setting')->set("alert-telegram", $telegramOn);
-        
-        $telegramUsers = $this->getPostValue('telegramusers') !== null ? '1' : '0';
-        $this->model('Setting')->set("alert-telegramUsers", $telegramUsers);
 
-        $telegramAll = $this->getPostValue('telegramall') !== null ? '1' : '0';
-        $this->model('Setting')->set("alert-telegramAll", $telegramAll);
+        $slackOn = $this->getPostValue('slackon') !== null ? '1' : '0';
+        $this->model('Setting')->set("alert-slack", $slackOn);
 
-        $bottoken = $this->getPostValue('telegram_bottoken');
-        $chatid = $this->getPostValue('telegram_chatid');
-        if(!preg_match('/^[a-zA-Z0-9:_-]+$/', $bottoken)) {
-            throw new Exception('This does not look like an valid Telegram bot token');
-        }
-
-        if (!ctype_digit($chatid)) {
-            throw new Exception('The chat id needs to be a digits');
-        }
+        $discordOn = $this->getPostValue('discordon') !== null ? '1' : '0';
+        $this->model('Setting')->set("alert-discord", $discordOn);
     }
 
     private function callbackAlertSettings()
