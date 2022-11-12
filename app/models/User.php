@@ -64,7 +64,8 @@ class User_model extends Model
         return true;
     }
 
-    public function updateUsername($id, $username) {
+    public function updateUsername($id, $username)
+    {
         $database = Database::openConnection();
         $database->getByUsername($this->table, $username);
 
@@ -91,12 +92,28 @@ class User_model extends Model
         return true;
     }
 
-    public function updateRank($id, $rank) {
+    public function updateRank($id, $rank)
+    {
         $database = Database::openConnection();
 
         $database->prepare('UPDATE `users` SET rank = :rank WHERE id = :id');
         $database->bindValue(':id', $id);
         $database->bindValue(':rank', $rank);
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return true;
+    }
+
+    public function updateSecret($id, $secret)
+    {
+        $database = Database::openConnection();
+
+        $database->prepare('UPDATE `users` SET secret = :secret WHERE id = :id');
+        $database->bindValue(':id', $id);
+        $database->bindValue(':secret', $secret);
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
@@ -136,7 +153,7 @@ class User_model extends Model
             throw new Exception("Password not strong enough");
         }
 
-        $database->prepare('INSERT INTO `users` (`username`, `password`, `rank`) VALUES (:username, :password, :rank);');
+        $database->prepare('INSERT INTO `users` (`username`, `password`, `rank`, `secret`) VALUES (:username, :password, :rank, "");');
         $database->bindValue(':username', $username);
         $database->bindValue(':password', password_hash($password, PASSWORD_BCRYPT));
         $database->bindValue(':rank', $rank);

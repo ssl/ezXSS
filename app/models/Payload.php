@@ -28,13 +28,13 @@ class Payload_model extends Model
         return $data;
     }
 
-    public function add($user_id, $payload)
+    public function add($userId, $payload)
     {
         $database = Database::openConnection();
 
         $database->prepare('INSERT INTO `payloads` (`payload`, `user_id`) VALUES (:payload, :user_id);');
         $database->bindValue(':payload', $payload);
-        $database->bindValue(':user_id', $user_id);
+        $database->bindValue(':user_id', $userId);
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");

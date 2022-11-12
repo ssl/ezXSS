@@ -7,6 +7,8 @@
 * Update
 * Install
 * Gen password button
+* Slack/discord alerts?
+* logs?
 
 # Main
 * My Dashboard
@@ -15,19 +17,14 @@
 * Account
     * Change password
     * Setup 2fa
+    * Setup alerts
 * Payload
     * Manage/show payloads
-    * Create payloads?
     * Add custom JS
-    * Add global JS for admins?
 
 # Admin
 * Dashboard
     * More data
-* Settings
-    * Application settings
-    * Fix kill switch
-    * Add alerting settings
 
 # Persistence
 - 
