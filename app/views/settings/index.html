@@ -135,9 +135,8 @@
 
                                 <div class="form-group">
                                     <label class="control-label" for="customjs">Custom javascript</label>
-                                    <small>Add custom javascript which will be added to <b>all</b> payloads</small>
-                                    <textarea class="form-control" name="customjs" rows=5
-                                        type="text">{%data customjs}</textarea>
+                                    <small>Add custom javascript which will be added to <i>all</i> payloads</small>
+                                    <textarea class="form-control" name="customjs" rows=5>{%data customjs}</textarea>
                                 </div>
 
                                 <button name="global-payload" type="submit" class="btn">Save</button>
@@ -184,11 +183,11 @@
                                     </select>
                                 </div>
 
-                                <div id="method-loading">
+                                <div id="method-pick">
                                     Pick an option
                                 </div>
 
-                                <div id="method-content-1" style="display:none">
+                                <div id="method-content-1" class="method-content">
 
                                     <label class="checkbox-label">
                                         <input {%checked mailAll} class="chkbox" name="mailon" type="checkbox">
@@ -204,7 +203,7 @@
 
                                 </div>
 
-                                <div id="method-content-2" style="display:none">
+                                <div id="method-content-2" class="method-content">
 
                                     <label class="checkbox-label">
                                         <input {%checked telegramAll} class="chkbox" name="telegramon" type="checkbox">
@@ -218,8 +217,7 @@
                                             <input class="form-control" name="telegram_bottoken"
                                                 placeholder="1234567890:AAbcd1234qZylg5bEzXsSjCGqro_Vb8XcM" type="text"
                                                 value="{%data telegramToken}">
-                                            <span class="input-group-addon"><a id="openGetChatId"
-                                                    style="cursor:pointer">Get
+                                            <span class="input-group-addon"><a id="openGetChatId">Get
                                                     chatID</a></span>
                                         </div>
                                     </div>
@@ -233,7 +231,7 @@
 
                                 </div>
 
-                                <div id="method-content-3" style="display:none">
+                                <div id="method-content-3" class="method-content">
 
                                     <label class="checkbox-label">
                                         <input {%checked slackAll} class="chkbox" name="slackon" type="checkbox">
@@ -250,7 +248,7 @@
 
                                 </div>
 
-                                <div id="method-content-4" style="display:none">
+                                <div id="method-content-4" class="method-content">
 
                                     <label class="checkbox-label">
                                         <input {%checked discordAll} class="chkbox" name="discordon" type="checkbox">
@@ -268,7 +266,7 @@
 
                                 </div>
 
-                                <div id="method-disabled" style="display:none">
+                                <div id="method-disabled" class="method-content">
 
                                     <p>This alerting option is currently not enabled, first enable this.
                                     </p>

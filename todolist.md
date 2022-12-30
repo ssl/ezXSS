@@ -1,30 +1,26 @@
 ## Global
-* Convert all code...
-* Company/share user?
+* Share Box
 * Good texts
 * Fix wiki
 * Callback
+* js payload
 * Update
 * Install
-* Gen password button
-* Slack/discord alerts?
+* Alerts
+* Telegram chat ID
 * logs?
+* image onerror report page
+* cleanup code (format & codeblocks)
 
 # Main
 * My Dashboard
     * Basic statictics about user and reports
     * ?
-* Account
-    * Change password
-    * Setup 2fa
-    * Setup alerts
-* Payload
-    * Manage/show payloads
-    * Add custom JS
 
 # Admin
 * Dashboard
     * More data
+    * Notepad
 
 # Persistence
 - 
@@ -32,13 +28,4 @@
     * 
 * Offline
     *
-
-# My Reports
-* All reports
-    * Show all button or other page for admin?
-    * Clean (data?) table
-    * Good search bar
-    * Showing payload?
-    * Send to persistence button?
-* Archived reports
-    * Are we keeping archived reports?
+* Send to persistence button?

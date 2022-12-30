@@ -112,6 +112,7 @@
                         <div class="panel-heading">Notepad</div>
                         <div class="panel-body">
                             <form class="form" id="notepad-settings" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
                                     <textarea class="form-control" id="notepad" name="notepad"
                                         rows=18>{%data notepad}</textarea>

@@ -30,6 +30,10 @@ class Dashboard extends Controller
         $this->view->setTitle('Account');
         $this->view->renderTemplate('dashboard/index');
 
+        if($this->isPOST()) {
+            $this->validateCsrfToken();
+            $this->model('Setting')->set('notepad', $this->getPostValue('notepad'));
+        }
 
         try {
             $ch = curl_init('https://status.ezxss.com/?v=' . version);
@@ -41,7 +45,6 @@ class Dashboard extends Controller
         } catch (Exception $e) {
             $release = [['?', '?', '?']];
         }
-
         $this->view->renderData('repoVersion', $release[0]['release']);
         $this->view->renderData('repoBody', $release[0]['body']);
         $this->view->renderData('repoUrl', $release[0]['zipball_url']);

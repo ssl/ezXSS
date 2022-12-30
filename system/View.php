@@ -20,10 +20,14 @@ class View
     {
         // Add security headers
         header('X-XSS-Protection: 1');
-        //header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; font-src fonts.gstatic.com; script-src 'self' 'nonce-csrf';");
         header('X-Frame-Options: DENY');
         header('X-Content-Type-Options: nosniff');
         header('Referrer-Policy: strict-origin-when-cross-origin');
+
+        // Add CSP header to manage
+        if(explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))[1] === 'manage') {
+            header("Content-Security-Policy: default-src 'self'; img-src 'self' data: chart.googleapis.com; font-src fonts.gstatic.com; script-src 'self' 'nonce-csrf'; style-src 'self' 'unsafe-inline';");
+        }
     }
 
     /**
@@ -37,6 +41,7 @@ class View
         $this->content = '';
         $this->renderTemplate('system/error');
         $this->renderMessage($message);
+        $this->content = str_replace('{theme}', '', $this->content);
         return $this->showContent();
     }
 
@@ -47,11 +52,11 @@ class View
      * @param string $type
      * @return void
      */
-    public function renderMessage($message, $type = 'danger')
+    public function renderMessage($message)
     {
         $content = $this->getContent();
 
-        $content = str_replace('{message}', '<div class="alert alert-' . e($type) . '" role="alert">' . e($message) . '</div>', $content);
+        $content = str_replace('{message}', '<div class="alert role="alert">' . e($message) . '</div>', $content);
 
         $this->content = $content;
     }
@@ -68,7 +73,7 @@ class View
     {
         $content = $this->getContent();
 
-        if($plain) {
+        if ($plain) {
             $content = str_replace('{%data ' . $param . '}', $value, $content);
         } else {
             $content = str_replace('{%data ' . $param . '}', e($value), $content);
@@ -84,11 +89,12 @@ class View
      * @param bool $bool
      * @return void
      */
-    public function renderCondition($condition, $bool)
+    public function renderCondition($condition, $bool, $falseCondition = false)
     {
         $content = $this->getContent();
 
-        preg_match_all('/{%if ' . $condition . '}(.*?){%\/if}/s', $content, $matches);
+        $search = !$falseCondition ? '/{%if ' . $condition . '}(.*?){%\/if}/s' : '/{%!if ' . $condition . '}(.*?){%\/!if}/s';
+        preg_match_all($search, $content, $matches);
         foreach ($matches[1] as $key => $value) {
             // Shows the content if the given boolean is true
             if ($bool === true) {
@@ -107,17 +113,24 @@ class View
             }
         }
         $this->content = $content;
+
+        // Render the other side of the boolean (also known as `else`)
+        if(!$falseCondition) {
+            $this->renderCondition($condition, !$bool, true);
+        }
     }
 
-    public function renderChecked($name, $checked) {
+    public function renderChecked($name, $checked)
+    {
         $content = $this->getContent();
 
         $content = str_replace('{%checked ' . $name . '}', $checked ? 'checked' : '', $content);
 
         $this->content = $content;
     }
-    
-    public function renderOptions() {
+
+    public function renderOptions()
+    {
         //todo?
     }
 
@@ -190,6 +203,7 @@ class View
 
         $this->content = $content;
         $this->renderCondition('userIsAdmin', $this->session('rank') == 7);
+        $this->renderCondition('isLoggedIn', $this->session('rank') > 0);
     }
 
     public function renderPayload($payload)
@@ -316,11 +330,25 @@ class View
         return ''; // todo
     }
 
-    public function currentPage($page)
+    public function currentPage($page, $hitFirst = false)
     {
         $uri = $_SERVER['REQUEST_URI'] ?? '';
         $uriParts = explode('/', $uri);
 
+        if ((substr($page, -2) === '*0' || substr($page, -2) === '*1') && isset($uriParts[2]) && $uriParts[2] == 'reports') {
+            if(isset($_GET['archive']) && $_GET['archive'] == '1') {
+                if(substr($page, -2) === '*0') {
+                    return 'menu-active';
+                }
+            } else {
+                if(substr($page, -2) === '*1') {
+                    return 'menu-active';
+                }
+            }
+        }
+        if (substr($page, -1) === '*' && isset($uriParts[2]) && $uriParts[2] == substr($page, 0, -1)) {
+            return 'menu-active';
+        }
         if (strpos($page, '/') !== false && isset($uriParts[3]) && $uriParts[2] . '/' . $uriParts[3] == $page) {
             return 'menu-active';
         }

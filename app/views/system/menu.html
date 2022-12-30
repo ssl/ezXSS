@@ -11,10 +11,11 @@
                 <div class="m-t-xs"><span class="c-white">ezXSS v{version[]}</span> github.com/ssl/ezxss</div>
             </li>
 
+            {%if isLoggedIn}
             <li class="nav-category">Main</li>
             <li class="{currentPage[dashboard/my]}"><a href="/manage/dashboard/my">My Dashboard</a></li>
             <li class="{currentPage[account]}"><a href="/manage/account">Account</a></li>
-            <li class="{currentPage[payload]}"><a href="/manage/payload">Payload</a></li>
+            <li class="{currentPage[payload*]}"><a href="/manage/payload">Payload</a></li>
 
             {%if userIsAdmin}
             <li class="nav-category">Admin</li>
@@ -29,8 +30,9 @@
 
 
             <li class="nav-category">My Reports</li>
-            <li class="{currentPage[reports]}"><a href="/manage/reports">All reports</a></li>
-            <li class="{currentPage[archive]}"><a href="/manage/archive">Archived reports</a></li>
+            <li class="{currentPage[reports*1]}"><a href="/manage/reports/all">All reports</a></li>
+            <li class="{currentPage[reports*0]}"><a href="/manage/reports/all/?archive=1">Archived reports</a></li>
+            {%/if}
         </ul>
     </nav>
 </aside>
