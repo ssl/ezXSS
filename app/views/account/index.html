@@ -82,6 +82,17 @@
                             </form>
                         </div>
                     </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Logout</div>
+                        <div class="panel-body">
+                            <form class="form" method="post">
+                                <p>Do you want to logout of your account?</p>
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <button name="logout" type="submit" class="btn">Logout</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
 
@@ -103,7 +114,7 @@
                                     </select>
                                 </div>
 
-                                <div id="method-loading">
+                                <div id="method-pick">
                                     Pick an option
 
                                     {%if userIsAdmin}
@@ -112,7 +123,7 @@
                                     {%/if}
                                 </div>
 
-                                <div id="method-content-1" style="display:none">
+                                <div id="method-content-1" class="method-content">
 
                                     <label class="checkbox-label">
                                         <input {%checked mailOn} class="chkbox" name="mailon" type="checkbox">
@@ -128,7 +139,7 @@
 
                                 </div>
 
-                                <div id="method-content-2" style="display:none">
+                                <div id="method-content-2" class="method-content">
 
                                     <label class="checkbox-label">
                                         <input {%checked telegramOn} class="chkbox" name="telegramon" type="checkbox">
@@ -142,9 +153,7 @@
                                             <input class="form-control" name="telegram_bottoken"
                                                 placeholder="1234567890:AAbcd1234qZylg5bEzXsSjCGqro_Vb8XcM" type="text"
                                                 value="{%data telegramToken}">
-                                            <span class="input-group-addon"><a id="openGetChatId"
-                                                    style="cursor:pointer">Get
-                                                    chatID</a></span>
+                                            <span class="input-group-addon"><a id="openGetChatId">Get chatID</a></span>
                                         </div>
                                     </div>
 
@@ -157,7 +166,7 @@
 
                                 </div>
 
-                                <div id="method-content-3" style="display:none">
+                                <div id="method-content-3" class="method-content">
 
                                     <label class="checkbox-label">
                                         <input {%checked slackOn} class="chkbox" name="slackon" type="checkbox">
@@ -175,7 +184,7 @@
 
                                 </div>
 
-                                <div id="method-content-4" style="display:none">
+                                <div id="method-content-4" class="method-content">
 
                                     <label class="checkbox-label">
                                         <input {%checked discordOn} class="chkbox" name="discordon" type="checkbox">
@@ -194,7 +203,7 @@
 
                                 </div>
 
-                                <div id="method-disabled" style="display:none">
+                                <div id="method-disabled" class="method-content">
 
                                     <p>This alerting option is currently not enabled, contact your ezXSS administrator.
                                     </p>
@@ -203,6 +212,7 @@
                             </form>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

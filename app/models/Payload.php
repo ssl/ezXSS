@@ -5,7 +5,6 @@ class Payload_model extends Model
 
     public $table = 'payloads';
 
-
     public function getAll()
     {
         $database = Database::openConnection();
@@ -14,6 +13,20 @@ class Payload_model extends Model
         $data = $database->fetchAll();
 
         return $data;
+    }
+
+    public function setSingleValue($id, $column, $value) {
+        $database = Database::openConnection();
+
+        $database->prepare('UPDATE `payloads` SET `'.$column.'` = :value WHERE id = :id');
+        $database->bindValue(':value', $value);
+        $database->bindValue(':id', $id);
+        
+        if(!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return true;
     }
 
     public function getAllByUserId($id)

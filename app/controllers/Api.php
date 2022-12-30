@@ -41,11 +41,30 @@ class Api extends Controller
 
     public function statistics()
     {
-        $this->isAdminOrExit();
         $this->validateCsrfToken();
 
         $statistics = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'collected' => 0, 'last' => 'never'];
-        $allReports = $this->model('Report')->getAllStaticticsData();
+
+        $page = $this->getPostValue('page');
+        if($page === 'dashboard') {
+            $this->isAdminOrExit();
+            $allReports = $this->model('Report')->getAllStaticticsData();
+        } else {
+            $this->isLoggedInOrExit();
+    
+            $user = $this->model('User')->getById($this->session->data('id'));
+            $payloads = $this->model('Payload')->getAllByUserId($user['id']);
+
+            $allReports = [];
+            foreach ($payloads as $payload) {
+                $payloadUri = '//' . $payload['payload'];
+                if (strpos($payload['payload'], '/') === false) {
+                    $payloadUri .= '/%';
+                }
+                $allReports = array_merge($allReports, $this->model('Report')->getAllStaticticsDataByPayload($payloadUri));
+            }
+        }
+
         $statistics['total'] = count($allReports);
         $uniqueDomains = [];
         $uniqueDomainsWeek = [];
@@ -103,6 +122,13 @@ class Api extends Controller
             [
                 'error' => e($error)
             ]
+        );
+    }
+
+    private function showMessage($array)
+    {
+        return json_encode(
+            $array
         );
     }
 }

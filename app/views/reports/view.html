@@ -1,0 +1,151 @@
+<div class="wrapper">
+
+    {menu}
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title float-left">
+                            <h3 class="m-b-xs">View report</h3>
+                            <small>View all information about a report</small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            {message}
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Information</div>
+                        <div class="panel-body">
+                            <div>
+                                <table class="table report">
+                                    <thead>
+                                        <tr>
+                                            <td width=150px>URL</td>
+                                            <td>{%data uri}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>IP</td>
+                                            <td>{%data ip}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Referer</td>
+                                            <td>{%data referer}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Payload</td>
+                                            <td>{%data payload}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>User Agent</td>
+                                            <td>{%data user-agent}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Cookies</td>
+                                            <td id="cookies">{%data cookies}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Local Storage</td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                    style="resize:vertical" class="form-control"
+                                                    rows="7.5">{%data localstorage}</textarea>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Session Storage</td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                    style="resize:vertical" class="form-control"
+                                                    rows="7.5">{%data sessionstorage}</textarea>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>DOM</td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                    style="resize:vertical" class="form-control"
+                                                    rows="12.5" id="dom">{%data dom}</textarea>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Origin</td>
+                                            <td>{%data origin}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Time</td>
+                                            <td>{%data time}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Screenshot</td>
+                                            <td><img src="/assets/img/report-{%data screenshot}.png"
+                                                    style="max-width: 100%;"></td>
+                                        </tr>
+                                    </thead>
+                                </table>
+
+                                {%if isLoggedIn}
+                                <button class="btn delete" report-id="{%data id}">Delete</button>
+                                <button class="btn archive" report-id="{%data id}">Archive</button>
+                                <button class="btn share" data-target="#shareModal" data-toggle="modal"
+                                    report-id="{%data id}" share-id="{%data shareid}">Share
+                                </button>
+                                <button class="btn copycookies" report-origin="{%data origin}">Copy cookies as
+                                    JSON
+                                </button>
+                                <button class="btn render" report-origin="{%data origin}">Render HTML DOM</button>
+                                {%/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+</section>
+
+<div class="modal fade" id="shareModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">&times;</button>
+                <h3 class="m-b-xs">Share</h3>
+                <small>Share your reports using direct link or with other ezXSS users</small>
+            </div>
+            <div class="modal-body">
+                <div id="alert"></div>
+                <form class="form" id="share-report" method="post">
+                    <input hidden id="reportid" name="reportid" type=hidden value="0">
+
+                    <div class="form-group">
+                        <label class="control-label" for="domain">Direct share link</label>
+                        <input class="form-control" id="shareid" type="text" value="">
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label" for="domain">Share by domain</label>
+                        <input class="form-control" id="domain" name="domain" type="text" value="">
+                    </div>
+                    <button name="share-domain" type="submit" class="btn">Share</button>
+
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label" for="email">Share by email</label>
+                        <input class="form-control" id="email" name="email" type="text" value="">
+                    </div>
+                    <button name="share-email" type="submit" class="btn">Share</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

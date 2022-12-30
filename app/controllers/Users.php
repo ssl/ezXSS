@@ -48,7 +48,7 @@ class Users extends Controller
                 $payloadString .= e($payload['payload']) . ', ';
             }
             $payloadString = $payloadString === '' ? $payloadString : substr($payloadString, 0, -2);
-            $payloadString = (strlen($payloadString) > 50) ? substr($payloadString,0,50).'...' : $payloadString;
+            $payloadString = (strlen($payloadString) > 35) ? substr($payloadString,0,35).'...' : $payloadString;
             $users[$key]['payloads'] = $payloadString;
         }
         $this->view->renderDataset('user', $users);
@@ -95,7 +95,7 @@ class Users extends Controller
                 if ($this->getPostValue('add') !== null) {
                     $payload = $this->getPostValue('payload');
 
-                    if (strpos($payload, 'http://') === 0 || strpos($payload, 'https://') === 0) {
+                    if (strpos($payload, 'http://') === 0 || strpos($payload, 'https://') === 0 || substr($payload, 0, 1) === '/') {
                         throw new Exception("Payload needs to be in format without http://");
                     }
 
@@ -148,6 +148,10 @@ class Users extends Controller
     {
         $this->isAdminOrExit();
         $this->validateCsrfToken();
+
+        if (!+$id) {
+            throw new Exception("Can't delete this payload");
+        }
 
         $this->model('Payload')->getById($id);
         $this->model('Payload')->deleteById($id);
