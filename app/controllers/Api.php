@@ -39,6 +39,29 @@ class Api extends Controller
         }
     }
 
+    public function getChatId()
+    {
+        $bottoken = $this->getPostValue('bottoken');
+
+        if(!preg_match('/^[a-zA-Z0-9:_-]+$/', $bottoken)) {
+            return $this->showEcho('This does not look like an valid Telegram bot token');
+        }
+
+        $api = curl_init("https://api.telegram.org/bot{$bottoken}/getUpdates");
+        curl_setopt($api, CURLOPT_RETURNTRANSFER, true);
+        $results = json_decode(curl_exec($api), true);
+
+        if($results['ok'] !== true) {
+            return $this->showEcho('Something went wrong. Your bot token is probably invalid.');
+        }
+
+        if(isset($results['result'][0]['message']['chat']['id'])) {
+            return $this->showEcho('chatId:' . $results['result'][0]['message']['chat']['id']);
+        }
+
+        return $this->showEcho('Your bot token seems valid, but I cannot find a chat. Start a chat with your bot by sending /start');
+    }
+
     public function statistics()
     {
         $this->validateCsrfToken();
@@ -89,7 +112,7 @@ class Api extends Controller
             }
 
             // Counts amount of collected pages
-            if (strpos($report['payload'], 'Collected page via ') === 0) {
+            if (strpos($report['referer'], 'Collected page via ') === 0) {
                 $statistics['collected']++;
             }
         }
@@ -130,5 +153,12 @@ class Api extends Controller
         return json_encode(
             $array
         );
+    }
+
+    private function showEcho($string)
+    {
+        return json_encode([
+            'echo' => $string
+        ]);
     }
 }

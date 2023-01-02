@@ -150,7 +150,7 @@
                                     <div class="form-group">
                                         <label class="control-label" for="telegram_bottoken">Bot Token</label>
                                         <div class="input-group">
-                                            <input class="form-control" name="telegram_bottoken"
+                                            <input class="form-control" name="telegram_bottoken" id="telegram_bottoken"
                                                 placeholder="1234567890:AAbcd1234qZylg5bEzXsSjCGqro_Vb8XcM" type="text"
                                                 value="{%data telegramToken}">
                                             <span class="input-group-addon"><a id="openGetChatId">Get chatID</a></span>
@@ -159,7 +159,7 @@
 
                                     <div class="form-group">
                                         <label class="control-label">Chat ID</label>
-                                        <input type="text" name="chatid" class="form-control" placeholder="123456789"
+                                        <input type="text" name="chatid" id="chatid" class="form-control" placeholder="123456789"
                                             value="{%data telegramChatID}">
                                     </div>
                                     <button name="alert" type="submit" class="btn">Save</button>
