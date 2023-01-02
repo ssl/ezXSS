@@ -325,6 +325,11 @@ class View
         return e(version);
     }
 
+    public function fileName()
+    {
+        return e(ltrim($_SERVER['REQUEST_URI'], '/'));
+    }
+
     public function theme()
     {
         return ''; // todo
@@ -365,7 +370,7 @@ class View
      */
     public function domain()
     {
-        return e($_SERVER['SERVER_NAME']);
+        return e($_SERVER['HTTP_HOST']);
     }
 
     /**

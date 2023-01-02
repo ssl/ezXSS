@@ -63,4 +63,15 @@ class Alert_model extends Model
 
         return $alert[$value];
     }
+
+    public function getAllByMethodId($id) {
+        $database = Database::openConnection();
+        $database->prepare('SELECT * FROM alerts WHERE method_id = :method_id AND `enabled` = 1 ORDER BY id ASC');
+        $database->bindValue(':method_id', $id);
+        $database->execute();
+
+        $data = $database->fetchAll();
+
+        return $data;
+    }
 }

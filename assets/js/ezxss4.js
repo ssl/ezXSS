@@ -1,4 +1,4 @@
-function request(action, data={}) {
+function request(action, data = {}) {
     data['csrf'] = csrf;
     return $.ajax({
         type: 'post',
@@ -15,7 +15,7 @@ function request(action, data={}) {
 $(document).ready(function () {
 
     if (location.toString().split('/')[4] === 'dashboard') {
-        request('/manage/api/statistics', {page:location.toString().split('/').pop()}).then(function (r) {
+        request('/manage/api/statistics', { page: location.toString().split('/').pop() }).then(function (r) {
             $.each(r, function (key, value) {
                 $('#' + key).html(value);
             });
@@ -57,18 +57,31 @@ $(document).ready(function () {
         }
     });
 
-    $(".remove-item").click(function() {
+    $(".remove-item").click(function () {
         const data = $(this).attr('data');
         const divId = $(this).attr('divid');
         const type = (divId.charAt(0) === "p" ? "pages" : (divId.charAt(0) === "w" ? "whitelist" : (divId.charAt(0) === "b" ? "blacklist" : "")));
         const id = window.location.href.split("/").length > 0 ? window.location.href.split("/")[window.location.href.split("/").length - 1] : "";
-        request('/manage/payload/removeItem/'+id, { data:data, type:type}).then(function(r) {
-            $('#'+divId).fadeOut( "slow", function() {});
+        request('/manage/payload/removeItem/' + id, { data: data, type: type }).then(function (r) {
+            $('#' + divId).fadeOut("slow", function () { });
         });
 
     });
 
-    $(".generate-password").click(function() {
+    $("#openGetChatId").click(function () {
+        var bottoken = $("#telegram_bottoken").val();
+        request("/manage/api/getchatid", { bottoken: bottoken }).then(function (r) {
+            if (r.echo.startsWith('chatId:')) {
+                $('#getChatId').modal('hide');
+                $("#chatid").val(r.echo.replace('chatId:', ''));
+            } else {
+                $('#getChatId').modal('show');
+                $("#getChatIdBody").html(r.echo);
+            }
+        });
+    });
+
+    $(".generate-password").click(function () {
         var password = "";
         const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
 
@@ -79,25 +92,25 @@ $(document).ready(function () {
         $("#password").val(password);
     });
 
-    $(".delete-selected").click(function() {
-        $.each($("input[name='selected']:checked"), function(){
-            request("/manage/reports/delete/" + $(this).val()).then(function(r) {
-                $("#" + $(this).val()).fadeOut( "slow", function() {});
+    $(".delete-selected").click(function () {
+        $.each($("input[name='selected']:checked"), function () {
+            request("/manage/reports/delete/" + $(this).val()).then(function (r) {
+                $("#" + $(this).val()).fadeOut("slow", function () { });
             });
         });
     });
 
-    $(".archive-selected").click(function() {
-        $.each($("input[name='selected']:checked"), function(){
-            request("/manage/reports/archive/" + $(this).val()).then(function(r) {
-                $("#" + $(this).val()).fadeOut( "slow", function() {});
+    $(".archive-selected").click(function () {
+        $.each($("input[name='selected']:checked"), function () {
+            request("/manage/reports/archive/" + $(this).val()).then(function (r) {
+                $("#" + $(this).val()).fadeOut("slow", function () { });
             });
         });
     });
 
-    $(".delete").click(function() {
+    $(".delete").click(function () {
         var id = $(this).attr('report-id');
-        request("/manage/reports/delete/" + id).then(function(r) {
+        request("/manage/reports/delete/" + id).then(function (r) {
             if (window.location.href.indexOf('/view/') !== -1) {
                 window.location.href = '/manage/reports';
             } else {
@@ -106,53 +119,52 @@ $(document).ready(function () {
         });
     });
 
-    $(".archive").click(function() {
+    $(".archive").click(function () {
         var id = $(this).attr('report-id');
-        request("/manage/reports/archive/" + id).then(function(r) {
-            $("#"+id).fadeOut( "slow", function() {});
+        request("/manage/reports/archive/" + id).then(function (r) {
+            $("#" + id).fadeOut("slow", function () { });
         });
     });
 
-    $(".share").click(function() {
-        $('#reportid').val( $(this).attr('report-id') );
-        $('#shareid').val("https://" + window.location.hostname + "/manage/reports/share/" + $(this).attr('share-id') );
+    $(".share").click(function () {
+        $('#reportid').val($(this).attr('report-id'));
+        $('#shareid').val("https://" + window.location.hostname + "/manage/reports/share/" + $(this).attr('share-id'));
     });
 
-    $(".render").click(function() {
+    $(".render").click(function () {
         const byteCharacters = unescape(encodeURIComponent($('#dom').val()));
         const byteArrays = [];
-      
+
         for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-          const slice = byteCharacters.slice(offset, offset + 1024);
-      
-          const byteNumbers = new Array(slice.length);
-          for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-          }
-      
-          const byteArray = new Uint8Array(byteNumbers);
-      
-          byteArrays.push(byteArray);
+            const slice = byteCharacters.slice(offset, offset + 1024);
+
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+
+            byteArrays.push(byteArray);
         }
-      
-        const blob = new Blob(byteArrays, {type: 'text/html'});
+
+        const blob = new Blob(byteArrays, { type: 'text/html' });
         const blobUrl = URL.createObjectURL(blob);
-      
+
         window.open(blobUrl, '_blank');
     });
 
-
-    $(".copycookies").click(function() {
+    $(".copycookies").click(function () {
         var split = $("#cookies").text().split('; ');
         var origin = $(this).attr('report-origin');
 
         var json = '[';
-        $.each( split, function( index, value ) {
+        $.each(split, function (index, value) {
             var cookieData = value.split('=');
             var cookieName = cookieData[0];
             var cookieValue = cookieData[1];
 
-            json += '{"domain":"'+origin+'","expirationDate":'+(Date.now() / 1000 + 31556926)+',"hostOnly":true,"httpOnly":false,"name":"'+cookieName+'","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId": "0","value":"'+cookieValue+'","id":"'+(index+1)+'"},';
+            json += '{"domain":"' + origin + '","expirationDate":' + (Date.now() / 1000 + 31556926) + ',"hostOnly":true,"httpOnly":false,"name":"' + cookieName + '","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId": "0","value":"' + cookieValue + '","id":"' + (index + 1) + '"},';
         });
         json = json.substring(0, json.length - 1) + ']';
 
@@ -163,14 +175,13 @@ $(document).ready(function () {
         $temp.remove();
     });
 
-
-    $('#select-all').click(function(event) {
-        if(this.checked) {
-            $(':checkbox').each(function() {
+    $('#select-all').click(function (event) {
+        if (this.checked) {
+            $(':checkbox').each(function () {
                 this.checked = true;
             });
         } else {
-            $(':checkbox').each(function() {
+            $(':checkbox').each(function () {
                 this.checked = false;
             });
         }
@@ -178,7 +189,7 @@ $(document).ready(function () {
 
     var lastChecked = null;
     const checkboxes = $('.chkbox');
-    checkboxes.click(function(e) {
+    checkboxes.click(function (e) {
         if (!lastChecked) {
             lastChecked = this;
             return;
@@ -190,5 +201,4 @@ $(document).ready(function () {
         }
         lastChecked = this;
     });
-
 });
