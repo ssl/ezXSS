@@ -1,5 +1,10 @@
 <?php
 try {
+    // Check PHP version
+    if (PHP_VERSION_ID < 70100) {
+        throw new Exception('PHP 7.1 or up is required to use ezXSS');
+    }
+
     // Load all required files
     require __DIR__ . '/system/Autoload.php';
 
@@ -8,11 +13,8 @@ try {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
-    }
-
-    // Check PHP version
-    if (PHP_VERSION_ID < 70100) {
-        throw new Exception('PHP 7.1 or up is required to use ezXSS');
+    } else {
+        ini_set('display_errors', 0);
     }
 
     // Start routing
