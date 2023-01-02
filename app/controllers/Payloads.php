@@ -67,7 +67,43 @@ class Payloads extends Controller
         $data->payload = substr($data->payload, 0, 500);
         $data->{'user-agent'} = substr($data->{'user-agent'}, 0, 500);
 
-        // TODO: Check black/whitelist
+        // Check black and whitelist
+        $payload = $this->getPayloadByUrl($data->payload);
+        
+        $blacklistDomains = explode('~', $payload['blacklist']);
+        $whitelistDomains = explode('~', $payload['whitelist']);
+
+        // Check for blacklisted domains
+        foreach($blacklistDomains as $blockedDomain) {
+            if($data->origin == $blockedDomain) {
+                return 'github.com/ssl/ezXSS';
+            }
+            if (strpos($blockedDomain, '*') !== false) {
+                $blockedDomain = str_replace('*', '(.*)', $blockedDomain);
+                if(preg_match('/^'.$blockedDomain.'$/', $data->origin)) {
+                    return 'github.com/ssl/ezXSS';
+                }
+            }
+        }
+
+        // Check for whitelisted domains
+        if ($payload['whitelist'] !== '') {
+            $foundWhitelist = false;
+            foreach ($whitelistDomains as $whitelistDomain) {
+                if ($data->origin == $whitelistDomain) {
+                    $foundWhitelist = true;
+                }
+                if (strpos($whitelistDomain, '*') !== false) {
+                    $whitelistDomain = str_replace('*', '(.*)', $whitelistDomain);
+                    if (preg_match('/^' . $whitelistDomain . '$/', $data->origin)) {
+                        $foundWhitelist = true;
+                    }
+                }
+            }
+            if(!$foundWhitelist) {
+                return 'github.com/ssl/ezXSS';
+            }
+        }
 
         // Check if the report should be saved or alerted
         $doubleReport = false;
@@ -79,13 +115,6 @@ class Payloads extends Controller
                     $doubleReport = true;
                 }
             }
-        }
-
-        // Check if the DOM should be truncated
-        if ($this->model('Setting')->get('dompart') > 0 && strlen($data->dom) > $this->model('Setting')->get('dompart')) {
-            $domExtra = '&#13;&#10;&#13;&#10;View full dom on the report page or change this setting on /settings';
-        } else {
-            $domExtra = '';
         }
 
         if (($doubleReport && ($this->model('Setting')->get('filter-save') == 1 || $this->model('Setting')->get('filter-alert') == 1)) || (!$doubleReport)) {
@@ -109,14 +138,43 @@ class Payloads extends Controller
             
             // Send out alerts
             if (($doubleReport && $this->model('Setting')->get('filter-alert') == 1) || (!$doubleReport)) {
-                $this->alert();
+                $this->alert($data);
             }
         }
 
         return 'github.com/ssl/ezXSS';
     }
 
-    private function alert() {
+    private function alert($data) {
         // TODO: alerting
+
+        // Check if the DOM should be truncated
+        if ($this->model('Setting')->get('dompart') > 0 && strlen($data->dom) > $this->model('Setting')->get('dompart')) {
+            $domExtra = '&#13;&#10;&#13;&#10;View full dom on the report page or change this setting on /settings';
+        } else {
+            $domExtra = '';
+        }
+        
     }
+
+    private function getPayloadByUrl($payloadUrl) {
+        // Split the URL into segments
+        $splitUrl = explode('/', $payloadUrl);
+
+        try {
+            // Attempt to retrieve the payload by the full path
+            $payload = $this->model('Payload')->getByPayload($splitUrl[2] ?? '' . '/' . $splitUrl[3] ?? '');
+        } catch (Exception $e) {
+            try {
+                // If the payload is not found by the full path, try to retrieve it by the payload without the path
+                $payload = $this->model('Payload')->getByPayload($splitUrl[2] ?? '');
+            } catch (Exception $e) {
+                // If the payload is still not found, fallback to the default payload
+                $payload = $this->model('Payload')->getById(0);
+            }
+        }
+
+        return $payload;
+    }
+    
 }

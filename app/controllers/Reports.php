@@ -2,7 +2,7 @@
 
 class Reports extends Controller
 {
-    public $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'screenshot', 'shareid'];
+    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'screenshot', 'shareid'];
 
     public function __construct() {
         parent::__construct();

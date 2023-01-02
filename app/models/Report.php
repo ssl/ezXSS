@@ -96,7 +96,7 @@ class Report_model extends Model
         $database->bindValue(':userAgent', $userAgent);
         $database->bindValue(':ip', $ip);
         $database->bindValue(':time', time());
-        $database->bindValue(':screenshot', ($screenshotName ?? ''));
+        $database->bindValue(':screenshot', $screenshotName);
         $database->bindValue(':localstorage', $localStorage);
         $database->bindValue(':sessionstorage', $sessionStorage);
         $database->bindValue(':payload', $payload);

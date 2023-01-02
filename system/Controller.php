@@ -183,6 +183,11 @@ class Controller
         return isset($_GET[$param]) ? $_GET[$param] : null;
     }
 
+    /**
+     * Kill switcher
+     *
+     * @return void
+     */
     private function killSwitcher()
     {
         try {

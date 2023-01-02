@@ -504,9 +504,6 @@ th{color:#ffffff}
 .checkbox-text {
   /**padding-bottom: 5px;**/
 }
-.checkbox-label {
-  display:inline;
-}
 .method-content {
   display:none;
 }
@@ -551,4 +548,12 @@ table.dataTable td.dt-control{text-align:center;cursor:pointer}table.dataTable t
     width: 100%;
     padding-right: 15px;
     padding-left: 15px;
+}
+.checkbox-label {
+  display:inline;
+}
+@-moz-document url-prefix() {
+  .checkbox-custom {
+    margin-top: 24px;
+  }
 }

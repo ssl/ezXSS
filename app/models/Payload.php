@@ -56,6 +56,21 @@ class Payload_model extends Model
         return true;
     }
 
+    public function getByPayload($payload) {
+        $database = Database::openConnection();
+        $database->prepare('SELECT * FROM payloads WHERE payload = :payload ORDER BY id ASC LIMIT 1');
+        $database->bindValue(':payload', $payload);
+        $database->execute();
+
+        if ($database->countRows() === 0) {
+            throw new Exception("Payload not found");
+        }
+
+        $payload = $database->fetch();
+
+        return $payload;
+    }
+
     /**
      * Return user by id
      *
