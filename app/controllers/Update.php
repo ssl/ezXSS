@@ -31,6 +31,8 @@ class Update extends Controller
                     }
                 }
 
+                // Future updates come here!
+
                 header('Location: dashboard/index');
                 exit();
             } catch (Exception $e) {
@@ -62,5 +64,17 @@ class Update extends Controller
         // Create new user and update password to old password
         $user = $this->model('User')->create('admin', 'Temp1234!', 7);
         $this->model('User')->updatePassword($user['id'], $currentPassword, true);
+
+        // Update all oldskool 'collected pages' and NULL payloads
+        $reports = $this->model('Report')->getAllInvalid();
+        foreach ($reports as $report) {
+            // Set payload to current host
+            $this->model('Report')->setSingleValue($report['id'], 'payload', '//' . host . '/');
+
+            // Set refer to collected if collected is set
+            if(strpos($report['payload'], 'Collected page via ') === 0) {
+                $this->model('Report')->setSingleValue($report['id'], 'referer', $report['payload']);
+            }
+        }
     }
 }
