@@ -36,6 +36,13 @@ class Account extends Controller
                     $code = $this->getPostValue('code');
                     $this->mfaSettings($secret, $code);
                 }
+
+                // Check if posted data is logout
+                if ($this->getPostValue('logout') !== null) {
+                    $this->session->deleteSession();
+                    header('Location: /manage/account/login');
+                    exit();
+                }
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
