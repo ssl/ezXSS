@@ -2,23 +2,30 @@
 
 class Api extends Controller
 {
+    /**
+     * Contains functionality that always needs to be done for these type of requests
+     */
     public function __construct()
     {
         parent::__construct();
-        $this->view->setContentType('application/json');
-    }
 
-    public function getAlertStatus()
-    {
+        // Set content type to json
+        $this->view->setContentType('application/json');
+
+        // Validate session
         $this->isLoggedInOrExit();
         $this->validateCsrfToken();
+    }
 
-        $alertIds = [
-            '1' => 'mail',
-            '2' => 'telegram',
-            '3' => 'slack',
-            '4' => 'discord'
-        ];
+    /**
+     * Returns all enabled alerting methods to user
+     * 
+     * @throws Exception
+     * @return bool|string
+     */
+    public function getAlertStatus()
+    {
+        $alertIds = ['1' => 'mail', '2' => 'telegram', '3' => 'slack', '4' => 'discord'];
 
         try {
             $alertId = $this->getPostValue('alertId');
@@ -28,57 +35,63 @@ class Api extends Controller
             }
 
             $enabled = $this->model('Setting')->get('alert-' . $alertIds[$alertId]);
-
-            return json_encode(
-                [
-                    'enabled' => e($enabled)
-                ]
-            );
+            return json_encode(['enabled' => e($enabled)]);
         } catch (Exception $e) {
             return $this->showError($e->getMessage());
         }
     }
 
+    /**
+     * Retrieves chat ID from telegram bot
+     * 
+     * @return string
+     */
     public function getChatId()
     {
         $bottoken = $this->getPostValue('bottoken');
 
-        if(!preg_match('/^[a-zA-Z0-9:_-]+$/', $bottoken)) {
+        // Validate bottoken string
+        if (!preg_match('/^[a-zA-Z0-9:_-]+$/', $bottoken)) {
             return $this->showEcho('This does not look like an valid Telegram bot token');
         }
 
+        // Get last chat from bot
         $api = curl_init("https://api.telegram.org/bot{$bottoken}/getUpdates");
         curl_setopt($api, CURLOPT_RETURNTRANSFER, true);
         $results = json_decode(curl_exec($api), true);
 
-        if($results['ok'] !== true) {
+        // Check if result is OK
+        if ($results['ok'] !== true) {
             return $this->showEcho('Something went wrong. Your bot token is probably invalid.');
         }
 
-        if(isset($results['result'][0]['message']['chat']['id'])) {
+        // Check if result contains any chat
+        if (isset($results['result'][0]['message']['chat']['id'])) {
             return $this->showEcho('chatId:' . $results['result'][0]['message']['chat']['id']);
         }
 
+        // No recent chat found
         return $this->showEcho('Your bot token seems valid, but I cannot find a chat. Start a chat with your bot by sending /start');
     }
 
+    /**
+     * Generates statictics about reports
+     * 
+     * @return string
+     */
     public function statistics()
     {
-        $this->validateCsrfToken();
+        $allReports = [];
 
-        $statistics = ['total' => 0, 'week' => 0, 'totaldomains' => 0, 'weekdomains' => 0, 'collected' => 0, 'last' => 'never'];
-
-        $page = $this->getPostValue('page');
-        if($page === 'dashboard') {
+        // Check if requested statistics is for admin or user
+        if ($this->getPostValue('page') === 'dashboard') {
             $this->isAdminOrExit();
             $allReports = $this->model('Report')->getAllStaticticsData();
         } else {
-            $this->isLoggedInOrExit();
-    
             $user = $this->model('User')->getById($this->session->data('id'));
             $payloads = $this->model('Payload')->getAllByUserId($user['id']);
 
-            $allReports = [];
+            // Merge all reports that belong to user
             foreach ($payloads as $payload) {
                 $payloadUri = '//' . $payload['payload'];
                 if (strpos($payload['payload'], '/') === false) {
@@ -88,12 +101,18 @@ class Api extends Controller
             }
         }
 
-        $statistics['total'] = count($allReports);
+        $statistics = [
+            'total'        => count($allReports),
+            'week'         => 0,
+            'weekdomains'  => 0,
+            'totaldomains' => 0,
+            'collected'    => 0,
+            'last'         => 'never',
+        ];
         $uniqueDomains = [];
         $uniqueDomainsWeek = [];
 
         foreach ($allReports as $report) {
-
             // Counts report from last week
             if ($report['time'] > time() - 604800) {
                 $statistics['week']++;
@@ -117,6 +136,7 @@ class Api extends Controller
             }
         }
 
+        // Get the time of the last report
         $lastReport = end($allReports);
         if (isset($lastReport['time'])) {
             $time = time() - $lastReport['time'];
@@ -139,6 +159,12 @@ class Api extends Controller
         return json_encode($statistics);
     }
 
+    /**
+     * Renders error message
+     * 
+     * @param string $error The error message
+     * @return string
+     */
     private function showError($error)
     {
         return json_encode(
@@ -148,6 +174,12 @@ class Api extends Controller
         );
     }
 
+    /**
+     * Renders message from array
+     * 
+     * @param array $array The array
+     * @return string
+     */
     private function showMessage($array)
     {
         return json_encode(
@@ -155,10 +187,18 @@ class Api extends Controller
         );
     }
 
+    /**
+     * Renders echo message from string
+     * 
+     * @param string $string The message
+     * @return string
+     */
     private function showEcho($string)
     {
-        return json_encode([
-            'echo' => $string
-        ]);
+        return json_encode(
+            [
+                'echo' => e($string)
+            ]
+        );
     }
 }

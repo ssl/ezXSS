@@ -2,10 +2,24 @@
 
 class Alert_model extends Model
 {
-
+    /**
+     * Summary of table
+     * 
+     * @var string
+     */
     public $table = 'alerts';
 
-
+    /**
+     * Updates alert values
+     * 
+     * @param int $userId The user id
+     * @param int $methodId The method id
+     * @param int $enabled The enabled value
+     * @param string $value1 The first value
+     * @param string $value2 The second value
+     * @throws Exception
+     * @return bool
+     */
     public function set($userId, $methodId, $enabled, $value1 = '', $value2 = '')
     {
         $database = Database::openConnection();
@@ -38,6 +52,15 @@ class Alert_model extends Model
         return true;
     }
 
+    /**
+     * Get alert by user id and method id
+     * 
+     * @param int $userId The user id
+     * @param int $methodId The method id
+     * @param string $value The value
+     * @throws Exception
+     * @return mixed
+     */
     public function get($userId, $methodId, $value = 'value1')
     {
         $database = Database::openConnection();
@@ -64,11 +87,22 @@ class Alert_model extends Model
         return $alert[$value];
     }
 
-    public function getAllByMethodId($id) {
+    /**
+     * Gets alert by method id
+     * 
+     * @param int $id The method id
+     * @throws Exception
+     * @return array
+     */
+    public function getAllByMethodId($id)
+    {
         $database = Database::openConnection();
         $database->prepare('SELECT * FROM alerts WHERE method_id = :method_id AND `enabled` = 1 ORDER BY id ASC');
         $database->bindValue(':method_id', $id);
-        $database->execute();
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
 
         $data = $database->fetchAll();
 
