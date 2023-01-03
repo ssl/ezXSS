@@ -1,0 +1,17 @@
+<section id="content">
+    <center>
+        <h1>Update</h1>
+        <br>
+        {message}
+        <div class="login">
+            <form class="form" id="update" method="post">
+                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                <b class="transparent">Thanks for using ezXSS.</b><br><br>
+                You've updated your setup to {version[]}. Click the
+                button bellow to update your database.<br><br>
+                <button class="btn">Update</button>
+            </form>
+        </div><br>
+        <p>Visit the <a href="https://github.com/ssl/ezXSS/wiki">wiki</a> for more information.</p>
+    </center>
+</section>

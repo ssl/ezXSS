@@ -142,6 +142,17 @@ class Database
     }
 
     /**
+     * Executes query
+     *
+     * @param string query The query
+     * @return void
+     */
+    public function exec($query)
+    {
+        return $this->connection->exec($query);
+    }
+
+    /**
      * Returns all rows
      *
      * @return void

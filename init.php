@@ -23,6 +23,7 @@ try {
 } catch (Exception $message) {
     // Any unexpected uncatched exception will show a error page
     $view = new View();
+    $view->setContentType('text/html');
     echo $view->renderErrorPage($message->getMessage());
     exit();
 }
