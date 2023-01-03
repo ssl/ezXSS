@@ -207,6 +207,29 @@ class Report_model extends Model
     }
 
     /**
+     * Set report value of single item by id
+     * @param int $id The report id
+     * @param string $column The column name
+     * @param string $value The new value
+     * @throws Exception
+     * @return bool
+     */
+    public function setSingleValue($id, $column, $value)
+    {
+        $database = Database::openConnection();
+
+        $database->prepare('UPDATE `reports` SET `' . $column . '` = :value WHERE id = :id');
+        $database->bindValue(':value', $value);
+        $database->bindValue(':id', $id);
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return true;
+    }
+
+    /**
      * Archive report by id
      * 
      * @param string $id The report id
@@ -248,5 +271,21 @@ class Report_model extends Model
         }
 
         return true;
+    }
+
+    /**
+     * Get all 3.x invalid reports
+     * 
+     * @return array
+     */
+    public function getAllInvalid()
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT id,payload FROM `reports` WHERE `payload` LIKE "%Collected page via %" OR `payload` IS NULL');
+        $database->execute();
+
+        $data = $database->fetchAll();
+
+        return $data;
     }
 }
