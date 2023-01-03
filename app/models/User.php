@@ -48,7 +48,7 @@ class User_model extends Model
      * @throws Exception
      * @return bool
      */
-    public function updatePassword($id, $password)
+    public function updatePassword($id, $password, $hashed = false)
     {
         $database = Database::openConnection();
 
@@ -61,7 +61,7 @@ class User_model extends Model
 
         $database->prepare('UPDATE `users` SET password = :password WHERE id = :id');
         $database->bindValue(':id', $id);
-        $database->bindValue(':password', password_hash($password, PASSWORD_BCRYPT));
+        $database->bindValue(':password', !$hashed ? password_hash($password, PASSWORD_BCRYPT) : $password);
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
@@ -153,10 +153,11 @@ class User_model extends Model
     }
 
     /**
-     * Creates an new account
+     * Creates an new user
      *
      * @param string $username The username
      * @param string $password The password
+     * @param string $rank The rank
      * @throws Exception
      * @return bool
      */

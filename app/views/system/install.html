@@ -1,0 +1,26 @@
+<section id="content">
+    <center>
+        <h1>Install</h1>
+        <br>
+        {message}
+        <div class="login">
+            <form class="form" id="install" method="post">
+                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                <div class="form-group">
+                    <label class="control-label" for="username">Username</label>
+                    <input class="form-control" id="username" name="username" type="username">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="password">Password</label>
+                    <div class="input-group">
+                        <input class="form-control" id="password" name="password" type="text">
+                        <span class="input-group-addon"><a class="generate-password"
+                                style="cursor:pointer">Generate</a></span>
+                    </div>
+                </div>
+                <button class="btn">Install</button>
+            </form>
+        </div><br>
+        <p>Visit the <a href="https://github.com/ssl/ezXSS/wiki">wiki</a> for more information.</p>
+    </center>
+</section>

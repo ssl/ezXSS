@@ -15,6 +15,7 @@ class Users extends Controller
     public function __construct()
     {
         parent::__construct();
+        
         // Validate if user is admin
         $this->isAdminOrExit();
     }
@@ -96,13 +97,11 @@ class Users extends Controller
                     $password = $this->getPostValue('password');
                     $rank = intval($this->getPostValue('rank'));
 
-                    // Prevent editing own user
-                    if ($user['id'] == $this->session->data('id')) {
-                        throw new Exception("Can't edit your own user");
-                    }
-
                     // Check if posted data wants to change password
                     if ($password != '') {
+                        if ($user['id'] == $this->session->data('id')) {
+                            throw new Exception("Can't edit your own users password here");
+                        }
                         $userModel->updatePassword($user['id'], $password);
                     }
 
@@ -135,6 +134,7 @@ class Users extends Controller
         }
 
         // Render user data
+        $user = $userModel->getById($id);
         $payloads = $this->model('Payload')->getAllByUserId($user['id']);
         $this->view->renderDataset('payload', $payloads);
         $this->view->renderData('username', $user['username']);

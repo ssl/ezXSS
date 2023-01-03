@@ -90,8 +90,8 @@ class Account extends Controller
                 $username = $this->getPostValue('username');
                 $password = $this->getPostValue('password');
 
-                $account = $this->model('User')->login($username, $password);
-                $this->session->createSession($account);
+                $user = $this->model('User')->login($username, $password);
+                $this->session->createSession($user);
                 header('Location: dashboard/index');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());

@@ -18,7 +18,16 @@ class Controller
         $this->view = new View();
 
         // Check if kill switcher is turned on
-        $this->killSwitcher();
+        $this->checkKillSwitch();
+
+        // Check if platform is installed
+        $this->checkIfInstalled();
+
+        // Check for updates
+        $this->checkForUpdates();
+
+        // Set timezone
+        date_default_timezone_set($this->model('Setting')->get('timezone'));
     }
 
     /**
@@ -94,6 +103,11 @@ class Controller
                 // Check if the password has been changed
                 if ($this->session->data('password_hash') != md5($account['password'])) {
                     throw new Exception("Password has been changed");
+                }
+
+                // Check if the username has been changed
+                if ($this->session->data('username') != $account['username']) {
+                    throw new Exception("Username has been changed");
                 }
 
                 // Check if the rank has been changed
@@ -196,14 +210,14 @@ class Controller
     }
 
     /**
-     * Kill switcher
+     * Checks if platform is in kill switch mode
      *
      * @return void
      */
-    private function killSwitcher()
+    private function checkKillSwitch()
     {
         try {
-            $killswitch = $this->model('Setting')->get("killswitch");
+            $killswitch = $this->model('Setting')->get('killswitch');
 
             if (!empty($killswitch)) {
                 if ($this->getGetValue('pass') === $killswitch) {
@@ -215,6 +229,44 @@ class Controller
                 }
             }
         } catch (Exception $e) {
+        }
+    }
+
+    /**
+     * Checks if platform if installed
+     * 
+     * @return void|bool
+     */
+    private function checkIfInstalled()
+    {
+        try {
+            if(path !== '/manage/install') {
+                // Fetch current version will throw exception if no database exists
+                $this->model('Setting')->get('version');
+            }
+        } catch (Exception $e) {
+            header('Location: /manage/install');
+            exit();
+        }
+    }
+
+    /**
+     * Checks if platform needs updates
+     * 
+     * @return void
+     */
+    private function checkForUpdates()
+    {
+        try {
+            if(path !== '/manage/update') {
+                $version = $this->model('Setting')->get('version');
+                if($version !== version) {
+                    throw new Exception('ezXSS is not up-to-date');
+                }
+            }
+        } catch (Exception $e) {
+            header('Location: /manage/update');
+            exit();
         }
     }
 }

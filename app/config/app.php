@@ -11,3 +11,6 @@ define('host', e($_SERVER['HTTP_HOST']));
 
 // Defines the current url
 define('url', e("//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"));
+
+// Defines the current path
+define('path', e($_SERVER['REQUEST_URI']));
