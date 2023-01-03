@@ -234,6 +234,31 @@ class View
         return file_get_contents($file);
     }
 
+    public function getAlert($alert) 
+    {
+        $file = __DIR__ . "/../app/views/alerts/$alert";
+        if (!is_file($file)) {
+            throw new Exception('Alert not found');
+        }
+        return file_get_contents($file);
+    }
+
+    public function renderAlertData($template, $data) {
+        $content = $template;
+        preg_match_all('/{{(.*?)}}/', $template, $matches);
+        foreach ($matches[1] as $key => $value) {
+            if (is_object($data->{$matches[1][$key]})) {
+                $data->{$matches[1][$key]} = json_encode($data->{$matches[1][$key]});
+            }
+            $content = str_replace(
+                $matches[0][$key],
+                substr(!empty($data->{$matches[1][$key]}) ? $data->{$matches[1][$key]} : 'None', 0, 1024),
+                $content
+            );
+        }
+        return $content;
+    }
+
     /**
      * Surrounds the body content with the header and footer
      *

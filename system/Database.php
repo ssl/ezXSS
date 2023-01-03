@@ -159,6 +159,15 @@ class Database
     }
 
     /**
+     * Returns last inserted id
+     *
+     * @return string
+     */
+    public function lastInsertId() {
+        return $this->connection->lastInsertId();
+    }
+
+    /**
      * Returns type by value
      *
      * @param mixed $value

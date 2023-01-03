@@ -105,7 +105,7 @@ class Report_model extends Model
             throw new Exception("Something unexpected went wrong");
         }
 
-        return true;
+        return $database->lastInsertId();
     }
 
     public function searchForDublicates($cookies, $dom, $origin, $referer, $uri, $userAgent, $ip) {

@@ -1,0 +1,48 @@
+{
+    "username": "ezXSS",
+    "embeds": [
+        {
+            "title": "[ezXSS] XSS Report #{{id}}",
+            "type": "rich",
+            "url": "https://example.com/manage/reports/view/{{id}}",
+            "timestamp": "{{timestamp}}",
+            "color": 2924135,
+            "fields": [
+                {
+                    "name": "URL",
+                    "value": "{{uri}}"
+                },
+                {
+                    "name": "IP",
+                    "value": "{{ip}}"
+                },
+                {
+                    "name": "Referer",
+                    "value": "{{referer}}"
+                },
+                {
+                    "name": "Payload",
+                    "value": "{{payload}}"
+                },
+                {
+                    "name": "User Agent",
+                    "value": "{{user-agent}}"
+                },
+                {
+                    "name": "Cookies",
+                    "value": "{{cookies}}"
+                },
+                {
+                    "name": "Origin",
+                    "value": "{{origin}}"
+                }
+            ],
+            "image": {
+                "url": "{{screenshot}}"
+            },
+            "footer": {
+                "text": "github.com/ssl/ezXSS"
+            }
+        }
+    ]
+}
