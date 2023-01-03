@@ -3,6 +3,12 @@ $(document).ready(function () {
         columnDefs: [
             { orderable: false, targets: [0, 1] }
         ],
-        order: [[2, 'desc']]
+        order: [[1, 'desc']],
+        orderMulti: false,
+        columns: [
+            {
+                width: 110
+            },{},{},{},{width:50}
+        ]
     });
 });

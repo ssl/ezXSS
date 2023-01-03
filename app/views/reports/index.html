@@ -21,7 +21,7 @@
             <div class="row">
 
                 <div class="col-lg-12">
-                    <select class="form-control" id="payloadListReport" name="payloadListReport">
+                    <select class="form-control content-select" id="payloadListReport" name="payloadListReport">
                         {%foreach payload}
                         <option value="{payload->id}" {payload->selected}>{payload->name}</option>
                         {%/foreach}
@@ -36,16 +36,15 @@
                             {%if hasReports}
                             <div class="table-responsive">
 
-                                <table id="reports" class="table" style="white-space: nowrap;">
+                                <table id="reports" class="table" style="white-space: nowrap;width:100%;">
                                     <thead>
                                         <tr>
                                             <th style="width:4%">
-                                                <label class="checkbox-label">
+                                                <label class="reports-checkbox-label">
                                                     <input id="select-all" name="select-all" type="checkbox">
-                                                    <span class="checkbox-custom rectangular" style="top:-12px"></span>
+                                                    <span class="reports-checkbox-custom rectangular" style="top:4px!important"></span>
                                                 </label>
                                             </th>
-                                            <th style="width:10%">View</th>
                                             <th style="width:3%">ID</th>
                                             <th>URL</th>
                                             <th>IP</th>
@@ -56,20 +55,18 @@
                                         {%foreach report}
                                         <tr id="{report->id}">
                                             <td scope=row style="width:50px;max-width:50px;border-color:#5b6187">
-                                                <label class="checkbox-label" for="chk_{report->id}">
+                                                <label class="reports-checkbox-label" for="chk_{report->id}">
                                                     <input class="chkbox" type="checkbox" name="selected"
                                                         value="{report->id}" id="chk_{report->id}"
                                                         report-id="{report->id}">
-                                                    <span class="checkbox-custom rectangular" style="top:-12px"></span>
+                                                    <span class="reports-checkbox-custom rectangular"></span>
                                                 </label>
-                                            </td>
 
-                                            <td>
                                                 <div class="btn-group btn-view" style="width:100px;max-width:100px;"
                                                     role=group>
-                                                    <a href="/manage/reports/view/{report->id}" class=btn>View</a>
+                                                    <a href="/manage/reports/view/{report->id}" class="btn pretty-border">View</a>
                                                     <div class=btn-group role=group>
-                                                        <button type=button class="btn btn-default dropdown-toggle"
+                                                        <button type=button class="btn btn-default dropdown-toggle pretty-border"
                                                             data-toggle=dropdown aria-haspopup=true aria-expanded=true>
                                                             <span class=caret></span>
                                                         </button>

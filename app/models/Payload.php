@@ -102,7 +102,7 @@ class Payload_model extends Model
     public function getByPayload($payload)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM payloads WHERE payload = :payload ORDER BY id DESC LIMIT 1');
+        $database->prepare('SELECT * FROM payloads WHERE payload = :payload ORDER BY id ASC LIMIT 1');
         $database->bindValue(':payload', $payload);
         $database->execute();
 

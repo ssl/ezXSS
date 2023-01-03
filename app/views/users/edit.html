@@ -51,6 +51,26 @@
                     </div>
                 </div>
 
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Add payloads</div>
+                        <div class="panel-body">
+                            <form class="form" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+
+                                <div class="form-group">
+                                    <label class="control-label" for="payload">Payload domain/URI</label>
+                                    <small>This can be any (sub)domain and/or path linked to your ezXSS
+                                        platform.</small>
+                                    <input class="form-control" id="payload" name="payload" type="text"
+                                        placeholder="example.{domain[]}/example">
+                                </div>
+                                <p>When no path is given payload is valid for domain/*</p>
+                                <button type="submit" name="add" class="btn">Add</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
@@ -78,28 +98,6 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Add payloads</div>
-                        <div class="panel-body">
-                            <form class="form" method="post">
-                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-
-                                <div class="form-group">
-                                    <label class="control-label" for="payload">Payload domain/URI</label>
-                                    <small>This can be any (sub)domain and/or path linked to your ezXSS
-                                        platform.</small>
-                                    <input class="form-control" id="payload" name="payload" type="text"
-                                        placeholder="example.{domain[]}/example">
-                                </div>
-                                <p>When no path is given payload is valid for domain/*</p>
-                                <button type="submit" name="add" class="btn">Add</button>
-                            </form>
                         </div>
                     </div>
                 </div>

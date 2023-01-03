@@ -149,7 +149,9 @@ class Reports extends Controller
         // Remove or keep reports depending the requested archive value
         $archive = $this->getGetValue('archive') == '1' ? true : false;
         foreach ($reports as $key => $value) {
-            $reports[$key]['uri'] = substr($reports[$key]['uri'], 0, 70);
+            $reports[$key]['uri'] = substr($reports[$key]['uri'], 0, 85);
+            $reports[$key]['ip'] = substr($reports[$key]['ip'], 0, 25);
+            $reports[$key]['payload'] = substr($reports[$key]['payload'], 0, 50);
 
             if (($reports[$key]['archive'] == '0' && $archive) ||
                 ($reports[$key]['archive'] == '1' && !$archive)
