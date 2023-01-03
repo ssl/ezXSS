@@ -70,29 +70,29 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="checkbox-label">
-                                                <input {%checked cUri} class="chkbox" name="uri" type="checkbox">
+                                                <input {%checked collect_uri} class="chkbox" name="uri" type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">URL</p>
                                             <label class="checkbox-label">
-                                                <input {%checked cIP} class="chkbox" name="ip" type="checkbox">
+                                                <input {%checked collect_ip} class="chkbox" name="ip" type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">IP</p>
                                             <label class="checkbox-label">
-                                                <input {%checked cReferer} class="chkbox" name="referer"
+                                                <input {%checked collect_referer} class="chkbox" name="referer"
                                                     type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Referer</p>
                                             <label class="checkbox-label">
-                                                <input {%checked cUserAgent} class="chkbox" name="user-agent"
+                                                <input {%checked collect_user-agent} class="chkbox" name="user-agent"
                                                     type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">User Agent</p>
                                             <label class="checkbox-label">
-                                                <input {%checked cCookies} class="chkbox" name="cookies"
+                                                <input {%checked collect_cookies} class="chkbox" name="cookies"
                                                     type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
@@ -102,29 +102,30 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="checkbox-label">
-                                                <input {%checked cLocalStorage} class="chkbox" name="localstorage"
-                                                    type="checkbox">
+                                                <input {%checked collect_localstorage} class="chkbox"
+                                                    name="localstorage" type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Local Storage</p>
                                             <label class="checkbox-label">
-                                                <input {%checked cSessionStorage} class="chkbox" name="sessionstorage"
-                                                    type="checkbox">
+                                                <input {%checked collect_sessionstorage} class="chkbox"
+                                                    name="sessionstorage" type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Session Storage</p>
                                             <label class="checkbox-label">
-                                                <input {%checked cDOM} class="chkbox" name="dom" type="checkbox">
+                                                <input {%checked collect_dom} class="chkbox" name="dom" type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">DOM</p>
                                             <label class="checkbox-label">
-                                                <input {%checked cOrigin} class="chkbox" name="origin" type="checkbox">
+                                                <input {%checked collect_origin} class="chkbox" name="origin"
+                                                    type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
                                             <p class="checkbox-text">Origin</p>
                                             <label class="checkbox-label">
-                                                <input {%checked cScreenshot} class="chkbox" name="screenshot"
+                                                <input {%checked collect_screenshot} class="chkbox" name="screenshot"
                                                     type="checkbox">
                                                 <span class="checkbox-custom rectangular"></span>
                                             </label>
@@ -224,8 +225,8 @@
 
                                     <div class="form-group">
                                         <label class="control-label">Chat ID</label>
-                                        <input type="text" name="chatid" id="chatid" class="form-control" placeholder="123456789"
-                                            value="{%data telegramChatID}">
+                                        <input type="text" name="chatid" id="chatid" class="form-control"
+                                            placeholder="123456789" value="{%data telegramChatID}">
                                     </div>
                                     <button name="global-alert" type="submit" class="btn">Save</button>
 
@@ -242,7 +243,8 @@
                                     <div class="form-group">
                                         <label class="control-label">Webhook URL</label>
                                         <input type="text" name="slack_webhook" class="form-control"
-                                            placeholder="https://hooks.slack.com/services/T00000000/B00000000/XXXX..." value="{%data slackWebhook}">
+                                            placeholder="https://hooks.slack.com/services/T00000000/B00000000/XXXX..."
+                                            value="{%data slackWebhook}">
                                     </div>
                                     <button name="global-alert" type="submit" class="btn">Save</button>
 
@@ -259,7 +261,8 @@
                                     <div class="form-group">
                                         <label class="control-label">Webhook URL</label>
                                         <input type="text" name="discord_webhook" class="form-control"
-                                            placeholder="https://discordapp.com/api/webhooks/1038928198292..." value="{%data discordWebhook}">
+                                            placeholder="https://discordapp.com/api/webhooks/1038928198292..."
+                                            value="{%data discordWebhook}">
                                     </div>
 
                                     <button name="global-alert" type="submit" class="btn">Save</button>
@@ -283,25 +286,25 @@
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
 
                                 <label class="checkbox-label">
-                                    <input {%checked mailOn} class="chkbox" name="mailon" type="checkbox">
+                                    <input {%checked alert-mail} class="chkbox" name="mailon" type="checkbox">
                                     <span class="checkbox-custom rectangular"></span>
                                 </label>
                                 <p class="checkbox-text">Enable email alerts</p>
 
                                 <label class="checkbox-label">
-                                    <input {%checked telegramOn} class="chkbox" name="telegramon" type="checkbox">
+                                    <input {%checked alert-telegram} class="chkbox" name="telegramon" type="checkbox">
                                     <span class="checkbox-custom rectangular"></span>
                                 </label>
                                 <p class="checkbox-text">Enable Telegram alerts</p>
 
                                 <label class="checkbox-label">
-                                    <input {%checked slackOn} class="chkbox" name="slackon" type="checkbox">
+                                    <input {%checked alert-slack} class="chkbox" name="slackon" type="checkbox">
                                     <span class="checkbox-custom rectangular"></span>
                                 </label>
                                 <p class="checkbox-text">Enable Slack alerts</p>
 
                                 <label class="checkbox-label">
-                                    <input {%checked discordOn} class="chkbox" name="discordon" type="checkbox">
+                                    <input {%checked alert-discord} class="chkbox" name="discordon" type="checkbox">
                                     <span class="checkbox-custom rectangular"></span>
                                 </label>
                                 <p class="checkbox-text">Enable Discord alerts</p>
@@ -318,7 +321,7 @@
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <label class="checkbox-label">
-                                    <input {%checked callbackOn} class="chkbox" name="callbackon" type="checkbox">
+                                    <input {%checked alert-callback} class="chkbox" name="callbackon" type="checkbox">
                                     <span class="checkbox-custom rectangular"></span>
                                 </label>
                                 <p class="checkbox-text">Enable custom callback alert</p>

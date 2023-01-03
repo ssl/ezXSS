@@ -2,24 +2,34 @@
 
 class Users extends Controller
 {
-
-    public $ranks = [
-        0 => 'Banned',
-        1 => 'User',
-        7 => 'Admin'
-    ];
+    /**
+     * Summary of ranks
+     * 
+     * @var array
+     */
+    public $ranks = [0 => 'Banned', 1 => 'User', 7 => 'Admin'];
 
     /**
-     * Account index. This holds all pastes by the user
+     * Constructor that always validates if user is admin or not
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        // Validate if user is admin
+        $this->isAdminOrExit();
+    }
+
+    /**
+     * Renders the users index and returns the content.
      *
      * @return string
      */
     public function index()
     {
-        $this->isAdminOrExit();
         $this->view->setTitle('Users');
         $this->view->renderTemplate('users/index');
 
+        // Check if request is trying to create user
         if ($this->isPOST()) {
             try {
                 $this->validateCsrfToken();
@@ -28,73 +38,91 @@ class Users extends Controller
                 $password = $this->getPostValue('password');
                 $rank = intval($this->getPostValue('rank'));
 
+                // Validate rank type
                 if (!isset($this->ranks[$rank])) {
                     throw new Exception("Invalid rank");
                 }
 
+                // Try to create user
                 $this->model('User')->create($username, $password, $rank);
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
         }
 
+        // Renders user list on page
         $users = $this->model('User')->getAllUsers();
-        foreach ($users as $key => $value) {
-            $users[$key]['rank'] = $this->ranks[intval($users[$key]['rank'])];
-            
-            $payloads = $this->model('Payload')->getAllByUserId($users[$key]['id']);
-            $payloadString = $users[$key]['rank'] == 'Admin' ? '*, ' : '';
-            foreach($payloads as $payload) {
+        foreach ($users as &$user) {
+            // Translate rank id to readable name
+            $user['rank'] = $this->ranks[$user['rank']];
+
+            // Create list of all payloads of user
+            $payloads = $this->model('Payload')->getAllByUserId($user['id']);
+            $payloadString = $user['rank'] == 'Admin' ? '*, ' : '';
+            foreach ($payloads as $payload) {
                 $payloadString .= e($payload['payload']) . ', ';
             }
             $payloadString = $payloadString === '' ? $payloadString : substr($payloadString, 0, -2);
-            $payloadString = (strlen($payloadString) > 35) ? substr($payloadString,0,35).'...' : $payloadString;
-            $users[$key]['payloads'] = $payloadString;
+            $payloadString = (strlen($payloadString) > 35) ? substr($payloadString, 0, 35) . '...' : $payloadString;
+            $user['payloads'] = $payloadString;
         }
         $this->view->renderDataset('user', $users);
 
         return $this->showContent();
     }
 
+    /**
+     * Renders or edits the user edit and returns the content.
+     * 
+     * @param string $id The user id
+     * @throws Exception
+     * @return string
+     */
     public function edit($id)
     {
-        $this->isAdminOrExit();
         $this->view->setTitle('Edit User');
         $this->view->renderTemplate('users/edit');
 
         $userModel = $this->model('User');
+        $user = $userModel->getById($id);
+
         if ($this->isPOST()) {
             try {
-                $user = $userModel->getById($id);
+                $this->validateCsrfToken();
 
-                // Editing user
+                // Check if posted data is changing alerts
                 if ($this->getPostValue('edit') !== null) {
                     $username = $this->getPostValue('username');
                     $password = $this->getPostValue('password');
                     $rank = intval($this->getPostValue('rank'));
 
+                    // Prevent editing own user
                     if ($user['id'] == $this->session->data('id')) {
                         throw new Exception("Can't edit your own user");
                     }
 
+                    // Check if posted data wants to change password
                     if ($password != '') {
                         $userModel->updatePassword($user['id'], $password);
                     }
 
+                    // Check if posted data wants to change username
                     if ($username !== $user['username']) {
                         $userModel->updateUsername($user['id'], $username);
                     }
 
+                    // Validate and update rank
                     if (!isset($this->ranks[$rank])) {
-                        throw new Exception("Invalid rank");
+                        throw new Exception('Invalid rank');
                     }
                     $userModel->updateRank($user['id'], $rank);
                 }
 
-                // Add payload
+                // Check if posted data is adding payload
                 if ($this->getPostValue('add') !== null) {
                     $payload = $this->getPostValue('payload');
 
+                    // Validate payload url
                     if (strpos($payload, 'http://') === 0 || strpos($payload, 'https://') === 0 || substr($payload, 0, 1) === '/') {
                         throw new Exception("Payload needs to be in format without http://");
                     }
@@ -106,35 +134,37 @@ class Users extends Controller
             }
         }
 
-        try {
-            $user = $userModel->getById($id);
-            $this->view->renderData('username', $user['username']);
-
-            $this->view->renderData('rankOptions', $this->rankOptions($user['rank']), true);
-
-            $payloads = $this->model('Payload')->getAllByUserId($user['id']);
-            $this->view->renderDataset('payload', $payloads);
-        } catch (Exception $e) {
-            return $this->view->renderErrorPage($e->getMessage());
-        }
+        // Render user data
+        $payloads = $this->model('Payload')->getAllByUserId($user['id']);
+        $this->view->renderDataset('payload', $payloads);
+        $this->view->renderData('username', $user['username']);
+        $this->view->renderData('rankOptions', $this->rankOptions($user['rank']), true);
 
         return $this->showContent();
     }
 
+    /**
+     * Deletes user account
+     * 
+     * @param string $id The user id
+     * @throws Exception
+     * @return string
+     */
     public function delete($id)
     {
-        $this->isAdminOrExit();
         $this->view->setTitle('Delete User');
         $this->view->renderTemplate('users/delete');
 
+        // Retrieve user by id
         $user = $this->model('User')->getById($id);
         $this->view->renderData('username', $user['username']);
 
         if ($this->isPOST()) {
             $this->validateCsrfToken();
 
+            // Prevent deleting own user
             if ($user['id'] == $this->session->data('id')) {
-                throw new Exception("Can't delete your own account");
+                throw new Exception("Can't delete your own user");
             }
 
             $this->model('User')->deleteById($id);
@@ -144,21 +174,35 @@ class Users extends Controller
         return $this->showContent();
     }
 
+    /**
+     * Deletes a users payload
+     * 
+     * @param string $id The payload id
+     * @throws Exception
+     * @return string
+     */
     public function deletePayload($id)
     {
-        $this->isAdminOrExit();
         $this->validateCsrfToken();
 
+        // Check if payload is not default payload
         if (!+$id) {
             throw new Exception("Can't delete this payload");
         }
 
+        // Delete payload
         $this->model('Payload')->getById($id);
         $this->model('Payload')->deleteById($id);
 
-        return json_encode(['true']);
+        return json_encode([1]);
     }
 
+    /**
+     * Creates and returns select box of available ranks
+     * 
+     * @param int $default The id of the current selected payload
+     * @return string
+     */
     private function rankOptions($default = 0)
     {
         $html = '';

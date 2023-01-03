@@ -32,7 +32,7 @@ class Session
     /**
      * Create a session
      *
-     * @param array $account
+     * @param array $user The user data
      * @return void
      */
     public function createSession($user)
@@ -59,7 +59,7 @@ class Session
     /**
      * Returns session data
      *
-     * @param string $param
+     * @param string $param The param
      * @return string
      */
     public function data($param)

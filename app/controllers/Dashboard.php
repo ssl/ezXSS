@@ -2,16 +2,14 @@
 
 class Dashboard extends Controller
 {
-
     /**
-     * User dashboard
+     * Renders the users dashboard and returns the content.
      *
      * @return string
      */
     public function my()
     {
         $this->isLoggedInOrExit();
-
         $this->view->setTitle('Account');
         $this->view->renderTemplate('dashboard/my');
 
@@ -19,28 +17,30 @@ class Dashboard extends Controller
     }
 
     /**
-     * Admin dashboard
+     * Renders the admin dashboard and returns the content.
      *
      * @return string
      */
     public function index()
     {
         $this->isAdminOrExit();
-
         $this->view->setTitle('Account');
         $this->view->renderTemplate('dashboard/index');
 
-        if($this->isPOST()) {
+        // Set and render notepad value
+        if ($this->isPOST()) {
             $this->validateCsrfToken();
             $this->model('Setting')->set('notepad', $this->getPostValue('notepad'));
         }
+        $this->view->renderData('notepad', $this->model('Setting')->get('notepad'));
 
+        // Check ezXSS updates
         try {
             $ch = curl_init('https://status.ezxss.com/?v=' . version);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, ['User-Agent: ezXSS']);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
             $release = json_decode(curl_exec($ch), true);
         } catch (Exception $e) {
             $release = [['?', '?', '?']];
@@ -48,8 +48,6 @@ class Dashboard extends Controller
         $this->view->renderData('repoVersion', $release[0]['release']);
         $this->view->renderData('repoBody', $release[0]['body']);
         $this->view->renderData('repoUrl', $release[0]['zipball_url']);
-
-        $this->view->renderData('notepad', $this->model('Setting')->get('notepad'));
 
         return $this->showContent();
     }

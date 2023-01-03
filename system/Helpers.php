@@ -12,7 +12,12 @@ function e($value)
     return htmlspecialchars($value, ENT_QUOTES);
 }
 
-
+/**
+ * Gets current auth code of provided secret
+ * 
+ * @param mixed $secret The MFA secret
+ * @return string
+ */
 function getAuthCode($secret): string
 {
     $secretKey = baseDecode($secret);
@@ -22,6 +27,12 @@ function getAuthCode($secret): string
     return str_pad($value % (10 ** 6), 6, '0', STR_PAD_LEFT);
 }
 
+/**
+ * base32 decodes a string
+ * 
+ * @param mixed $data The string
+ * @return string
+ */
 function baseDecode($data): string
 {
     $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';

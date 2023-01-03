@@ -2,15 +2,20 @@
 
 class User_model extends Model
 {
-
+    /**
+     * Summary of table
+     * 
+     * @var string
+     */
     public $table = 'users';
 
     /**
      * Validates login and returns user
      *
-     * @param string $username
-     * @param string $password
-     * @return Exception|array
+     * @param string $username The username
+     * @param string $password The password
+     * @throws Exception
+     * @return bool
      */
     public function login($username, $password)
     {
@@ -38,9 +43,10 @@ class User_model extends Model
     /**
      * Update password
      *
-     * @param int $id
-     * @param string $password
-     * @return Exception|bool
+     * @param int $id The user id
+     * @param string $password The password
+     * @throws Exception
+     * @return bool
      */
     public function updatePassword($id, $password)
     {
@@ -64,6 +70,14 @@ class User_model extends Model
         return true;
     }
 
+    /**
+     * Updates username
+     * 
+     * @param int $id The user id
+     * @param string $username The new username
+     * @throws Exception
+     * @return bool
+     */
     public function updateUsername($id, $username)
     {
         $database = Database::openConnection();
@@ -92,6 +106,14 @@ class User_model extends Model
         return true;
     }
 
+    /**
+     * Update rank
+     * 
+     * @param int $id The user id
+     * @param int $rank The new rank
+     * @throws Exception
+     * @return bool
+     */
     public function updateRank($id, $rank)
     {
         $database = Database::openConnection();
@@ -107,6 +129,14 @@ class User_model extends Model
         return true;
     }
 
+    /**
+     * Updates secret
+     * 
+     * @param int $id The user id
+     * @param string $secret The new secret
+     * @throws Exception
+     * @return bool
+     */
     public function updateSecret($id, $secret)
     {
         $database = Database::openConnection();
@@ -123,11 +153,12 @@ class User_model extends Model
     }
 
     /**
-     * Creates an new user
+     * Creates an new account
      *
-     * @param string $username
-     * @param string $password
-     * @return Exception|array
+     * @param string $username The username
+     * @param string $password The password
+     * @throws Exception
+     * @return bool
      */
     public function create($username, $password, $rank)
     {
@@ -186,8 +217,9 @@ class User_model extends Model
     /**
      * Return user by id
      *
-     * @param int $id
-     * @return Exception|array
+     * @param int $id The user id
+     * @throws Exception
+     * @return bool
      */
     public function getById($id)
     {
@@ -206,8 +238,9 @@ class User_model extends Model
     /**
      * Delete user by id
      *
-     * @param int $id
-     * @return Exception|bool
+     * @param int $id The user id
+     * @throws Exception
+     * @return bool
      */
     public function deleteById($id)
     {

@@ -2,13 +2,17 @@
 
 class View
 {
-
     /**
-     * @var [type]
+     * Current page content
+     * 
+     * @var string
      */
     private $content;
+
     /**
-     * @var [type]
+     * Current page title
+     * 
+     * @var string
      */
     public $title;
 
@@ -33,7 +37,7 @@ class View
     /**
      * Makes a render of a page with only an error message
      *
-     * @param string $message
+     * @param string $message The error message
      * @return string
      */
     public function renderErrorPage($message)
@@ -48,8 +52,7 @@ class View
     /**
      * Updates the message template with the given message
      *
-     * @param string $message
-     * @param string $type
+     * @param string $message The message
      * @return void
      */
     public function renderMessage($message)
@@ -64,9 +67,9 @@ class View
     /**
      * Updates all the data parameters with the correct data
      *
-     * @param string $param
-     * @param string $value
-     * @param bool $plain
+     * @param string $param The param
+     * @param string $value The value
+     * @param bool $plain Text or HTML
      * @return void
      */
     public function renderData($param, $value, $plain = false)
@@ -85,8 +88,9 @@ class View
     /**
      * Updates all if statements in the view template based on the given boolean
      *
-     * @param string $condition
-     * @param bool $bool
+     * @param string $condition The condition name
+     * @param bool $bool The condition value
+     * @param bool $falseCondition Whether condition is true or false
      * @return void
      */
     public function renderCondition($condition, $bool, $falseCondition = false)
@@ -120,6 +124,13 @@ class View
         }
     }
 
+    /**
+     * Renders a checked checkbox if checked
+     * 
+     * @param mixed $name The checkbox name
+     * @param mixed $checked Whether checked or not
+     * @return void
+     */
     public function renderChecked($name, $checked)
     {
         $content = $this->getContent();
@@ -129,17 +140,12 @@ class View
         $this->content = $content;
     }
 
-    public function renderOptions()
-    {
-        //todo?
-    }
-
     /**
      * Renders a dataset in a foreach block, for example for in tables
      *
-     * @param string $name
-     * @param array $data
-     * @param bool $plain
+     * @param string $name The data set name
+     * @param array $data The data to go in
+     * @param bool $plain Text or HTML
      * @return void
      */
     public function renderDataset($name, $data, $plain = false)
@@ -182,7 +188,7 @@ class View
     /**
      * Renders the content of a function given
      *
-     * @param string $view
+     * @param string $view The view name
      * @return void
      */
     public function renderTemplate($view)
@@ -206,6 +212,12 @@ class View
         $this->renderCondition('isLoggedIn', $this->session('rank') > 0);
     }
 
+    /**
+     * Renders the content of a payload
+     * 
+     * @param mixed $payload The payload name
+     * @return void
+     */
     public function renderPayload($payload)
     {
         $content = $this->getPayload($payload);
@@ -225,6 +237,13 @@ class View
         $this->content = $content;
     }
 
+    /**
+     * Get payload by payload name
+     * 
+     * @param string $payload The payload name
+     * @throws Exception
+     * @return string
+     */
     public function getPayload($payload)
     {
         $file = __DIR__ . "/../app/views/payloads/$payload.js";
@@ -234,6 +253,13 @@ class View
         return file_get_contents($file);
     }
 
+    /**
+     * Get alert by alert name
+     * 
+     * @param string $alert The alert name
+     * @throws Exception
+     * @return string
+     */
     public function getAlert($alert) 
     {
         $file = __DIR__ . "/../app/views/alerts/$alert";
@@ -243,6 +269,13 @@ class View
         return file_get_contents($file);
     }
 
+    /**
+     * Renders the data within a alert template
+     * 
+     * @param string $template The template
+     * @param string|object $data The data
+     * @return string
+     */
     public function renderAlertData($template, $data) {
         $content = $template;
         preg_match_all('/{{(.*?)}}/', $template, $matches);
@@ -262,7 +295,7 @@ class View
     /**
      * Surrounds the body content with the header and footer
      *
-     * @param string $view
+     * @param string $view The view name
      * @return string
      */
     public function surroundBody($view)
@@ -277,7 +310,7 @@ class View
     /**
      * Returns HTML block of the given view
      *
-     * @param string $file
+     * @param string $file The file name
      * @return string
      */
     private function getHtml($file)
@@ -292,7 +325,7 @@ class View
     /**
      * Last function in controller to return all content from how its build
      *
-     * @return void
+     * @return string
      */
     public function showContent()
     {
@@ -302,7 +335,7 @@ class View
     /**
      * Returns correct page title with site name
      *
-     * @return void
+     * @return string
      */
     public function title()
     {
@@ -312,7 +345,7 @@ class View
     /**
      * Get's session data
      *
-     * @param string $param
+     * @param string $param The param
      * @return string
      */
     public function session($param)
@@ -350,21 +383,28 @@ class View
         return e(version);
     }
 
+    /**
+     * Returns current file name
+     * 
+     * @return string
+     */
     public function fileName()
     {
         return e(ltrim($_SERVER['REQUEST_URI'], '/'));
     }
 
-    public function theme()
-    {
-        return ''; // todo
-    }
-
-    public function currentPage($page, $hitFirst = false)
+    /**
+     * Returns menu-active for the menu when its the current page
+     * 
+     * @param string $page The page to check
+     * @return string
+     */
+    public function currentPage($page)
     {
         $uri = $_SERVER['REQUEST_URI'] ?? '';
         $uriParts = explode('/', $uri);
 
+        // Check current page for reporting pages
         if ((substr($page, -2) === '*0' || substr($page, -2) === '*1') && isset($uriParts[2]) && $uriParts[2] == 'reports') {
             if(isset($_GET['archive']) && $_GET['archive'] == '1') {
                 if(substr($page, -2) === '*0') {
@@ -376,6 +416,8 @@ class View
                 }
             }
         }
+
+        // Check other type of pages
         if (substr($page, -1) === '*' && isset($uriParts[2]) && $uriParts[2] == substr($page, 0, -1)) {
             return 'menu-active';
         }
@@ -395,13 +437,13 @@ class View
      */
     public function domain()
     {
-        return e($_SERVER['HTTP_HOST']);
+        return host;
     }
 
     /**
      * Set's title
      *
-     * @param string $title
+     * @param string $title The new title
      * @return void
      */
     public function setTitle($title)
@@ -412,7 +454,8 @@ class View
     /**
      * Set's content type
      *
-     * @return string
+     * @param string $type The new content type
+     * @return void
      */
     public function setContentType($type)
     {

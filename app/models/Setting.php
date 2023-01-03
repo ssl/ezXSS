@@ -2,9 +2,18 @@
 
 class Setting_model extends Model
 {
-
+    /**
+     * Summary of table
+     * 
+     * @var string
+     */
     public $table = 'settings';
 
+    /**
+     * Get all settings
+     * 
+     * @return array
+     */
     public function getAll()
     {
         $database = Database::openConnection();
@@ -15,6 +24,14 @@ class Setting_model extends Model
         return $data;
     }
 
+    /**
+     * Set setting value
+     * 
+     * @param string $setting The setting name
+     * @param string $value The new value
+     * @throws Exception
+     * @return bool
+     */
     public function set($setting, $value) {
         $database = Database::openConnection();
 
@@ -29,6 +46,13 @@ class Setting_model extends Model
         return true;
     }
 
+    /**
+     * Get setting value
+     * 
+     * @param string $setting The setting name
+     * @throws Exception
+     * @return mixed
+     */
     public function get($setting)
     {
         $database = Database::openConnection();

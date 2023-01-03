@@ -2,9 +2,10 @@
 
 class Model
 {
-
     /**
-     * @var null
+     * Table
+     * 
+     * @var mixed
      */
     public $table = null;
 
@@ -22,7 +23,7 @@ class Model
     /**
      * Checks if row with id exists
      *
-     * @param int $id
+     * @param int $id The row id
      * @return bool
      */
     public function exists($id)

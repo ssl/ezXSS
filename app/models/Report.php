@@ -2,10 +2,18 @@
 
 class Report_model extends Model
 {
-
+    /**
+     * Summary of table
+     * 
+     * @var string
+     */
     public $table = 'reports';
 
-
+    /**
+     * Get all reports
+     * 
+     * @return array
+     */
     public function getAll()
     {
         $database = Database::openConnection();
@@ -17,6 +25,13 @@ class Report_model extends Model
         return $data;
     }
 
+    /**
+     * Get report by id
+     * 
+     * @param int $id The report id
+     * @throws Exception
+     * @return array
+     */
     public function getById($id)
     {
         $database = Database::openConnection();
@@ -31,6 +46,13 @@ class Report_model extends Model
         return $report;
     }
 
+    /**
+     * Get report by share id
+     * 
+     * @param mixed $id The share id
+     * @throws Exception
+     * @return array
+     */
     public function getByShareId($id)
     {
         $database = Database::openConnection();
@@ -47,43 +69,83 @@ class Report_model extends Model
         return $report;
     }
 
+    /**
+     * Get report by payload
+     * @param string $payload The payload
+     * @throws Exception
+     * @return array
+     */
     public function getAllByPayload($payload)
     {
         $database = Database::openConnection();
         $database->prepare('SELECT id,uri,ip,payload,archive,shareid FROM reports WHERE payload LIKE :payload ORDER BY id DESC');
         $database->bindValue(':payload', $payload);
-        $database->execute();
+        
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
 
-        $data = $database->fetchAll();
-
-        return $data;
+        return $database->fetchAll();
     }
 
+    /**
+     * Get all statictics data
+     * 
+     * @throws Exception
+     * @return array
+     */
     public function getAllStaticticsData()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT origin,time,payload FROM reports ORDER BY id ASC');
-        $database->execute();
+        $database->prepare('SELECT origin,time,referer FROM reports ORDER BY id ASC');
+        
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
 
-        $data = $database->fetchAll();
-
-        return $data;
+        return $database->fetchAll();
     }
 
+    /**
+     * Get al statictics data by payload
+     * 
+     * @param string $payload The payload
+     * @throws Exception
+     * @return array
+     */
     public function getAllStaticticsDataByPayload($payload)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT origin,time,payload FROM reports WHERE payload LIKE :payload ORDER BY id ASC');
+        $database->prepare('SELECT origin,time,referer,payload FROM reports WHERE payload LIKE :payload ORDER BY id ASC');
         $database->bindValue(':payload', $payload);
-        $database->execute();
 
-        $data = $database->fetchAll();
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
 
-        return $data;
+        return $database->fetchAll();
     }
 
-    public function add($shareId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshotName, $localStorage, $sessionStorage, $payload) {
-
+    /**
+     * Add report
+     * 
+     * @param string $shareId The share id
+     * @param string $cookies The cookies
+     * @param string $dom The HTML dom
+     * @param string $origin The origin
+     * @param string $referer The referer
+     * @param string $uri The url
+     * @param string $userAgent The user agent
+     * @param string $ip The IP
+     * @param string $screenshotName The name of the screenshot
+     * @param string $localStorage The local storage
+     * @param string $sessionStorage The session storage
+     * @param string $payload The payload name
+     * @throws Exception
+     * @return string
+     */
+    public function add($shareId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshotName, $localStorage, $sessionStorage, $payload)
+    {
         $database = Database::openConnection();
 
         $database->prepare('INSERT INTO reports (`shareid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`, `payload`) VALUES (:shareid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage, :payload)');
@@ -108,8 +170,21 @@ class Report_model extends Model
         return $database->lastInsertId();
     }
 
-    public function searchForDublicates($cookies, $dom, $origin, $referer, $uri, $userAgent, $ip) {
-
+    /**
+     * Search for dublicate reports
+     * 
+     * @param string $cookies The cookies
+     * @param string $dom The HTML dom
+     * @param string $origin The origin
+     * @param string $referer The referer
+     * @param string $uri The url
+     * @param string $userAgent The user agent
+     * @param string $ip The IP
+     * @throws Exception
+     * @return bool
+     */
+    public function searchForDublicates($cookies, $dom, $origin, $referer, $uri, $userAgent, $ip)
+    {
         $database = Database::openConnection();
         $database->prepare('SELECT id FROM reports WHERE cookies = :cookies AND dom = :dom AND origin = :origin AND referer = :referer AND uri = :uri AND `user-agent` = :userAgent AND ip = :ip LIMIT 1');
         $database->bindValue(':cookies', $cookies);
@@ -119,17 +194,27 @@ class Report_model extends Model
         $database->bindValue(':uri', $uri);
         $database->bindValue(':userAgent', $userAgent);
         $database->bindValue(':ip', $ip);
-        $database->execute();
+        
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
 
-        $rowCount = $database->countRows();
-
-        if($rowCount > 0) {
+        if ($database->countRows() > 0) {
             return true;
         }
+
         return false;
     }
 
-    public function archiveById($id) {
+    /**
+     * Archive report by id
+     * 
+     * @param string $id The report id
+     * @throws Exception
+     * @return bool
+     */
+    public function archiveById($id)
+    {
         $database = Database::openConnection();
 
         $report = $this->getById($id);
@@ -138,14 +223,21 @@ class Report_model extends Model
         $database->prepare('UPDATE `reports` SET `archive` = :archive WHERE id = :id');
         $database->bindValue(':archive', $archive);
         $database->bindValue(':id', $id);
-        
-        if(!$database->execute()) {
+
+        if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
         }
 
         return true;
     }
 
+    /**
+     * Delete report by id
+     * 
+     * @param string $id The report id
+     * @throws Exception
+     * @return bool
+     */
     public function deleteById($id)
     {
         $database = Database::openConnection();

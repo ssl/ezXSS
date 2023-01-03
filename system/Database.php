@@ -2,14 +2,17 @@
 
 class Database
 {
-
     /**
-     * @var null
+     * Connection
+     * 
+     * @var mixed
      */
     private $connection = null;
 
     /**
-     * @var null
+     * Database
+     * 
+     * @var mixed
      */
     private static $database = null;
 
@@ -30,7 +33,7 @@ class Database
     /**
      * Opens connection
      *
-     * @return class
+     * @return self
      */
     public static function openConnection()
     {
@@ -43,8 +46,8 @@ class Database
     /**
      * Delete row by id
      *
-     * @param string $table
-     * @param int $id
+     * @param string $table The table
+     * @param int $id The id
      * @return void
      */
     public function deleteById($table, $id)
@@ -57,8 +60,8 @@ class Database
     /**
      * Get row by id
      *
-     * @param string $table
-     * @param string $id
+     * @param string $table The table
+     * @param string $id The id
      * @return void
      */
     public function getById($table, $id)
@@ -71,8 +74,8 @@ class Database
     /**
      * Get row by username
      *
-     * @param string $table
-     * @param string $username
+     * @param string $table The table
+     * @param string $username The username
      * @return void
      */
     public function getByUsername($table, $username)
@@ -85,7 +88,7 @@ class Database
     /**
      * Get all rows of table
      *
-     * @param string $table
+     * @param string $table The table
      * @return void
      */
     public function getAll($table)
@@ -97,7 +100,7 @@ class Database
     /**
      * Prepares a query
      *
-     * @param string $query
+     * @param string $query The query
      * @return void
      */
     public function prepare($query)
@@ -108,8 +111,8 @@ class Database
     /**
      * Binds value to prepared query
      *
-     * @param string $param
-     * @param string $value
+     * @param string $param The param
+     * @param string $value The value
      * @return void
      */
     public function bindValue($param, $value)
@@ -163,14 +166,15 @@ class Database
      *
      * @return string
      */
-    public function lastInsertId() {
+    public function lastInsertId()
+    {
         return $this->connection->lastInsertId();
     }
 
     /**
      * Returns type by value
      *
-     * @param mixed $value
+     * @param mixed $value The value to be checked
      * @return mixed
      */
     private static function getPDOType($value)

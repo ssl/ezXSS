@@ -2,12 +2,18 @@
 
 class Reports extends Controller
 {
-    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'screenshot', 'shareid'];
+    /**
+     * Summary of rows
+     * 
+     * @var array
+     */
+    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'shareid'];
 
-    public function __construct() {
-        parent::__construct();
-    }
-
+    /**
+     * Redirects to all reports
+     * 
+     * @return never
+     */
     public function index()
     {
         $this->isLoggedInOrExit();
@@ -16,59 +22,103 @@ class Reports extends Controller
         exit();
     }
 
+    /**
+     * Returns the report view for 0 (all).
+     * 
+     * @return string
+     */
     public function all()
     {
         return $this->list(0);
     }
 
-    public function view($id) {
+    /**
+     * Renders the report view and returns the content.
+     * 
+     * @param string $id The report id
+     * @throws Exception
+     * @return string
+     */
+    public function view($id)
+    {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Report');
         $this->view->renderTemplate('reports/view');
 
         $report = $this->model('Report')->getById($id);
 
-        if(!is_numeric($id) || !$this->hasReportPermissions($id)) {
+        // Check report permissions
+        if (!is_numeric($id) || !$this->hasReportPermissions($id)) {
             throw new Exception('You dont have permissions to this report');
         }
 
-        $this->checkForShareReport();
+        // Check if post is sharing report
+        if ($this->isPost() && $this->getPostValue('reportid') !== null) {
+            $this->shareReport($id);
+        }
+
+        // Render all rows
+        $screenshot = !empty($report['screenshot']) ? '<img src="/assets/img/report-' . e($report['screenshot']) . '.png">' : '';
+        $this->view->renderData('screenshot', $screenshot, true);
+        $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
 
         foreach ($this->rows as $value) {
             $this->view->renderData($value, $report[$value]);
         }
-        $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
 
         return $this->showContent();
     }
 
-    public function share($id) {
+    /**
+     * Renders the shared report view and returns the content.
+     * 
+     * @param string $id The report id
+     * @return string
+     */
+    public function share($id)
+    {
         $this->view->setTitle('Report');
         $this->view->renderTemplate('reports/view');
 
         $report = $this->model('Report')->getByShareId($id);
 
+        // Render all rows
+        $screenshot = !empty($report['screenshot']) ? '<img src="/assets/img/report-' . e($report['screenshot']) . '.png">' : '';
+        $this->view->renderData('screenshot', $screenshot, true);
+        $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
+
         foreach ($this->rows as $value) {
             $this->view->renderData($value, $report[$value]);
         }
-        $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
 
         return $this->showContent();
     }
 
+    /**
+     * Renders the list of all reports within payload and returns the content.
+     * 
+     * @param string $id The payload id
+     * @throws Exception
+     * @return string
+     */
     public function list($id)
     {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Reports');
         $this->view->renderTemplate('reports/index');
 
+        // Check payload permissions
         $payloadList = $this->payloadList();
         if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
             throw new Exception('You dont have permissions to this payload');
         }
 
-        $this->checkForShareReport();
+        // Check if post is sharing report
+        if ($this->isPost() && $this->getPostValue('reportid') !== null) {
+            $this->shareReport($id);
+        }
 
+        // Retrieve and render all payloads of user for listing
         $payloads = [];
         foreach ($payloadList as $val) {
             $name = !$val ? 'All reports' : $this->model('Payload')->getById($val)['payload'];
@@ -76,6 +126,7 @@ class Reports extends Controller
         }
         $this->view->renderDataset('payload', $payloads);
 
+        // Checks if requested id is 'all'
         if (+$id === 0) {
             if ($this->isAdmin()) {
                 // Show all reports
@@ -84,7 +135,7 @@ class Reports extends Controller
                 // Show all reports of allowed payloads
                 $reports = [];
                 foreach ($payloadList as $payloadId) {
-                    if($payloadId !== 0) {
+                    if ($payloadId !== 0) {
                         $payload = $this->model('Payload')->getById($payloadId);
                         $payloadUri = '//' . $payload['payload'];
                         if (strpos($payload['payload'], '/') === false) {
@@ -97,21 +148,22 @@ class Reports extends Controller
         } else {
             // Show reports of payload
             $payload = $this->model('Payload')->getById($id);
-            
+
             $payloadUri = '//' . $payload['payload'];
             if (strpos($payload['payload'], '/') === false) {
                 $payloadUri .= '/%';
             }
-
             $reports = $this->model('Report')->getAllByPayload($payloadUri);
         }
 
+        // Remove or keep reports depending the requested archive value
         $archive = $this->getGetValue('archive') == '1' ? true : false;
         foreach ($reports as $key => $value) {
             $reports[$key]['uri'] = substr($reports[$key]['uri'], 0, 70);
 
-            if( ($reports[$key]['archive'] == '0' && $archive) ||
-                ($reports[$key]['archive'] == '1' && !$archive)) {
+            if (($reports[$key]['archive'] == '0' && $archive) ||
+                ($reports[$key]['archive'] == '1' && !$archive)
+            ) {
                 unset($reports[$key]);
             }
         }
@@ -121,11 +173,19 @@ class Reports extends Controller
         return $this->showContent();
     }
 
-    public function delete($id) {
+    /**
+     * Deletes a report
+     * 
+     * @param string $id The report id
+     * @throws Exception
+     * @return string
+     */
+    public function delete($id)
+    {
         $this->isLoggedInOrExit();
         $this->validateCsrfToken();
 
-        if(!$this->hasReportPermissions($id)) {
+        if (!$this->hasReportPermissions($id)) {
             throw new Exception('You dont have permissions to this report');
         }
 
@@ -134,11 +194,19 @@ class Reports extends Controller
         return json_encode(['true']);
     }
 
-    public function archive($id) {
+    /**
+     * (Un)Archives a report
+     * 
+     * @param string $id The report id
+     * @throws Exception
+     * @return string
+     */
+    public function archive($id)
+    {
         $this->isLoggedInOrExit();
         $this->validateCsrfToken();
 
-        if(!$this->hasReportPermissions($id)) {
+        if (!$this->hasReportPermissions($id)) {
             throw new Exception('You dont have permissions to this report');
         }
 
@@ -147,57 +215,72 @@ class Reports extends Controller
         return json_encode(['true']);
     }
 
-    private function checkForShareReport() {
-        if($this->isPost() && $this->getPostValue('reportid') !== null) {
-            $id = $this->getPostValue('reportid');
-            $report = $this->model('Report')->getById($id);
+    /**
+     * Share a report by domain/mail
+     * 
+     * @param string $id The report id
+     * @throws Exception
+     * @return string
+     */
+    private function shareReport($id)
+    {
+        $report = $this->model('Report')->getById($id);
 
-            if(!is_numeric($id) || !$this->hasReportPermissions($id)) {
-                throw new Exception('You dont have permissions to this report');
-            }
-
-            $this->view->renderMessage('TODO');
+        if (!is_numeric($id) || !$this->hasReportPermissions($id)) {
+            throw new Exception('You dont have permissions to this report');
         }
+
+        $this->view->renderMessage('TODO');
     }
 
-    private function hasReportPermissions($id) {
-        if($this->isAdmin()) {
+    /**
+     * Checks if user is allowed to view report
+     * 
+     * @param string $id The report id
+     * @return bool
+     */
+    private function hasReportPermissions($id)
+    {
+        if ($this->isAdmin()) {
             return true;
         }
 
+        // Get data about report and payloads of user
+        $report = $this->model('Report')->getById($id);
         $user = $this->model('User')->getById($this->session->data('id'));
         $payloads = $this->model('Payload')->getAllByUserId($user['id']);
 
-        $hasPermissions = false;
-        foreach($payloads as $payload) {
+        // Check all payloads if it correspondents to report 
+        foreach ($payloads as $payload) {
             if (strpos($payload['payload'], '/') === false) {
-                // Domain *
+                // Check for domain
                 $payload = '//' . $payload['payload'] . '/';
-                if ( $payload === $report['payload'] || substr( $report['payload'], 0, strlen($payload) ) === $payload) {
-                    $hasPermissions = true;
-                    break;
+                if ($payload === $report['payload'] || substr($report['payload'], 0, strlen($payload)) === $payload) {
+                    return true;
                 }
             } else {
-                // Domain + path
-                if ( '//' . $payload['payload'] === $report['payload']) {
-                    $hasPermissions = true;
-                    break;
+                // Check for domain + path
+                if ('//' . $payload['payload'] === $report['payload']) {
+                    return true;
                 }
             }
-        }
-
-        if($hasPermissions) {
-            return true;
         }
 
         return false;
     }
 
+    /**
+     * Returns the payload list array
+     * 
+     * @return array
+     */
     private function payloadList()
     {
         $payloadList = [];
+        // '0' correspondents to 'all'
         array_push($payloadList, 0);
 
+        // Push all payloads of user to list
         $user = $this->model('User')->getById($this->session->data('id'));
         $payloads = $this->model('Payload')->getAllByUserId($user['id']);
         foreach ($payloads as $payload) {
