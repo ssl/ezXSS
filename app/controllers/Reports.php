@@ -52,11 +52,6 @@ class Reports extends Controller
             throw new Exception('You dont have permissions to this report');
         }
 
-        // Check if post is sharing report
-        if ($this->isPost() && $this->getPostValue('reportid') !== null) {
-            $this->shareReport($id);
-        }
-
         // Render all rows
         $screenshot = !empty($report['screenshot']) ? '<img src="/assets/img/report-' . e($report['screenshot']) . '.png">' : '';
         $this->view->renderData('screenshot', $screenshot, true);
@@ -111,11 +106,6 @@ class Reports extends Controller
         $payloadList = $this->payloadList();
         if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
             throw new Exception('You dont have permissions to this payload');
-        }
-
-        // Check if post is sharing report
-        if ($this->isPost() && $this->getPostValue('reportid') !== null) {
-            $this->shareReport($id);
         }
 
         // Retrieve and render all payloads of user for listing
@@ -213,24 +203,6 @@ class Reports extends Controller
         $this->model('Report')->archiveById($id);
 
         return json_encode(['true']);
-    }
-
-    /**
-     * Share a report by domain/mail
-     * 
-     * @param string $id The report id
-     * @throws Exception
-     * @return string
-     */
-    private function shareReport($id)
-    {
-        $report = $this->model('Report')->getById($id);
-
-        if (!is_numeric($id) || !$this->hasReportPermissions($id)) {
-            throw new Exception('You dont have permissions to this report');
-        }
-
-        $this->view->renderMessage('TODO');
     }
 
     /**
