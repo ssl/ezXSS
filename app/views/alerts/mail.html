@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>ezXSS</title>
+    <style media="screen">
+        .mail {
+            background-color: #23284b;
+            font-family: Roboto Mono, monospace;
+            color: #6e749b;
+            padding: 5px;
+            border-radius: 5px;
+            padding-left: 25px;
+            padding-right: 25px
+        }
+
+        .h {
+            color: #fff;
+            font-size: 24px;
+            margin-bottom: 2px
+        }
+
+        small {
+            font-size: 85%
+        }
+
+        hr {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border: 0;
+            border-top: 1px solid #2b3157
+        }
+
+        .panel {
+            background-color: #2b3157;
+            box-shadow: none;
+            color: #5e648b;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            border: 1px solid transparent
+        }
+
+        .panel-heading {
+            background-color: #343a60;
+            border-bottom: #30355c 3px solid;
+            color: #fff;
+            padding: 10px 15px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px
+        }
+
+        .panel-body {
+            padding-top: 10px;
+            padding: 5px 15px 15px 15px
+        }
+
+        table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 20px;
+            background-color: transparent;
+            border-spacing: 0;
+            border-collapse: collapse
+        }
+
+        tr {
+            display: table-row
+        }
+
+        th {
+            border-top: 0;
+            border-color: #5e648b;
+            border-bottom: none;
+            padding: 8px;
+            vertical-align: middle;
+            color: #fff;
+            width: 150px;
+            text-align: left
+        }
+
+        td {
+            border-color: #5e648b;
+            border-top: 1px solid #5e648b;
+            padding: 8px;
+            vertical-align: middle;
+            line-height: 1.42857143;
+            word-wrap: break-word;
+            max-width: 800px
+        }
+
+        a {
+            color: #5e648b !important
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mail">
+        <div class="view-header">
+            <div class="header-title">
+                <h3 class="h">XSS Report #{{id}}</h3>
+                <small>Get a fast view below or view the whole report on
+                    <a href="https://{{domain}}/manage/reports/view/{{id}}">https://{{domain}}/manage/reports/view/{{id}}</a></small>
+            </div>
+        </div>
+        <hr>
+        <div class="panel">
+            <div class="panel-heading">View report</div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="color: #5e648b;">URL</td>
+                            <td style="color: #5e648b;">{{uri}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">IP</td>
+                            <td style="color: #5e648b;">{{ip}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">Referer</td>
+                            <td style="color: #5e648b;">{{referer}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">Payload</td>
+                            <td style="color: #5e648b;">{{payload}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">User Agent</td>
+                            <td style="color: #5e648b;">{{user-agent}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">Cookies</td>
+                            <td style="color: #5e648b;">{{cookies}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">Local Storage</td>
+                            <td><textarea spellcheck="false"
+                                    style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;resize:vertical">{{localstorage}}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">Session Storage</td>
+                            <td><textarea spellcheck="false"
+                                    style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;resize:vertical">{{sessionstorage}}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">DOM</td>
+                            <td><textarea spellcheck="false"
+                                    style="width: 100%;color: #5e648b;height: 100px;background-color: transparent;border-color: #52587e;resize:vertical">{{dom}}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">Origin</td>
+                            <td style="color: #5e648b;">{{origin}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">Time</td>
+                            <td style="color: #5e648b;">{{timestamp}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #5e648b;">Screenshot</td>
+                            <td>{{screenshot}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
