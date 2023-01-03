@@ -56,7 +56,7 @@
                                         {%foreach report}
                                         <tr id="{report->id}">
                                             <td scope=row style="width:50px;max-width:50px;border-color:#5b6187">
-                                                <label class="checkbox-label">
+                                                <label class="checkbox-label" for="chk_{report->id}">
                                                     <input class="chkbox" type="checkbox" name="selected"
                                                         value="{report->id}" id="chk_{report->id}"
                                                         report-id="{report->id}">

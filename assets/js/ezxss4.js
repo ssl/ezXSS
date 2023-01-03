@@ -94,16 +94,18 @@ $(document).ready(function () {
 
     $(".delete-selected").click(function () {
         $.each($("input[name='selected']:checked"), function () {
-            request("/manage/reports/delete/" + $(this).val()).then(function (r) {
-                $("#" + $(this).val()).fadeOut("slow", function () { });
+            const id = $(this).val();
+            request("/manage/reports/delete/" + id).then(function (r) {
+                $("#" + id).fadeOut("slow", function () { });
             });
         });
     });
 
     $(".archive-selected").click(function () {
         $.each($("input[name='selected']:checked"), function () {
-            request("/manage/reports/archive/" + $(this).val()).then(function (r) {
-                $("#" + $(this).val()).fadeOut("slow", function () { });
+            const id = $(this).val();
+            request("/manage/reports/archive/" + id).then(function (r) {
+                $("#" + id).fadeOut("slow", function () { });
             });
         });
     });
@@ -187,18 +189,29 @@ $(document).ready(function () {
         }
     });
 
-    var lastChecked = null;
-    const checkboxes = $('.chkbox');
-    checkboxes.click(function (e) {
+    var lastChecked;
+
+    $('label').on('mousedown', function (e) {
+        // Find the checkbox associated with the clicked label
+        var checkbox = $('#' + $(this).attr('for'));
+
         if (!lastChecked) {
-            lastChecked = this;
+            lastChecked = checkbox[0];
             return;
         }
+
         if (e.shiftKey) {
-            const start = checkboxes.index(this);
-            const end = checkboxes.index(lastChecked);
-            checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).prop('checked', this.checked);
+            var start = $('input[type="checkbox"]').index(checkbox);
+            var end = $('input[type="checkbox"]').index(lastChecked);
+
+            $('input[type="checkbox"]').slice(Math.min(start, end), Math.max(start, end) + 1).each(function () {
+                this.checked = lastChecked.checked;
+            });
         }
-        lastChecked = this;
+
+        lastChecked = checkbox[0];
+
+        // Prevent text selection
+        document.onselectstart = function () { return false; };
     });
 });
