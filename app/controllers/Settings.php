@@ -2,7 +2,11 @@
 
 class Settings extends Controller
 {
-
+    /**
+     * Renders the settings index and returns the content.
+     * 
+     * @return string
+     */
     public function index()
     {
         $this->isAdminOrExit();
@@ -14,34 +18,48 @@ class Settings extends Controller
             try {
                 $this->validateCsrfToken();
 
+                // Check if posted data is changing application settings
                 if ($this->getPostValue('application') !== null) {
-                    $this->applicationSettings();
+                    $timezone = $this->getPostValue('timezone');
+                    $theme = $this->getPostValue('theme');
+                    $filter = $this->getPostValue('filter');
+                    $dompart = $this->getPostValue('dompart');
+                    $this->applicationSettings($timezone, $theme, $filter, $dompart);
                 }
 
+                // Check if posted data is changing global payload settings
                 if ($this->getPostValue('global-payload') !== null) {
                     $this->payloadSettings();
                 }
 
+                // Check if posted data is changing global alerting settings
                 if ($this->getPostValue('global-alert') !== null) {
                     $this->alertSettings();
                 }
 
+                // Check if posted data is enabling killswitch
                 if ($this->getPostValue('killswitch') !== null) {
-                    $this->killSwitch();
+                    $password = $this->getPostValue('password');
+                    $this->killSwitch($password);
                 }
 
+                // Check if posted data is changing alert method settings
                 if ($this->getPostValue('alert-methods') !== null) {
                     $this->alertMethods();
                 }
 
+                // Check if posted data is changing callback alert settings
                 if ($this->getPostValue('callback-alert') !== null) {
-                    $this->callbackAlertSettings();
+                    $callbackOn = $this->getPostValue('callbackon');
+                    $url = $this->getPostValue('callback_url');
+                    $this->callbackAlertSettings($callbackOn, $url);
                 }
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
         }
 
+        // Retrieves and renders all and current timezone
         $timezones = [];
         $timezone = $this->model('Setting')->get('timezone');
         foreach (timezone_identifiers_list() as $key => $name) {
@@ -50,6 +68,7 @@ class Settings extends Controller
         }
         $this->view->renderDataset('timezone', $timezones, true);
 
+        // Retrieves and renders all and current theme
         $themes = [];
         $theme = $this->model('Setting')->get('theme');
         $files = array_diff(scandir(__DIR__ . '/../../assets/css'), array('.', '..'));
@@ -60,77 +79,81 @@ class Settings extends Controller
         }
         $this->view->renderDataset('theme', $themes, true);
 
+        // Set settings values
         $settings = $this->model('Setting');
         $filterSave = $settings->get('filter-save');
         $filterAlert = $settings->get('filter-alert');
 
-        // This is just one big mess of rendering trying to make this work
+        // Renders data of correct selected filter
         $this->view->renderData('filter1', $filterSave == 1 && $filterAlert == 1 ? 'selected' : '');
         $this->view->renderData('filter2', $filterSave == 1 && $filterAlert == 0 ? 'selected' : '');
         $this->view->renderData('filter3', $filterSave == 0 && $filterAlert == 1 ? 'selected' : '');
         $this->view->renderData('filter4', $filterSave == 0 && $filterAlert == 0 ? 'selected' : '');
 
-        // Global payload settings
-        $this->view->renderChecked('cUri', $settings->get('collect_uri') == 1);
-        $this->view->renderChecked('cIP', $settings->get('collect_ip') == 1);
-        $this->view->renderChecked('cReferer', $settings->get('collect_referer') == 1);
-        $this->view->renderChecked('cUserAgent', $settings->get('collect_user-agent') == 1);
-        $this->view->renderChecked('cCookies', $settings->get('collect_cookies') == 1);
-        $this->view->renderChecked('cLocalStorage', $settings->get('collect_localstorage') == 1);
-        $this->view->renderChecked('cSessionStorage', $settings->get('collect_sessionstorage') == 1);
-        $this->view->renderChecked('cDOM', $settings->get('collect_dom') == 1);
-        $this->view->renderChecked('cOrigin', $settings->get('collect_origin') == 1);
-        $this->view->renderChecked('cScreenshot', $settings->get('collect_screenshot') == 1);
-        $this->view->renderData('customjs', $settings->get('customjs'));
+        // Renders checkboxes
+        $renderSettings = [
+            'collect_uri', 'collect_ip', 'collect_referer', 'collect_user-agent', 'collect_cookies', 'collect_localstorage', 'collect_sessionstorage',
+            'collect_dom', 'collect_origin', 'collect_screenshot', 'alert-mail', 'alert-telegram', 'alert-slack', 'alert-discord', 'alert-callback'
+        ];
+        foreach ($renderSettings as $setting) {
+            $this->view->renderChecked($setting, $settings->get($setting) == 1);
+        }
 
-        // Settings
-        $this->view->renderData('dompart', $settings->get('dompart'));
-        $this->view->renderChecked('mailOn', $settings->get('alert-mail') == 1);
-        $this->view->renderChecked('telegramOn', $settings->get('alert-telegram') == 1);
-        $this->view->renderChecked('slackOn', $settings->get('alert-slack') == 1);
-        $this->view->renderChecked('discordOn', $settings->get('alert-discord') == 1);
-        $this->view->renderChecked('callbackOn', $settings->get('alert-callback') == 1);
-        $this->view->renderData('callbackURL', $settings->get('callback-url'));
-
-        // Alerts
+        // Renders checkboxes of global alerts
         $alerts = $this->model('Alert');
         $this->view->renderChecked('mailAll', $alerts->get(0, 1, 'enabled'));
         $this->view->renderChecked('telegramAll', $alerts->get(0, 2, 'enabled'));
         $this->view->renderChecked('slackAll', $alerts->get(0, 3, 'enabled'));
         $this->view->renderChecked('discordAll', $alerts->get(0, 4, 'enabled'));
 
+        // Renders data of global alerts
         $this->view->renderData('email', $alerts->get(0, 1, 'value1'));
         $this->view->renderData('telegramToken', $alerts->get(0, 2, 'value1'));
         $this->view->renderData('telegramChatID', $alerts->get(0, 2, 'value2'));
         $this->view->renderData('slackWebhook', $alerts->get(0, 3, 'value1'));
         $this->view->renderData('discordWebhook', $alerts->get(0, 4, 'value1'));
 
+        // Render last data parts
+        $this->view->renderData('customjs', $settings->get('customjs'));
+        $this->view->renderData('dompart', $settings->get('dompart'));
+        $this->view->renderData('callbackURL', $settings->get('callback-url'));
+
         return $this->showContent();
     }
 
-    private function applicationSettings()
+    /**
+     * Updates the applications settings
+     * 
+     * @param string $timezone The timezone to set
+     * @param string $theme The theme name
+     * @param string $filter The filter option
+     * @param string $dompart The length of the dom part
+     * @throws Exception
+     * @return void
+     */
+    private function applicationSettings($timezone, $theme, $filter, $dompart)
     {
-        $timezone = $this->getPostValue('timezone');
-        $theme = $this->getPostValue('theme');
-        $filter = $this->getPostValue('filter');
-        $dompart = $this->getPostValue('dompart');
-
+        // Validate timezone
         if (!in_array($timezone, timezone_identifiers_list(), true)) {
             throw new Exception('The timezone is not a valid timezone.');
         }
 
+        // Validate if theme exists
         $theme = preg_replace('/[^a-zA-Z0-9]/', '', $theme);
         if (!file_exists(__DIR__ . "/../../assets/css/{$theme}.css")) {
             throw new Exception('This theme is not installed.');
         }
 
+        // Check if type is digit
         if (!ctype_digit($dompart)) {
-            throw new Exception('The dom length needs to be a int number.');
+            throw new Exception('The dom length needs to be digits.');
         }
 
+        // Set the value based on the posted filter
         $filterSave = ($filter == 1 || $filter == 2) ? 1 : 0;
         $filterAlert = ($filter == 1 || $filter == 3) ? 1 : 0;
 
+        // Save settings
         $this->model('Setting')->set('dompart', $dompart);
         $this->model('Setting')->set('filter-save', $filterSave);
         $this->model('Setting')->set('filter-alert', $filterAlert);
@@ -138,6 +161,11 @@ class Settings extends Controller
         $this->model('Setting')->set('theme', $theme);
     }
 
+    /**
+     * Updates the payload settings
+     * 
+     * @return void
+     */
     private function payloadSettings()
     {
         $options = ['uri', 'ip', 'referer', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'screenshot'];
@@ -153,11 +181,17 @@ class Settings extends Controller
         $this->model('Setting')->set("customjs", $this->getPostValue('customjs'));
     }
 
+    /**
+     * Updates the global alerting settings
+     * 
+     * @throws Exception
+     * @return void
+     */
     private function alertSettings()
     {
         $alerts = $this->model('Alert');
 
-        // Mail
+        // Update mail settings
         $mailOn = $this->getPostValue('mailon');
         $mail = $this->getPostValue('mail');
         if (!filter_var($mail, FILTER_VALIDATE_EMAIL) && !empty($mail)) {
@@ -165,7 +199,7 @@ class Settings extends Controller
         }
         $alerts->set(0, 1, $mailOn !== null, $mail);
 
-        // Telegram
+        // Update Telegram settings
         $telegramOn = $this->getPostValue('telegramon');
         $telegramToken = $this->getPostValue('telegram_bottoken');
         $telegramChatID = $this->getPostValue('chatid');
@@ -180,7 +214,7 @@ class Settings extends Controller
         }
         $alerts->set(0, 2, $telegramOn !== null, $telegramToken, $telegramChatID);
 
-        // Slack
+        // Update Slack settings
         $slackOn = $this->getPostValue('slackon');
         $slackWebhook = $this->getPostValue('slack_webhook');
         if (!empty($slackWebhook)) {
@@ -190,7 +224,7 @@ class Settings extends Controller
         }
         $alerts->set(0, 3, $slackOn !== null, $slackWebhook);
 
-        // Discord
+        // Update Discord settings
         $discordOn = $this->getPostValue('discordon');
         $discordWebhook = $this->getPostValue('discord_webhook');
         if (!empty($discordWebhook)) {
@@ -201,13 +235,23 @@ class Settings extends Controller
         $alerts->set(0, 4, $discordOn !== null, $discordWebhook);
     }
 
-    private function killSwitch()
+    /**
+     * Kills the ezXSS platform
+     * 
+     * @param string $password
+     * @return string
+     */
+    private function killSwitch($password)
     {
-        $password = $this->getPostValue('password');
         $this->model('Setting')->set("killswitch", $password);
         $this->view->renderErrorPage("ezXSS is now killed with password $password");
     }
 
+    /**
+     * Enable or disable alerting methods
+     * 
+     * @return void
+     */
     private function alertMethods()
     {
         $mailOn = $this->getPostValue('mailon') !== null ? '1' : '0';
@@ -223,12 +267,19 @@ class Settings extends Controller
         $this->model('Setting')->set("alert-discord", $discordOn);
     }
 
-    private function callbackAlertSettings()
+    /**
+     * Updates callback alerting settings
+     * 
+     * @param string $callbackOn Switch to turn function on or off
+     * @param string $url The callback url
+     * @throws Exception
+     * @return void
+     */
+    private function callbackAlertSettings($callbackOn, $url)
     {
-        $callbackOn = $this->getPostValue('callbackon') !== null ? '1' : '0';
-        $this->model('Setting')->set("alert-callback", $callbackOn);
+        $this->model('Setting')->set("alert-callback", $callbackOn !== null ? '1' : '0');
 
-        $url = $this->getPostValue('callback_url');
+        // Validate callback url
         if (!empty($url) && (strpos($url, "http") !== 0 || filter_var($url, FILTER_VALIDATE_URL) === false)) {
             throw new Exception('Invalid callback URL');
         }

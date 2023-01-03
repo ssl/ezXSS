@@ -2,11 +2,10 @@
 
 class Router
 {
-
     /**
      * Routing processing. All requests go through this function and matches it to the correct functions
      *
-     * @param string $uri
+     * @param string $uri The current url
      * @return string
      */
     public function proccess($uri)
@@ -51,6 +50,7 @@ class Router
             }
             $args = isset($parts[4]) ? [$parts[4]] : [];
         } else {
+            // Sends request to payloads to create a js payload or callback
             $controller = 'Payloads';
             $args = isset($parts[1]) && !empty($parts[1]) ? [$parts[1]] : [];
             $method = $args === [] ? 'index' : 'custom';

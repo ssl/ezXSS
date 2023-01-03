@@ -62,20 +62,21 @@
                         <div class="panel-body">
                             <form class="form" id="createUser" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-                                
+
                                 <div class="form-group">
                                     <label class="control-label" for="username">Username</label>
                                     <input class="form-control" id="username" name="username" type="text">
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label class="control-label" for="password">Password</label>
                                     <div class="input-group">
                                         <input class="form-control" id="password" name="password" type="text">
-                                        <span class="input-group-addon"><a class="generate-password" style="cursor:pointer">Generate</a></span>
+                                        <span class="input-group-addon"><a class="generate-password"
+                                                style="cursor:pointer">Generate</a></span>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label class="control-label" for="rank">Rank</label>
                                     <select class="form-control" id="rank" name="rank">
@@ -84,7 +85,7 @@
                                         <option value="0">Banned</option>
                                     </select>
                                 </div>
-                                
+
                                 <button type="submit" class="btn">Create</button>
                             </form>
                         </div>

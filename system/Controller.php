@@ -2,27 +2,29 @@
 
 class Controller
 {
-
     /**
-     * @var [type]
+     * Model
+     * 
+     * @var mixed
      */
     public $model;
 
     /**
-     * 
+     * Constructor
      */
     public function __construct()
     {
         $this->session = new Session();
         $this->view = new View();
 
+        // Check if kill switcher is turned on
         $this->killSwitcher();
     }
 
     /**
-     * Load a model
-     *
-     * @param string $name
+     * Load model
+     * 
+     * @param string $name The model name
      * @return class
      */
     public function model($name)
@@ -41,13 +43,21 @@ class Controller
         return $this->model[$name];
     }
 
+    /**
+     * Shows the page content
+     * 
+     * @return string
+     */
     public function showContent()
     {
+        // Check if a theme is set
         try {
             $theme = $this->model('Setting')->get('theme');
         } catch (Exception $e) {
             $theme = 'classic';
         }
+
+        // Get content and add correct theme stylsheet
         $content = $this->view->showContent();
         $content = str_replace('{theme}', '<link rel="stylesheet" href="/assets/css/' . e($theme) . '.css">', $content);
         return $content;
@@ -55,8 +65,9 @@ class Controller
 
     /**
      * Validate if the posted csrf token is valid
-     *
-     * @return Exception|void
+     * 
+     * @throws Exception
+     * @return void
      */
     public function validateCsrfToken()
     {
@@ -69,8 +80,9 @@ class Controller
 
     /**
      * Validate session if user still needs to be logged in
-     *
-     * @return Exception|void
+     * 
+     * @throws Exception
+     * @return void
      */
     public function validateSession()
     {
@@ -164,7 +176,7 @@ class Controller
     /**
      * Returns post value
      *
-     * @param string $param
+     * @param string $param The param
      * @return string|null
      */
     public function getPostValue($param)
@@ -175,7 +187,7 @@ class Controller
     /**
      * Returns get value
      *
-     * @param string $param
+     * @param string $param The param
      * @return string|null
      */
     public function getGetValue($param)

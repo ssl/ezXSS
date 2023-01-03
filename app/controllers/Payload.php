@@ -2,9 +2,8 @@
 
 class Payload extends Controller
 {
-
     /**
-     * Account index.
+     * Either redirects to first payload or renders the payload index and returns the content.
      *
      * @return string
      */
@@ -23,12 +22,20 @@ class Payload extends Controller
         return $this->showContent();
     }
 
+    /**
+     * Renders or edits the payload edit and returns the content. 
+     * 
+     * @param string $id The payload id
+     * @throws Exception
+     * @return string
+     */
     public function edit($id)
     {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Payload');
         $this->view->renderTemplate('payload/edit');
 
+        // Check payload permissions
         $payloadList = $this->payloadList();
         if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
             throw new Exception('You dont have permissions to this payload');
@@ -38,22 +45,27 @@ class Payload extends Controller
             try {
                 $this->validateCsrfToken();
 
+                // Check if posted data is editing collecting
                 if ($this->getPostValue('collecting') !== null) {
                     $this->setCollecting($id);
                 }
 
+                // Check if posted data is editing custom js
                 if ($this->getPostValue('secondary-payload') !== null) {
                     $this->model('Payload')->setSingleValue($id, "customjs", $this->getPostValue('customjs'));
                 }
 
+                // Check if posted data is editing extracting pages
                 if ($this->getPostValue('extract-pages') !== null) {
                     $this->setPages($id, $this->getPostValue('path'));
                 }
 
+                // Check if posted data is editing blacklisted domains
                 if ($this->getPostValue('blacklist-domains') !== null) {
                     $this->setBlacklist($id, $this->getPostValue('domain'));
                 }
 
+                // Check if posted data is editing whitelisted domains
                 if ($this->getPostValue('whitelist-domains') !== null) {
                     $this->setWhitelist($id, $this->getPostValue('domain'));
                 }
@@ -62,6 +74,7 @@ class Payload extends Controller
             }
         }
 
+        // Retrieve and render all payloads of user for listing
         $payloads = [];
         foreach ($payloadList as $val) {
             $payload = $this->model('Payload')->getById($val);
@@ -69,11 +82,12 @@ class Payload extends Controller
         }
         $this->view->renderDataset('payload', $payloads);
 
+        // Get current payload
         $payload = $this->model('Payload')->getById($id);
-        $payload['payload'] = !+$id ? e($_SERVER['HTTP_HOST']) : $payload['payload'];
+        $payload['payload'] = !+$id ? host : $payload['payload'];
 
+        // Render all data and checkboxes
         $this->view->renderData('domain', $payload['payload']);
-
         $this->view->renderChecked('cUri', $payload['collect_uri'] == 1);
         $this->view->renderChecked('cIP', $payload['collect_ip'] == 1);
         $this->view->renderChecked('cReferer', $payload['collect_referer'] == 1);
@@ -87,6 +101,8 @@ class Payload extends Controller
         $this->view->renderData('customjs', $payload['customjs']);
 
         $i = 0;
+
+        // Render data set of all pages of payload
         $pages = [];
         foreach (explode('~', $payload['pages']) as $val) {
             if (!empty($val)) {
@@ -95,6 +111,7 @@ class Payload extends Controller
         }
         $this->view->renderDataset('pages', $pages);
 
+        // Render data set of all blacklisted domains of payload
         $blacklist = [];
         foreach (explode('~', $payload['blacklist']) as $val) {
             if (!empty($val)) {
@@ -103,6 +120,7 @@ class Payload extends Controller
         }
         $this->view->renderDataset('blacklist', $blacklist);
 
+        // Render data set of all whitelisted domains of payload
         $whitelist = [];
         foreach (explode('~', $payload['whitelist']) as $val) {
             if (!empty($val)) {
@@ -114,14 +132,23 @@ class Payload extends Controller
         return $this->showContent();
     }
 
+    /**
+     * Removes page, blacklist or whitelist from payload
+     * 
+     * @param mixed $id The payload id
+     * @throws Exception
+     * @return bool|string
+     */
     public function removeItem($id)
     {
+        // Set json content type
         $this->view->setContentType('application/json');
 
         try {
             $this->isLoggedInOrExit();
             $this->validateCsrfToken();
 
+            // Check payload permissions
             $payloadList = $this->payloadList();
             if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
                 throw new Exception('You dont have permissions to this payload');
@@ -131,10 +158,12 @@ class Payload extends Controller
             $data = $this->getPostValue('data');
             $type = $this->getPostValue('type');
 
+            // Prevent changing anything else then the allowed items
             if (!in_array($type, ['pages', 'blacklist', 'whitelist'])) {
                 throw new Exception('You cant remove that here');
             }
 
+            // Removes item from current data field
             $newString = $payload[$type];
             if (substr($payload[$type], -strlen($data) - 1) === '~' . $data || $payload[$type] === '~' . $data) {
                 $newString = substr($payload[$type], 0, -strlen($data) - 1);
@@ -150,13 +179,20 @@ class Payload extends Controller
         }
     }
 
+    /**
+     * Returns all payloads that the user is allowed to see/edit
+     * 
+     * @return array
+     */
     private function payloadList()
     {
         $payloadList = [];
         if ($this->isAdmin()) {
+            // Add default/fallback payload to list for admins
             array_push($payloadList, 0);
         }
 
+        // Add all payloads from user to list
         $user = $this->model('User')->getById($this->session->data('id'));
         $payloads = $this->model('Payload')->getAllByUserId($user['id']);
         foreach ($payloads as $payload) {
@@ -166,21 +202,36 @@ class Payload extends Controller
         return $payloadList;
     }
 
+    /**
+     * Saves collecting data
+     * 
+     * @param string $id The payload id
+     * @return void
+     */
     private function setCollecting($id)
     {
         $options = ['uri', 'ip', 'referer', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'screenshot'];
 
         foreach ($options as $option) {
-
             if ($this->getPostValue($option) !== null) {
+                // Enable collecting item for payload if allowed by admin settings
                 $enable = ($this->model('Setting')->get("collect_{$option}") == 1) ? 1 : 0;
                 $this->model('Payload')->setSingleValue($id, "collect_{$option}", $enable);
             } else {
+                // Disable item
                 $this->model('Payload')->setSingleValue($id, "collect_{$option}", 0);
             }
         }
     }
 
+    /**
+     * Add page to payload collecting pages
+     * 
+     * @param string $id The payload id
+     * @param string $path The path to add
+     * @throws Exception
+     * @return void
+     */
     private function setPages($id, $path)
     {
         $payload = $this->model('Payload')->getById($id);
@@ -197,10 +248,19 @@ class Payload extends Controller
         $this->model('Payload')->setSingleValue($id, "pages", $newString);
     }
 
+    /**
+     * Add blacklisted domain to payload list
+     * 
+     * @param string $id The payload id
+     * @param string $domain The domain to add
+     * @throws Exception
+     * @return void
+     */
     private function setBlacklist($id, $domain)
     {
         $payload = $this->model('Payload')->getById($id);
 
+        // Validate domain string
         if (!preg_match('/^(?!\-)(?:(?:[a-zA-Z\d][a-zA-Z\d\-]{0,61})?[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$/', $domain)) {
             throw new Exception('This does not look like an valid domain');
         }
@@ -209,10 +269,19 @@ class Payload extends Controller
         $this->model('Payload')->setSingleValue($id, "blacklist", $newString);
     }
 
+    /**
+     * Add blacklisted domain to payload list
+     * 
+     * @param string $id The payload id
+     * @param string $domain The domain to add
+     * @throws Exception
+     * @return void
+     */
     private function setWhitelist($id, $domain)
     {
         $payload = $this->model('Payload')->getById($id);
 
+        // Validate domain string
         if (!preg_match('/^(?!\-)(?:(?:[a-zA-Z\d][a-zA-Z\d\-]{0,61})?[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$/', $domain)) {
             throw new Exception('This does not look like an valid domain');
         }

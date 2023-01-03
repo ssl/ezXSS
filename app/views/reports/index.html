@@ -38,54 +38,62 @@
 
                                 <table id="reports" class="table" style="white-space: nowrap;">
                                     <thead>
-                                    <tr>
-                                        <th style="width:4%">
-                                            <label class="checkbox-label">
-                                                <input id="select-all" name="select-all" type="checkbox">
-                                                <span class="checkbox-custom rectangular" style="top:-12px"></span>
-                                            </label>
-                                        </th>
-                                        <th style="width:10%">View</th>
-                                        <th style="width:3%">ID</th>
-                                        <th>URL</th>
-                                        <th>IP</th>
-                                        <th>Payload</th>
-                                    </tr>
+                                        <tr>
+                                            <th style="width:4%">
+                                                <label class="checkbox-label">
+                                                    <input id="select-all" name="select-all" type="checkbox">
+                                                    <span class="checkbox-custom rectangular" style="top:-12px"></span>
+                                                </label>
+                                            </th>
+                                            <th style="width:10%">View</th>
+                                            <th style="width:3%">ID</th>
+                                            <th>URL</th>
+                                            <th>IP</th>
+                                            <th>Payload</th>
+                                        </tr>
                                     </thead>
                                     <tbody id="reports-list">
                                         {%foreach report}
                                         <tr id="{report->id}">
                                             <td scope=row style="width:50px;max-width:50px;border-color:#5b6187">
-                                               <label class="checkbox-label">
-                                                  <input class="chkbox" type="checkbox" name="selected" value="{report->id}" id="chk_{report->id}" report-id="{report->id}">
-                                                  <span class="checkbox-custom rectangular" style="top:-12px"></span>
-                                              </label>           
+                                                <label class="checkbox-label">
+                                                    <input class="chkbox" type="checkbox" name="selected"
+                                                        value="{report->id}" id="chk_{report->id}"
+                                                        report-id="{report->id}">
+                                                    <span class="checkbox-custom rectangular" style="top:-12px"></span>
+                                                </label>
                                             </td>
-                                            
+
                                             <td>
-                                              <div class="btn-group btn-view" style="width:100px;max-width:100px;" role=group>
-                                                <a href="/manage/reports/view/{report->id}" class=btn>View</a>
-                                                <div class=btn-group role=group>
-                                                  <button type=button class="btn btn-default dropdown-toggle" data-toggle=dropdown aria-haspopup=true aria-expanded=true>
-                                                    <span class=caret></span>
-                                                  </button>
-                                  
-                                                  <div class=dropdown-backdrop></div>
-                                  
-                                                  <ul class=dropdown-menu>
-                                                    <li><a class="share" report-id="{report->id}" share-id="{report->shareid}" data-toggle="modal" data-target="#shareModal">Share</a></li>
-                                                    <li><a class="delete" report-id="{report->id}">Delete</a></li>
-                                                    <li><a class="archive" report-id="{report->id}">Archive</a></li>
-                                                  </ul>
-                                  
+                                                <div class="btn-group btn-view" style="width:100px;max-width:100px;"
+                                                    role=group>
+                                                    <a href="/manage/reports/view/{report->id}" class=btn>View</a>
+                                                    <div class=btn-group role=group>
+                                                        <button type=button class="btn btn-default dropdown-toggle"
+                                                            data-toggle=dropdown aria-haspopup=true aria-expanded=true>
+                                                            <span class=caret></span>
+                                                        </button>
+
+                                                        <div class=dropdown-backdrop></div>
+
+                                                        <ul class=dropdown-menu>
+                                                            <li><a class="share" report-id="{report->id}"
+                                                                    share-id="{report->shareid}" data-toggle="modal"
+                                                                    data-target="#shareModal">Share</a></li>
+                                                            <li><a class="delete" report-id="{report->id}">Delete</a>
+                                                            </li>
+                                                            <li><a class="archive" report-id="{report->id}">Archive</a>
+                                                            </li>
+                                                        </ul>
+
+                                                    </div>
                                                 </div>
-                                              </div>
                                             </td>
                                             <td><b>{report->id}</b></td>
                                             <td>{report->uri}</td>
                                             <td>{report->ip}</td>
                                             <td>{report->payload}</td>
-                                          </tr>
+                                        </tr>
                                         {%/foreach}
                                     </tbody>
                                 </table>
@@ -93,8 +101,8 @@
                                 <div class="">
                                     <div class="dataTables_paginate paging_simple_numbers">
                                         with selected:
-                                                <button class="btn delete-selected">Delete</button>
-                                                <button class="btn archive-selected">Archive</button>
+                                        <button class="btn delete-selected">Delete</button>
+                                        <button class="btn archive-selected">Archive</button>
                                     </div>
                                 </div>
                             </div>

@@ -2,9 +2,8 @@
 
 class Account extends Controller
 {
-
     /**
-     * Account index.
+     * Renders the account index and returns the content.
      *
      * @return string
      */
@@ -17,36 +16,53 @@ class Account extends Controller
         if ($this->isPOST()) {
             try {
                 $this->validateCsrfToken();
+
+                // Check if posted data is changing alerts
                 if ($this->getPostValue('alert') !== null) {
                     $this->alertSettings();
                 }
+
+                // Check if posted data is changing passwords
                 if ($this->getPostValue('password') !== null) {
-                    $this->passwordSettings();
+                    $currentPassword = $this->getPostValue('currentpassword');
+                    $newPassword = $this->getPostValue('newpassword');
+                    $newPassword2 = $this->getPostValue('newpassword2');
+                    $this->passwordSettings($currentPassword, $newPassword, $newPassword2);
                 }
+
+                // Check if posted data is changing MFA
                 if ($this->getPostValue('mfa') !== null) {
-                    $this->mfaSettings();
+                    $secret = $this->getPostValue('secret');
+                    $code = $this->getPostValue('code');
+                    $this->mfaSettings($secret, $code);
                 }
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
         }
 
+        // Get user data
+        $user = $this->model('User')->getById($this->session->data('id'));
+
+        // Generate MFA secret
         $secret = '';
         for ($i = 0; $i < 16; $i++) {
             $secret .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'[rand(0, 31)];
         }
-        $this->view->renderData('secret', $secret);
 
-        $user = $this->model('User')->getById($this->session->data('id'));
+        // Render MFA data and conditions
+        $this->view->renderData('secret', $secret);
         $this->view->renderCondition('mfaDisabled', strlen($user['secret']) !== 16);
         $this->view->renderCondition('mfaEnabled', strlen($user['secret']) === 16);
 
+        // Render alerting checkboxes
         $alerts = $this->model('Alert');
         $this->view->renderChecked('mailOn', $alerts->get($user['id'], 1, 'enabled'));
         $this->view->renderChecked('telegramOn', $alerts->get($user['id'], 2, 'enabled'));
         $this->view->renderChecked('slackOn', $alerts->get($user['id'], 3, 'enabled'));
         $this->view->renderChecked('discordOn', $alerts->get($user['id'], 4, 'enabled'));
 
+        // Render alerting data
         $this->view->renderData('email', $alerts->get($user['id'], 1, 'value1'));
         $this->view->renderData('telegramToken', $alerts->get($user['id'], 2, 'value1'));
         $this->view->renderData('telegramChatID', $alerts->get($user['id'], 2, 'value2'));
@@ -57,7 +73,7 @@ class Account extends Controller
     }
 
     /**
-     * Login page
+     * Renders the account login page and returns the content.
      *
      * @return string
      */
@@ -85,12 +101,17 @@ class Account extends Controller
         return $this->showContent();
     }
 
-    private function passwordSettings()
+    /**
+     * Updates the users password
+     * 
+     * @param string $currentPassword The current password
+     * @param string $newPassword The new password
+     * @param string $newPassword2 The new password for confirmation
+     * @throws Exception
+     * @return void
+     */
+    private function passwordSettings($currentPassword, $newPassword, $newPassword2)
     {
-        $currentPassword = $this->getPostValue('currentpassword');
-        $newPassword = $this->getPostValue('newpassword');
-        $newPassword2 = $this->getPostValue('newpassword2');
-
         $user = $this->model('User')->getById($this->session->data('id'));
 
         if (!password_verify($currentPassword, $user['password'])) {
@@ -104,12 +125,18 @@ class Account extends Controller
         $this->model('User')->updatePassword($user['id'], $newPassword);
     }
 
-    private function mfaSettings()
+    /**
+     * Updates the users MFA settings
+     * 
+     * @param string $secret The used secret
+     * @param string $code The corresponding code
+     * @throws Exception
+     * @return void
+     */
+    private function mfaSettings($secret, $code)
     {
         $user = $this->model('User')->getById($this->session->data('id'));
         $secretCode = $user['secret'];
-        $secret = $this->getPostValue('secret');
-        $code = $this->getPostValue('code');
 
         if (strlen($secret) == 16) {
             if (strlen($secretCode) === 16) {
@@ -136,6 +163,12 @@ class Account extends Controller
         $this->model('User')->updateSecret($user['id'], $secret);
     }
 
+    /**
+     * Updates the users alerting settings
+     * 
+     * @throws Exception
+     * @return void
+     */
     private function alertSettings()
     {
         $alerts = $this->model('Alert');
