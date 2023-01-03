@@ -103,8 +103,8 @@
                 </div>
             </div>
         </div>
+    </section>
 </div>
-</section>
 
 <div class="modal fade" id="shareModal" role="dialog">
     <div class="modal-dialog">
@@ -112,39 +112,17 @@
             <div class="modal-header">
                 <button class="close" data-dismiss="modal" type="button">&times;</button>
                 <h3 class="m-b-xs">Share</h3>
-                <small>Share your reports using direct link or with other ezXSS users</small>
+                <small>Share your reports using a direct link anyone without permissions can view</small>
             </div>
             <div class="modal-body">
-                <div id="alert"></div>
-                <form class="form" id="share-report" method="post">
-                    <input hidden id="reportid" name="reportid" type=hidden value="0">
-
-                    <div class="form-group">
-                        <label class="control-label" for="domain">Direct share link</label>
-                        <input class="form-control" id="shareid" type="text" value="">
-                    </div>
-
-                    <hr>
-
-                    <div class="form-group">
-                        <label class="control-label" for="domain">Share by domain</label>
-                        <input class="form-control" id="domain" name="domain" type="text" value="">
-                    </div>
-                    <button name="share-domain" type="submit" class="btn">Share</button>
-
-                    <hr>
-
-                    <div class="form-group">
-                        <label class="control-label" for="email">Share by email</label>
-                        <input class="form-control" id="email" name="email" type="text" value="">
-                    </div>
-                    <button name="share-email" type="submit" class="btn">Share</button>
-                </form>
+                <div class="form-group">
+                    <label class="control-label" for="domain">Direct share link</label>
+                    <input class="form-control" id="shareid" type="text" value="">
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal" type="button">Close</button>
             </div>
         </div>
     </div>
-</div>
 </div>
