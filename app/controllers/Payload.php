@@ -189,7 +189,7 @@ class Payload extends Controller
         $payloadList = [];
         if ($this->isAdmin()) {
             // Add default/fallback payload to list for admins
-            array_push($payloadList, 0);
+            array_push($payloadList, 1);
         }
 
         // Add all payloads from user to list

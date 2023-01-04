@@ -441,7 +441,7 @@ class Payloads extends Controller
                 $payload = $this->model('Payload')->getByPayload($splitUrl[2] ?? '');
             } catch (Exception $e) {
                 // If the payload is still not found, fallback to the default payload
-                $payload = $this->model('Payload')->getById(0);
+                $payload = $this->model('Payload')->getById(1);
             }
         }
 

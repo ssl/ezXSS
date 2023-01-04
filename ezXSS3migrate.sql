@@ -52,7 +52,7 @@ CREATE TABLE `payloads` (
 --
 
 INSERT INTO `payloads` (`id`, `payload`, `user_id`, `pages`, `blacklist`, `whitelist`, `customjs`, `collect_uri`, `collect_ip`, `collect_referer`, `collect_user-agent`, `collect_cookies`, `collect_localstorage`, `collect_sessionstorage`, `collect_dom`, `collect_origin`, `collect_screenshot`) VALUES
-(0, 'Fallback (default)', 0, '', '', '', '', 1, 1, 1, 1, 1, 1, 1, 1, 1, 0);
+(1, 'Fallback (default)', 0, '', '', '', '', 1, 1, 1, 1, 1, 1, 1, 1, 1, 0);
 
 --
 -- Dumping data for table `settings`
@@ -131,8 +131,5 @@ ALTER TABLE `payloads`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-
-
-UPDATE `payloads` SET `id` = '0' WHERE `payloads`.`id` = 1;
 
 ALTER TABLE reports CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
