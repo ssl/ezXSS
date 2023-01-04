@@ -58,12 +58,12 @@ class Update extends Controller
         $database = Database::openConnection();
         $database->exec($sql);
         $database->exec('ALTER DATABASE `' . DB_NAME . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;');
-        
+
         $this->model('Setting')->set('version', version);
 
         // Create new user and update password to old password
         $user = $this->model('User')->create('admin', 'Temp1234!', 7);
-        $this->model('User')->updatePassword($user['id'], $currentPassword, true);
+        $this->model('User')->setPassword($user['id'], $currentPassword, true);
 
         // Update all oldskool 'collected pages' and NULL payloads
         $reports = $this->model('Report')->getAllInvalid();
@@ -72,7 +72,7 @@ class Update extends Controller
             $this->model('Report')->setSingleValue($report['id'], 'payload', '//' . host . '/');
 
             // Set refer to collected if collected is set
-            if(strpos($report['payload'], 'Collected page via ') === 0) {
+            if (strpos($report['payload'], 'Collected page via ') === 0) {
                 $this->model('Report')->setSingleValue($report['id'], 'referer', $report['payload']);
             }
         }

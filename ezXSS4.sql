@@ -132,7 +132,10 @@ CREATE TABLE `users` (
   `username` varchar(25) NOT NULL,
   `password` varchar(60) NOT NULL,
   `rank` int(11) NOT NULL DEFAULT '1',
-  `secret` varchar(25) NOT NULL
+  `secret` varchar(25) NOT NULL,
+  `row1` tinyint(4) NOT NULL DEFAULT '1',
+  `row2` tinyint(4) NOT NULL DEFAULT '3',
+  `notepad` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --

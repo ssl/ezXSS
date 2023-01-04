@@ -9,7 +9,9 @@
                     <div class="view-header">
                         <div class="header-title">
                             <h3 class="m-b-xs">Dashboard</h3>
-                            <small>Your personal dashboard contains statistics on your payload reports. Use it to track the progress of your reports and stay informed on your payloads.</small>
+                            <small>Your personal dashboard contains statistics on your personal payload reports. Use it
+                                to track
+                                the progress of your reports and stay informed on your payloads.</small>
                         </div>
                     </div>
                     <hr>
@@ -87,9 +89,84 @@
                     </div>
                 </div>
 
+
+                <div class="col-lg-3 col-xs-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Most common<select class="common-selectbox" id="pick_common1">
+                                <option {%data common_1_1} value="1">Origins</option>
+                                <option {%data common_1_2} value="2">IPs</option>
+                                <option {%data common_1_3} value="3">Cookies</option>
+                                <option {%data common_1_4} value="4">User-Agents</option>
+                                <option {%data common_1_5} value="5">Payloads</option>
+                            </select></div>
+                        <div class="panel-body">
+                            <table class="table" style="white-space: nowrap;">
+                                <thead>
+                                    <tr id="toprow_common1" style="display:none;">
+                                        <th>Value</th>
+                                        <th style="width:10%">X</th>
+                                    </tr>
+                                </thead>
+                                <div id="loding_common1"><br>
+                                    <center>
+                                        <div class="loader"></div>
+                                    </center>
+                                </div>
+                                <tbody id="most_common1">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-xs-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Most common<select class="common-selectbox" id="pick_common2">
+                                <option {%data common_2_1} value="1">Origins</option>
+                                <option {%data common_2_2} value="2">IPs</option>
+                                <option {%data common_2_3} value="3">Cookies</option>
+                                <option {%data common_2_4} value="4">User-Agents</option>
+                                <option {%data common_2_5} value="5">Payloads</option>
+                            </select></div>
+                        <div class="panel-body">
+                            <table class="table" style="white-space: nowrap;">
+                                <thead>
+                                    <tr id="toprow_common2" style="display:none;">
+                                        <th>Value</th>
+                                        <th style="width:10%">X</th>
+                                    </tr>
+                                </thead>
+                                <div id="loding_common2"><br>
+                                    <center>
+                                        <div class="loader"></div>
+                                    </center>
+                                </div>
+                                <tbody id="most_common2">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-xs-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Notepad</div>
+                        <div class="panel-body">
+                            <form class="form" id="notepad-settings" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <textarea class="form-control" id="notepad" name="notepad"
+                                        rows=18>{%data notepad}</textarea>
+                                </div>
+                                <button class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-
-
         </div>
     </section>
 </div>

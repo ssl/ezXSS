@@ -80,7 +80,7 @@ class Report_model extends Model
         $database = Database::openConnection();
         $database->prepare('SELECT id,uri,ip,payload,archive,shareid FROM reports WHERE payload LIKE :payload ORDER BY id DESC');
         $database->bindValue(':payload', $payload);
-        
+
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
         }
@@ -98,7 +98,7 @@ class Report_model extends Model
     {
         $database = Database::openConnection();
         $database->prepare('SELECT origin,time,referer FROM reports ORDER BY id ASC');
-        
+
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
         }
@@ -194,7 +194,7 @@ class Report_model extends Model
         $database->bindValue(':uri', $uri);
         $database->bindValue(':userAgent', $userAgent);
         $database->bindValue(':ip', $ip);
-        
+
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
         }
@@ -281,8 +281,106 @@ class Report_model extends Model
     public function getAllInvalid()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT id,payload FROM `reports` WHERE `payload` LIKE "%Collected page via %" OR `payload` IS NULL');
-        $database->execute();
+        $database->prepare('SELECT id,payload FROM `reports` WHERE `payload` LIKE "%Collected page via %" OR `payload` IS NULL OR `payload` = ""');
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        $data = $database->fetchAll();
+
+        return $data;
+    }
+
+    /**
+     * Get top 10 most common origins
+     * 
+     * @return array
+     */
+    public function getTopOrigins()
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT origin, COUNT(*) as count FROM reports GROUP BY origin ORDER BY count DESC LIMIT 10');
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        $data = $database->fetchAll();
+
+        return $data;
+    }
+
+    /**
+     * Get top 10 most common IPs
+     * 
+     * @return array
+     */
+    public function getTopIPs()
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT ip, COUNT(*) as count FROM reports GROUP BY ip ORDER BY count DESC LIMIT 10');
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        $data = $database->fetchAll();
+
+        return $data;
+    }
+
+    /**
+     * Get top 10 most common payloads
+     * 
+     * @return array
+     */
+    public function getTopPayloads()
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT payload, COUNT(*) as count FROM reports GROUP BY payload ORDER BY count DESC LIMIT 10');
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        $data = $database->fetchAll();
+
+        return $data;
+    }
+
+    /**
+     * Get all cookies
+     * 
+     * @return array
+     */
+    public function getAllCookies()
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT cookies FROM `reports` WHERE cookies IS NOT NULL and cookies != ""');
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        $data = $database->fetchAll();
+
+        return $data;
+    }
+
+    /**
+     * Get all user agents
+     * 
+     * @return array
+     */
+    public function getAllUserAgents()
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT `user-agent` FROM `reports` WHERE `user-agent` IS NOT NULL and `user-agent` != ""');
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
 
         $data = $database->fetchAll();
 

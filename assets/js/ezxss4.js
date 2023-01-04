@@ -20,6 +20,11 @@ $(document).ready(function () {
                 $('#' + key).html(value);
             });
         });
+
+        if (location.toString().split('/').pop() === 'my') {
+            pick_common($('#pick_common1').val(), 1);
+            pick_common($('#pick_common2').val(), 2);
+        }
     }
 
     $("a[method='post']").click(function (e) {
@@ -46,6 +51,35 @@ $(document).ready(function () {
     $('#payloadList').on('change', function () {
         window.location.href = '/manage/payload/edit/' + this.value;
     });
+
+    $('#pick_common1').on('change', function () {
+        pick_common(this.value, 1);
+    });
+
+    $('#pick_common2').on('change', function () {
+        pick_common(this.value, 2);
+    });
+
+    function pick_common(id, row) {
+        $('#most_common' + row).empty();
+        $('#toprow_common' + row).hide();
+        $('#loding_common' + row).show();
+        request('/manage/api/getMostCommon', { id: id, row: row }).then(function (r) {
+            $('#loding_common' + row).hide();
+            $('#toprow_common' + row).show();
+            if (r.length > 0) {
+                $.each(r, function (key, value) {
+                    $('<tr>').append(
+                        $('<td>').text(Object.values(value)[0]),
+                        $('<td>').text(Object.values(value)[1])
+                    ).appendTo('#most_common' + row);
+                });
+            } else {
+                $('#toprow_common' + row).hide();
+                $('#most_common' + row).text('No reports data found on this term');
+            }
+        });
+    }
 
     $('#payloadListReport').on('change', function () {
         const urlParams = new URLSearchParams(window.location.search);

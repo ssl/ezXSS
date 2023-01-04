@@ -129,7 +129,7 @@ class Account extends Controller
             throw new Exception('The retyped password is not the same as the new password.');
         }
 
-        $this->model('User')->updatePassword($user['id'], $newPassword);
+        $this->model('User')->setPassword($user['id'], $newPassword);
     }
 
     /**
