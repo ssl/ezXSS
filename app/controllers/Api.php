@@ -75,6 +75,104 @@ class Api extends Controller
     }
 
     /**
+     * Retrieves top 10 most common report value
+     * 
+     * @return string
+     */
+    public function getMostCommon()
+    {
+        $id = $this->getPostValue('id');
+        $row = $this->getPostValue('row');
+        $data = [];
+
+        // Validate if id and row is correct
+        if (!in_array($id, [1, 2, 3, 4, 5]) || !in_array($row, [1, 2])) {
+            return $this->showEcho('Something went wrong.');
+        }
+
+        // Save row/id combination of user
+        if ($row === '1') {
+            $this->model('User')->setRow1($this->session->data('id'), $id);
+        } else {
+            $this->model('User')->setRow2($this->session->data('id'), $id);
+        }
+
+        // Check if requested id is a simple top request
+        if ($id === '1') {
+            // Get top origins
+            $data = $this->model('Report')->getTopOrigins();
+        } elseif ($id === '2') {
+            // Get top IPs
+            $data = $this->model('Report')->getTopIPs();
+        } elseif ($id === '5') {
+            // Get top payloads
+            $data = $this->model('Report')->getTopPayloads();
+        }
+
+        // Get top cookies
+        if ($id === '3') {
+            // Get all cookies from all reports
+            $allCookies = $this->model('Report')->getAllCookies();
+            $cookies = [];
+            $results = [];
+
+            // Loop through the cookies of each report and parse them as seperate cookies
+            foreach ($allCookies as $cookie) {
+                $foundCookies = $this->parseCookies($cookie['cookies']);
+                foreach ($foundCookies as $foundCookie) {
+                    $cookies[] = $foundCookie;
+                }
+            }
+
+            // Count dublicate cookies
+            foreach ($cookies as $cookie) {
+                if (isset($results[$cookie])) {
+                    $results[$cookie]++;
+                } else {
+                    $results[$cookie] = 1;
+                }
+            }
+
+            // Create top 10 of most common cookies
+            arsort($results);
+            foreach ($results as $value => $count) {
+                $data[] = ["cookie" => $value, "count" => $count];
+                if (count($data) == 10) {
+                    break;
+                }
+            }
+        }
+
+        // Get top user agents
+        if ($id === '4') {
+            // Get all user agents from all reports
+            $userAgents = $this->model('Report')->getAllUserAgents();
+            $results = [];
+
+            // Loop through the user agents and count dublicates
+            foreach ($userAgents as $userAgent) {
+                $parsedAgent = $this->parseUserAgent($userAgent['user-agent']);
+                if (isset($results[$parsedAgent])) {
+                    $results[$parsedAgent]++;
+                } else {
+                    $results[$parsedAgent] = 1;
+                }
+            }
+
+            // Create top 10 of most common user agents
+            arsort($results);
+            foreach ($results as $value => $count) {
+                $data[] = ["useragent" => $value, "count" => $count];
+                if (count($data) == 10) {
+                    break;
+                }
+            }
+        }
+
+        return json_encode($data);
+    }
+
+    /**
      * Generates statictics about reports
      * 
      * @return string
@@ -157,6 +255,91 @@ class Api extends Controller
         }
 
         return json_encode($statistics);
+    }
+
+    /**
+     * Parses cookies string as single cookies array
+     * 
+     * @param string $cookies The cookies string
+     * @return array
+     */
+    private function parseCookies($cookies)
+    {
+        // Split the string on the ';' character to get an array of cookie strings
+        $cookieArray = explode(';', $cookies);
+        $cookieNames = [];
+
+        // Iterate over the array of cookie strings
+        foreach ($cookieArray as $cookie) {
+            $nameValue = explode('=', $cookie);
+            $cookieName = $nameValue[0];
+            $cookieName = trim($cookieName);
+
+            // Add the cookie name to the array
+            $cookieNames[] = $cookieName;
+        }
+
+        // Return the array of cookie names
+        return $cookieNames;
+    }
+
+    /**
+     * Parses user agent and returns string with browser and OS
+     * 
+     * @param string $userAgent The user agent string
+     * @return string
+     */
+    private function parseUserAgent($userAgent)
+    {
+        $browser = "Unknown";
+        $os = "Unknown";
+
+        $browsers = [
+            '/MSIE/i' => 'Internet Explorer',
+            '/Trident/i' => 'Internet Explorer',
+            '/Edge/i' => 'Microsoft Edge',
+            '/Firefox/i' => 'Mozilla Firefox',
+            '/Chrome/i' => 'Google Chrome',
+            '/OPR/i' => 'Opera',
+            '/Opera/i' => 'Opera',
+            '/UCBrowser/i' => 'UC Browser',
+            '/SamsungBrowser/i' => 'Samsung Browser',
+            '/YaBrowser/i' => 'Yandex Browser',
+            '/Vivaldi/i' => 'Vivaldi',
+            '/Brave/i' => 'Brave',
+            '/Safari/i' => 'Apple Safari'
+        ];
+
+        $oses = [
+            '/Windows/i' => 'Windows',
+            '/Mac/i' => 'Mac',
+            '/Linux/i' => 'Linux',
+            '/Unix/i' => 'Unix',
+            '/Android/i' => 'Android',
+            '/iOS/i' => 'iOS',
+            '/BlackBerry/i' => 'BlackBerry',
+            '/Symbian/i' => 'Symbian',
+            '/FirefoxOS/i' => 'Firefox OS',
+            '/Windows Phone/i' => 'Windows Phone'
+        ];
+
+        // Get the browser
+        foreach ($browsers as $regex => $name) {
+            if (preg_match($regex, $userAgent)) {
+                $browser = $name;
+                break;
+            }
+        }
+
+        // Get the operating system
+        foreach ($oses as $regex => $name) {
+            if (preg_match($regex, $userAgent)) {
+                $os = $name;
+                break;
+            }
+        }
+
+        return "{$browser} with {$os}";
     }
 
     /**
