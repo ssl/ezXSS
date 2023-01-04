@@ -50,8 +50,9 @@ class Update extends Controller
      */
     private function ezXSS3migrate()
     {
-        // Store old password
-        $currentPassword = $this->model('Setting')->get('password');
+        // Store old data
+        $password = $this->model('Setting')->get('password');
+        $notepad = $this->model('Setting')->get('notepad');
 
         // Update the database tables and rows
         $sql = file_get_contents(__DIR__ . '/../../ezXSS3migrate.sql');
@@ -61,9 +62,12 @@ class Update extends Controller
 
         $this->model('Setting')->set('version', version);
 
-        // Create new user and update password to old password
+        // Create new user and update old 
         $user = $this->model('User')->create('admin', 'Temp1234!', 7);
-        $this->model('User')->setPassword($user['id'], $currentPassword, true);
+        $this->model('User')->setPassword($user['id'], $password, true);
+
+        // Add note
+        $this->model('Setting')->set('notepad', "Great! U have updated to ezXSS 4!\n\nA lot of things have changed, and some settings like your alerts and payloads needs to be re-done in other to make everything work correct again.\n\nPlease visit the Github wiki for help on github.com/ssl/ezXSS/wiki\n\n" . $notepad);
 
         // Update all oldskool 'collected pages' and NULL payloads
         $reports = $this->model('Report')->getAllInvalid();
