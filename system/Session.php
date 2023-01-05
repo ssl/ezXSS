@@ -10,7 +10,19 @@ class Session
     {
         // Creates a session if there is non yet
         if (session_status() == 1) {
-            session_set_cookie_params(6000000, '/', null, false, true);
+            session_name('__Host-EZXSS');
+            if(PHP_VERSION_ID < 70300) {
+                session_set_cookie_params(6000000, '/; samesite=Lax', null, true, true);
+            } else {
+                session_set_cookie_params([
+                    'lifetime' => 6000000,
+                    'path' => '/',
+                    'domain' => null,
+                    'secure' => true,
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ]);
+            }
             session_start();
             $this->getCsrfToken();
         }

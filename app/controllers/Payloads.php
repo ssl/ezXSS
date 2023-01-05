@@ -87,6 +87,11 @@ class Payloads extends Controller
         // Set the content type to plain text
         $this->view->setContentType('text/plain');
 
+        // Check method
+        if (!$this->isPOST()) {
+            return 'github.com/ssl/ezXSS';
+        }
+
         // Decode the JSON data
         $data = json_decode(file_get_contents('php://input'), false);
 

@@ -195,7 +195,7 @@ class Controller
      */
     public function getPostValue($param)
     {
-        return isset($_POST[$param]) ? $_POST[$param] : null;
+        return isset($_POST[$param]) && is_string($_POST[$param]) ? $_POST[$param] : null;
     }
 
     /**
