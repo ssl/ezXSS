@@ -30,7 +30,7 @@ class Api extends Controller
         try {
             $alertId = $this->getPostValue('alertId');
 
-            if (!isset($alertIds[$alertId])) {
+            if (!is_string($alertId) || !isset($alertIds[$alertId])) {
                 throw new Exception("Invalid alert");
             }
 
