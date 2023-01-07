@@ -97,27 +97,48 @@ class Api extends Controller
             $this->model('User')->setRow2($this->session->data('id'), $id);
         }
 
-        // Check if requested id is a simple top request
-        if ($id === '1') {
-            // Get top origins
-            $data = $this->model('Report')->getTopOrigins();
-        } elseif ($id === '2') {
-            // Get top IPs
-            $data = $this->model('Report')->getTopIPs();
-        } elseif ($id === '5') {
-            // Get top payloads
-            $data = $this->model('Report')->getTopPayloads();
+        $user = $this->model('User')->getById($this->session->data('id'));
+        $payloads = $this->model('Payload')->getAllByUserId($user['id']);
+        $allReports = [];
+
+        // Merge all reports that belong to user
+        foreach ($payloads as $payload) {
+            $payloadUri = '//' . $payload['payload'];
+            if (strpos($payload['payload'], '/') === false) {
+                $payloadUri .= '/%';
+            }
+            $allReports = array_merge($allReports, $this->model('Report')->getAllCommonDataByPayload($payloadUri));
+        }
+
+        $rows = [1 => 'origin', 2 => 'ip', 5 => 'payload'];
+        if (in_array($id, [1,2,5])) {
+            $results = [];
+            // Loop through the reports and count dublicates
+            foreach ($allReports as $report) {
+                $value = $report[$rows[$id]];
+                if (isset($results[$value])) {
+                    $results[$value]++;
+                } else {
+                    $results[$value] = 1;
+                }
+            }
+
+            // Create top 10 of most common
+            arsort($results);
+            foreach ($results as $value => $count) {
+                $data[] = ["value" => $value, "count" => $count];
+                if (count($data) == 10) {
+                    break;
+                }
+            }
         }
 
         // Get top cookies
         if ($id === '3') {
-            // Get all cookies from all reports
-            $allCookies = $this->model('Report')->getAllCookies();
             $cookies = [];
             $results = [];
-
             // Loop through the cookies of each report and parse them as seperate cookies
-            foreach ($allCookies as $cookie) {
+            foreach ($allReports as $cookie) {
                 $foundCookies = $this->parseCookies($cookie['cookies']);
                 foreach ($foundCookies as $foundCookie) {
                     $cookies[] = $foundCookie;
@@ -145,12 +166,9 @@ class Api extends Controller
 
         // Get top user agents
         if ($id === '4') {
-            // Get all user agents from all reports
-            $userAgents = $this->model('Report')->getAllUserAgents();
             $results = [];
-
             // Loop through the user agents and count dublicates
-            foreach ($userAgents as $userAgent) {
+            foreach ($allReports as $userAgent) {
                 $parsedAgent = $this->parseUserAgent($userAgent['user-agent']);
                 if (isset($results[$parsedAgent])) {
                     $results[$parsedAgent]++;
@@ -312,13 +330,12 @@ class Api extends Controller
 
         $oses = [
             '/Windows/i' => 'Windows',
-            '/Mac/i' => 'Mac',
+            '/Mac/i' => 'macOS',
             '/Linux/i' => 'Linux',
             '/Unix/i' => 'Unix',
             '/Android/i' => 'Android',
             '/iOS/i' => 'iOS',
             '/BlackBerry/i' => 'BlackBerry',
-            '/Symbian/i' => 'Symbian',
             '/FirefoxOS/i' => 'Firefox OS',
             '/Windows Phone/i' => 'Windows Phone'
         ];
@@ -339,7 +356,7 @@ class Api extends Controller
             }
         }
 
-        return "{$browser} with {$os}";
+        return "{$os} with {$browser}";
     }
 
     /**

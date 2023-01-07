@@ -66,6 +66,8 @@ class Update extends Controller
         $user = $this->model('User')->create('admin', 'Temp1234!', 7);
         $this->model('User')->setPassword($user['id'], $password, true);
 
+        $this->model('Payload')->add($user['id'], host);
+
         // Add note
         $this->model('Setting')->set('notepad', "Great! U have updated to ezXSS 4!\n\nA lot of things have changed, and some settings like your alerts and payloads needs to be re-done in other to make everything work correct again.\n\nPlease visit the Github wiki for help on github.com/ssl/ezXSS/wiki\n\n" . $notepad);
 
