@@ -127,6 +127,26 @@ class Report_model extends Model
     }
 
     /**
+     * Get al common data by payload
+     * 
+     * @param string $payload The payload
+     * @throws Exception
+     * @return array
+     */
+    public function getAllCommonDataByPayload($payload)
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT origin,ip,cookies,`user-agent`,payload FROM reports WHERE payload LIKE :payload ORDER BY id ASC');
+        $database->bindValue(':payload', $payload);
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return $database->fetchAll();
+    }
+
+    /**
      * Add report
      * 
      * @param string $shareId The share id
@@ -300,7 +320,7 @@ class Report_model extends Model
     public function getTopOrigins()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT origin, COUNT(*) as count FROM reports GROUP BY origin ORDER BY count DESC LIMIT 10');
+        $database->prepare('SELECT origin, COUNT(*) as count FROM reports WHERE payload LIKE :payload GROUP BY origin ORDER BY count DESC LIMIT 10');
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
@@ -319,7 +339,7 @@ class Report_model extends Model
     public function getTopIPs()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT ip, COUNT(*) as count FROM reports GROUP BY ip ORDER BY count DESC LIMIT 10');
+        $database->prepare('SELECT ip, COUNT(*) as count FROM reports WHERE payload LIKE :payload GROUP BY ip ORDER BY count DESC LIMIT 10');
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
@@ -338,7 +358,7 @@ class Report_model extends Model
     public function getTopPayloads()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT payload, COUNT(*) as count FROM reports GROUP BY payload ORDER BY count DESC LIMIT 10');
+        $database->prepare('SELECT payload, COUNT(*) as count FROM reports WHERE payload LIKE :payload GROUP BY payload ORDER BY count DESC LIMIT 10');
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
@@ -357,7 +377,7 @@ class Report_model extends Model
     public function getAllCookies()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT cookies FROM `reports` WHERE cookies IS NOT NULL and cookies != ""');
+        $database->prepare('SELECT cookies FROM `reports` WHERE payload LIKE :payload AND cookies IS NOT NULL AND cookies != ""');
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
@@ -376,7 +396,7 @@ class Report_model extends Model
     public function getAllUserAgents()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT `user-agent` FROM `reports` WHERE `user-agent` IS NOT NULL and `user-agent` != ""');
+        $database->prepare('SELECT `user-agent` FROM `reports` WHERE payload LIKE :payload AND `user-agent` IS NOT NULL AND `user-agent` != ""');
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
