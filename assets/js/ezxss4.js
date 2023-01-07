@@ -150,7 +150,7 @@ $(document).ready(function () {
             if (window.location.href.indexOf('/view/') !== -1) {
                 window.location.href = '/manage/reports';
             } else {
-                window.location.href = window.location.href;
+                $("#" + id).fadeOut("slow", function () { });
             }
         });
     });
