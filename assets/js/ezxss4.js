@@ -76,7 +76,7 @@ $(document).ready(function () {
                 });
             } else {
                 $('#toprow_common' + row).hide();
-                $('#most_common' + row).text('No reports data found on this term');
+                $('#most_common' + row).text('No reports data found');
             }
         });
     }

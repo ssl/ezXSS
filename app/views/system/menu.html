@@ -22,15 +22,17 @@
             <li class="{currentPage[dashboard]}"><a href="/manage/dashboard">Dashboard</a></li>
             <li class="{currentPage[settings]}"><a href="/manage/settings">Settings</a></li>
             <li class="{currentPage[users*]}"><a href="/manage/users">Users</a></li>
+            <li class="{currentPage[logs]}"><a href="/manage/logs">Logs</a></li>
             {%/if}
 
-            <li class="nav-category">PersistenceX</li>
+            <li class="nav-category">Persistence</li>
             <li class="{currentPage[persistence/online]}"><a href="/manage/persistence/online">Online</a></li>
             <li class="{currentPage[persistence/offline]}"><a href="/manage/persistence/offline">Offline</a></li>
 
-            <li class="nav-category">My Reports</li>
+            <li class="nav-category">Reports</li>
             <li class="{currentPage[reports*1]}"><a href="/manage/reports/all">All reports</a></li>
             <li class="{currentPage[reports*0]}"><a href="/manage/reports/all/?archive=1">Archived reports</a></li>
+
             {%/if}
         </ul>
     </nav>
