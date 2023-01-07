@@ -95,6 +95,10 @@ class Payloads extends Controller
         // Decode the JSON data
         $data = json_decode(file_get_contents('php://input'), false);
 
+        if(empty($data)) {
+            return 'github.com/ssl/ezXSS';
+        }
+
         // Set a default value for the screenshot
         $data->screenshot = $data->screenshot ?? '';
 
@@ -102,14 +106,14 @@ class Payloads extends Controller
         $data->ip = $data->ip ?? $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'];
 
         // Remove the protocol from the origin URL
-        $data->origin = str_replace(['https://', 'http://'], '', $data->origin);
+        $data->origin = str_replace(['https://', 'http://'], '', $data->origin ?? '');
 
         // Truncate very long strings
-        $data->uri = substr($data->uri, 0, 1000);
-        $data->referer = substr($data->referer, 0, 1000);
-        $data->origin = substr($data->origin, 0, 500);
-        $data->payload = substr($data->payload, 0, 500);
-        $data->{'user-agent'} = substr($data->{'user-agent'}, 0, 500);
+        $data->uri = substr($data->uri ?? '', 0, 1000);
+        $data->referer = substr($data->referer ?? '', 0, 1000);
+        $data->origin = substr($data->origin ?? '', 0, 500);
+        $data->payload = substr($data->payload ?? '', 0, 500);
+        $data->{'user-agent'} = substr($data->{'user-agent'} ?? '', 0, 500);
 
         // Check black and whitelist
         $payload = $this->getPayloadByUrl($data->payload);
@@ -152,7 +156,7 @@ class Payloads extends Controller
         // Check if the report should be saved or alerted
         $doubleReport = false;
         if ($this->model('Setting')->get('filter-save') == 0 || $this->model('Setting')->get('filter-alert') == 0) {
-            if ($this->model('Report')->searchForDublicates($data->cookies, $data->dom, $data->origin, $data->referer, $data->uri, $data->{'user-agent'}, $data->ip)) {
+            if ($this->model('Report')->searchForDublicates($data->cookies ?? '', $data->dom ?? '', $data->origin, $data->referer, $data->uri, $data->{'user-agent'}, $data->ip)) {
                 if ($this->model('Setting')->get('filter-save') == 0 && $this->model('Setting')->get('filter-alert') == 0) {
                     return 'github.com/ssl/ezXSS';
                 } else {
@@ -182,16 +186,16 @@ class Payloads extends Controller
             $shareId = sha1(bin2hex(openssl_random_pseudo_bytes(32)) . time());
             $data->id = $this->model('Report')->add(
                 $shareId,
-                $data->cookies,
-                $data->dom,
+                $data->cookies ?? '',
+                $data->dom ?? '',
                 $data->origin,
                 $data->referer,
                 $data->uri,
                 $data->{'user-agent'},
                 $data->ip,
                 ($data->screenshotName ?? ''),
-                json_encode($data->localstorage),
-                json_encode($data->sessionstorage),
+                json_encode($data->localstorage ?? ''),
+                json_encode($data->sessionstorage ?? ''),
                 $data->payload
             );
             $data->domain = host;
@@ -224,8 +228,8 @@ class Payloads extends Controller
         }
 
         // Check if the DOM should be truncated
-        if ($this->model('Setting')->get('dompart') > 0 && strlen($data->dom) > $this->model('Setting')->get('dompart')) {
-            $data->dom = substr($data->dom, 0, $this->model('Setting')->get('dompart')) .
+        if ($this->model('Setting')->get('dompart') > 0 && strlen($data->dom ?? '') > $this->model('Setting')->get('dompart')) {
+            $data->dom = substr($data->dom ?? '', 0, $this->model('Setting')->get('dompart')) .
                 '&#13;&#10;&#13;&#10;View full dom on the report page or change this setting on /settings';
         }
 
@@ -439,11 +443,12 @@ class Payloads extends Controller
 
         try {
             // Attempt to retrieve the payload by the full path
-            $payload = $this->model('Payload')->getByPayload($splitUrl[2] ?? '' . '/' . $splitUrl[3] ?? '');
+            $url = (array_key_exists(2, $splitUrl) ? $splitUrl[2] : '' ). '/' . (array_key_exists(3, $splitUrl) ? $splitUrl[3] : '');
+            $payload = $this->model('Payload')->getByPayload($url);
         } catch (Exception $e) {
             try {
                 // If the payload is not found by the full path, try to retrieve it by the domain name
-                $payload = $this->model('Payload')->getByPayload($splitUrl[2] ?? '');
+                $payload = $this->model('Payload')->getByPayload((array_key_exists(2, $splitUrl) ? $splitUrl[2] : '' ));
             } catch (Exception $e) {
                 // If the payload is still not found, fallback to the default payload
                 $payload = $this->model('Payload')->getById(1);
