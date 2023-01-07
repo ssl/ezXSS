@@ -53,6 +53,7 @@ class Payloads extends Controller
         $this->view->renderData('noCollect', implode(',', $noCollect), true);
         $this->view->renderData('pages', implode(',', $pages), true);
         $this->view->renderData('customjs', $payload['customjs'], true);
+        $this->view->renderData('globaljs', $this->model('Setting')->get('customjs'), true);
         $this->view->renderData('screenshot', $screenshot, true);
         $this->view->renderData('payload', url);
 

@@ -53,7 +53,7 @@ class Reports extends Controller
         }
 
         // Render all rows
-        $screenshot = !empty($report['screenshot']) ? '<img src="/assets/img/report-' . e($report['screenshot']) . '.png">' : '';
+        $screenshot = !empty($report['screenshot']) ? '<img src="/assets/img/report-' . e($report['screenshot']) . '.png" style="max-width:100%">' : '';
         $this->view->renderData('screenshot', $screenshot, true);
         $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
 
