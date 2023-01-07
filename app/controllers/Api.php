@@ -84,6 +84,7 @@ class Api extends Controller
         $id = $this->getPostValue('id');
         $row = $this->getPostValue('row');
         $data = [];
+        $results = [];
 
         // Validate if id and row is correct
         if (!in_array($id, [1, 2, 3, 4, 5]) || !in_array($row, [1, 2])) {
@@ -110,25 +111,20 @@ class Api extends Controller
             $allReports = array_merge($allReports, $this->model('Report')->getAllCommonDataByPayload($payloadUri));
         }
 
-        $rows = [1 => 'origin', 2 => 'ip', 5 => 'payload'];
-        if (in_array($id, [1,2,5])) {
-            $results = [];
+        $rows = [1 => 'origin', 2 => 'ip', 4 => 'user-agent', 5 => 'payload'];
+        if (in_array($id, [1, 2, 4, 5])) {
             // Loop through the reports and count dublicates
             foreach ($allReports as $report) {
-                $value = $report[$rows[$id]];
+                if($rows[$id] == 'user-agent') {
+                    $value = $this->parseUserAgent($report[$rows[$id]]);
+                } else {
+                    $value = $report[$rows[$id]];
+                }
+                
                 if (isset($results[$value])) {
                     $results[$value]++;
                 } else {
                     $results[$value] = 1;
-                }
-            }
-
-            // Create top 10 of most common
-            arsort($results);
-            foreach ($results as $value => $count) {
-                $data[] = ["value" => $value, "count" => $count];
-                if (count($data) == 10) {
-                    break;
                 }
             }
         }
@@ -136,7 +132,6 @@ class Api extends Controller
         // Get top cookies
         if ($id === '3') {
             $cookies = [];
-            $results = [];
             // Loop through the cookies of each report and parse them as seperate cookies
             foreach ($allReports as $cookie) {
                 $foundCookies = $this->parseCookies($cookie['cookies']);
@@ -153,37 +148,14 @@ class Api extends Controller
                     $results[$cookie] = 1;
                 }
             }
-
-            // Create top 10 of most common cookies
-            arsort($results);
-            foreach ($results as $value => $count) {
-                $data[] = ["cookie" => $value, "count" => $count];
-                if (count($data) == 10) {
-                    break;
-                }
-            }
         }
 
-        // Get top user agents
-        if ($id === '4') {
-            $results = [];
-            // Loop through the user agents and count dublicates
-            foreach ($allReports as $userAgent) {
-                $parsedAgent = $this->parseUserAgent($userAgent['user-agent']);
-                if (isset($results[$parsedAgent])) {
-                    $results[$parsedAgent]++;
-                } else {
-                    $results[$parsedAgent] = 1;
-                }
-            }
-
-            // Create top 10 of most common user agents
-            arsort($results);
-            foreach ($results as $value => $count) {
-                $data[] = ["useragent" => $value, "count" => $count];
-                if (count($data) == 10) {
-                    break;
-                }
+        // Create top 10 of most common
+        arsort($results);
+        foreach ($results as $value => $count) {
+            $data[] = ["value" => $value, "count" => $count];
+            if (count($data) == 10) {
+                break;
             }
         }
 
@@ -313,19 +285,19 @@ class Api extends Controller
         $os = "Unknown";
 
         $browsers = [
-            '/MSIE/i' => 'Internet Explorer',
-            '/Trident/i' => 'Internet Explorer',
-            '/Edge/i' => 'Microsoft Edge',
-            '/Firefox/i' => 'Mozilla Firefox',
-            '/Chrome/i' => 'Google Chrome',
+            '/MSIE/i' => 'IE',
+            '/Trident/i' => 'IE',
+            '/Edge/i' => 'Edge',
+            '/Firefox/i' => 'Firefox',
+            '/Chrome/i' => 'Chrome',
             '/OPR/i' => 'Opera',
             '/Opera/i' => 'Opera',
             '/UCBrowser/i' => 'UC Browser',
-            '/SamsungBrowser/i' => 'Samsung Browser',
-            '/YaBrowser/i' => 'Yandex Browser',
+            '/SamsungBrowser/i' => 'SamsungBrowser',
+            '/YaBrowser/i' => 'Yandex',
             '/Vivaldi/i' => 'Vivaldi',
             '/Brave/i' => 'Brave',
-            '/Safari/i' => 'Apple Safari'
+            '/Safari/i' => 'Safari'
         ];
 
         $oses = [

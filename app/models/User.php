@@ -61,7 +61,7 @@ class User_model extends Model
 
         $database->prepare('UPDATE `users` SET password = :password WHERE id = :id');
         $database->bindValue(':id', $id);
-        $database->bindValue(':password', !$hashed ? password_hash($password, PASSWORD_BCRYPT) : $password);
+        $database->bindValue(':password', !$hashed ? password_hash($password, PASSWORD_BCRYPT, ['cost' => 14]) : $password);
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
@@ -256,7 +256,7 @@ class User_model extends Model
 
         $database->prepare('INSERT INTO `users` (`username`, `password`, `rank`, `secret`, `notepad`) VALUES (:username, :password, :rank, "", "Welcome to ezXSS");');
         $database->bindValue(':username', $username);
-        $database->bindValue(':password', password_hash($password, PASSWORD_BCRYPT));
+        $database->bindValue(':password', password_hash($password, PASSWORD_BCRYPT, ['cost' => 14]));
         $database->bindValue(':rank', $rank);
 
         if (!$database->execute()) {

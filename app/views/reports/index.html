@@ -10,8 +10,7 @@
                         <div class="header-title float-left">
                             <h3 class="m-b-xs">All reports</h3>
                             <small>The reports page allows you to view, search, share, and delete all of your payload's
-                                reports. Use it to track important data and to share information with your team or
-                                stakeholders.</small>
+                                reports. Use it to track important data and to share reports with your stakeholders.</small>
                         </div>
                     </div>
                     <hr>
@@ -57,7 +56,7 @@
                                     <tbody id="reports-list">
                                         {%foreach report}
                                         <tr id="{report->id}">
-                                            <td scope=row style="width:50px;max-width:50px;border-color:#5b6187">
+                                            <td scope=row style="width:50px;border-color:#5b6187">
                                                 <label class="reports-checkbox-label" for="chk_{report->id}">
                                                     <input class="chkbox" type="checkbox" name="selected"
                                                         value="{report->id}" id="chk_{report->id}"
@@ -105,7 +104,7 @@
                                         with selected:
                                         <button class="btn delete-selected">Delete</button>
                                         <button class="btn archive-selected">Archive</button>
-                                    </div>
+                                    </div><br>
                                 </div>
                             </div>
                             {%/if}

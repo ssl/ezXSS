@@ -84,7 +84,7 @@ class Payload extends Controller
 
         // Get current payload
         $payload = $this->model('Payload')->getById($id);
-        $payload['payload'] = !+$id ? host : $payload['payload'];
+        $payload['payload'] = +$id === 1 ? host : $payload['payload'];
 
         // Render all data and checkboxes
         $this->view->renderData('domain', $payload['payload']);
