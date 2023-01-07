@@ -10,12 +10,12 @@
 </p>
 
 ## Features
-* Easy to use dashboard with statistics, payloads, view/share/search reports
-* Multiple users with permissions to personal payloads & reports
+* Easy to use dashboard with settings, statistics, payloads, view/share/search reports
+* Unlimited users with permissions to personal payloads & their reports
 * Instant alerts via mail, Telegram, Slack, Discord or custom callback URL
 * Custom javascript payloads
 * Custom payload links to distinguish insert points
-* Block, whitelist and other filters
+* Extract additional pages, block, whitelist and other filters
 * Secure your login with Two-factor (2FA)
 * The following information can be collected on a vulnerable page:
     * The URL of the page
