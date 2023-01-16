@@ -136,7 +136,9 @@ class Api extends Controller
             foreach ($allReports as $cookie) {
                 $foundCookies = $this->parseCookies($cookie['cookies']);
                 foreach ($foundCookies as $foundCookie) {
-                    $cookies[] = $foundCookie;
+                    if($foundCookie !== '') {
+                        $cookies[] = $foundCookie;
+                    }
                 }
             }
 
