@@ -45,7 +45,7 @@ textarea.form-control{height:auto}
 .container-fluid:before,.container-fluid:after,.row:before,.row:after,.nav:before,.nav:after,.navbar-header:before,.navbar-header:after,.panel-body:before,.panel-body:after{display:table;content:" "}
 .container-fluid:after,.row:after,.nav:after,.navbar-header:after,.panel-body:after{clear:both}
 .m-b-none{margin-bottom:0}
-.col-lg-2,.col-xs-6,.col-lg-6,.col-lg-12,.col-lg-8{padding-left:10px;padding-right:10px}
+.col-lg-2,.col-xs-6,.col-lg-6,.col-lg-12,.col-lg-8,.col-lg-3{padding-left:10px;padding-right:10px}
 h2,h3{color:#FFFFFF}
 h2,h3{margin-top:10px}
 .form-control[disabled]{background-color:#2b3157;opacity:1;border:#686D93 1px solid}
