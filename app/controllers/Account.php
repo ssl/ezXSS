@@ -199,7 +199,7 @@ class Account extends Controller
                 throw new Exception('This does not look like an valid Telegram bot token');
             }
 
-            if (!is_numeric($telegramChatID)) {
+            if (!filter_var($telegramChatID, FILTER_VALIDATE_INT)) {
                 throw new Exception('The chat id needs to be numeric');
             }
         }
