@@ -208,8 +208,8 @@ class Settings extends Controller
                 throw new Exception('This does not look like an valid Telegram bot token');
             }
 
-            if (!ctype_digit($telegramChatID)) {
-                throw new Exception('The chat id needs to be a digits');
+            if (!filter_var($telegramChatID, FILTER_VALIDATE_INT)) {
+                throw new Exception('The chat id needs to be numeric');
             }
         }
         $alerts->set(0, 2, $telegramOn !== null, $telegramToken, $telegramChatID);
