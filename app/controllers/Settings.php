@@ -208,7 +208,7 @@ class Settings extends Controller
                 throw new Exception('This does not look like an valid Telegram bot token');
             }
 
-            if (!filter_var($telegramChatID, FILTER_VALIDATE_INT)) {
+            if (!preg_match('/^[0-9-]*$/', $telegramChatID)) {
                 throw new Exception('The chat id needs to be numeric');
             }
         }
