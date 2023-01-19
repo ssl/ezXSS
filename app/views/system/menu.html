@@ -1,3 +1,4 @@
+{%if isLoggedIn}
 <div class="navbar-header">
     <div id="mobile-menu">
         <div class="left-nav-toggle"><a href="#"><i class="fa fa-bars"></i></a></div>
@@ -11,7 +12,6 @@
                 <div class="m-t-xs"><span class="c-white">ezXSS v{version[]}</span> github.com/ssl/ezxss</div>
             </li>
 
-            {%if isLoggedIn}
             <li class="nav-category">Main</li>
             <li class="{currentPage[dashboard/my]}"><a href="/manage/dashboard/my">My Dashboard</a></li>
             <li class="{currentPage[account]}"><a href="/manage/account">Account</a></li>
@@ -27,8 +27,8 @@
             <li class="nav-category">Reports</li>
             <li class="{currentPage[reports*1]}"><a href="/manage/reports/all">All reports</a></li>
             <li class="{currentPage[reports*0]}"><a href="/manage/reports/all/?archive=1">Archived reports</a></li>
-
-            {%/if}
+            
         </ul>
     </nav>
 </aside>
+{%/if}
