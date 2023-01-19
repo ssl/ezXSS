@@ -44,7 +44,7 @@ CREATE TABLE `payloads` (
   `collect_sessionstorage` tinyint(1) NOT NULL DEFAULT '1',
   `collect_dom` tinyint(1) NOT NULL DEFAULT '1',
   `collect_origin` tinyint(1) NOT NULL DEFAULT '1',
-  `collect_screenshot` tinyint(1) NOT NULL DEFAULT '1'
+  `collect_screenshot` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
