@@ -10,15 +10,15 @@ class Session
     {
         // Creates a session if there is non yet
         if (session_status() == 1) {
-            session_name('__Host-EZXSS');
+            session_name(!httpmode ? '__Host-EZXSS' : 'EZXSS');
             if(PHP_VERSION_ID < 70300) {
-                session_set_cookie_params(6000000, '/; samesite=Lax', null, true, true);
+                session_set_cookie_params(6000000, '/; samesite=Lax', null, !httpmode, true);
             } else {
                 session_set_cookie_params([
                     'lifetime' => 6000000,
                     'path' => '/',
                     'domain' => null,
-                    'secure' => true,
+                    'secure' => !httpmode,
                     'httponly' => true,
                     'samesite' => 'Lax'
                 ]);

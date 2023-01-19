@@ -3,6 +3,9 @@
 // Debug modus will show and report any kind of errors, do not enable this unless you are debugging something
 define('debug', true);
 
+// Defines whenever httpmode is enabled, this allows ezXSS panel to be used without SSL
+define('httpmode', true);
+
 // Current ezXSS version. Do not edit this
 define('version', '4.0');
 

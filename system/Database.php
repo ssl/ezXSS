@@ -17,6 +17,13 @@ class Database
     private static $database = null;
 
     /**
+     * Statement
+     * 
+     * @var mixed
+     */
+    private $statement = null;
+
+    /**
      * Starts new PDO database connection
      */
     private function __construct()

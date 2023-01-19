@@ -10,6 +10,21 @@ class Controller
     public $model;
 
     /**
+     * Session
+     * 
+     * @var object
+     */
+    public $session;
+    
+    
+    /**
+     * View
+     * 
+     * @var object
+     */
+    public $view;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -83,6 +98,9 @@ class Controller
         $csrf = $this->getPostValue('csrf');
 
         if (!$this->session->isValidCsrfToken($csrf)) {
+            if (!httpmode && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === "")) {
+                throw new Exception("ezXSS does not work without SSL");
+            }
             throw new Exception("Invalid CSRF token");
         }
     }

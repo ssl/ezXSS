@@ -3,6 +3,13 @@
 class Router
 {
     /**
+     * Contoller
+     * 
+     * @var string
+     */
+    public $controller = null;
+
+    /**
      * Routing processing. All requests go through this function and matches it to the correct functions
      *
      * @param string $uri The current url
