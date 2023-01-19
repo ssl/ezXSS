@@ -45,7 +45,7 @@ class Install extends Controller
                 $sql = file_get_contents(__DIR__ . '/../../ezXSS4.sql');
                 $database = Database::openConnection();
                 $database->exec($sql);
-                $database->exec('ALTER DATABASE '.DB_NAME.' CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;');
+                $database->exec('ALTER DATABASE `'.DB_NAME.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;');
 
                 // Create and login user
                 $this->model('User')->create($username, $password, 7);

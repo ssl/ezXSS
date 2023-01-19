@@ -42,7 +42,11 @@ class Controller
         $this->checkForUpdates();
 
         // Set timezone
-        date_default_timezone_set($this->model('Setting')->get('timezone'));
+        try {
+            date_default_timezone_set($this->model('Setting')->get('timezone'));
+        } catch (Exception $e) {
+            date_default_timezone_set('Europe/Amsterdam');
+        }
     }
 
     /**
@@ -276,7 +280,7 @@ class Controller
     private function checkForUpdates()
     {
         try {
-            if(path !== '/manage/update') {
+            if(path !== '/manage/update' && path !== '/manage/install') {
                 $version = $this->model('Setting')->get('version');
                 if($version !== version) {
                     throw new Exception('ezXSS is not up-to-date');
