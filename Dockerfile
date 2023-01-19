@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y msmtp && rm -rf /var/lib/apt/lists/*
 # Installs php modules
 RUN docker-php-ext-install pdo_mysql
 # config msmtp https://owendavies.net/articles/setting-up-msmtp/
-COPY ./docker-php/msmtprc /etc/msmtprc
+COPY ./msmtprc /etc/msmtprc
 RUN chmod 600 /etc/msmtprc
 RUN touch /var/log/msmtp.log
 RUN chown www-data:www-data /etc/msmtprc
@@ -25,13 +25,7 @@ RUN echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-se
 FROM partial
 ENV PUID=2000
 ENV PGID=2000
-COPY ./docker-php/init.sh /init.sh
-COPY ./.htaccess /var/www/html/
-COPY ./index.html /var/www/html/
-COPY ./init.php /var/www/html/
-COPY ./assets/ /var/www/html/assets/
-COPY ./templates/ /var/www/html/templates/
-COPY ./src/ /var/www/html/src/
+COPY . /var/www/html/
 RUN find . -type f -exec sed -i 's/\r$//' {} \; && \
     chmod +x /init.sh && \
     sed -i -e 's/\r$//' /init.sh

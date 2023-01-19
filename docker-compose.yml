@@ -15,7 +15,7 @@ services:
   ezxss:
     build:
       context: .
-      dockerfile: ./docker-php/Dockerfile
+      dockerfile: ./Dockerfile
       target: partial
     ports:
       - "80:80"
