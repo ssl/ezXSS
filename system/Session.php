@@ -4,7 +4,7 @@ class Session
 {
 
     /**
-     * Constructor which starts an secure session
+     * Constructor which starts a secure session
      */
     public function __construct()
     {

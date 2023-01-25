@@ -107,7 +107,7 @@ class Report_model extends Model
     }
 
     /**
-     * Get al statictics data by payload
+     * Get all statictics data by payload
      * 
      * @param string $payload The payload
      * @throws Exception
@@ -127,7 +127,7 @@ class Report_model extends Model
     }
 
     /**
-     * Get al common data by payload
+     * Get all common data by payload
      * 
      * @param string $payload The payload
      * @throws Exception

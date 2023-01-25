@@ -270,7 +270,7 @@ class View
     }
 
     /**
-     * Renders the data within a alert template
+     * Renders the data within an alert template
      * 
      * @param string $template The template
      * @param string|object $data The data

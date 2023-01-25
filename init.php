@@ -21,7 +21,7 @@ try {
     $router = new Router();
     echo $router->proccess($_SERVER['REQUEST_URI']);
 } catch (Exception $message) {
-    // Any unexpected uncatched exception will show a error page
+    // Any unexpected uncatched exception will show an error page
     $view = new View();
     $view->setContentType('text/html');
     echo $view->renderErrorPage($message->getMessage());

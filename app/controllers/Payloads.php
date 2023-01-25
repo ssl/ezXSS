@@ -168,7 +168,7 @@ class Payloads extends Controller
 
         if (($doubleReport && ($this->model('Setting')->get('filter-save') == 1 || $this->model('Setting')->get('filter-alert') == 1)) || (!$doubleReport)) {
 
-            // Create a image from the screenshot data
+            // Create an image from the screenshot data
             if (!empty($data->screenshot)) {
                 try {
                     $screenshot = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data->screenshot));
