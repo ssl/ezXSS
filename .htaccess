@@ -1,4 +1,5 @@
 Options -Indexes
 RewriteEngine On
 RewriteCond %{REQUEST_URI} !assets
+RewriteCond %{REQUEST_URI} !.well-known/acme-challenge/
 RewriteRule ^(.*)$ init.php [L]
