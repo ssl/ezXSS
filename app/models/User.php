@@ -118,7 +118,7 @@ class User_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('UPDATE `users` SET rank = :rank WHERE id = :id');
+        $database->prepare('UPDATE `users` SET `rank` = :rank WHERE id = :id');
         $database->bindValue(':id', $id);
         $database->bindValue(':rank', $rank);
 
