@@ -1,4 +1,5 @@
 #!/bin/bash
+chown -R www-data:www-data /var/www/html/*
 groupadd --gid "$PUID" ezxss || true
 useradd --system --uid "$PUID" --gid "$PGID" ezxss || true
 chown ezxss: /var/www/html -R || true
