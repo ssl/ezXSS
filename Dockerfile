@@ -16,8 +16,7 @@ RUN chown www-data:www-data /var/log/msmtp.log
 RUN echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
 
 COPY . /var/www/html/
-RUN chown www-data:www-data /var/www/html/assets/img
-RUN chmod 777 /var/www/html/assets/img
+RUN /bin/bash -c 'chown www-data:www-data /var/www/html/assets/img'
 
 FROM partial
 ENV PUID=2000
