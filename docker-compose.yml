@@ -21,7 +21,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - .:/var/www/html
+      - .:/tmp/ezxss
     restart: always
     depends_on:
       - ezxssdb
