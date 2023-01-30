@@ -133,6 +133,8 @@ class Account extends Controller
 
         if ($this->isPOST()) {
             try {
+                $this->validateCsrfToken();
+                
                 $username = $this->session->data('username');
                 $password = $this->session->data('password');
                 $code = $this->getPostValue('code');
