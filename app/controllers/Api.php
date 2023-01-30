@@ -31,7 +31,7 @@ class Api extends Controller
             $alertId = $this->getPostValue('alertId');
 
             if (!is_string($alertId) || !isset($alertIds[$alertId])) {
-                throw new Exception("Invalid alert");
+                throw new Exception('Invalid alert');
             }
 
             $enabled = $this->model('Setting')->get('alert-' . $alertIds[$alertId]);
@@ -62,7 +62,7 @@ class Api extends Controller
 
         // Check if result is OK
         if ($results['ok'] !== true) {
-            return $this->showEcho('Something went wrong. Your bot token is probably invalid.');
+            return $this->showEcho('Something went wrong, your bot token is probably invalid');
         }
 
         // Check if result contains any chat
@@ -88,7 +88,7 @@ class Api extends Controller
 
         // Validate if id and row is correct
         if (!in_array($id, [1, 2, 3, 4, 5]) || !in_array($row, [1, 2])) {
-            return $this->showEcho('Something went wrong.');
+            return $this->showEcho('Something went wrong');
         }
 
         // Save row/id combination of user

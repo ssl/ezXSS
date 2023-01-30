@@ -135,18 +135,18 @@ class Settings extends Controller
     {
         // Validate timezone
         if (!in_array($timezone, timezone_identifiers_list(), true)) {
-            throw new Exception('The timezone is not a valid timezone.');
+            throw new Exception('The timezone is not a valid timezone');
         }
 
         // Validate if theme exists
         $theme = preg_replace('/[^a-zA-Z0-9]/', '', $theme);
         if (!file_exists(__DIR__ . "/../../assets/css/{$theme}.css")) {
-            throw new Exception('This theme is not installed.');
+            throw new Exception('This theme is not installed');
         }
 
         // Check if type is digit
         if (!ctype_digit($dompart)) {
-            throw new Exception('The dom length needs to be digits.');
+            throw new Exception('The dom length needs to be digits');
         }
 
         // Set the value based on the posted filter
@@ -195,7 +195,7 @@ class Settings extends Controller
         $mailOn = $this->getPostValue('mailon');
         $mail = $this->getPostValue('mail');
         if (!filter_var($mail, FILTER_VALIDATE_EMAIL) && !empty($mail)) {
-            throw new Exception('This is not a correct email address.');
+            throw new Exception('This is not a correct email address');
         }
         $alerts->set(0, 1, $mailOn !== null, $mail);
 

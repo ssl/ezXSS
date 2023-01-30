@@ -141,7 +141,7 @@ class Account extends Controller
                 $user = $this->model('User')->login($username, $password);
 
                 if (getAuthCode($user['secret']) != $code) {
-                    throw new Exception('Code is incorrect.');
+                    throw new Exception('Code is incorrect');
                 }
 
                 $this->session->createSession($user);
@@ -168,11 +168,11 @@ class Account extends Controller
         $user = $this->model('User')->getById($this->session->data('id'));
 
         if (!password_verify($currentPassword, $user['password'])) {
-            throw new Exception('Current password is not correct.');
+            throw new Exception('Current password is incorrect');
         }
 
         if ($newPassword !== $newPassword2) {
-            throw new Exception('The retyped password is not the same as the new password.');
+            throw new Exception('The retyped password is not the same as the new password');
         }
 
         $this->model('User')->setPassword($user['id'], $newPassword);
@@ -193,7 +193,7 @@ class Account extends Controller
 
         if (strlen($secret) == 16) {
             if (strlen($secretCode) === 16) {
-                throw new Exception('2FA settings are already enabled.');
+                throw new Exception('2FA settings are already enabled');
             }
 
             if (strlen($secret) !== 16) {
@@ -205,11 +205,11 @@ class Account extends Controller
             }
         } else {
             if (strlen($secretCode) !== 16) {
-                throw new Exception('2FA settings are already disabled.');
+                throw new Exception('2FA settings are already disabled');
             }
 
             if (getAuthCode($secretCode) != $code) {
-                throw new Exception('Code is incorrect.');
+                throw new Exception('Code is incorrect');
             }
             $secret = '';
         }
@@ -232,7 +232,7 @@ class Account extends Controller
         $mailOn = $this->getPostValue('mailon');
         $mail = $this->getPostValue('mail');
         if (!filter_var($mail, FILTER_VALIDATE_EMAIL) && !empty($mail)) {
-            throw new Exception('This is not a correct email address.');
+            throw new Exception('This is not a correct email address');
         }
         $alerts->set($user['id'], 1, $mailOn !== null, $mail);
 
