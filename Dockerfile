@@ -15,13 +15,13 @@ RUN chown www-data:www-data /etc/msmtprc
 RUN chown www-data:www-data /var/log/msmtp.log
 RUN echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
 
-RUN mkdir /var/www/html/assets/ && mkdir /var/www/html/assets/img
+COPY . /var/www/html/
+RUN chown www-data:www-data /var/www/html/assets/img
 RUN chmod 777 /var/www/html/assets/img
 
 FROM partial
 ENV PUID=2000
 ENV PGID=2000
-COPY . /var/www/html/
 RUN find . -type f -exec sed -i 's/\r$//' {} \; && \
     chmod +x /init.sh && \
     sed -i -e 's/\r$//' /init.sh
