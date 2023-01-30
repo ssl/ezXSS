@@ -98,6 +98,51 @@ class Account extends Controller
                 $password = $this->getPostValue('password');
 
                 $user = $this->model('User')->login($username, $password);
+
+                if (strlen($user['secret']) === 16) {
+                    $user['password'] = $password;
+                    $this->session->createTempSession($user);
+                    header('Location: /manage/account/mfa');
+                } else {
+                    $this->session->createSession($user);
+                    header('Location: dashboard/index');
+                }
+            } catch (Exception $e) {
+                $this->view->renderMessage($e->getMessage());
+            }
+        }
+
+        return $this->showContent();
+    }
+
+    /**
+     * Renders the account MFA page and returns the content.
+     *
+     * @return string
+     */
+    public function mfa() 
+    {
+        $this->isLoggedOutOrExit();
+        $this->view->setTitle('Login');
+        $this->view->renderTemplate('account/mfa');
+
+        if($this->session->data('temp') != true) {
+            header('Location: dashboard/index');
+            exit();
+        }
+
+        if ($this->isPOST()) {
+            try {
+                $username = $this->session->data('username');
+                $password = $this->session->data('password');
+                $code = $this->getPostValue('code');
+
+                $user = $this->model('User')->login($username, $password);
+
+                if (getAuthCode($user['secret']) != $code) {
+                    throw new Exception('Code is incorrect.');
+                }
+
                 $this->session->createSession($user);
                 header('Location: dashboard/index');
             } catch (Exception $e) {

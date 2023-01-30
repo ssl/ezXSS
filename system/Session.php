@@ -50,10 +50,25 @@ class Session
     public function createSession($user)
     {
         $_SESSION['loggedIn'] = true;
+        $_SESSION['temp'] = false;
         $_SESSION['username'] = $user['username'];
         $_SESSION['id'] = $user['id'];
         $_SESSION['rank'] = intval($user['rank']);
         $_SESSION['password_hash'] = md5($user['password']);
+    }
+
+    /**
+     * Create a temporary session
+     *
+     * @param array $user The user data
+     * @return void
+     */
+    public function createTempSession($user)
+    {
+        $_SESSION['loggedIn'] = false;
+        $_SESSION['temp'] = true;
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['password'] = $user['password'];
     }
 
     /**
