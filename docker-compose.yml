@@ -16,7 +16,6 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-      target: partial
     ports:
       - "80:80"
       - "443:443"

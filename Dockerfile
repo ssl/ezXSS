@@ -1,4 +1,4 @@
-FROM php:8-apache as partial
+FROM php:8-apache
 
 RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
@@ -20,7 +20,6 @@ RUN chmod +x /usr/local/bin/init.sh
 
 COPY . /var/www/html
 
-FROM partial
 ENV PUID=2000
 ENV PGID=2000
-ENTRYPOINT ["/usr/local/bin/init.sh"]
+CMD ["/usr/local/bin/init.sh"]
