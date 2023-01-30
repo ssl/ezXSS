@@ -213,7 +213,7 @@ class Account extends Controller
                 throw new Exception('This does not look like an valid Slack webhook URL');
             }
         }
-        $alerts->set(0, 3, $slackOn !== null, $slackWebhook);
+        $alerts->set($user['id'], 3, $slackOn !== null, $slackWebhook);
 
         // Discord
         $discordOn = $this->getPostValue('discordon');
@@ -223,6 +223,6 @@ class Account extends Controller
                 throw new Exception('This does not look like an valid Discord webhook URL');
             }
         }
-        $alerts->set(0, 4, $discordOn !== null, $discordWebhook);
+        $alerts->set($user['id'], 4, $discordOn !== null, $discordWebhook);
     }
 }
