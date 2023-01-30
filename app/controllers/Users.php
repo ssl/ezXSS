@@ -168,7 +168,7 @@ class Users extends Controller
             }
 
             $this->model('User')->deleteById($id);
-            header('Location: /manage/users');
+            redirect('/manage/users');
         }
 
         return $this->showContent();

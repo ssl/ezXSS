@@ -50,3 +50,15 @@ function baseDecode($data): string
     }
     return $result;
 }
+
+/**
+ * Rredirects to location
+ * 
+ * @param string $location The location
+ * @return null
+ */
+function redirect($location) 
+{
+    header('Location: ' . $location);
+    exit();
+}

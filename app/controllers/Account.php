@@ -40,8 +40,7 @@ class Account extends Controller
                 // Check if posted data is logout
                 if ($this->getPostValue('logout') !== null) {
                     $this->session->deleteSession();
-                    header('Location: /manage/account/login');
-                    exit();
+                    redirect('/manage/account/login');
                 }
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
@@ -102,10 +101,10 @@ class Account extends Controller
                 if (strlen($user['secret']) === 16) {
                     $user['password'] = $password;
                     $this->session->createTempSession($user);
-                    header('Location: /manage/account/mfa');
+                    redirect('/manage/account/mfa');
                 } else {
                     $this->session->createSession($user);
-                    header('Location: dashboard/index');
+                    redirect('dashboard/index');
                 }
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
@@ -127,14 +126,14 @@ class Account extends Controller
         $this->view->renderTemplate('account/mfa');
 
         if($this->session->data('temp') != true) {
-            header('Location: dashboard/index');
+            redirect('dashboard/index');
             exit();
         }
 
         if ($this->isPOST()) {
             try {
                 $this->validateCsrfToken();
-                
+
                 $username = $this->session->data('username');
                 $password = $this->session->data('password');
                 $code = $this->getPostValue('code');
@@ -146,7 +145,7 @@ class Account extends Controller
                 }
 
                 $this->session->createSession($user);
-                header('Location: dashboard/index');
+                redirect('dashboard/index');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }

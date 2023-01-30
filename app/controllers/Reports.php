@@ -18,8 +18,7 @@ class Reports extends Controller
     {
         $this->isLoggedInOrExit();
 
-        header('Location: /manage/reports/all');
-        exit();
+        redirect('/manage/reports/all/');
     }
 
     /**

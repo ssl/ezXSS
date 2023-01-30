@@ -140,8 +140,7 @@ class Controller
         } catch (Exception $e) {
             // If session failed to validate, clear the session
             $this->session->deleteSession();
-            header('Location: /manage/account/login');
-            exit();
+            redirect('/manage/account/login');
         }
     }
 
@@ -154,8 +153,7 @@ class Controller
     {
         $this->validateSession();
         if (!$this->session->isLoggedIn()) {
-            header('Location: /manage/account/login');
-            exit();
+            redirect('/manage/account/login');
         }
     }
 
@@ -167,8 +165,7 @@ class Controller
     public function isLoggedOutOrExit()
     {
         if ($this->session->isLoggedIn()) {
-            header('Location: /manage/dashboard/index');
-            exit();
+            redirect('/manage/dashboard/index');
         }
     }
 
@@ -181,8 +178,7 @@ class Controller
     {
         $this->isLoggedInOrExit();
         if (!$this->isAdmin()) {
-            header('Location: /manage/dashboard/my');
-            exit();
+            redirect('/manage/dashboard/my');
         }
     }
 
@@ -244,7 +240,7 @@ class Controller
             if (!empty($killswitch)) {
                 if ($this->getGetValue('pass') === $killswitch) {
                     $this->model('Setting')->set('killswitch', '');
-                    header('Location: /');
+                    redirect('/');
                 } else {
                     http_response_code(404);
                     exit();
@@ -267,8 +263,7 @@ class Controller
                 $this->model('Setting')->get('version');
             }
         } catch (Exception $e) {
-            header('Location: /manage/install');
-            exit();
+            redirect('/manage/install');
         }
     }
 
@@ -287,8 +282,7 @@ class Controller
                 }
             }
         } catch (Exception $e) {
-            header('Location: /manage/update');
-            exit();
+            redirect('/manage/update');
         }
     }
 }

@@ -15,8 +15,7 @@ class Install extends Controller
         // Make sure the platform is not already installed
         try {
             $this->model('Setting')->get('version');
-            header('Location: dashboard/index');
-            exit();
+            redirect('dashboard/index');
         } catch (Exception $e) {}
 
         if($this->isPOST()) {
@@ -51,8 +50,7 @@ class Install extends Controller
                 $this->model('User')->create($username, $password, 7);
                 $user = $this->model('User')->login($username, $password);
                 $this->session->createSession($user);
-                header('Location: dashboard/index');
-                exit();
+                redirect('dashboard/index');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }

@@ -33,7 +33,7 @@ class Update extends Controller
 
                 // Future updates come here!
 
-                header('Location: dashboard/index');
+                redirect('dashboard/index');
                 exit();
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());

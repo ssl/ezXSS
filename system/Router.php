@@ -52,8 +52,7 @@ class Router
                     throw new Exception('404');
                 }
             } catch (Exception $e) {
-                header('Location: /manage/dashboard');
-                exit();
+                redirect('/manage/dashboard');
             }
             $args = isset($parts[4]) ? [$parts[4]] : [];
         } else {

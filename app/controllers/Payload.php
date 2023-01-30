@@ -15,8 +15,7 @@ class Payload extends Controller
 
         $payloadList = $this->payloadList();
         if (!empty($this->payloadList())) {
-            header('Location: /manage/payload/edit/' . $payloadList[0]);
-            exit();
+            redirect('/manage/payload/edit/' . $payloadList[0]);
         }
 
         return $this->showContent();
