@@ -167,7 +167,7 @@ class Account extends Controller
             }
             $secret = '';
         }
-        $this->model('User')->updateSecret($user['id'], $secret);
+        $this->model('User')->setSecret($user['id'], $secret);
     }
 
     /**
