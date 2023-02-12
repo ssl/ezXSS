@@ -45,3 +45,7 @@ visit the [wiki](https://github.com/ssl/ezXSS/wiki) for installation instruction
 
 ## Live demo
 For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.
+
+
+## :new: Free to use hosted ezXSS
+No more need of having to install the tool on a server, as now users can register for an account on [ez.pe](https://ez.pe), and start using the tool for free.
