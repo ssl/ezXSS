@@ -22,4 +22,14 @@ class Persistence extends Controller {
         return $this->showContent();
     }
 
+    public function session($clientid) 
+    {
+        $this->isLoggedInOrExit();
+        $this->view->setTitle('Online');
+        $this->view->renderTemplate('persistence/session');
+
+        //
+
+    }
+
 }

@@ -167,6 +167,10 @@ $(document).ready(function () {
         $('#shareid').val("https://" + window.location.hostname + "/manage/reports/share/" + $(this).attr('share-id'));
     });
 
+    $('#persistence-mode').click(function () {
+        //$('#persistence').submit();
+    });
+
     $(".render").click(function () {
         const byteCharacters = unescape(encodeURIComponent($('#dom').val()));
         const byteArrays = [];

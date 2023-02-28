@@ -49,6 +49,11 @@ class Payload extends Controller
                     $this->setCollecting($id);
                 }
 
+                // Check if posted data is editing persistence mode
+                if ($this->getPostValue('persistence') !== null) {
+                    $this->model('Payload')->setSingleValue($id, "persistence", ($this->getPostValue('persistence-mode') !== null) ? 1 : 0);
+                }
+
                 // Check if posted data is editing custom js
                 if ($this->getPostValue('secondary-payload') !== null) {
                     $this->model('Payload')->setSingleValue($id, "customjs", $this->getPostValue('customjs'));
@@ -97,6 +102,7 @@ class Payload extends Controller
         $this->view->renderChecked('cDOM', $payload['collect_dom'] == 1);
         $this->view->renderChecked('cOrigin', $payload['collect_origin'] == 1);
         $this->view->renderChecked('cScreenshot', $payload['collect_screenshot'] == 1);
+        $this->view->renderChecked('cPersistence', $payload['persistence'] == 1);
         $this->view->renderData('customjs', $payload['customjs']);
 
         $i = 0;

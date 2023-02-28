@@ -52,7 +52,6 @@ function ra_hL() {
     } catch (e) {
         ez_rD.method = ""
     }
-    try{ez_rD.payload="{{domain}}"}catch(e){ez_rD.payload=""}
     try {
         ez_rD.uri = ez_n(location.toString())
     } catch (e) {

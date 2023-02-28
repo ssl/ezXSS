@@ -21,6 +21,8 @@ CREATE TABLE `persistence` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 
+ALTER TABLE `payloads` ADD `persistence` BOOLEAN NOT NULL DEFAULT FALSE AFTER `pages`;
+
 --
 -- AUTO_INCREMENT for table `persistence`
 --
