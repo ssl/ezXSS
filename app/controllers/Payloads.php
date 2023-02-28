@@ -46,7 +46,7 @@ class Payloads extends Controller
         // Create the string of pages we collect
         $pages = array_map(function ($page) {
             return "'" . e($page) . "'";
-        }, array_filter(explode('~', $payload['pages'])));
+        }, array_filter(explode('~', $payload['pages'] ?? '')));
 
         $screenshot = $payload['collect_screenshot'] ? $this->view->getPayload('screenshot') : '';
 
@@ -71,7 +71,6 @@ class Payloads extends Controller
         try {
             $this->view->renderPayload($name);
             $this->view->setContentType('application/x-javascript');
-            $this->view->renderData('payload', url);
             return $this->view->getContent();
         } catch (Exception $e) {
             // On any type of error, fallback to default
@@ -120,8 +119,8 @@ class Payloads extends Controller
         // Check black and whitelist
         $payload = $this->getPayloadByUrl($data->payload);
 
-        $blacklistDomains = explode('~', $payload['blacklist']);
-        $whitelistDomains = explode('~', $payload['whitelist']);
+        $blacklistDomains = explode('~', $payload['blacklist'] ?? '');
+        $whitelistDomains = explode('~', $payload['whitelist'] ?? '');
 
         // Check for blacklisted domains
         foreach ($blacklistDomains as $blockedDomain) {
@@ -474,7 +473,7 @@ class Payloads extends Controller
     private function getPayloadByUrl($payloadUrl)
     {
         // Split the URL into segments
-        $splitUrl = explode('/', $payloadUrl);
+        $splitUrl = explode('/', $payloadUrl ?? '');
 
         try {
             // Attempt to retrieve the payload by the full path

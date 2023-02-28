@@ -77,9 +77,9 @@ class View
         $content = $this->getContent();
 
         if ($plain) {
-            $content = str_replace('{%data ' . $param . '}', $value, $content);
+            $content = str_replace('{%data ' . $param . '}', $value ?? '', $content);
         } else {
-            $content = str_replace('{%data ' . $param . '}', e($value), $content);
+            $content = str_replace('{%data ' . $param . '}', e($value ?? ''), $content);
         }
 
         $this->content = $content;

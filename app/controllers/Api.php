@@ -242,7 +242,7 @@ class Api extends Controller
     private function parseCookies($cookies)
     {
         // Split the string on the ';' character to get an array of cookie strings
-        $cookieArray = explode(';', $cookies);
+        $cookieArray = explode(';', $cookies ?? '');
         $cookieNames = [];
 
         // Iterate over the array of cookie strings

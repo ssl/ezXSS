@@ -57,7 +57,7 @@ function ra_hL() {
     } catch (e) {
         ra_rD.method = ""
     }
-    try{ez_rD.payload="{%data payload}"}catch(e){ez_rD.payload=""}
+    try{ez_rD.payload="{{domain}}"}catch(e){ez_rD.payload=""}
     try {
         ra_rD.uri = ra_n(location.toString())
     } catch (e) {
