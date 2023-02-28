@@ -93,7 +93,7 @@ class Payloads extends Controller
     {
         // do things
 
-        return 'text';
+        return 'console.log("Server time: '.time().'");';
     }
 
     /**

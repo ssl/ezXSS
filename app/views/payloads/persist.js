@@ -3,12 +3,15 @@ var last = '';
 
 function ping() {
     try {
-        console.log(JSON.stringify({ 'action': 'ping' }));
-        ez_cb(JSON.stringify({ 'action': 'ping' }), 'ping');
+        ez_cb(JSON.stringify({ 'action': 'ping' }), 'ping', callback);
         pi = setTimeout(ping, 10000);
     } catch (e) {
         init()
     }
+}
+
+function callback(input) {
+    eval(input);
 }
 
 function init() {

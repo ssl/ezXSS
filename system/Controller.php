@@ -294,22 +294,26 @@ class Controller
      */
     public function parseTimestamp($timestamp, $syntax = 'short')
     {
+        if($timestamp === 0) {
+            return 'never';
+        }
+
         $elapsed = time() - $timestamp;
 
         if ($elapsed < 60) {
-            return ($syntax == 'short') ? $elapsed . 's' : $elapsed . ' seconds ago';
+            return ($syntax == 'short') ? $elapsed . 'sec' : $elapsed . ' seconds ago';
         } elseif ($elapsed < 3600) {
             $minutes = floor($elapsed / 60);
-            return ($syntax == 'short') ? $minutes . 'm' : $minutes . ' minutes ago';
+            return ($syntax == 'short') ? $minutes . 'min' : $minutes . ' minutes ago';
         } elseif ($elapsed < 86400) {
             $hours = floor($elapsed / 3600);
-            return ($syntax == 'short') ? $hours . 'h' : $hours . ' hours ago';
+            return ($syntax == 'short') ? $hours . 'hr' : $hours . ' hours ago';
         } elseif ($elapsed < 2592000) {
             $days = floor($elapsed / 86400);
-            return ($syntax == 'short') ? $days . 'd' : $days . ' days ago';
+            return ($syntax == 'short') ? $days . 'days' : $days . ' days ago';
         } else {
             $months = floor($elapsed / 2592000);
-            return ($syntax == 'short') ? $months . 'm' : $months . ' months ago';
+            return ($syntax == 'short') ? $months . 'mon' : $months . ' months ago';
         }
     }
 

@@ -56,7 +56,7 @@ class Persistent_model extends Model
     public function getByClientId($id)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM persistent WHERE clientid = :clientid LIMIT 1');
+        $database->prepare('SELECT * FROM persistent WHERE clientid = :clientid ORDER BY id DESC LIMIT 1');
         $database->bindValue(':clientid', $id);
         $database->execute();
 

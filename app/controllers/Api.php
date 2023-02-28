@@ -228,7 +228,7 @@ class Api extends Controller
 
         // Get the time of the last report
         $lastReport = end($allReports);
-        $statistics['last'] = $this->parseTimestamp($lastReport['time']);
+        $statistics['last'] = $this->parseTimestamp($lastReport !== false ? $lastReport['time'] : 0);
 
         return json_encode($statistics);
     }

@@ -1,6 +1,13 @@
 <?php
 
-class Persistent extends Controller {
+class Persistent extends Controller 
+{
+    /**
+     * Summary of rows
+     * 
+     * @var array
+     */
+    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'clientid'];
 
     public function all()
     {
@@ -22,13 +29,27 @@ class Persistent extends Controller {
         return $this->showContent();
     }
 
-    public function session($clientid) 
+    public function session($clientId) 
     {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Online');
         $this->view->renderTemplate('persistent/session');
 
-        //
+        $session = $this->model('Persistent')->getByClientId($clientId);
+
+        // Check report permissions
+        // todo
+
+        // Render all rows
+        $screenshot = !empty($session['screenshot']) ? '<img src="/assets/img/report-' . e($session['screenshot']) . '.png" style="max-width:100%">' : '';
+        $this->view->renderData('screenshot', $screenshot, true);
+        $this->view->renderData('time', date('F j, Y, g:i a', $session['time']));
+
+        foreach ($this->rows as $value) {
+            $this->view->renderData($value, $session[$value]);
+        }
+
+        return $this->showContent();
 
     }
 

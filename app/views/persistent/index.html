@@ -7,8 +7,8 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="view-header">
-                        <div class="header-title float-left">
-                            <h3 class="m-b-xs">Online</h3>
+                        <div class="header-title">
+                            <h3 class="m-b-xs">All sessions</h3>
                             <small>....</small>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                                     <tbody id="reports-list">
                                         {%foreach session}
                                         <tr id="{report->id}">
-                                            <td><a href="">{session->clientid}</a></td>
+                                            <td><a href="/manage/persistent/session/{session->clientid}">{session->clientid}</a></td>
                                             <td><img style="width:20px" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACvUlEQVR4nO2dsW7TUBRAXyW2rPQb/AFlIAiqDDCXsZWygTxagR9gentSFJhgbZeyMyBlKEvkvwhRslTqvfIIGD3JlSICipM03FdzjnTXyDnHfrGs6Nk5AAAAAAAAAAAAAGgwqvpERM5FZCoi31W1ZLS2g+BMRL6JyJmqPt44RFmW90TkPfL1Vk9AERkGt2sHIYbubCWYTCYf116muDJ0p0vzYDB46Zzbq3t1nBNEdxokz/NL59yDukGmv3/AcHBRPj18VXbaGdOu7yA4G55eLAWZz+dXzrkT59x+nSBLd1PEyDY+EZ8dvl4Kcn19/aMK8qjOb8jSB3BlZFs5+JPTKsjzrYMUaZdJVzuoGeSYIGlUQcJwhRQE+f+WuQ5XSNc8AkFSe/EESe1lEyS1F0yQ1F4qQSIQWRDEXl5BEHthBUHsJRUEsRdTEMReRhHB8OgktY9AkNRevHkQ/gChtRwQROMagqh9BIKovXiCqL1sgqi9YIKovVSCRCBSCWIvTwliL0wJYi9JCWIvRgliL0MjGB6dqH0Egqi9eIKovWyCqL1ggqi91DsRJPFfGL/aAUF8XCcKQbx9BIJ4e/EE8fayCeLtBRPE20slSAQiE4LYy0sIYi8sIYi9pIQg9mISgtjLSCIYHp14+wgE8fbiCeLtZRPE2wuONgiT3eYmmKuDsE1s9i+3iT3ZbCPlUzZS7mwQI+x3/O7tp6Ugs9nsap0gZzH8SUAbPOPx+LL2NrEi8lBEfloftDZ4er3emyrI0cogVZSh9UFrQ2c0Gn1eWK7atYKEl45Mp9MP1gevDYzRarW6C0FWb8a/SL/ff5Hn+dfwIxTuDKy/kN6xCc6Cu/B6iizLbpapmzlwG7BXvedi8YMYt7WDg9ovdPkL+9WrFY6qOwOiuLUcHFfugsP724QAAAAAAAAAAAAAAABwDeAXb2IfQlX36+cAAAAASUVORK5CYII=">
                                             {session->browser}</td>
                                             <td>{session->ip}</td>
