@@ -228,23 +228,7 @@ class Api extends Controller
 
         // Get the time of the last report
         $lastReport = end($allReports);
-        if (isset($lastReport['time'])) {
-            $time = time() - $lastReport['time'];
-            $syntaxText = 's';
-            if ($time > 60) {
-                $time /= 60;
-                $syntaxText = 'm';
-            }
-            if ($time > 60) {
-                $time /= 60;
-                $syntaxText = 'h';
-            }
-            if ($time > 24) {
-                $time /= 24;
-                $syntaxText = 'd';
-            }
-            $statistics['last'] = floor($time) . $syntaxText;
-        }
+        $statistics['last'] = $this->parseTimestamp($lastReport['time']);
 
         return json_encode($statistics);
     }
@@ -273,64 +257,6 @@ class Api extends Controller
 
         // Return the array of cookie names
         return $cookieNames;
-    }
-
-    /**
-     * Parses user agent and returns string with browser and OS
-     * 
-     * @param string $userAgent The user agent string
-     * @return string
-     */
-    private function parseUserAgent($userAgent)
-    {
-        $browser = "Unknown";
-        $os = "Unknown";
-
-        $browsers = [
-            '/MSIE/i' => 'IE',
-            '/Trident/i' => 'IE',
-            '/Edge/i' => 'Edge',
-            '/Firefox/i' => 'Firefox',
-            '/Chrome/i' => 'Chrome',
-            '/OPR/i' => 'Opera',
-            '/Opera/i' => 'Opera',
-            '/UCBrowser/i' => 'UC Browser',
-            '/SamsungBrowser/i' => 'SamsungBrowser',
-            '/YaBrowser/i' => 'Yandex',
-            '/Vivaldi/i' => 'Vivaldi',
-            '/Brave/i' => 'Brave',
-            '/Safari/i' => 'Safari'
-        ];
-
-        $oses = [
-            '/Windows/i' => 'Windows',
-            '/Mac/i' => 'macOS',
-            '/Linux/i' => 'Linux',
-            '/Unix/i' => 'Unix',
-            '/Android/i' => 'Android',
-            '/iOS/i' => 'iOS',
-            '/BlackBerry/i' => 'BlackBerry',
-            '/FirefoxOS/i' => 'Firefox OS',
-            '/Windows Phone/i' => 'Windows Phone'
-        ];
-
-        // Get the browser
-        foreach ($browsers as $regex => $name) {
-            if (preg_match($regex, $userAgent)) {
-                $browser = $name;
-                break;
-            }
-        }
-
-        // Get the operating system
-        foreach ($oses as $regex => $name) {
-            if (preg_match($regex, $userAgent)) {
-                $os = $name;
-                break;
-            }
-        }
-
-        return "{$os} with {$browser}";
     }
 
     /**

