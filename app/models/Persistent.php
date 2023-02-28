@@ -1,13 +1,13 @@
 <?php
 
-class Persistence_model extends Model
+class Persistent_model extends Model
 {
     /**
      * Summary of table
      * 
      * @var string
      */
-    public $table = 'persistence';
+    public $table = 'persistent';
 
     /**
      * Get all reports
@@ -17,7 +17,7 @@ class Persistence_model extends Model
     public function getAll()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.`user-agent`, last_row.requests FROM persistence p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM persistence GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.id DESC;');
+        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.`user-agent`, last_row.requests FROM persistent p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM persistent GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.id DESC;');
         $database->execute();
 
         $data = $database->fetchAll();
@@ -56,7 +56,7 @@ class Persistence_model extends Model
     public function getByClientId($id)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM persistence WHERE clientid = :clientid LIMIT 1');
+        $database->prepare('SELECT * FROM persistent WHERE clientid = :clientid LIMIT 1');
         $database->bindValue(':clientid', $id);
         $database->execute();
 
@@ -78,7 +78,7 @@ class Persistence_model extends Model
     public function getAllByPayload($payload)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT id,uri,ip,payload,archive,shareid FROM reports WHERE payload LIKE :payload ORDER BY id DESC');
+        $database->prepare('SELECT id,uri,ip,payload,archive,shareid FROM persistent WHERE payload LIKE :payload ORDER BY id DESC');
         $database->bindValue(':payload', $payload);
 
         if (!$database->execute()) {
@@ -110,7 +110,7 @@ class Persistence_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('INSERT INTO persistence (`clientid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`, `payload`) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage, :payload)');
+        $database->prepare('INSERT INTO persistent (`clientid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`, `payload`) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage, :payload)');
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':cookies', $cookies);
         $database->bindValue(':dom', $dom);

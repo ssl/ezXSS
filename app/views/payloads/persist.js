@@ -4,7 +4,8 @@ var last = '';
 function ping() {
     try {
         console.log(JSON.stringify({ 'action': 'ping' }));
-        pi = setTimeout(ping, 30000);
+        ez_cb(JSON.stringify({ 'action': 'ping' }), 'ping');
+        pi = setTimeout(ping, 10000);
     } catch (e) {
         init()
     }

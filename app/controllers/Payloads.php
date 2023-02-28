@@ -50,9 +50,9 @@ class Payloads extends Controller
 
         $screenshot = $payload['collect_screenshot'] ? $this->view->getPayload('screenshot') : '';
 
-        // Create the persistence payload
-        if($payload['persistence']) {
-            $persistence = $this->view->getPayload('persist');
+        // Create the persistent payload
+        if($payload['persistent']) {
+            $persistent = $this->view->getPayload('persist');
         }
 
         $this->view->renderData('noCollect', implode(',', $noCollect), true);
@@ -61,7 +61,7 @@ class Payloads extends Controller
         $this->view->renderData('globaljs', $this->model('Setting')->get('customjs'), true);
         $this->view->renderData('screenshot', $screenshot, true);
         $this->view->renderData('payload', url);
-        $this->view->renderData('persistence', $persistence ?? '', true);
+        $this->view->renderData('persistent', $persistent ?? '', true);
 
         return $this->view->getContent();
     }
@@ -82,6 +82,18 @@ class Payloads extends Controller
             // On any type of error, fallback to default
             return $this->index();
         }
+    }
+
+    /**
+     * Ping function that receives pings and gives pongs
+     *
+     * @return string
+     */
+    public function ping() 
+    {
+        // do things
+
+        return 'text';
     }
 
     /**
@@ -160,7 +172,7 @@ class Payloads extends Controller
             }
         }
 
-        // Check if callback should be threated as persistence mode
+        // Check if callback should be threated as persistent mode
         if(isset($data->method) && $data->method === 'persist') {
             return $this->persistCallback($data);
         }
@@ -227,7 +239,7 @@ class Payloads extends Controller
     }
 
     /**
-     * Persistence allback function that receives all incoming data from persistence mode
+     * Persistent callback function that receives all incoming data from persistent mode
      *
      * @param object $data The data coming from the callback function
      * @return void
@@ -236,7 +248,7 @@ class Payloads extends Controller
     {
         // do something
 
-        $data->id = $this->model('Persistence')->add(
+        $data->id = $this->model('Persistent')->add(
             $data->clientid ?? '',
             $data->cookies ?? '',
             $data->dom ?? '',
@@ -251,7 +263,7 @@ class Payloads extends Controller
             $data->payload
         );
 
-        return 'github.com/ssl/ezXSS persistence';
+        return 'github.com/ssl/ezXSS persistent';
     }
 
     /**

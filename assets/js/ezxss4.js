@@ -167,8 +167,8 @@ $(document).ready(function () {
         $('#shareid').val("https://" + window.location.hostname + "/manage/reports/share/" + $(this).attr('share-id'));
     });
 
-    $('#persistence-mode').click(function () {
-        //$('#persistence').submit();
+    $('#persistent-mode').click(function () {
+        //$('#persistent').submit();
     });
 
     $(".render").click(function () {

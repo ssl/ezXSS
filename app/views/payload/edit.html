@@ -59,15 +59,15 @@
                     <div class="panel panel-filled">
                         <div class="panel-heading">Persistent mode</div>
                         <div class="panel-body" style="padding-bottom:0px">
-                            <form class="form" id="persistence" method="post">
+                            <form class="form" id="persistent" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
                                     <label class="checkbox-label">
-                                        <input {%checked cPersistence} class="chkbox" id="persistence-mode" name="persistence-mode" type="checkbox">
+                                        <input {%checked cPersistent} class="chkbox" id="persistent-mode" name="persistent-mode" type="checkbox">
                                         <span class="checkbox-custom rectangular"></span>
                                     </label>
                                     <p class="checkbox-text">Enable persistent mode [<a href="https://github.com/ssl/ezXSS/wiki" target=_blank>?</a>]</p>
-                                    <button name="persistence" type="submit" class="btn" style="margin-top:-35px;float:right;">Save</button>
+                                    <button name="persistent" type="submit" class="btn" style="margin-top:-35px;float:right;">Save</button>
                                 </div>
                             </form>
                         </div>

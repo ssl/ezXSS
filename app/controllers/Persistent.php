@@ -1,16 +1,16 @@
 <?php
 
-class Persistence extends Controller {
+class Persistent extends Controller {
 
-    public function online()
+    public function all()
     {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Online');
-        $this->view->renderTemplate('persistence/online');
+        $this->view->renderTemplate('persistent/index');
 
         $this->view->renderCondition('hasReports', true);
 
-        $sessions = $this->model('Persistence')->getAll();
+        $sessions = $this->model('Persistent')->getAll();
 
         foreach ($sessions as $key => $value) {
             $sessions[$key]['browser'] = $this->parseUserAgent($sessions[$key]['user-agent']);
@@ -26,10 +26,15 @@ class Persistence extends Controller {
     {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Online');
-        $this->view->renderTemplate('persistence/session');
+        $this->view->renderTemplate('persistent/session');
 
         //
 
+    }
+
+    public function view($id)
+    {
+        //
     }
 
 }
