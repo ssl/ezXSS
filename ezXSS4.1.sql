@@ -23,8 +23,12 @@ CREATE TABLE `persistent` (
 
 ALTER TABLE `payloads` ADD `persistent` BOOLEAN NOT NULL DEFAULT FALSE AFTER `pages`;
 
+ALTER TABLE `persistent` ADD `console` LONGTEXT NOT NULL AFTER `sessionstorage`;
+
+
 --
 -- AUTO_INCREMENT for table `persistent`
 --
 ALTER TABLE `persistent`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+

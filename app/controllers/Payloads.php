@@ -85,18 +85,6 @@ class Payloads extends Controller
     }
 
     /**
-     * Ping function that receives pings and gives pongs
-     *
-     * @return string
-     */
-    public function ping() 
-    {
-        // do things
-
-        return 'console.log("Server time: '.time().'");';
-    }
-
-    /**
      * Callback function that receives all incoming data
      *
      * @return string
@@ -114,7 +102,7 @@ class Payloads extends Controller
         // Decode the JSON data
         $data = json_decode(file_get_contents('php://input'), false);
 
-        if(empty($data)) {
+        if(empty($data) || !is_object($data)) {
             return 'github.com/ssl/ezXSS';
         }
 
@@ -247,23 +235,41 @@ class Payloads extends Controller
     private function persistCallback($data)
     {
         // do something
+        $data->type = $data->type ?? '';
 
-        $data->id = $this->model('Persistent')->add(
-            $data->clientid ?? '',
-            $data->cookies ?? '',
-            $data->dom ?? '',
-            $data->origin,
-            $data->referer,
-            $data->uri,
-            $data->{'user-agent'},
-            $data->ip,
-            ($data->screenshotName ?? ''),
-            json_encode($data->localstorage ?? ''),
-            json_encode($data->sessionstorage ?? ''),
-            $data->payload
-        );
+        // A new request has been made
+        if($data->type === 'init') {
+            // Save the request data
+            $data->id = $this->model('Persistent')->add(
+                $data->clientid ?? '',
+                $data->cookies ?? '',
+                $data->dom ?? '',
+                $data->origin,
+                $data->referer,
+                $data->uri,
+                $data->{'user-agent'},
+                $data->ip,
+                ($data->screenshotName ?? ''),
+                json_encode($data->localstorage ?? ''),
+                json_encode($data->sessionstorage ?? ''),
+                $data->payload,
+                $data->console ?? ''
+            );
+            return 'github.com/ssl/ezXSS';
+        }
 
-        return 'github.com/ssl/ezXSS persistent';
+        // Session is pinged and is waiting for pong
+        if($data->type === 'ping') {
+            try {
+                $session = $this->model('Persistent')->getByClientId($data->clientid ?? '', $data->origin);
+
+                $this->model('Persistent')->setSingleValue($session['id'], 'time', time());
+                $this->model('Persistent')->setSingleValue($session['id'], 'console', $data->console ?? '');
+            } catch(Exception $e) {
+                return 'hmm...';
+            }
+            return 'console.log("PONG! Server time: '.time().'");';
+        }
     }
 
     /**

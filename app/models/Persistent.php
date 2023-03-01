@@ -17,7 +17,7 @@ class Persistent_model extends Model
     public function getAll()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.`user-agent`, last_row.requests FROM persistent p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM persistent GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.id DESC;');
+        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM persistent p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM persistent GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.id DESC;');
         $database->execute();
 
         $data = $database->fetchAll();
@@ -47,21 +47,23 @@ class Persistent_model extends Model
     }
 
     /**
-     * Get report by share id
+     * Get session by client id
      * 
      * @param mixed $id The share id
+     * @param string $id The origin
      * @throws Exception
      * @return array
      */
-    public function getByClientId($id)
+    public function getByClientId($id, $origin)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM persistent WHERE clientid = :clientid ORDER BY id DESC LIMIT 1');
+        $database->prepare('SELECT * FROM persistent WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC LIMIT 1');
         $database->bindValue(':clientid', $id);
+        $database->bindValue(':origin', $origin);
         $database->execute();
 
         if ($database->countRows() === 0) {
-            throw new Exception("Report not found");
+            throw new Exception("Session not found");
         }
 
         $report = $database->fetch();
@@ -103,14 +105,15 @@ class Persistent_model extends Model
      * @param string $localStorage The local storage
      * @param string $sessionStorage The session storage
      * @param string $payload The payload name
+     * @param string $console The console log
      * @throws Exception
      * @return string
      */
-    public function add($clientId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshotName, $localStorage, $sessionStorage, $payload)
+    public function add($clientId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshotName, $localStorage, $sessionStorage, $payload, $console)
     {
         $database = Database::openConnection();
 
-        $database->prepare('INSERT INTO persistent (`clientid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`, `payload`) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage, :payload)');
+        $database->prepare('INSERT INTO persistent (`clientid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`, `payload`, `console`) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage, :payload, :console)');
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':cookies', $cookies);
         $database->bindValue(':dom', $dom);
@@ -124,12 +127,36 @@ class Persistent_model extends Model
         $database->bindValue(':localstorage', $localStorage);
         $database->bindValue(':sessionstorage', $sessionStorage);
         $database->bindValue(':payload', $payload);
+        $database->bindValue(':console', $console);
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
         }
 
         return $database->lastInsertId();
+    }
+
+    /**
+     * Set session value of single item by id
+     * @param int $id The persistent id
+     * @param string $column The column name
+     * @param string $value The new value
+     * @throws Exception
+     * @return bool
+     */
+    public function setSingleValue($id, $column, $value)
+    {
+        $database = Database::openConnection();
+
+        $database->prepare('UPDATE `persistent` SET `' . $column . '` = :value WHERE id = :id');
+        $database->bindValue(':value', $value);
+        $database->bindValue(':id', $id);
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return true;
     }
 
     /**

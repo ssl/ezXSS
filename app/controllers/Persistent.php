@@ -7,7 +7,7 @@ class Persistent extends Controller
      * 
      * @var array
      */
-    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'clientid'];
+    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'clientid', 'console'];
 
     public function all()
     {
@@ -35,7 +35,8 @@ class Persistent extends Controller
         $this->view->setTitle('Online');
         $this->view->renderTemplate('persistent/session');
 
-        $session = $this->model('Persistent')->getByClientId($clientId);
+        $clientId = explode('-', $clientId ?? '');
+        $session = $this->model('Persistent')->getByClientId($clientId[0] ?? '', $clientId[1] ?? '');
 
         // Check report permissions
         // todo
