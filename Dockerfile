@@ -15,9 +15,12 @@ RUN chmod 640 /etc/msmtprc
 RUN touch /var/log/msmtp.log
 RUN chown root:msmtp /etc/msmtprc
 RUN chown root:msmtp /var/log/msmtp.log
+RUN chown root:msmtp /etc/msmtprc
+RUN chown root:msmtp /var/log/msmtp.log
 RUN echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
 
 COPY . /var/www/html
 
 ENTRYPOINT ["docker-php-entrypoint"]
 CMD ["apache2-foreground"]
+
