@@ -2,7 +2,9 @@ FROM php:8-apache
 
 RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
-RUN a2enmod rewrite headers
+RUN echo "RemoteIPHeader X-Forwarded-For" >> /etc/apache2/conf-enabled/remoteip.conf
+RUN echo "RemoteIPInternalProxy 172.16.0.0/12" >> /etc/apache2/conf-enabled/remoteip.conf
+RUN a2enmod rewrite headers remoteip
 
 RUN apt-get update && apt-get install -y msmtp && rm -rf /var/lib/apt/lists/*
 
