@@ -15,11 +15,7 @@ RUN chown www-data:www-data /etc/msmtprc
 RUN chown www-data:www-data /var/log/msmtp.log
 RUN echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
 
-COPY init.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/init.sh
-
 COPY . /var/www/html
 
-ENV PUID=2000
-ENV PGID=2000
-CMD ["/usr/local/bin/init.sh"]
+ENTRYPOINT ["docker-php-entrypoint"]
+CMD ["apache2-foreground"]
