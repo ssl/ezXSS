@@ -1,0 +1,8 @@
+.github/
+.gitignore
+.env
+Dockerfile
+docker-compose.yml
+msmtprc
+readme.md
+nginx-rewrite.conf
