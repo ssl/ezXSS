@@ -1,13 +1,13 @@
 <?php
 
-class Persistent_model extends Model
+class Session_model extends Model
 {
     /**
      * Summary of table
      * 
      * @var string
      */
-    public $table = 'persistent';
+    public $table = 'sessions';
 
     /**
      * Get all reports
@@ -17,7 +17,7 @@ class Persistent_model extends Model
     public function getAll()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM persistent p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM persistent GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.id DESC;');
+        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM `sessions` p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM `sessions` GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.id DESC;');
         $database->execute();
 
         $data = $database->fetchAll();
@@ -57,7 +57,7 @@ class Persistent_model extends Model
     public function getByClientId($id, $origin)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM persistent WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC LIMIT 1');
+        $database->prepare('SELECT * FROM `sessions` WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC LIMIT 1');
         $database->bindValue(':clientid', $id);
         $database->bindValue(':origin', $origin);
         $database->execute();
@@ -80,7 +80,7 @@ class Persistent_model extends Model
     public function getAllByPayload($payload)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT id,uri,ip,payload,archive,shareid FROM persistent WHERE payload LIKE :payload ORDER BY id DESC');
+        $database->prepare('SELECT id,uri,ip,payload,archive,shareid FROM `sessions` WHERE payload LIKE :payload ORDER BY id DESC');
         $database->bindValue(':payload', $payload);
 
         if (!$database->execute()) {
@@ -113,7 +113,7 @@ class Persistent_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('INSERT INTO persistent (`clientid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`, `payload`, `console`) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage, :payload, :console)');
+        $database->prepare('INSERT INTO `sessions` (`clientid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`, `payload`, `console`) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage, :payload, :console)');
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':cookies', $cookies);
         $database->bindValue(':dom', $dom);
@@ -138,7 +138,7 @@ class Persistent_model extends Model
 
     /**
      * Set session value of single item by id
-     * @param int $id The persistent id
+     * @param int $id The session id
      * @param string $column The column name
      * @param string $value The new value
      * @throws Exception
@@ -148,7 +148,7 @@ class Persistent_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('UPDATE `persistent` SET `' . $column . '` = :value WHERE id = :id');
+        $database->prepare('UPDATE `sessions` SET `' . $column . '` = :value WHERE id = :id');
         $database->bindValue(':value', $value);
         $database->bindValue(':id', $id);
 

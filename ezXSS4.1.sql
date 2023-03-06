@@ -1,8 +1,8 @@
 --
--- Table structure for table `persistent`
+-- Table structure for table `sessions`
 --
 
-CREATE TABLE `persistent` (
+CREATE TABLE `sessions` (
   `id` int(11) NOT NULL,
   `shareid` varchar(50) NOT NULL,
   `cookies` mediumtext,
@@ -21,14 +21,14 @@ CREATE TABLE `persistent` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 
-ALTER TABLE `payloads` ADD `persistent` BOOLEAN NOT NULL DEFAULT FALSE AFTER `pages`;
+ALTER TABLE `payloads` ADD `sessions` BOOLEAN NOT NULL DEFAULT FALSE AFTER `pages`;
 
-ALTER TABLE `persistent` ADD `console` LONGTEXT NOT NULL AFTER `sessionstorage`;
+ALTER TABLE `sessions` ADD `console` LONGTEXT NOT NULL AFTER `sessionstorage`;
 
 
 --
--- AUTO_INCREMENT for table `persistent`
+-- AUTO_INCREMENT for table `sessions`
 --
-ALTER TABLE `persistent`
+ALTER TABLE `sessions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 

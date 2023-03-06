@@ -240,7 +240,7 @@ class Payloads extends Controller
         // A new request has been made
         if($data->type === 'init') {
             // Save the request data
-            $data->id = $this->model('Persistent')->add(
+            $data->id = $this->model('Session')->add(
                 $data->clientid ?? '',
                 $data->cookies ?? '',
                 $data->dom ?? '',
@@ -261,10 +261,10 @@ class Payloads extends Controller
         // Session is pinged and is waiting for pong
         if($data->type === 'ping') {
             try {
-                $session = $this->model('Persistent')->getByClientId($data->clientid ?? '', $data->origin);
+                $session = $this->model('Session')->getByClientId($data->clientid ?? '', $data->origin);
 
-                $this->model('Persistent')->setSingleValue($session['id'], 'time', time());
-                $this->model('Persistent')->setSingleValue($session['id'], 'console', $data->console ?? '');
+                $this->model('Session')->setSingleValue($session['id'], 'time', time());
+                $this->model('Session')->setSingleValue($session['id'], 'console', $data->console ?? '');
             } catch(Exception $e) {
                 return 'hmm...';
             }

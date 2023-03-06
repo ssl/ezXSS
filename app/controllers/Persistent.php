@@ -17,7 +17,7 @@ class Persistent extends Controller
 
         $this->view->renderCondition('hasReports', true);
 
-        $sessions = $this->model('Persistent')->getAll();
+        $sessions = $this->model('Session')->getAll();
 
         foreach ($sessions as $key => $value) {
             $sessions[$key]['browser'] = $this->parseUserAgent($sessions[$key]['user-agent']);
@@ -36,7 +36,7 @@ class Persistent extends Controller
         $this->view->renderTemplate('persistent/session');
 
         $clientId = explode('-', $clientId ?? '');
-        $session = $this->model('Persistent')->getByClientId($clientId[0] ?? '', $clientId[1] ?? '');
+        $session = $this->model('Session')->getByClientId($clientId[0] ?? '', $clientId[1] ?? '');
 
         // Check report permissions
         // todo
