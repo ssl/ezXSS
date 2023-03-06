@@ -11,10 +11,10 @@ RUN apt-get update && apt-get install -y msmtp && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-install pdo_mysql
 
 COPY ./msmtprc /etc/msmtprc
-RUN chmod 600 /etc/msmtprc
+RUN chmod 640 /etc/msmtprc
 RUN touch /var/log/msmtp.log
-RUN chown www-data:www-data /etc/msmtprc
-RUN chown www-data:www-data /var/log/msmtp.log
+RUN chown root:msmtp /etc/msmtprc
+RUN chown root:msmtp /var/log/msmtp.log
 RUN echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
 
 COPY . /var/www/html
