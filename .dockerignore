@@ -1,5 +1,6 @@
 .github/
 .gitignore
+.git/
 Dockerfile
 docker-compose.yml
 readme.md
