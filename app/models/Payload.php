@@ -135,23 +135,4 @@ class Payload_model extends Model
 
         return $payload;
     }
-
-    /**
-     * Delete payload by id
-     *
-     * @param int $id The payload id
-     * @throws Exception
-     * @return bool
-     */
-    public function deleteById($id)
-    {
-        $database = Database::openConnection();
-        $database->deleteById($this->table, $id);
-
-        if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
-        }
-
-        return true;
-    }
 }

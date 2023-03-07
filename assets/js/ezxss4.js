@@ -167,9 +167,16 @@ $(document).ready(function () {
         $('#shareid').val("https://" + window.location.hostname + "/manage/reports/share/" + $(this).attr('share-id'));
     });
 
-    $('#persistent-mode').click(function () {
-        //$('#persistent').submit();
+    $('#execute').click(function () {
+        command = $('#command').val();
+        request(window.location.pathname, {command:command}).then(function (r) {
+            console.log(r)
+        });
     });
+
+    if (location.toString().split('/')[5] === 'session') {
+        alert(1);
+    }
 
     $(".render").click(function () {
         const byteCharacters = unescape(encodeURIComponent($('#dom').val()));

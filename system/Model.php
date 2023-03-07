@@ -33,4 +33,23 @@ class Model
 
         return $database->countRows() === 1;
     }
+
+    /**
+     * Delete by id
+     * 
+     * @param string $id The id
+     * @throws Exception
+     * @return bool
+     */
+    public function deleteById($id)
+    {
+        $database = Database::openConnection();
+        $database->deleteById($this->table, $id);
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return true;
+    }
 }

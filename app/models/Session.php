@@ -180,23 +180,4 @@ class Session_model extends Model
 
         return true;
     }
-
-    /**
-     * Delete report by id
-     * 
-     * @param string $id The report id
-     * @throws Exception
-     * @return bool
-     */
-    public function deleteById($id)
-    {
-        $database = Database::openConnection();
-        $database->deleteById($this->table, $id);
-
-        if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
-        }
-
-        return true;
-    }
 }

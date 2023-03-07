@@ -268,7 +268,7 @@ class Payloads extends Controller
             } catch(Exception $e) {
                 return 'hmm...';
             }
-            return 'console.log("PONG! Server time: '.time().'");';
+            return $this->model('Console')->getNext($data->clientid ?? '', $data->origin);
         }
     }
 
