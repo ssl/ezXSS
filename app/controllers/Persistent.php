@@ -7,7 +7,7 @@ class Persistent extends Controller
      * 
      * @var array
      */
-    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'clientid', 'console'];
+    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'clientid'];
 
     public function all()
     {
@@ -45,6 +45,9 @@ class Persistent extends Controller
         $screenshot = !empty($session['screenshot']) ? '<img src="/assets/img/report-' . e($session['screenshot']) . '.png" style="max-width:100%">' : '';
         $this->view->renderData('screenshot', $screenshot, true);
         $this->view->renderData('time', date('F j, Y, g:i a', $session['time']));
+
+        $console = $this->model('Session')->getAllConsole($clientId[0] ?? '', $clientId[1] ?? '');
+        $this->view->renderData('console', $console);
 
         foreach ($this->rows as $value) {
             $this->view->renderData($value, $session[$value]);

@@ -25,6 +25,28 @@ class Session_model extends Model
         return $data;
     }
 
+    public function getAllConsole($clientid, $origin)
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT `console` FROM `sessions` WHERE clientid = :clientid AND origin = :origin AND console != "" ORDER BY id DESC');
+        $database->bindValue(':clientid', $clientid);
+        $database->bindValue(':origin', $origin);
+        $database->execute();
+
+        if ($database->countRows() === 0) {
+            return '';
+        }
+
+        $console = '';
+        $sessions = $database->fetchAll();
+
+        foreach ($sessions as $value) {
+            $console .= $value['console'];
+        }
+
+        return $console;
+    }
+
     /**
      * Get report by id
      * 
