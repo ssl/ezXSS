@@ -35,6 +35,27 @@ class Model
     }
 
     /**
+     * Get by id
+     * 
+     * @param int $id The id
+     * @throws Exception
+     * @return array
+     */
+    public function getById($id)
+    {
+        $database = Database::openConnection();
+        $database->getById($this->table, $id);
+
+        if ($database->countRows() === 0) {
+            throw new Exception("Not found");
+        }
+
+        $report = $database->fetch();
+
+        return $report;
+    }
+
+    /**
      * Delete by id
      * 
      * @param string $id The id

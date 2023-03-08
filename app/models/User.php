@@ -283,25 +283,4 @@ class User_model extends Model
 
         return $users;
     }
-
-    /**
-     * Return user by id
-     *
-     * @param int $id The user id
-     * @throws Exception
-     * @return bool
-     */
-    public function getById($id)
-    {
-        $database = Database::openConnection();
-        $database->getById($this->table, $id);
-
-        if ($database->countRows() === 0) {
-            throw new Exception("Account not found");
-        }
-
-        $account = $database->fetch();
-
-        return $account;
-    }
 }

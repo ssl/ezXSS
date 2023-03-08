@@ -114,25 +114,4 @@ class Payload_model extends Model
 
         return $payload;
     }
-
-    /**
-     * Return payload by id
-     *
-     * @param int $id The payload id
-     * @throws Exception
-     * @return array
-     */
-    public function getById($id)
-    {
-        $database = Database::openConnection();
-        $database->getById($this->table, $id);
-
-        if ($database->countRows() === 0) {
-            throw new Exception("Payload not found");
-        }
-
-        $payload = $database->fetch();
-
-        return $payload;
-    }
 }

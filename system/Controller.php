@@ -251,7 +251,8 @@ class Controller
             '/YaBrowser/i' => 'Yandex',
             '/Vivaldi/i' => 'Vivaldi',
             '/Brave/i' => 'Brave',
-            '/Safari/i' => 'Safari'
+            '/Safari/i' => 'Safari',
+            '/PlayStation/i' => 'PlayStation'
         ];
 
         $oses = [
@@ -263,7 +264,11 @@ class Controller
             '/iOS/i' => 'iOS',
             '/BlackBerry/i' => 'BlackBerry',
             '/FirefoxOS/i' => 'Firefox OS',
-            '/Windows Phone/i' => 'Windows Phone'
+            '/Windows Phone/i' => 'Windows Phone',
+            '/CrOS/i' => 'ChromeOS',
+            '/Googlebot/i' => 'Googlebot',
+            '/YandexBot/i' => 'YandexBot',
+            '/PlayStation/i' => 'PlayStation',
         ];
 
         // Get the browser

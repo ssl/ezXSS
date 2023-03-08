@@ -191,7 +191,7 @@ $(document).ready(function () {
         }, 1000);
         setInterval(function() {
             location.reload();
-        }, 30000);
+        }, 60000);
     }
 
     $(".render").click(function () {

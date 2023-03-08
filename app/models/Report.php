@@ -26,27 +26,6 @@ class Report_model extends Model
     }
 
     /**
-     * Get report by id
-     * 
-     * @param int $id The report id
-     * @throws Exception
-     * @return array
-     */
-    public function getById($id)
-    {
-        $database = Database::openConnection();
-        $database->getById($this->table, $id);
-
-        if ($database->countRows() === 0) {
-            throw new Exception("Report not found");
-        }
-
-        $report = $database->fetch();
-
-        return $report;
-    }
-
-    /**
      * Get report by share id
      * 
      * @param mixed $id The share id

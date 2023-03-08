@@ -10,7 +10,7 @@ class Session_model extends Model
     public $table = 'sessions';
 
     /**
-     * Get all reports
+     * Get all sessions
      * 
      * @return array
      */
@@ -25,11 +25,19 @@ class Session_model extends Model
         return $data;
     }
 
-    public function getAllConsole($clientid, $origin)
+    /**
+     * Get all console data
+     * 
+     * @param string $clientId The client id
+     * @param string $origin The origin
+     * @throws Exception
+     * @return array
+     */
+    public function getAllConsole($clientId, $origin)
     {
         $database = Database::openConnection();
         $database->prepare('SELECT `console` FROM `sessions` WHERE clientid = :clientid AND origin = :origin AND console != "" ORDER BY id DESC');
-        $database->bindValue(':clientid', $clientid);
+        $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->execute();
 
@@ -48,39 +56,18 @@ class Session_model extends Model
     }
 
     /**
-     * Get report by id
+     * Get by client id
      * 
-     * @param int $id The report id
+     * @param string $clientId The client id
+     * @param string $origin The origin
      * @throws Exception
      * @return array
      */
-    public function getById($id)
-    {
-        $database = Database::openConnection();
-        $database->getById($this->table, $id);
-
-        if ($database->countRows() === 0) {
-            throw new Exception("Report not found");
-        }
-
-        $report = $database->fetch();
-
-        return $report;
-    }
-
-    /**
-     * Get session by client id
-     * 
-     * @param mixed $id The share id
-     * @param string $id The origin
-     * @throws Exception
-     * @return array
-     */
-    public function getByClientId($id, $origin)
+    public function getByClientId($clientId, $origin)
     {
         $database = Database::openConnection();
         $database->prepare('SELECT * FROM `sessions` WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC LIMIT 1');
-        $database->bindValue(':clientid', $id);
+        $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->execute();
 
@@ -94,7 +81,7 @@ class Session_model extends Model
     }
 
     /**
-     * Get report by payload
+     * Get session by payload
      * @param string $payload The payload
      * @throws Exception
      * @return array
@@ -113,7 +100,7 @@ class Session_model extends Model
     }
 
     /**
-     * Add report
+     * Add session
      * 
      * @param string $clientId The client id
      * @param string $cookies The cookies

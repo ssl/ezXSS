@@ -9,6 +9,15 @@ class Console_model extends Model
      */
     public $table = 'console';
 
+    /**
+     * Add console command
+     * 
+     * @param string $clientId The client id
+     * @param string $origin The origin
+     * @param string $command The command
+     * @throws Exception
+     * @return string
+     */
     public function add($clientId, $origin, $command)
     {
         $database = Database::openConnection();
@@ -25,6 +34,14 @@ class Console_model extends Model
         return true;
     }
 
+    /**
+     * Get next command
+     * 
+     * @param string $clientId The client id
+     * @param string $origin The origin
+     * @throws Exception
+     * @return string
+     */
     public function getNext($clientId, $origin)
     {
         $database = Database::openConnection();

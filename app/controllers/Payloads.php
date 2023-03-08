@@ -266,7 +266,7 @@ class Payloads extends Controller
                 $this->model('Session')->setSingleValue($session['id'], 'time', time());
                 $this->model('Session')->setSingleValue($session['id'], 'console', $data->console ?? '');
             } catch(Exception $e) {
-                return 'hmm...';
+                return '';
             }
             return $this->model('Console')->getNext($data->clientid ?? '', $data->origin);
         }
