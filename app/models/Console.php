@@ -13,7 +13,7 @@ class Console_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('INSERT INTO `console` (`clientid`, `origin`, `exec`) VALUES (:clientid, :origin, :command);');
+        $database->prepare('INSERT INTO `console` (`clientid`, `origin`, `command`) VALUES (:clientid, :origin, :command);');
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->bindValue(':command', $command);

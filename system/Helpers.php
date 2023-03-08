@@ -62,10 +62,3 @@ function redirect($location)
     header('Location: ' . $location);
     exit();
 }
-
-function getCountryByIP($ip_address) {
-    use GeoIp2\Database\Reader;
-    $reader = new Reader(__DIR__ . '/../GeoLite2-Country.mmdb');
-    $record = $reader->country($ip_address);
-    return strtolower($record->country->isoCode ?? 'xx');
-}

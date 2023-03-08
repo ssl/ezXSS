@@ -169,13 +169,29 @@ $(document).ready(function () {
 
     $('#execute').click(function () {
         command = $('#command').val();
-        request(window.location.pathname, {command:command}).then(function (r) {
-            console.log(r)
+        request(window.location.pathname, {'execute': '', command:command}).then(function (r) {
+            $('#command').val('');
         });
     });
 
     if (location.toString().split('/')[5] === 'session') {
-        alert(1);
+        window.setInterval(function() {
+            request(window.location.pathname, {'getconsole': ''}).then(function (r) {
+                $('#console').val(r.console);
+            });
+        }, 10000);
+    }
+
+    if(window.location.pathname === "/manage/persistent/all") {
+        var startTime = new Date();
+        setInterval(function() {
+            var elapsedTime = new Date() - startTime;
+            var seconds = Math.round(elapsedTime / 1000);
+            $("#last").text(seconds + "s ago");
+        }, 1000);
+        setInterval(function() {
+            location.reload();
+        }, 30000);
     }
 
     $(".render").click(function () {

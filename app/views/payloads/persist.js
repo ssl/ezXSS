@@ -46,7 +46,7 @@ if (!console.everything) {
             defaultMethod.apply(console, arguments);
         };
     }
-    var methods = ["log", "error", "warn", "debug"];
+    var methods = ["log", "error", "warn"];
     for (var i = 0; i < methods.length; i++) {
         wrapConsoleMethod(methods[i], methods[i].toUpperCase());
     }
@@ -196,7 +196,7 @@ function ra_r() {
         });
     });
 
-    document.querySelectorAll("form").forEach(form => {
+    /**document.querySelectorAll("form").forEach(form => {
         form.addEventListener("submit", event => {
             event.preventDefault(); // prevent the form from redirecting or refreshing the page
             const formData = new FormData(form); // get all data from the form
@@ -215,5 +215,5 @@ function ra_r() {
             };
             xhr.send(formData);
         });
-    });
+    });**/
 }

@@ -17,7 +17,7 @@ class Session_model extends Model
     public function getAll()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM `sessions` p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM `sessions` GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.id DESC;');
+        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM `sessions` p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM `sessions` GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.time DESC;');
         $database->execute();
 
         $data = $database->fetchAll();

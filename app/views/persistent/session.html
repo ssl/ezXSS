@@ -18,6 +18,57 @@
 
             {message}
 
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Session data</div>
+                        <div class="panel-body">
+                            <table class="table report">
+                                <thead>
+                                    <tr>
+                                        <td width=150px>Client ID</td>
+                                        <td>{%data clientid}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>IP</td>
+                                        <td>{%data ip}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Browser</td>
+                                        <td>{%data browser}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Payload</td>
+                                        <td>{%data payload}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Origin</td>
+                                        <td>{%data origin}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Requests</td>
+                                        <td>34</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Last online</td>
+                                        <td>{%data last}</td>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Settings</div>
+                        <div class="panel-body">
+                            ...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             
 
             <div class="row">
@@ -63,10 +114,6 @@
                                             <td>{%data referer}</td>
                                         </tr>
                                         <tr>
-                                            <td>Payload</td>
-                                            <td>{%data payload}</td>
-                                        </tr>
-                                        <tr>
                                             <td>User Agent</td>
                                             <td>{%data user-agent}</td>
                                         </tr>
@@ -96,16 +143,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Origin</td>
-                                            <td>{%data origin}</td>
-                                        </tr>
-                                        <tr>
                                             <td>Time</td>
                                             <td>{%data time}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Screenshot</td>
-                                            <td>{%data screenshot}</td>
                                         </tr>
                                     </thead>
                                 </table>
