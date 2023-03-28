@@ -246,7 +246,7 @@ class Payload extends Controller
         }
 
         if (strpos($path, '~') !== false) {
-            throw new Exception('This does not look like an valid path');
+            throw new Exception('This does not look like a valid path');
         }
 
         $newString = $payload['pages'] . '~' . $path;
@@ -267,7 +267,7 @@ class Payload extends Controller
 
         // Validate domain string
         if (!preg_match('/^(?!\-)(?:(?:[a-zA-Z\d][a-zA-Z\d\-]{0,61})?[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$/', $domain)) {
-            throw new Exception('This does not look like an valid domain');
+            throw new Exception('This does not look like a valid domain');
         }
 
         $newString = $payload['blacklist'] . '~' . $domain;
@@ -288,7 +288,7 @@ class Payload extends Controller
 
         // Validate domain string
         if (!preg_match('/^(?!\-)(?:(?:[a-zA-Z\d][a-zA-Z\d\-]{0,61})?[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$/', $domain)) {
-            throw new Exception('This does not look like an valid domain');
+            throw new Exception('This does not look like a valid domain');
         }
 
         $newString = $payload['whitelist'] . '~' . $domain;

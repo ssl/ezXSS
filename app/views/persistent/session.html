@@ -61,9 +61,23 @@
 
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Settings</div>
+                        <div class="panel-heading">Reverse proxy</div>
                         <div class="panel-body">
-                            ...
+                            <form class="form" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <label class="control-label" for="ipport">Proxy IP and port</label>
+                                    <input class="form-control" name="ipport" type="text" placeholder="domain:30055">
+                                </div>
+
+                                <label class="checkbox-label">
+                                    <input checked class="chkbox" name="passorigin" type="checkbox">
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text">Pass origin requests through proxy</p>
+
+                                <button name="proxy" type="submit" class="btn">Start</button>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -52,7 +52,7 @@ class Api extends Controller
 
         // Validate bottoken string
         if (!preg_match('/^[a-zA-Z0-9:_-]+$/', $bottoken)) {
-            return $this->showEcho('This does not look like an valid Telegram bot token');
+            return $this->showEcho('This does not look like a valid Telegram bot token');
         }
 
         // Get last chat from bot

