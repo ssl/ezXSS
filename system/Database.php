@@ -30,7 +30,7 @@ class Database
     {
         if ($this->connection === null) {
             // Construct a new connection
-            $this->connection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';port=' . DB_PORT . ';charset=utf8', DB_USER, DB_PASS);
+            $this->connection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';port=' . DB_PORT . ';charset=utf8mb4', DB_USER, DB_PASS);
 
             $this->connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
