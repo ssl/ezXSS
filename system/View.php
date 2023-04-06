@@ -285,7 +285,7 @@ class View
             }
             $content = str_replace(
                 $matches[0][$key],
-                substr(!empty($data->{$matches[1][$key]}) ? $data->{$matches[1][$key]} : 'None', 0, 1024),
+                substr(!empty($data->{$matches[1][$key]}) ? $data->{$matches[1][$key]} : '', 0, 1024),
                 $content
             );
         }
