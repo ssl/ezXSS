@@ -367,7 +367,7 @@ class Payloads extends Controller
         });
 
         if (!empty($data->screenshot)) {
-            $data->screenshot = "<img style=\"max-width:100%;\" src=\"https://{$data->domain}/assets/img/report-{$data->screenshotName}.png\">";
+            $escapedData->screenshot = "<img style=\"max-width:100%;\" src=\"https://{$data->domain}/assets/img/report-{$data->screenshotName}.png\">";
         }
 
         // Create mail alert template
@@ -427,7 +427,7 @@ class Payloads extends Controller
         });
 
         if (!empty($data->screenshot)) {
-            $data->screenshot = "https://{$data->domain}/assets/img/report-{$data->screenshotName}.png";
+            $escapedData->screenshot = "https://{$data->domain}/assets/img/report-{$data->screenshotName}.png";
         }
 
         // Create Discord alert template
