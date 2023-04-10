@@ -16,4 +16,9 @@ $(document).ready(function () {
         "pageLength": 25,
         order: [[6, 'desc']],
     });
+
+    $('#logs').DataTable({
+        "pageLength": 25,
+        order: [[3, 'desc']],
+    });
 });

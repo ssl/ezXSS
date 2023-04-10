@@ -24,7 +24,8 @@ class Settings extends Controller
                     $theme = $this->getPostValue('theme');
                     $filter = $this->getPostValue('filter');
                     $dompart = $this->getPostValue('dompart');
-                    $this->applicationSettings($timezone, $theme, $filter, $dompart);
+                    $logging = $this->getPostValue('loggingon');
+                    $this->applicationSettings($timezone, $theme, $filter, $dompart, $logging);
                 }
 
                 // Check if posted data is changing global payload settings
@@ -84,6 +85,8 @@ class Settings extends Controller
         $filterSave = $settings->get('filter-save');
         $filterAlert = $settings->get('filter-alert');
 
+        $this->view->renderChecked('logging', $settings->get('logging') === '1');
+
         // Renders data of correct selected filter
         $this->view->renderData('filter1', $filterSave == 1 && $filterAlert == 1 ? 'selected' : '');
         $this->view->renderData('filter2', $filterSave == 1 && $filterAlert == 0 ? 'selected' : '');
@@ -128,10 +131,11 @@ class Settings extends Controller
      * @param string $theme The theme name
      * @param string $filter The filter option
      * @param string $dompart The length of the dom part
+     * @param string $logging Enable logging
      * @throws Exception
      * @return void
      */
-    private function applicationSettings($timezone, $theme, $filter, $dompart)
+    private function applicationSettings($timezone, $theme, $filter, $dompart, $logging)
     {
         // Validate timezone
         if (!in_array($timezone, timezone_identifiers_list(), true)) {
@@ -159,6 +163,7 @@ class Settings extends Controller
         $this->model('Setting')->set('filter-alert', $filterAlert);
         $this->model('Setting')->set('timezone', $timezone);
         $this->model('Setting')->set('theme', $theme);
+        $this->model('Setting')->set('logging', $logging !== null ? '1' : '0');
     }
 
     /**

@@ -32,3 +32,35 @@ ALTER TABLE `sessions` ADD `console` LONGTEXT NOT NULL AFTER `sessionstorage`;
 ALTER TABLE `sessions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
+INSERT INTO `settings` (`id`, `setting`, `value`) VALUES (NULL, 'logging', '0');
+
+CREATE TABLE `logs` (
+  `id` int NOT NULL,
+  `user` varchar(500) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` varchar(1000) COLLATE utf8mb4_general_ci NOT NULL,
+  `ip` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `time` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `logs`
+--
+ALTER TABLE `logs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `logs`
+--
+ALTER TABLE `logs`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+COMMIT;
+
+ALTER TABLE `logs` CHANGE `user` `user_id` INT NOT NULL;

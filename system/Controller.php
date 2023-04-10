@@ -323,6 +323,19 @@ class Controller
     }
 
     /**
+     * Log item
+     *
+     * @param string $description The description
+     * @return void
+     */
+    public function log($description)
+    {
+        $userId = $this->session->data('id');
+        $username = $this->session->data('username');
+        $this->model('Log')->add($userId !== '' ? $userId : 0, "{$username}: $description", $_SERVER['REMOTE_ADDR']);
+    }
+
+    /**
      * Checks if platform is in kill switch mode
      *
      * @return void

@@ -55,6 +55,13 @@
                                     <label class="control-label" for="dompart">Max DOM length in alerts</label>
                                     <input class="form-control" name="dompart" type="text" value="{%data dompart}">
                                 </div>
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input {%checked logging} class="chkbox" name="loggingon" type="checkbox">
+                                        <span class="checkbox-custom rectangular"></span>
+                                    </label>
+                                    <p class="checkbox-text">Enable logging</p>
+                                </div>
                                 <button name="application" type="submit" class="btn">Save</button>
                             </form>
                         </div>
