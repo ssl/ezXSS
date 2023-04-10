@@ -415,20 +415,28 @@ class Payloads extends Controller
      */
     private function mailAlert($data, $email)
     {
+        // Escapes data for alert
+        $escapedData = json_decode(json_encode($data), false);
+        array_walk_recursive($escapedData, function(&$item) {
+            if(is_string($item)) {
+                $item = e($item);
+            }
+        });
+
         if (!empty($data->screenshot)) {
-            $data->screenshot = "<img style=\"max-width:100%;\" src=\"https://{$data->domain}/assets/img/report-{$data->screenshotName}.png\">";
+            $escapedData->screenshot = "<img style=\"max-width:100%;\" src=\"https://{$data->domain}/assets/img/report-{$data->screenshotName}.png\">";
         }
 
         // Create mail alert template
         $alertTemplate = $this->view->getAlert('mail.html');
-        $alertTemplate = $this->view->renderAlertData($alertTemplate, $data);
+        $alertTemplate = $this->view->renderAlertData($alertTemplate, $escapedData);
 
         $headers[] = 'From: ezXSS';
         $headers[] = 'MIME-Version: 1.0';
         $headers[] = 'Content-type: text/html; charset=iso-8859-1';
         mail(
             $email,
-            '[ezXSS] XSS on ' . e($data->uri),
+            '[ezXSS] XSS on ' . $data->uri,
             $alertTemplate,
             implode("\r\n", $headers)
         );
@@ -467,13 +475,21 @@ class Payloads extends Controller
      */
     private function discordAlert($data, $webhookURL)
     {
+        // Escapes data for alert
+        $escapedData = json_decode(json_encode($data), false);
+        array_walk_recursive($escapedData, function(&$item) {
+            if(is_string($item)) {
+                $item = addslashes($item);
+            }
+        });
+
         if (!empty($data->screenshot)) {
-            $data->screenshot = "https://{$data->domain}/assets/img/report-{$data->screenshotName}.png";
+            $escapedData->screenshot = "https://{$data->domain}/assets/img/report-{$data->screenshotName}.png";
         }
 
         // Create Discord alert template
         $alertTemplate = $this->view->getAlert('discord.json');
-        $alertTemplate = $this->view->renderAlertData($alertTemplate, $data);
+        $alertTemplate = $this->view->renderAlertData($alertTemplate, $escapedData);
         $discordMessage = json_encode(json_decode($alertTemplate), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         // Send alert to Discord webhook

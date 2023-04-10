@@ -22,6 +22,9 @@ try {
     echo $router->proccess($_SERVER['REQUEST_URI']);
 } catch (Exception $message) {
     // Any unexpected uncatched exception will show an error page
+    if(!class_exists('View')) {
+        require_once __DIR__ . '/system/View.php';
+    }
     $view = new View();
     $view->setContentType('text/html');
     echo $view->renderErrorPage($message->getMessage());
