@@ -33,13 +33,64 @@ class Persistent extends Controller
      */
     public function all()
     {
+        return $this->list(0);
+    }
+
+    /**
+     * Renders the list of all sessions within payload and returns the content.
+     * 
+     * @param string $id The payload id
+     * @return string
+     */
+    public function list($id)
+    {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Online');
         $this->view->renderTemplate('persistent/index');
 
-        $this->view->renderCondition('hasReports', true);
+        // Check payload permissions
+        $payloadList = $this->payloadList();
+        if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
+            throw new Exception('You dont have permissions to this payload');
+        }
 
-        $sessions = $this->model('Session')->getAll();
+        // Retrieve and render all payloads of user for listing
+        $payloads = [];
+        foreach ($payloadList as $val) {
+            $name = !$val ? 'All reports' : $this->model('Payload')->getById($val)['payload'];
+            $payloads[] = ['id' => $val, 'name' => ucfirst($name), 'selected' => $val == $id ? 'selected' : ''];
+        }
+        $this->view->renderDataset('payload', $payloads);
+
+        // Checks if requested id is 'all'
+        if (+$id === 0) {
+            if ($this->isAdmin()) {
+                // Show all sessions
+                $sessions = $this->model('Session')->getAll();
+            } else {
+                // Show all sessions of allowed payloads
+                $sessions = [];
+                foreach ($payloadList as $payloadId) {
+                    if ($payloadId !== 0) {
+                        $payload = $this->model('Payload')->getById($payloadId);
+                        $payloadUri = '//' . $payload['payload'];
+                        if (strpos($payload['payload'], '/') === false) {
+                            $payloadUri .= '/%';
+                        }
+                        $sessions = array_merge($sessions, $this->model('Session')->getAllByPayload($payloadUri));
+                    }
+                }
+            }
+        } else {
+            // Show sessions of payload
+            $payload = $this->model('Payload')->getById($id);
+
+            $payloadUri = '//' . $payload['payload'];
+            if (strpos($payload['payload'], '/') === false) {
+                $payloadUri .= '/%';
+            }
+            $sessions = $this->model('Session')->getAllByPayload($payloadUri);
+        }
 
         foreach ($sessions as $key => $value) {
             $record = $this->reader->country($sessions[$key]['ip']);
@@ -49,6 +100,7 @@ class Persistent extends Controller
             $sessions[$key]['shorturi'] = substr($sessions[$key]['uri'], 0, 50);
         }
 
+        $this->view->renderCondition('hasSessions', count($sessions) > 0);
         $this->view->renderDataset('session', $sessions);
 
         return $this->showContent();
@@ -71,10 +123,11 @@ class Persistent extends Controller
         $origin = $clientId[1] ?? '';
         $clientId = $clientId[0] ?? '';
 
-        $session = $this->model('Session')->getByClientId($clientId, $origin);
+        if (!$this->hasSessionPermissions($clientId, $origin)) {
+            throw new Exception('You dont have permissions to this session');
+        }
 
-        // Check report permissions
-        // todo
+        $session = $this->model('Session')->getByClientId($clientId, $origin);
 
         if($this->isPOST()) {
             try {
@@ -133,5 +186,63 @@ class Persistent extends Controller
 
         return $this->showContent();
 
+    }
+
+    /**
+     * Checks if user is allowed to view session
+     * 
+     * @param string $id The session id
+     * @param string $id The session origin
+     * @return bool
+     */
+    private function hasSessionPermissions($clientId, $origin)
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Get data about report and payloads of user
+        $session = $this->model('Session')->getByClientId($clientId, $origin);
+        $user = $this->model('User')->getById($this->session->data('id'));
+        $payloads = $this->model('Payload')->getAllByUserId($user['id']);
+
+        // Check all payloads if it correspondents to session 
+        foreach ($payloads as $payload) {
+            if (strpos($payload['payload'], '/') === false) {
+                // Check for domain
+                $payload = '//' . $payload['payload'] . '/';
+                if ($payload === $session['payload'] || substr($session['payload'], 0, strlen($payload)) === $payload) {
+                    return true;
+                }
+            } else {
+                // Check for domain + path
+                if ('//' . $payload['payload'] === $session['payload']) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the payload list array
+     * 
+     * @return array
+     */
+    private function payloadList()
+    {
+        $payloadList = [];
+        // '0' correspondents to 'all'
+        array_push($payloadList, 0);
+
+        // Push all payloads of user to list
+        $user = $this->model('User')->getById($this->session->data('id'));
+        $payloads = $this->model('Payload')->getAllByUserId($user['id']);
+        foreach ($payloads as $payload) {
+            array_push($payloadList, $payload['id']);
+        }
+
+        return $payloadList;
     }
 }

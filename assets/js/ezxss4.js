@@ -93,6 +93,14 @@ $(document).ready(function () {
         }
     });
 
+    $('#payloadListSession').on('change', function () {
+        if (this.value !== '0') {
+            window.location.href = '/manage/persistent/list/' + this.value;
+        } else {
+            window.location.href = '/manage/persistent/all';
+        }
+    });
+
     $(".remove-item").click(function () {
         const data = $(this).attr('data');
         const divId = $(this).attr('divid');
@@ -184,7 +192,7 @@ $(document).ready(function () {
         }, 10000);
     }
 
-    if(window.location.pathname === "/manage/persistent/all") {
+    if(location.toString().split('/')[4] === "persistent") {
         var startTime = new Date();
         setInterval(function() {
             var elapsedTime = new Date() - startTime;

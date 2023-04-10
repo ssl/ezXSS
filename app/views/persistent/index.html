@@ -19,11 +19,21 @@
             {message}
 
             <div class="row">
+
+                <div class="col-lg-12">
+                    <select class="form-control content-select" id="payloadListSession" name="payloadListSession">
+                        {%foreach payload}
+                        <option value="{payload->id}" {payload->selected}>{payload->name}</option>
+                        {%/foreach}
+                    </select>
+                    <br>
+                </div>
+
                 <div class="col-lg-12">
                     <div class="panel panel-filled">
                         <div class="panel-heading">Information <span id="last" style="float:right">0s ago</span></div>
                         <div class="panel-body">
-                            {%if hasReports}
+                            {%if hasSessions}
                             <div class="table-responsive">
 
                                 <table id="persistent" class="table" style="white-space: nowrap;width:100%;">
@@ -55,8 +65,8 @@
                             </div>
                             {%/if}
 
-                            {%!if hasReports}
-                            <p>There are no reports yet for this payload.</p>
+                            {%!if hasSessions}
+                            <p>There are no sessions yet for this payload.</p>
                             {%/!if}
                         </div>
                     </div>
