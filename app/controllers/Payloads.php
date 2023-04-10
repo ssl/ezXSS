@@ -110,7 +110,7 @@ class Payloads extends Controller
         $data->screenshot = $data->screenshot ?? '';
 
         // Get the user's IP address
-        $data->ip = $data->ip ?? $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'];
+        $data->ip = substr($data->ip ?? $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'], 0, 50);
 
         // Remove the protocol from the origin URL
         $data->origin = str_replace(['https://', 'http://'], '', $data->origin ?? '');
