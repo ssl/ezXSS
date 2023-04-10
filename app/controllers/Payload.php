@@ -73,6 +73,8 @@ class Payload extends Controller
                 if ($this->getPostValue('whitelist-domains') !== null) {
                     $this->setWhitelist($id, $this->getPostValue('domain'));
                 }
+
+                $this->log("Updated payload {$id} settings");
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }

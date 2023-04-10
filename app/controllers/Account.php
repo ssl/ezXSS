@@ -103,6 +103,7 @@ class Account extends Controller
                     $this->session->createTempSession($user);
                     redirect('/manage/account/mfa');
                 } else {
+                    $this->log('Succesfully logged in');
                     $this->session->createSession($user);
                     redirect('dashboard/index');
                 }
@@ -144,6 +145,7 @@ class Account extends Controller
                     throw new Exception('Code is incorrect');
                 }
 
+                $this->log('Succesfully logged in with MFA');
                 $this->session->createSession($user);
                 redirect('dashboard/index');
             } catch (Exception $e) {
@@ -175,6 +177,7 @@ class Account extends Controller
             throw new Exception('The retyped password is not the same as the new password');
         }
 
+        $this->log('Changed password');
         $this->model('User')->setPassword($user['id'], $newPassword);
     }
 
@@ -213,6 +216,7 @@ class Account extends Controller
             }
             $secret = '';
         }
+        $this->log('Updated MFA settings');
         $this->model('User')->setSecret($user['id'], $secret);
     }
 
@@ -270,5 +274,7 @@ class Account extends Controller
             }
         }
         $alerts->set($user['id'], 4, $discordOn !== null, $discordWebhook);
+
+        $this->log('Editted personal alert settings');
     }
 }

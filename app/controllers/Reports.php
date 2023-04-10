@@ -85,6 +85,8 @@ class Reports extends Controller
             $this->view->renderData($value, $report[$value]);
         }
 
+        $this->log("Visited shared report page {$id}");
+
         return $this->showContent();
     }
 

@@ -17,8 +17,12 @@ class Logs extends Controller
         $logs = $this->model('Log')->getAll();
 
         foreach ($logs as $key => $value) {
-            $user = $this->model('User')->getById($logs[$key]['user_id']);
-            $logs[$key]['user'] = $user['username'];
+            if($logs[$key]['user_id'] !== 0) {
+                $user = $this->model('User')->getById($logs[$key]['user_id']);
+                $logs[$key]['user'] = $user['username'];
+            } else {
+                $logs[$key]['user'] = 'Not logged in';
+            }
             $logs[$key]['date'] = date('F j, Y, g:i a', $logs[$key]['time']);
         }
         $this->view->renderDataset('log', $logs);

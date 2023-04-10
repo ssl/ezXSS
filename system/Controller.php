@@ -330,9 +330,10 @@ class Controller
      */
     public function log($description)
     {
-        $userId = $this->session->data('id');
-        $username = $this->session->data('username');
-        $this->model('Log')->add($userId !== '' ? $userId : 0, "{$username}: $description", $_SERVER['REMOTE_ADDR']);
+        if($this->model('Setting')->get('logging') === '1') {
+            $userId = $this->session->data('id');
+            $this->model('Log')->add($userId !== '' ? $userId : 0, $description, $_SERVER['REMOTE_ADDR']);
+        }
     }
 
     /**

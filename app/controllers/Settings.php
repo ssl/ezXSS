@@ -55,6 +55,8 @@ class Settings extends Controller
                     $url = $this->getPostValue('callback_url');
                     $this->callbackAlertSettings($callbackOn, $url);
                 }
+
+                $this->log('Updated admin settings');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
