@@ -225,7 +225,7 @@ a:hover,a:focus{color:#fff;outline:none}
 hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #686d93}
 .row{margin-left:-10px;margin-right:-10px}
 .col-lg-12{padding-left:10px;padding-right:10px}
-.left-nav-toggle{float:left;padding:9px 10px 8px 25px}
+.left-nav-toggle{float:left;padding:25px 10px 8px 25px}
 .left-nav-toggle:hover a{color:#636c88}
 .left-nav-toggle a{font-size:30px;color:#949ba2}
 .left-nav-toggle a:hover,.left-nav-toggle a:focus{text-decoration:none}
@@ -579,4 +579,15 @@ table.dataTable td.dt-control{text-align:center;cursor:pointer}table.dataTable t
   width: 145px;
   border: #343a60 1px solid;
   background-color: #343a60;
+}
+
+#mobile-dropdown {
+  display: none;
+}
+
+#mobile-icon {
+  width: 35px;
+  height: 5px;
+  background-color: black;
+  margin: 6px 0;
 }

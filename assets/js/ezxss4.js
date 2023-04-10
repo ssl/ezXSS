@@ -14,6 +14,10 @@ function request(action, data = {}) {
 
 $(document).ready(function () {
 
+    $('.left-nav-toggle').click(function() {
+        $('#mobile-dropdown').slideToggle();
+    });
+
     if (location.toString().split('/')[4] === 'dashboard') {
         request('/manage/api/statistics', { page: location.toString().split('/').pop() }).then(function (r) {
             $.each(r, function (key, value) {
