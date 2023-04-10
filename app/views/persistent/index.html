@@ -1,0 +1,73 @@
+<div class="wrapper">
+
+    {menu}
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title">
+                            <h3 class="m-b-xs">All sessions</h3>
+                            <small>....</small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            {message}
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Information <span id="last" style="float:right">0s ago</span></div>
+                        <div class="panel-body">
+                            {%if hasReports}
+                            <div class="table-responsive">
+
+                                <table id="persistent" class="table" style="white-space: nowrap;width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Client ID</th>
+                                            <th>Browser</th>
+                                            <th>IP</th>
+                                            <th>Current page</th>
+                                            <th>Payload</th>
+                                            <th>Requests</th>
+                                            <th>Last online</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reports-list">
+                                        {%foreach session}
+                                        <tr>
+                                            <td><a href="/manage/persistent/session/{session->clientid}~{session->origin}">{session->clientid}</a></td>
+                                            <td><span class="flag flag-{session->country}"></span>{session->browser}</td>
+                                            <td>{session->ip}</td>
+                                            <td>{session->shorturi}</td>
+                                            <td>{session->payload}</td>
+                                            <td>{session->requests}</td>
+                                            <td data-sort="{session->time}">{session->last}</td>
+                                        </tr>
+                                        {%/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {%/if}
+
+                            {%!if hasReports}
+                            <p>There are no reports yet for this payload.</p>
+                            {%/!if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- Reports JS -->
+<script src="/assets/js/dataTables/jquery.dataTables.js"></script>
+<script src="/assets/js/dataTables/bootstrap.dataTables.js"></script>
+<script src="/assets/js/dataTables/init.js"></script>

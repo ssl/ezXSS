@@ -11,4 +11,9 @@ $(document).ready(function () {
             },{},{},{},{width:50}
         ]
     });
+
+    $('#persistent').DataTable({
+        "pageLength": 25,
+        order: [[6, 'desc']],
+    });
 });

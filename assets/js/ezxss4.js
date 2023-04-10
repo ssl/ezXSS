@@ -167,6 +167,33 @@ $(document).ready(function () {
         $('#shareid').val("https://" + window.location.hostname + "/manage/reports/share/" + $(this).attr('share-id'));
     });
 
+    $('#execute').click(function () {
+        command = $('#command').val();
+        request(window.location.pathname, {'execute': '', command:command}).then(function (r) {
+            $('#command').val('');
+        });
+    });
+
+    if (location.toString().split('/')[5] === 'session') {
+        window.setInterval(function() {
+            request(window.location.pathname, {'getconsole': ''}).then(function (r) {
+                $('#console').val(r.console);
+            });
+        }, 10000);
+    }
+
+    if(window.location.pathname === "/manage/persistent/all") {
+        var startTime = new Date();
+        setInterval(function() {
+            var elapsedTime = new Date() - startTime;
+            var seconds = Math.round(elapsedTime / 1000);
+            $("#last").text(seconds + "s ago");
+        }, 1000);
+        setInterval(function() {
+            location.reload();
+        }, 60000);
+    }
+
     $(".render").click(function () {
         const byteCharacters = unescape(encodeURIComponent($('#dom').val()));
         const byteArrays = [];

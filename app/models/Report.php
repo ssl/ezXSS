@@ -26,27 +26,6 @@ class Report_model extends Model
     }
 
     /**
-     * Get report by id
-     * 
-     * @param int $id The report id
-     * @throws Exception
-     * @return array
-     */
-    public function getById($id)
-    {
-        $database = Database::openConnection();
-        $database->getById($this->table, $id);
-
-        if ($database->countRows() === 0) {
-            throw new Exception("Report not found");
-        }
-
-        $report = $database->fetch();
-
-        return $report;
-    }
-
-    /**
      * Get report by share id
      * 
      * @param mixed $id The share id
@@ -266,25 +245,6 @@ class Report_model extends Model
         $database->prepare('UPDATE `reports` SET `archive` = :archive WHERE id = :id');
         $database->bindValue(':archive', $archive);
         $database->bindValue(':id', $id);
-
-        if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
-        }
-
-        return true;
-    }
-
-    /**
-     * Delete report by id
-     * 
-     * @param string $id The report id
-     * @throws Exception
-     * @return bool
-     */
-    public function deleteById($id)
-    {
-        $database = Database::openConnection();
-        $database->deleteById($this->table, $id);
 
         if (!$database->execute()) {
             throw new Exception("Something unexpected went wrong");
