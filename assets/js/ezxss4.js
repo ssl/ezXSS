@@ -21,10 +21,10 @@ $(document).ready(function () {
             });
         });
 
-        if (location.toString().split('/').pop() === 'my') {
-            pick_common($('#pick_common1').val(), 1);
-            pick_common($('#pick_common2').val(), 2);
-        }
+        var isMy = (location.toString().split('/').pop() === 'my') ? 0 : 1;
+
+        pick_common($('#pick_common1').val(), 1, isMy);
+        pick_common($('#pick_common2').val(), 2, isMy);
     }
 
     $("a[method='post']").click(function (e) {
@@ -53,18 +53,20 @@ $(document).ready(function () {
     });
 
     $('#pick_common1').on('change', function () {
-        pick_common(this.value, 1);
+        var isMy = (location.toString().split('/').pop() === 'my') ? 0 : 1;
+        pick_common(this.value, 1, isMy);
     });
 
     $('#pick_common2').on('change', function () {
-        pick_common(this.value, 2);
+        var isMy = (location.toString().split('/').pop() === 'my') ? 0 : 1;
+        pick_common(this.value, 2, isMy);
     });
 
-    function pick_common(id, row) {
+    function pick_common(id, row, admin=0) {
         $('#most_common' + row).empty();
         $('#toprow_common' + row).hide();
         $('#loding_common' + row).show();
-        request('/manage/api/getMostCommon', { id: id, row: row }).then(function (r) {
+        request('/manage/api/getMostCommon', { id: id, row: row, admin: admin }).then(function (r) {
             $('#loding_common' + row).hide();
             $('#toprow_common' + row).show();
             if (r.length > 0) {

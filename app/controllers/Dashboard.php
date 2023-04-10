@@ -43,6 +43,14 @@ class Dashboard extends Controller
         $this->view->setTitle('Account');
         $this->view->renderTemplate('dashboard/index');
 
+        // Render the correct 'selected' box in the 2 rows
+        $user = $this->model('User')->getById($this->session->data('id'));
+        foreach (['1', '2'] as $row) {
+            for ($i = 1; $i <= 5; $i++) {
+                $this->view->renderData("common_{$row}_{$i}", $user['row' . $row] == $i ? 'selected' : '');
+            }
+        }
+
         // Set and render notepad value
         if ($this->isPOST()) {
             $this->validateCsrfToken();

@@ -126,6 +126,24 @@ class Report_model extends Model
     }
 
     /**
+     * Get all common data
+     * 
+     * @throws Exception
+     * @return array
+     */
+    public function getAllCommonData()
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT origin,ip,cookies,`user-agent`,payload FROM reports ORDER BY id ASC');
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return $database->fetchAll();
+    }
+
+    /**
      * Add report
      * 
      * @param string $shareId The share id

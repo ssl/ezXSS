@@ -83,8 +83,14 @@ class Api extends Controller
     {
         $id = $this->getPostValue('id');
         $row = $this->getPostValue('row');
+        $admin = $this->getPostValue('admin') === '1';
         $data = [];
         $results = [];
+
+        // Validate if admin
+        if ($admin && !$this->isAdmin()) {
+            return $this->showEcho('Something went wrong');
+        }
 
         // Validate if id and row is correct
         if (!in_array($id, [1, 2, 3, 4, 5]) || !in_array($row, [1, 2])) {
@@ -98,17 +104,21 @@ class Api extends Controller
             $this->model('User')->setRow2($this->session->data('id'), $id);
         }
 
-        $user = $this->model('User')->getById($this->session->data('id'));
-        $payloads = $this->model('Payload')->getAllByUserId($user['id']);
-        $allReports = [];
+        if($admin) {
+            $allReports = $this->model('Report')->getAllCommonData();
+        } else {
+            $user = $this->model('User')->getById($this->session->data('id'));
+            $payloads = $this->model('Payload')->getAllByUserId($user['id']);
+            $allReports = [];
 
-        // Merge all reports that belong to user
-        foreach ($payloads as $payload) {
-            $payloadUri = '//' . $payload['payload'];
-            if (strpos($payload['payload'], '/') === false) {
-                $payloadUri .= '/%';
+            // Merge all reports that belong to user
+            foreach ($payloads as $payload) {
+                $payloadUri = '//' . $payload['payload'];
+                if (strpos($payload['payload'], '/') === false) {
+                    $payloadUri .= '/%';
+                }
+                $allReports = array_merge($allReports, $this->model('Report')->getAllCommonDataByPayload($payloadUri));
             }
-            $allReports = array_merge($allReports, $this->model('Report')->getAllCommonDataByPayload($payloadUri));
         }
 
         $rows = [1 => 'origin', 2 => 'ip', 4 => 'user-agent', 5 => 'payload'];
