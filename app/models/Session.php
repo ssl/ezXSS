@@ -100,6 +100,23 @@ class Session_model extends Model
     }
 
     /**
+     * Get request count by client id
+     * 
+     * @param string $clientId The client id
+     * @throws Exception
+     * @return int
+     */
+    public function getRequestCount($clientId)
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT clientid FROM `sessions` WHERE clientid = :clientid');
+        $database->bindValue(':clientid', $clientId);
+        $database->execute();
+
+        return $database->countRows();
+    }
+
+    /**
      * Add session
      * 
      * @param string $clientId The client id

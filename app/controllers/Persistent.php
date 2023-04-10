@@ -116,7 +116,7 @@ class Persistent extends Controller
 
         // Render all rows
         $this->view->renderData('time', date('F j, Y, g:i a', $session['time']));
-        $this->view->renderData('requests', 'test');
+        $this->view->renderData('requests', $this->model('Session')->getRequestCount($clientId));
 
         $record = $this->reader->country($session['ip']);
         $this->view->renderData('country', strtolower($record->country->isoCode ?? 'xx'));
