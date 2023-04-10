@@ -115,6 +115,7 @@ class Payload extends Controller
             }
         }
         $this->view->renderDataset('pages', $pages);
+        $this->view->renderCondition('hasPages', count($pages) > 0);
 
         // Render data set of all blacklisted domains of payload
         $blacklist = [];
@@ -124,6 +125,7 @@ class Payload extends Controller
             }
         }
         $this->view->renderDataset('blacklist', $blacklist);
+        $this->view->renderCondition('hasBlacklist', count($blacklist) > 0);
 
         // Render data set of all whitelisted domains of payload
         $whitelist = [];
@@ -133,6 +135,7 @@ class Payload extends Controller
             }
         }
         $this->view->renderDataset('whitelist', $whitelist);
+        $this->view->renderCondition('hasWhitelist', count($whitelist) > 0);
 
         return $this->showContent();
     }

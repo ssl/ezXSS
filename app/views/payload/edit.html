@@ -183,6 +183,7 @@
                                 <button name="extract-pages" type="submit" class="btn">Save</button>
                             </form>
                             <hr>
+                            {%if hasPages}
                             <p><b>Pages:</b></p>
                             {%foreach pages}
                             <div id="p{pages->id}" class="input-group" style="margin-bottom:15px">
@@ -191,6 +192,11 @@
                                         divid="p{pages->id}" style="cursor:pointer">Remove</a></span>
                             </div>
                             {%/foreach}
+                            {%/if}
+
+                            {%!if hasPages}
+                            <p>There are no pages yet for this payload.</p>
+                            {%/!if}
                         </div>
                     </div>
                 </div>
@@ -209,6 +215,7 @@
                                 <button name="blacklist-domains" type="submit" class="btn">Save</button>
                             </form>
                             <hr>
+                            {%if hasBlacklist}
                             <p><b>Domains:</b></p>
                             {%foreach blacklist}
                             <div id="b{blacklist->id}" class="input-group" style="margin-bottom:15px">
@@ -217,6 +224,12 @@
                                         divid="b{blacklist->id}" style="cursor:pointer">Remove</a></span>
                             </div>
                             {%/foreach}
+                            {%/if}
+
+                            {%!if hasBlacklist}
+                            <p>There are no blacklisted domains yet for this payload.</p>
+                            {%/!if}
+
                         </div>
                     </div>
                 </div>
@@ -235,6 +248,7 @@
                                 <button name="whitelist-domains" type="submit" class="btn">Save</button>
                             </form>
                             <hr>
+                            {%if hasWhitelist}
                             <p><b>Domains:</b></p>
                             {%foreach whitelist}
                             <div id="w{whitelist->id}" class="input-group" style="margin-bottom:15px">
@@ -243,6 +257,11 @@
                                         divid="w{whitelist->id}" style="cursor:pointer">Remove</a></span>
                             </div>
                             {%/foreach}
+                            {%/if}
+
+                            {%!if hasWhitelist}
+                            <p>There are no whitelisted domains yet for this payload.</p>
+                            {%/!if}
                         </div>
                     </div>
                 </div>
