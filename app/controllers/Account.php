@@ -242,7 +242,7 @@ class Account extends Controller
         $telegramChatID = $this->getPostValue('chatid');
         if (!empty($telegramToken) || !empty($telegramChatID)) {
             if (!preg_match('/^[a-zA-Z0-9:_-]+$/', $telegramToken)) {
-                throw new Exception('This does not look like a valid Telegram bot token');
+                throw new Exception('This does not look like an valid Telegram bot token');
             }
 
             if (!preg_match('/^[0-9-]*$/', $telegramChatID)) {
@@ -256,7 +256,7 @@ class Account extends Controller
         $slackWebhook = $this->getPostValue('slack_webhook');
         if (!empty($slackWebhook)) {
             if (!preg_match('/https:\/\/hooks\.slack\.com\/services\/([a-zA-Z0-9]+)\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)$/', $slackWebhook)) {
-                throw new Exception('This does not look like a valid Slack webhook URL');
+                throw new Exception('This does not look like an valid Slack webhook URL');
             }
         }
         $alerts->set($user['id'], 3, $slackOn !== null, $slackWebhook);
@@ -266,7 +266,7 @@ class Account extends Controller
         $discordWebhook = $this->getPostValue('discord_webhook');
         if (!empty($discordWebhook)) {
             if (!preg_match('/https:\/\/(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-zA-Z0-9_-]+)$/', $discordWebhook)) {
-                throw new Exception('This does not look like a valid Discord webhook URL');
+                throw new Exception('This does not look like an valid Discord webhook URL');
             }
         }
         $alerts->set($user['id'], 4, $discordOn !== null, $discordWebhook);
