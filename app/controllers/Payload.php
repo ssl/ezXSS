@@ -51,6 +51,9 @@ class Payload extends Controller
 
                 // Check if posted data is editing persistent mode
                 if ($this->getPostValue('persistent') !== null) {
+                    if($this->model('Setting')->get('persistent') !== '1' && $this->getPostValue('persistent-mode') !== null) {
+                        throw new Exception('Persistent mode is globally disabled by the ezXSS admin');
+                    }
                     $this->model('Payload')->setSingleValue($id, "persistent", ($this->getPostValue('persistent-mode') !== null) ? 1 : 0);
                 }
 

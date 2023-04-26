@@ -14,7 +14,7 @@ function request(action, data = {}) {
 
 $(document).ready(function () {
 
-    $('.left-nav-toggle').click(function() {
+    $('.left-nav-toggle').click(function () {
         $('#mobile-dropdown').slideToggle();
     });
 
@@ -66,7 +66,7 @@ $(document).ready(function () {
         pick_common(this.value, 2, isMy);
     });
 
-    function pick_common(id, row, admin=0) {
+    function pick_common(id, row, admin = 0) {
         $('#most_common' + row).empty();
         $('#toprow_common' + row).hide();
         $('#loding_common' + row).show();
@@ -183,27 +183,27 @@ $(document).ready(function () {
 
     $('#execute').click(function () {
         command = $('#command').val();
-        request(window.location.pathname, {'execute': '', command:command}).then(function (r) {
+        request(window.location.pathname, { 'execute': '', command: command }).then(function (r) {
             $('#command').val('');
         });
     });
 
     if (location.toString().split('/')[5] === 'session') {
-        window.setInterval(function() {
-            request(window.location.pathname, {'getconsole': ''}).then(function (r) {
+        window.setInterval(function () {
+            request(window.location.pathname, { 'getconsole': '' }).then(function (r) {
                 $('#console').val(r.console);
             });
         }, 10000);
     }
 
-    if(location.toString().split('/')[4] === "persistent") {
+    if (location.toString().split('/')[4] === "persistent") {
         var startTime = new Date();
-        setInterval(function() {
+        setInterval(function () {
             var elapsedTime = new Date() - startTime;
             var seconds = Math.round(elapsedTime / 1000);
             $("#last").text(seconds + "s ago");
         }, 1000);
-        setInterval(function() {
+        setInterval(function () {
             location.reload();
         }, 60000);
     }

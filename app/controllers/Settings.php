@@ -88,6 +88,7 @@ class Settings extends Controller
         $filterAlert = $settings->get('filter-alert');
 
         $this->view->renderChecked('logging', $settings->get('logging') === '1');
+        $this->view->renderChecked('persistent', $settings->get('persistent') === '1');
 
         // Renders data of correct selected filter
         $this->view->renderData('filter1', $filterSave == 1 && $filterAlert == 1 ? 'selected' : '');
@@ -186,6 +187,9 @@ class Settings extends Controller
         }
 
         $this->model('Setting')->set("customjs", $this->getPostValue('customjs'));
+
+        $persistent = $this->getPostValue('persistenton');
+        $this->model('Setting')->set('persistent', $persistent !== null ? '1' : '0');
     }
 
     /**
