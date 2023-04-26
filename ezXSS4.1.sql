@@ -33,6 +33,7 @@ ALTER TABLE `sessions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 INSERT INTO `settings` (`id`, `setting`, `value`) VALUES (NULL, 'logging', '0');
+INSERT INTO `settings` (`id`, `setting`, `value`) VALUES (NULL, 'persistent', '0');
 
 CREATE TABLE `logs` (
   `id` int NOT NULL,

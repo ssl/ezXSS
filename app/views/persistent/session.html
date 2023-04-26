@@ -80,13 +80,21 @@
                             </form>
                         </div>
                     </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Settings</div>
+                        <div class="panel-body" style="padding:19px">
+                            <form class="form" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <button name="delete" type="submit" class="btn">Delete</button>
+                                <button name="kill" type="submit" class="btn">Kill persistent</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            
-
             <div class="row">
-
                 <div class="col-lg-12">
                     <div class="panel panel-filled">
                         <div class="panel-heading">Console</div>
@@ -103,7 +111,6 @@
                                     <span class="input-group-addon"><a name="execute" id="execute" style="cursor:pointer">Send</a></span>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>

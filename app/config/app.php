@@ -7,7 +7,7 @@ define('debug', true);
 define('httpmode', false);
 
 // Defines whenever sign up is enabled, do not enable this unless you are serving a public ezXSS installation - this allows anyone to register!
-define('signupEnabled', true);
+define('signupEnabled', false);
 
 // Current ezXSS version. Do not edit this
 define('version', '4.0');

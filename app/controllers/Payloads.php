@@ -234,11 +234,29 @@ class Payloads extends Controller
      */
     private function persistCallback($data)
     {
-        // do something
         $data->type = $data->type ?? '';
+        $tryInit = false;
 
         // A new request has been made
         if($data->type === 'init') {
+            $tryInit = true;
+        }
+
+        // Session is pinged and is waiting for pong
+        if($data->type === 'ping') {
+            try {
+                $session = $this->model('Session')->getByClientId($data->clientid ?? '', $data->origin);
+
+                $this->model('Session')->setSingleValue($session['id'], 'time', time());
+                $this->model('Session')->setSingleValue($session['id'], 'console', $data->console ?? '');
+
+                return $this->model('Console')->getNext($data->clientid ?? '', $data->origin);
+            } catch(Exception $e) {
+                $tryInit = true;
+            }
+        }
+
+        if($tryInit) {
             // Save the request data
             $data->id = $this->model('Session')->add(
                 $data->clientid ?? '',
@@ -255,21 +273,9 @@ class Payloads extends Controller
                 $data->payload,
                 $data->console ?? ''
             );
-            return 'github.com/ssl/ezXSS';
         }
 
-        // Session is pinged and is waiting for pong
-        if($data->type === 'ping') {
-            try {
-                $session = $this->model('Session')->getByClientId($data->clientid ?? '', $data->origin);
-
-                $this->model('Session')->setSingleValue($session['id'], 'time', time());
-                $this->model('Session')->setSingleValue($session['id'], 'console', $data->console ?? '');
-            } catch(Exception $e) {
-                return '';
-            }
-            return $this->model('Console')->getNext($data->clientid ?? '', $data->origin);
-        }
+        return '';
     }
 
     /**

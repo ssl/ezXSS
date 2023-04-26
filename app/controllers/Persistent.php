@@ -135,6 +135,18 @@ class Persistent extends Controller
 
                 $this->view->setContentType('application/json');
 
+                // Check if posted data is deleting session
+                if ($this->getPostValue('delete') !== null) {
+                    $this->model('Session')->deleteAll($clientId, $origin);
+                    redirect('/manage/persistent/all');
+                }
+
+                // Check if posted data is killing persistent
+                if ($this->getPostValue('kill') !== null) {
+                    $this->model('Console')->add($clientId, $origin, "ez_stop()");
+                    throw new Exception('Kill commando send to session');
+                }
+
                 // Check if posted data is executing command
                 if ($this->getPostValue('execute') !== null) {
                     $command = $this->getPostValue('command');

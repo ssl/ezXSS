@@ -184,4 +184,21 @@ class Session_model extends Model
 
         return true;
     }
+
+    /**
+     * Delete all by client id
+     * 
+     * @param string $clientId The client id
+     * @param string $origin The origin
+     * @throws Exception
+     * @return array
+     */
+    public function deleteAll($clientId, $origin)
+    {
+        $database = Database::openConnection();
+        $database->prepare('DELETE FROM `sessions` WHERE clientid = :clientid AND origin = :origin');
+        $database->bindValue(':clientid', $clientId);
+        $database->bindValue(':origin', $origin);
+        $database->execute();
+    }
 }

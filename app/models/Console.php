@@ -46,7 +46,7 @@ class Console_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('SELECT id,command FROM `console` WHERE `clientid` = :clientid AND `origin` = :origin AND executed = 0 ORDER BY id DESC LIMIT 1');
+        $database->prepare('SELECT id,command FROM `console` WHERE `clientid` = :clientid AND `origin` = :origin AND executed = 0 ORDER BY id ASC LIMIT 1');
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->execute();
