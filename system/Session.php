@@ -56,6 +56,19 @@ class Session
         $_SESSION['id'] = $user['id'];
         $_SESSION['rank'] = intval($user['rank']);
         $_SESSION['password_hash'] = md5($user['password']);
+        $_SESSION['ip'] = userip;
+    }
+
+    /**
+     * Set a session item
+     *
+     * @param string $param The parameter
+     * @param string $value The value
+     * @return void
+     */
+    public function set($param, $value)
+    {
+        $_SESSION[$param] = $value;
     }
 
     /**

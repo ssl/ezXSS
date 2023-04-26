@@ -136,6 +136,12 @@ class Controller
                 if ($this->session->data('rank') != $account['rank']) {
                     throw new Exception("Rank has been changed");
                 }
+
+                // Log if the user ip has been changed
+                if ($this->session->data('ip') != userip) {
+                    $this->log('New IP address in session');
+                    $this->session->set('ip', userip);
+                }
             }
         } catch (Exception $e) {
             // If session failed to validate, clear the session
@@ -332,7 +338,7 @@ class Controller
     {
         if($this->model('Setting')->get('logging') === '1') {
             $userId = $this->session->data('id');
-            $this->model('Log')->add($userId !== '' ? $userId : 0, $description, $_SERVER['REMOTE_ADDR']);
+            $this->model('Log')->add($userId !== '' ? $userId : 0, $description, userip);
         }
     }
 

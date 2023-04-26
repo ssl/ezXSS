@@ -114,4 +114,25 @@ class Payload_model extends Model
 
         return $payload;
     }
+
+    /**
+     * Check if payload domain is available
+     * 
+     * @param mixed $payload The payload url
+     * @throws Exception
+     * @return mixed
+     */
+    public function isAvailable($payload)
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT * FROM payloads WHERE payload = :payload ORDER BY id ASC LIMIT 1');
+        $database->bindValue(':payload', $payload);
+        $database->execute();
+
+        if ($database->countRows() === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

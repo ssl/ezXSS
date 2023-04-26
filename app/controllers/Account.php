@@ -103,8 +103,8 @@ class Account extends Controller
                     $this->session->createTempSession($user);
                     redirect('/manage/account/mfa');
                 } else {
-                    $this->log('Succesfully logged in');
                     $this->session->createSession($user);
+                    $this->log('Succesfully logged in');
                     redirect('dashboard/index');
                 }
             } catch (Exception $e) {
@@ -120,13 +120,13 @@ class Account extends Controller
      *
      * @return string
      */
-    public function mfa() 
+    public function mfa()
     {
         $this->isLoggedOutOrExit();
         $this->view->setTitle('Login');
         $this->view->renderTemplate('account/mfa');
 
-        if($this->session->data('temp') != true) {
+        if ($this->session->data('temp') != true) {
             redirect('dashboard/index');
             exit();
         }
@@ -145,9 +145,61 @@ class Account extends Controller
                     throw new Exception('Code is incorrect');
                 }
 
-                $this->log('Succesfully logged in with MFA');
                 $this->session->createSession($user);
+                $this->log('Succesfully logged in with MFA');
                 redirect('dashboard/index');
+            } catch (Exception $e) {
+                $this->view->renderMessage($e->getMessage());
+            }
+        }
+
+        return $this->showContent();
+    }
+
+    /**
+     * Renders the signup page and returns the content.
+     *
+     * @return string
+     */
+    public function signup()
+    {
+        $this->isLoggedOutOrExit();
+        $this->view->setTitle('Sign up');
+        $this->view->renderTemplate('account/signup');
+
+        $this->view->renderCondition('isEnabled', signupEnabled);
+
+        if ($this->isPOST()) {
+            try {
+                if(!signupEnabled) {
+                    throw new Exception("Signup is disabled");
+                }
+
+                $this->validateCsrfToken();
+
+                $username = $this->getPostValue('username');
+                $password = $this->getPostValue('password');
+                $domain = $this->getPostValue('domain');
+
+                if (preg_match('/[^A-Za-z0-9]/', $domain)) {
+                    throw new Exception("Invalid characters in the domain. Use a-Z0-9");
+                }
+
+                if (!$this->model('Payload')->isAvailable("{$domain}." . host)) {
+                    throw new Exception('Payload domain is already in use');
+                }
+
+                if (strlen($domain) < 1 || strlen($username) > 25) {
+                    throw new Exception("Domain needs to be between 1-25 long");
+                }
+
+                $user = $this->model('User')->create($username, $password, 1);
+                $user = $this->model('User')->login($username, $password);
+                $this->model('Payload')->add($user['id'], "{$domain}." . host);
+                $this->session->createSession($user);
+                $this->log('Succesfully created account');
+
+                redirect('manage/dashboard/index');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
