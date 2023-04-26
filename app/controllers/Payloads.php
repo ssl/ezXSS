@@ -267,7 +267,6 @@ class Payloads extends Controller
                 $data->uri,
                 $data->{'user-agent'},
                 $data->ip,
-                ($data->screenshotName ?? ''),
                 json_encode($data->localstorage ?? ''),
                 json_encode($data->sessionstorage ?? ''),
                 $data->payload,

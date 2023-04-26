@@ -248,6 +248,7 @@ class Controller
             '/MSIE/i' => 'IE',
             '/Trident/i' => 'IE',
             '/Edge/i' => 'Edge',
+            '/Edg/i' => 'Edge',
             '/Firefox/i' => 'Firefox',
             '/Chrome/i' => 'Chrome',
             '/OPR/i' => 'Opera',

@@ -127,7 +127,6 @@ class Session_model extends Model
      * @param string $uri The url
      * @param string $userAgent The user agent
      * @param string $ip The IP
-     * @param string $screenshotName The name of the screenshot
      * @param string $localStorage The local storage
      * @param string $sessionStorage The session storage
      * @param string $payload The payload name
@@ -135,11 +134,11 @@ class Session_model extends Model
      * @throws Exception
      * @return string
      */
-    public function add($clientId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshotName, $localStorage, $sessionStorage, $payload, $console)
+    public function add($clientId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $localStorage, $sessionStorage, $payload, $console)
     {
         $database = Database::openConnection();
 
-        $database->prepare('INSERT INTO `sessions` (`clientid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `screenshot`, `localstorage`, `sessionstorage`, `payload`, `console`) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :screenshot, :localstorage, :sessionstorage, :payload, :console)');
+        $database->prepare('INSERT INTO `sessions` (`clientid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `localstorage`, `sessionstorage`, `payload`, `console`) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :localstorage, :sessionstorage, :payload, :console)');
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':cookies', $cookies);
         $database->bindValue(':dom', $dom);
@@ -149,7 +148,6 @@ class Session_model extends Model
         $database->bindValue(':userAgent', $userAgent);
         $database->bindValue(':ip', $ip);
         $database->bindValue(':time', time());
-        $database->bindValue(':screenshot', $screenshotName);
         $database->bindValue(':localstorage', $localStorage);
         $database->bindValue(':sessionstorage', $sessionStorage);
         $database->bindValue(':payload', $payload);
