@@ -11,6 +11,7 @@
 
 ## Features
 * Easy to use dashboard with settings, statistics, payloads, view/share/search reports
+* :new: Persistent XSS sessions with reverse proxy aslong as the browser is open
 * Unlimited users with permissions to personal payloads & their reports
 * Instant alerts via mail, Telegram, Slack, Discord or custom callback URL
 * Custom javascript payloads
@@ -34,7 +35,7 @@
 * much much more, and, its just ez :-)
 
 ## Required
-* Server or hosting with PHP 7.1 or up
+* Server or webhosting with PHP 7.1 or up
 * Domain name (consider a short one)
 * SSL Certificate to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL)
 
