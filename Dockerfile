@@ -23,3 +23,4 @@ COPY . /var/www/html
 
 ENTRYPOINT ["docker-php-entrypoint"]
 CMD ["apache2-foreground"]
+

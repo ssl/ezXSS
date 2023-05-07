@@ -15,8 +15,8 @@ class Controller
      * @var object
      */
     public $session;
-    
-    
+
+
     /**
      * View
      * 
@@ -378,7 +378,7 @@ class Controller
     private function checkIfInstalled()
     {
         try {
-            if(path !== '/manage/install') {
+            if (path !== '/manage/install') {
                 // Fetch current version will throw exception if no database exists
                 $this->model('Setting')->get('version');
             }
@@ -395,9 +395,9 @@ class Controller
     private function checkForUpdates()
     {
         try {
-            if(path !== '/manage/update' && path !== '/manage/install') {
+            if (path !== '/manage/update' && path !== '/manage/install') {
                 $version = $this->model('Setting')->get('version');
-                if($version !== version) {
+                if ($version !== version) {
                     throw new Exception('ezXSS is not up-to-date');
                 }
             }

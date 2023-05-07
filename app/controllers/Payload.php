@@ -107,13 +107,14 @@ class Payload extends Controller
         $this->view->renderChecked('cDOM', $payload['collect_dom'] == 1);
         $this->view->renderChecked('cOrigin', $payload['collect_origin'] == 1);
         $this->view->renderChecked('cScreenshot', $payload['collect_screenshot'] == 1);
+        $this->view->renderChecked('cPersistent', $payload['persistent'] == 1);
         $this->view->renderData('customjs', $payload['customjs']);
 
         $i = 0;
 
         // Render data set of all pages of payload
         $pages = [];
-        foreach (explode('~', $payload['pages']) as $val) {
+        foreach (explode('~', $payload['pages'] ?? '') as $val) {
             if (!empty($val)) {
                 $pages[] = ['id' => $i++, 'value' => $val];
             }
@@ -123,7 +124,7 @@ class Payload extends Controller
 
         // Render data set of all blacklisted domains of payload
         $blacklist = [];
-        foreach (explode('~', $payload['blacklist']) as $val) {
+        foreach (explode('~', $payload['blacklist'] ?? '') as $val) {
             if (!empty($val)) {
                 $blacklist[] = ['id' => $i++, 'value' => $val];
             }
@@ -133,7 +134,7 @@ class Payload extends Controller
 
         // Render data set of all whitelisted domains of payload
         $whitelist = [];
-        foreach (explode('~', $payload['whitelist']) as $val) {
+        foreach (explode('~', $payload['whitelist'] ?? '') as $val) {
             if (!empty($val)) {
                 $whitelist[] = ['id' => $i++, 'value' => $val];
             }
@@ -253,7 +254,7 @@ class Payload extends Controller
         }
 
         if (strpos($path, '~') !== false) {
-            throw new Exception('This does not look like an valid path');
+            throw new Exception('This does not look like a valid path');
         }
 
         $newString = $payload['pages'] . '~' . $path;
@@ -274,7 +275,7 @@ class Payload extends Controller
 
         // Validate domain string
         if (!preg_match('/^(?!\-)(?:(?:[a-zA-Z\d][a-zA-Z\d\-]{0,61})?[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$/', $domain)) {
-            throw new Exception('This does not look like an valid domain');
+            throw new Exception('This does not look like a valid domain');
         }
 
         $newString = $payload['blacklist'] . '~' . $domain;
@@ -295,7 +296,7 @@ class Payload extends Controller
 
         // Validate domain string
         if (!preg_match('/^(?!\-)(?:(?:[a-zA-Z\d][a-zA-Z\d\-]{0,61})?[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$/', $domain)) {
-            throw new Exception('This does not look like an valid domain');
+            throw new Exception('This does not look like a valid domain');
         }
 
         $newString = $payload['whitelist'] . '~' . $domain;
