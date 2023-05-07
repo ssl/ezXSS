@@ -77,7 +77,7 @@ class Payload extends Controller
                     $this->setWhitelist($id, $this->getPostValue('domain'));
                 }
 
-                $this->log("Updated payload {$id} settings");
+                $this->log("Updated payload #{$id} settings");
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }

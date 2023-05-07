@@ -32,6 +32,7 @@ CREATE TABLE `payloads` (
   `payload` varchar(500) NOT NULL,
   `user_id` int(11) NOT NULL,
   `pages` text,
+  `persistent` tinyint(1) NOT NULL DEFAULT '0',
   `blacklist` text,
   `whitelist` text,
   `customjs` text,
@@ -119,7 +120,9 @@ INSERT INTO `settings` (`id`, `setting`, `value`) VALUES
 (23, 'alert-telegram', '1'),
 (24, 'alert-callback', '1'),
 (25, 'alert-slack', '1'),
-(26, 'alert-discord', '1');
+(26, 'alert-discord', '1'),
+(25, 'logging', '0'),
+(26, 'persistent', '0');
 
 -- --------------------------------------------------------
 
@@ -136,6 +139,57 @@ CREATE TABLE `users` (
   `row1` tinyint(4) NOT NULL DEFAULT '1',
   `row2` tinyint(4) NOT NULL DEFAULT '3',
   `notepad` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sessions`
+--
+
+CREATE TABLE `sessions` (
+  `id` int(11) NOT NULL,
+  `clientid` varchar(50) NOT NULL,
+  `cookies` mediumtext,
+  `dom` longtext,
+  `origin` varchar(500) DEFAULT NULL,
+  `referer` varchar(1000) DEFAULT NULL,
+  `payload` varchar(500) DEFAULT NULL,
+  `uri` varchar(1000) DEFAULT NULL,
+  `user-agent` varchar(500) DEFAULT NULL,
+  `ip` varchar(50) DEFAULT NULL,
+  `time` int(11) DEFAULT NULL,
+  `localstorage` longtext,
+  `sessionstorage` longtext,
+  `console` longtext
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `logs`
+--
+
+CREATE TABLE `logs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `description` varchar(1000) NOT NULL,
+  `ip` varchar(100) NOT NULL,
+  `time` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `console`
+--
+
+CREATE TABLE `console` (
+  `id` int(11) NOT NULL,
+  `clientid` varchar(50) NOT NULL,
+  `origin` varchar(500) NOT NULL,
+  `command` text NOT NULL,
+  `executed` decimal(10,0) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -173,6 +227,24 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `sessions`
+--
+ALTER TABLE `sessions`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `logs`
+--
+ALTER TABLE `logs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `console`
+--
+ALTER TABLE `console`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -201,3 +273,21 @@ ALTER TABLE `settings`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT for table `sessions`
+--
+ALTER TABLE `sessions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+COMMIT;
+--
+-- AUTO_INCREMENT for table `logs`
+--
+ALTER TABLE `logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+COMMIT;
+--
+-- AUTO_INCREMENT for table `console`
+--
+ALTER TABLE `console`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+COMMIT;

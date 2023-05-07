@@ -67,7 +67,7 @@ class Dashboard extends Controller
             curl_setopt($ch, CURLOPT_TIMEOUT, 3);
             $release = json_decode(curl_exec($ch), true);
         } catch (Exception $e) {
-            $release = [['?', '?', '?']];
+            $release = [['release' => '?', 'body' => 'Error loading', 'zipball_url' => '?']];
         }
         $this->view->renderData('repoVersion', $release[0]['release']);
         $this->view->renderData('repoBody', $release[0]['body']);
