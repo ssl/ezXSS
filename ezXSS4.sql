@@ -102,7 +102,7 @@ INSERT INTO `settings` (`id`, `setting`, `value`) VALUES
 (4, 'timezone', 'Europe/Amsterdam'),
 (5, 'customjs', ''),
 (7, 'notepad', 'Welcome to ezXSS 4!'),
-(8, 'version', '4.0'),
+(8, 'version', '4.1'),
 (9, 'killswitch', ''),
 (10, 'collect_uri', '1'),
 (11, 'collect_ip', '1'),
@@ -121,8 +121,8 @@ INSERT INTO `settings` (`id`, `setting`, `value`) VALUES
 (24, 'alert-callback', '1'),
 (25, 'alert-slack', '1'),
 (26, 'alert-discord', '1'),
-(25, 'logging', '0'),
-(26, 'persistent', '0');
+(27, 'logging', '0'),
+(28, 'persistent', '0');
 
 -- --------------------------------------------------------
 
