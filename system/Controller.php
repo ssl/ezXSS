@@ -244,6 +244,10 @@ class Controller
         $browser = "Unknown";
         $os = "Unknown";
 
+        if($userAgent === 'Not collected') {
+            return $userAgent;
+        }
+
         $browsers = [
             '/MSIE/i' => 'IE',
             '/Trident/i' => 'IE',

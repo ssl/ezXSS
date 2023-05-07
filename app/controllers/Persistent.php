@@ -1,5 +1,4 @@
 <?php
-use GeoIp2\Database\Reader;
 
 class Persistent extends Controller 
 {
@@ -9,22 +8,6 @@ class Persistent extends Controller
      * @var array
      */
     private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'clientid', 'browser', 'last'];
-
-    /**
-     * Reader
-     * 
-     * @var object
-     */
-    private $reader = null;
-
-    /**
-     * Add reader to constructor
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->reader = new Reader(__DIR__ . '/../../GeoLite2-Country.mmdb');
-    }
 
     /**
      * Returns the session view for 0 (all).
@@ -93,9 +76,7 @@ class Persistent extends Controller
         }
 
         foreach ($sessions as $key => $value) {
-            $record = $this->reader->country($sessions[$key]['ip']);
             $sessions[$key]['browser'] = $this->parseUserAgent($sessions[$key]['user-agent']);
-            $sessions[$key]['country'] = strtolower($record->country->isoCode ?? 'xx');
             $sessions[$key]['last'] = $this->parseTimestamp($sessions[$key]['time'], 'long');
             $sessions[$key]['shorturi'] = substr($sessions[$key]['uri'], 0, 50);
         }
@@ -182,9 +163,6 @@ class Persistent extends Controller
         // Render all rows
         $this->view->renderData('time', date('F j, Y, g:i a', $session['time']));
         $this->view->renderData('requests', $this->model('Session')->getRequestCount($clientId));
-
-        $record = $this->reader->country($session['ip']);
-        $this->view->renderData('country', strtolower($record->country->isoCode ?? 'xx'));
 
         $session['browser'] = $this->parseUserAgent($session['user-agent']);
         $session['last'] = $this->parseTimestamp($session['time'], 'long');

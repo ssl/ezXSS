@@ -52,7 +52,7 @@
                                         {%foreach session}
                                         <tr>
                                             <td><a href="/manage/persistent/session/{session->clientid}~{session->origin}">{session->clientid}</a></td>
-                                            <td><span class="flag flag-{session->country}"></span>{session->browser}</td>
+                                            <td>{session->browser}</td>
                                             <td>{session->ip}</td>
                                             <td>{session->shorturi}</td>
                                             <td>{session->payload}</td>
