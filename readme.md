@@ -44,9 +44,10 @@ ezXSS is ez to install with Apache, NGINX or Docker
 
 visit the [wiki](https://github.com/ssl/ezXSS/wiki) for installation instructions.
 
-## Live demo
-For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.
 
+## Free hosted ezXSS and demo
+No more need of having to install ezXSS on a server, as now users can register for an free account on [ez.pe](https://ez.pe), and start using the tool for free.
 
-## :new: Free to use hosted ezXSS
-No more need of having to install the tool on a server, as now users can register for an account on [ez.pe](https://ez.pe), and start using the tool for free.
+For a demo with admin account visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*.
+
+Please note that some features might be disabled in both these versions.
