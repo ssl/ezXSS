@@ -18,7 +18,11 @@ class Logs extends Controller
 
         foreach ($logs as $key => $value) {
             if($logs[$key]['user_id'] !== 0) {
-                $user = $this->model('User')->getById($logs[$key]['user_id']);
+                try {
+                    $user = $this->model('User')->getById($logs[$key]['user_id']);
+                } catch (Exception $e) {
+                    $logs[$key]['user'] = 'Deleted user';
+                }
                 $logs[$key]['user'] = $user['username'];
             } else {
                 $logs[$key]['user'] = 'Not logged in';
