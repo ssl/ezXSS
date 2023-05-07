@@ -33,44 +33,4 @@ class Model
 
         return $database->countRows() === 1;
     }
-
-    /**
-     * Get by id
-     * 
-     * @param int $id The id
-     * @throws Exception
-     * @return array
-     */
-    public function getById($id)
-    {
-        $database = Database::openConnection();
-        $database->getById($this->table, $id);
-
-        if ($database->countRows() === 0) {
-            throw new Exception("Not found");
-        }
-
-        $report = $database->fetch();
-
-        return $report;
-    }
-
-    /**
-     * Delete by id
-     * 
-     * @param string $id The id
-     * @throws Exception
-     * @return bool
-     */
-    public function deleteById($id)
-    {
-        $database = Database::openConnection();
-        $database->deleteById($this->table, $id);
-
-        if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
-        }
-
-        return true;
-    }
 }

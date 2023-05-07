@@ -96,7 +96,7 @@ class Database
      * Get all rows of table
      *
      * @param string $table The table
-     * @return object
+     * @return void
      */
     public function getAll($table)
     {
@@ -131,7 +131,7 @@ class Database
     /**
      * Returns row count
      *
-     * @return int
+     * @return void
      */
     public function countRows()
     {
@@ -162,7 +162,7 @@ class Database
     /**
      * Returns all rows
      *
-     * @return object
+     * @return void
      */
     public function fetchAll()
     {

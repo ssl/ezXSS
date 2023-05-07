@@ -8,7 +8,7 @@
  */
 function e($value)
 {
-    return htmlspecialchars($value ?? '', ENT_QUOTES);
+    return htmlspecialchars($value, ENT_QUOTES);
 }
 
 /**
