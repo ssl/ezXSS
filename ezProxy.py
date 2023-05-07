@@ -1,35 +1,50 @@
+#!/usr/bin/env python3
+import os
 import asyncio
 import ssl
 import websockets
 from urllib.parse import urlsplit
 import json
 import base64
+from dotenv import load_dotenv
+
+"""
+The ezXSS persistent proxy is a reverse proxy that can only be used in combination with a ezXSS installation.
+After starting the proxy, users can insert the domain and port used into a persistent session in the ezXSS management panel.
+This feature enables easy and secure testing of persistent XSS vulnerabilities on a target website.
+For additional information and support, please visit the ezXSS wiki on GitHub at https://github.com/ssl/ezXSS/wiki
+"""
 
 print("""
                    .::      .::  .:: ::    .:: ::  
                     .::   .::  .::    .::.::    .::
    .::    .:::: .::  .:: .::    .::       .::      
  .:   .::      .::     .::        .::       .::    
-.::::: .::   .::     .:: .::         .::       .:: 
-.:          .::     .::   .::  .::    .::.::    .::
-  .::::   .::::::::.::      .::  .:: ::    .:: ::  
+.::::: .::   .::     .:: .::         .::       .::     ezProxy v1.0
+.:          .::     .::   .::  .::    .::.::    .::    github.com/ssl/ezXSS
+  .::::   .::::::::.::      .::  .:: ::    .:: ::
 """)
 
 
 # Settings
-host, websockets_port, proxy_port = '0.0.0.0', 30055, 13000
-username = 'ezxss'
-password = 'test'
-cert = '/home/ezxss/domains/beta.ezxss.com/ssl'
+load_dotenv()
+host = os.getenv("prHost")
+websockets_port = os.getenv("prWebPort")
+proxy_port = os.getenv("prProxyPort")
+use_login = True if os.getenv("prUseLogin") == '1' else False
+username = os.getenv("prUser")
+password = os.getenv("prPassword")
+cert_file = os.getenv("prCertFile")
+cert_key = os.getenv("prKeyFile")
 
 # SSL context
 try:
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    ssl_context.load_cert_chain(f'{cert}.cert', keyfile=f'{cert}.key')
+    ssl_context.load_cert_chain(cert_file, keyfile=cert_key)
 
     from cryptography import x509
     from cryptography.hazmat.backends import default_backend
-    with open(f'{cert}.cert', "rb") as cert_file_stream:
+    with open(cert_file, "rb") as cert_file_stream:
         cert_data = cert_file_stream.read()
         certificate = x509.load_pem_x509_certificate(cert_data, default_backend())
         hostname = None
@@ -105,13 +120,14 @@ async def handle_connection(reader, writer):
         response_body = 'You can not browse the internet while on the ezXSS proxy.'.encode('utf-8')
 
         # Check for the Authorization header
-        auth_encoded = base64.b64encode(f'{username}:{password}'.encode('utf-8')).decode('utf-8')
-        auth_header = [header for header in request_head if header.lower().startswith('authorization')]
-        if not auth_header or f'Basic {auth_encoded}' != auth_header[0].split(' ', 1)[1]:
-            response_head = 'HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm="Proxy"\r\n\r\n'
-            writer.write(response_head.encode('utf-8'))
-            writer.write(response_body)
-            await writer.drain()
+        if use_login:
+            auth_encoded = base64.b64encode(f'{username}:{password}'.encode('utf-8')).decode('utf-8')
+            auth_header = [header for header in request_head if header.lower().startswith('authorization')]
+            if not auth_header or f'Basic {auth_encoded}' != auth_header[0].split(' ', 1)[1]:
+                response_head = 'HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm="Proxy"\r\n\r\n'
+                writer.write(response_head.encode('utf-8'))
+                writer.write(response_body)
+                await writer.drain()
 
         if domain.endswith('.ezxss'):
             client_id = domain[:-6]
