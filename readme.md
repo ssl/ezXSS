@@ -11,7 +11,7 @@
 
 ## Features
 * Easy to use dashboard with settings, statistics, payloads, view/share/search reports
-* :new: Persistent XSS sessions with reverse proxy aslong as the browser is open
+* :new: Persistent XSS sessions with reverse proxy aslong as the browser is active
 * Unlimited users with permissions to personal payloads & their reports
 * Instant alerts via mail, Telegram, Slack, Discord or custom callback URL
 * Custom javascript payloads
