@@ -193,6 +193,10 @@ class Account extends Controller
                     throw new Exception("Domain needs to be between 1-25 long");
                 }
 
+                if (!preg_match('/^(?=.{1,255}$)[a-z0-9][a-z0-9-]{0,62}(?<!-)(\.[a-z0-9][a-z0-9-]{0,62}(?<!-))*\.?$/i', host)) {
+                    throw new Exception("Host is not a valid hostname");
+                }
+
                 $user = $this->model('User')->create($username, $password, 1);
                 $user = $this->model('User')->login($username, $password);
                 $this->model('Payload')->add($user['id'], "{$domain}." . host);

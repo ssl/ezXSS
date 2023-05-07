@@ -123,8 +123,9 @@ async def handle_connection(reader, writer):
                 do_proxy = True
         
         if do_proxy:
+            full_uri = parsed_uri.path + ('?' + parsed_uri.query if parsed_uri.query else '')
             if client_id in connected_clients:
-                message = json.dumps({"do": request_method, "request_uri": parsed_uri.path, "postData": request_body})
+                message = json.dumps({"do": request_method, "request_uri": full_uri, "postData": request_body})
                 await connected_clients[client_id].send(message)
 
                 client_response = None
@@ -132,12 +133,12 @@ async def handle_connection(reader, writer):
                     if client_id not in client_queues:
                         client_queues[client_id] = {}
 
-                    if parsed_uri.path not in client_queues[client_id]:
-                        client_queues[client_id][parsed_uri.path] = asyncio.Queue()
+                    if full_uri not in client_queues[client_id]:
+                        client_queues[client_id][full_uri] = asyncio.Queue()
 
-                    msg = await asyncio.wait_for(client_queues[client_id][parsed_uri.path].get(), timeout=10)
+                    msg = await asyncio.wait_for(client_queues[client_id][full_uri].get(), timeout=10)
                     data = json.loads(msg)
-                    if 'body' in data and data.get('request_uri') == parsed_uri.path:
+                    if 'body' in data and data.get('request_uri') == full_uri:
                         status_code = data.get('statusCode', 200)
                         client_response = base64.b64decode(data['body'])
                         content_type = data.get('content_type', 'text/html')

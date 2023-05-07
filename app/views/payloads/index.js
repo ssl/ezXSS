@@ -17,5 +17,6 @@ function ez_r() {
 function ez_j() {
   {%data globaljs}
 }
-{%data screenshot}
 {%data persistent}
+
+{%data screenshot}
