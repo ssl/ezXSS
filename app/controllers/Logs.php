@@ -20,10 +20,10 @@ class Logs extends Controller
             if($logs[$key]['user_id'] !== 0) {
                 try {
                     $user = $this->model('User')->getById($logs[$key]['user_id']);
+                    $logs[$key]['user'] = $user['username'];
                 } catch (Exception $e) {
                     $logs[$key]['user'] = 'Deleted user';
                 }
-                $logs[$key]['user'] = $user['username'];
             } else {
                 $logs[$key]['user'] = 'Not logged in';
             }
