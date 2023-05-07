@@ -187,9 +187,13 @@ class Payloads extends Controller
                         $data->uri . time() . bin2hex(openssl_random_pseudo_bytes(16))
                     ) . bin2hex(openssl_random_pseudo_bytes(5));
                     $saveImage = fopen(__DIR__ . "/../../assets/img/report-{$data->screenshotName}.png", 'w');
+                    if(!$saveImage) {
+                        throw new Exception('Unable to save screenshots to server, check permissions');
+                    }
                     fwrite($saveImage, $screenshot);
                     fclose($saveImage);
                 } catch (Exception $e) {
+                    $this->log($e->getMessage());
                     $data->screenshotName = '';
                 }
             }
