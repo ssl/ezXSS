@@ -11,7 +11,7 @@ services:
       - MYSQL_USER=${dbUser}
       - MYSQL_PASSWORD=${dbPassword}
     volumes:
-      - "${dbDir}:/var/lib/mysql"
+      - "./ezxssdb:/var/lib/mysql"
   ezxss:
     build:
       context: .
