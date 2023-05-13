@@ -19,6 +19,8 @@ services:
     ports:
       - "${PORT:-80}:80"
       - "${TLSPORT:-443}:443"
+    volumes:
+      - .:/var/www/html
     restart: always
     depends_on:
       - ezxssdb
