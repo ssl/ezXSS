@@ -11,14 +11,16 @@ services:
       - MYSQL_USER=${dbUser}
       - MYSQL_PASSWORD=${dbPassword}
     volumes:
-      - "${dbDir}:/var/lib/mysql"
+      - "./ezxssdb:/var/lib/mysql"
   ezxss:
     build:
       context: .
       dockerfile: ./Dockerfile
     ports:
-      - "${PORT:-80}:80"
-      - "${TLSPORT:-443}:443"
+      - "${dockerHttpPort:-80}:80"
+      - "${dockerHttpsPort:-443}:443"
+    volumes:
+      - .:/var/www/html
     restart: always
     depends_on:
       - ezxssdb
