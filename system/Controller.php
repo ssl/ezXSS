@@ -254,8 +254,8 @@ class Controller
             '/Edge/i' => 'Edge',
             '/Edg/i' => 'Edge',
             '/Firefox/i' => 'Firefox',
-            '/Chrome/i' => 'Chrome',
             '/OPR/i' => 'Opera',
+            '/Chrome/i' => 'Chrome',
             '/Opera/i' => 'Opera',
             '/UCBrowser/i' => 'UC Browser',
             '/SamsungBrowser/i' => 'SamsungBrowser',
@@ -267,6 +267,7 @@ class Controller
         ];
 
         $oses = [
+            '/Googlebot/i' => 'Googlebot',
             '/Windows/i' => 'Windows',
             '/Mac/i' => 'macOS',
             '/Linux/i' => 'Linux',
@@ -277,7 +278,6 @@ class Controller
             '/FirefoxOS/i' => 'Firefox OS',
             '/Windows Phone/i' => 'Windows Phone',
             '/CrOS/i' => 'ChromeOS',
-            '/Googlebot/i' => 'Googlebot',
             '/YandexBot/i' => 'YandexBot',
             '/PlayStation/i' => 'PlayStation',
         ];

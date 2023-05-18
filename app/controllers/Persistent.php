@@ -179,6 +179,71 @@ class Persistent extends Controller
     }
 
     /**
+     * Renders all the requests of a session.
+     * 
+     * @param string $clientId The client id
+     * @throws Exception
+     * @return string
+     */
+    public function requests($clientId) 
+    {
+        $this->isLoggedInOrExit();
+        $this->view->setTitle('Online');
+        $this->view->renderTemplate('persistent/requests');
+
+        $clientId = explode('~', $clientId ?? '');
+        $origin = $clientId[1] ?? '';
+        $clientId = $clientId[0] ?? '';
+
+        if (!$this->hasSessionPermissions($clientId, $origin)) {
+            throw new Exception('You dont have permissions to this session');
+        }
+
+        $requests = $this->model('Session')->getAllByClientId($clientId, $origin);
+
+        foreach ($requests as $key => $value) {
+            $requests[$key]['browser'] = $this->parseUserAgent($requests[$key]['user-agent']);
+            $requests[$key]['last'] = $this->parseTimestamp($requests[$key]['time'], 'long');
+            $requests[$key]['shorturi'] = substr($requests[$key]['uri'], 0, 50);
+        }
+
+        $this->view->renderCondition('hasRequests', count($requests) > 0);
+        $this->view->renderDataset('request', $requests);
+
+        return $this->showContent();
+    }
+
+    /**
+     * Renders a request of a session.
+     * 
+     * @param string $id The request id
+     * @throws Exception
+     * @return string
+     */
+    public function request($id)
+    {
+        $this->isLoggedInOrExit();
+        $this->view->setTitle('Online');
+        $this->view->renderTemplate('persistent/request');
+
+        $request = $this->model('Session')->getById($id);
+        $clientId = $request['clientId'] ?? '';
+        $origin = $request['origin'] ?? '';
+
+        if (!$this->hasSessionPermissions($clientId, $origin)) {
+            throw new Exception('You dont have permissions to this session');
+        }
+
+        $this->view->renderData('time', date('F j, Y, g:i a', $request['time']));
+
+        foreach ($this->rows as $value) {
+            $this->view->renderData($value, $request[$value]);
+        }
+
+        return $this->showContent();
+    }
+
+    /**
      * Checks if user is allowed to view session
      * 
      * @param string $id The session id

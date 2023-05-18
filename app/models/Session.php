@@ -100,6 +100,26 @@ class Session_model extends Model
     }
 
     /**
+     * Get all session requests by client id
+     * @param string $payload The payload
+     * @throws Exception
+     * @return array
+     */
+    public function getAllByClientId($clientId, $origin)
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT * FROM `sessions` WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC');
+        $database->bindValue(':clientid', $clientId);
+        $database->bindValue(':origin', $origin);
+
+        if (!$database->execute()) {
+            throw new Exception("Something unexpected went wrong");
+        }
+
+        return $database->fetchAll();
+    }
+
+    /**
      * Get request count by client id
      * 
      * @param string $clientId The client id
