@@ -181,6 +181,18 @@ $(document).ready(function () {
         $('#shareid').val("https://" + window.location.hostname + "/manage/reports/share/" + $(this).attr('share-id'));
     });
 
+    $(".execute-selected").click(function () {
+        $.each($("input[name='selected']:checked"), function () {
+            const id = $(this).val();
+            const url = $(this).attr('url')
+            console.log(id);
+            command = $('#command').val();
+            request(url, { 'execute': '', command: command }).then(function (r) {
+                $('#command').val('');
+            });
+        });
+    });
+
     $('#execute').click(function () {
         command = $('#command').val();
         request(window.location.pathname, { 'execute': '', command: command }).then(function (r) {
@@ -205,7 +217,7 @@ $(document).ready(function () {
         }, 1000);
         setInterval(function () {
             location.reload();
-        }, 60000);
+        }, 120000);
     }
 
     $(".render").click(function () {

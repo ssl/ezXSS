@@ -40,7 +40,14 @@
                                 <table id="persistent" class="table" style="white-space: nowrap;width:100%;">
                                     <thead>
                                         <tr>
-                                            <th>Client ID</th>
+                                            <th style="width:120px">
+                                                <label class="reports-checkbox-label">
+                                                    <input id="select-all" name="select-all" type="checkbox">
+                                                    <span class="reports-checkbox-custom rectangular"
+                                                        style="top:4px!important"></span>
+                                                </label>
+                                                Client ID
+                                            </th>
                                             <th>Browser</th>
                                             <th>IP</th>
                                             <th>Current page</th>
@@ -52,7 +59,15 @@
                                     <tbody id="reports-list">
                                         {%foreach session}
                                         <tr>
-                                            <td><a href="/manage/persistent/session/{session->clientid}~{session->origin}">{session->clientid}</a></td>
+                                            <td scope=row style="width:50px;border-color:#5b6187">
+                                                <label class="reports-checkbox-label" for="chk_{session->id}">
+                                                    <input class="chkbox" type="checkbox" name="selected"
+                                                        value="{session->id}" id="chk_{session->id}"
+                                                        url="/manage/persistent/session/{session->clientid}~{session->origin}">
+                                                    <span class="reports-checkbox-custom rectangular"></span>
+                                                </label>
+                                                <a href="/manage/persistent/session/{session->clientid}~{session->origin}">{session->clientid}</a>
+                                            </td>
                                             <td>{session->browser}</td>
                                             <td>{session->ip}</td>
                                             <td>{session->shorturi}</td>
@@ -63,6 +78,13 @@
                                         {%/foreach}
                                     </tbody>
                                 </table>
+
+                                <div class="">
+                                    <div class="dataTables_paginate paging_simple_numbers">
+                                        with selected:
+                                        <a class="btn" data-toggle="modal" data-target="#executeModal">Execute</a>
+                                    </div><br>
+                                </div>
                             </div>
                             {%/if}
 
@@ -75,6 +97,27 @@
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="executeModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h3 class="m-b-xs">Execute code</h3>
+                    <small>Execute code on all selected sessions</small>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label" for="domain">Command</label>
+                        <input class="form-control" name="command" id="command" type="text" placeholder="console.log(1);">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn execute-selected" data-dismiss="modal" type="button">Execute</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
