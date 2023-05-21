@@ -179,6 +179,7 @@ async def handle_connection(reader, writer):
         writer.close()
 
 
+# Async server
 class AsyncServer:
     def __init__(self, server):
         self.server = server
@@ -190,6 +191,7 @@ class AsyncServer:
         self.server.close()
 
 
+# Run proxy server
 async def run_proxy_server():
     try:
         server = await asyncio.start_server(handle_connection, host, proxy_port)

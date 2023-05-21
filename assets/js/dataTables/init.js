@@ -6,7 +6,7 @@ $(document).ready(function () {
         order: [[1, 'desc']],
         orderMulti: false,
         columns: [
-            {width: 110},{},{},{},{width:50}
+            { width: 110 }, {}, {}, {}, { width: 50 }
         ]
     });
 
