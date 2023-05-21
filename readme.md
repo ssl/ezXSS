@@ -11,6 +11,7 @@
 
 ## Features
 * Easy to use dashboard with settings, statistics, payloads, view/share/search reports
+* :new: Persistent XSS sessions with reverse proxy aslong as the browser is active
 * Unlimited users with permissions to personal payloads & their reports
 * Instant alerts via mail, Telegram, Slack, Discord or custom callback URL
 * Custom javascript payloads
@@ -34,7 +35,7 @@
 * much much more, and, its just ez :-)
 
 ## Required
-* Server or hosting with PHP 7.1 or up
+* Server or webhosting with PHP 7.1 or up
 * Domain name (consider a short one)
 * SSL Certificate to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL)
 
@@ -43,9 +44,10 @@ ezXSS is ez to install with Apache, NGINX or Docker
 
 visit the [wiki](https://github.com/ssl/ezXSS/wiki) for installation instructions.
 
-## Live demo
-For a demo visit [demo.ezxss.com/manage](https://demo.ezxss.com/manage) with password *demo1234*. Please note that some features might be disabled in the demo version.
 
+## Explore ezXSS hassle free
+Interested in using ezXSS but not keen on installing it? Worry not! You can access and start using ezXSS with a free account on [ez.pe](https://ez.pe). Simply sign up and get started without any installation hassle.
 
-## :new: Free to use hosted ezXSS
-No more need of having to install the tool on a server, as now users can register for an account on [ez.pe](https://ez.pe), and start using the tool for free.
+Additionally, if you'd like to explore and test the tool before committing, there is a demo environment with admin account available at [demo.ezxss.com/manage](https://demo.ezxss.com/manage).
+
+Please note that some features might be disabled or limited in both the free account on ez.pe and the demo environment. These limitations are in place to maintain the integrity and security of the platforms. However, you can still get a good grasp of the tool's capabilities and decide after to install it yourself.

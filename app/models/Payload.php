@@ -116,42 +116,23 @@ class Payload_model extends Model
     }
 
     /**
-     * Return payload by id
-     *
-     * @param int $id The payload id
+     * Check if payload domain is available
+     * 
+     * @param mixed $payload The payload url
      * @throws Exception
-     * @return array
+     * @return mixed
      */
-    public function getById($id)
+    public function isAvailable($payload)
     {
         $database = Database::openConnection();
-        $database->getById($this->table, $id);
+        $database->prepare('SELECT * FROM payloads WHERE payload = :payload ORDER BY id ASC LIMIT 1');
+        $database->bindValue(':payload', $payload);
+        $database->execute();
 
         if ($database->countRows() === 0) {
-            throw new Exception("Payload not found");
+            return true;
+        } else {
+            return false;
         }
-
-        $payload = $database->fetch();
-
-        return $payload;
-    }
-
-    /**
-     * Delete payload by id
-     *
-     * @param int $id The payload id
-     * @throws Exception
-     * @return bool
-     */
-    public function deleteById($id)
-    {
-        $database = Database::openConnection();
-        $database->deleteById($this->table, $id);
-
-        if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
-        }
-
-        return true;
     }
 }

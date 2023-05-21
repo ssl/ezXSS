@@ -6,9 +6,20 @@ $(document).ready(function () {
         order: [[1, 'desc']],
         orderMulti: false,
         columns: [
-            {
-                width: 110
-            },{},{},{},{width:50}
+            { width: 110 }, {}, {}, {}, { width: 50 }
         ]
+    });
+
+    $('#persistent').DataTable({
+        columnDefs: [
+            { orderable: false, targets: [0] }
+        ],
+        "pageLength": 25,
+        order: [[6, 'desc']],
+    });
+
+    $('#logs').DataTable({
+        "pageLength": 25,
+        order: [[3, 'desc']],
     });
 });

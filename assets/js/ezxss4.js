@@ -14,6 +14,10 @@ function request(action, data = {}) {
 
 $(document).ready(function () {
 
+    $('.left-nav-toggle').click(function () {
+        $('#mobile-dropdown').slideToggle();
+    });
+
     if (location.toString().split('/')[4] === 'dashboard') {
         request('/manage/api/statistics', { page: location.toString().split('/').pop() }).then(function (r) {
             $.each(r, function (key, value) {
@@ -21,10 +25,10 @@ $(document).ready(function () {
             });
         });
 
-        if (location.toString().split('/').pop() === 'my') {
-            pick_common($('#pick_common1').val(), 1);
-            pick_common($('#pick_common2').val(), 2);
-        }
+        var isMy = (location.toString().split('/').pop() === 'my') ? 0 : 1;
+
+        pick_common($('#pick_common1').val(), 1, isMy);
+        pick_common($('#pick_common2').val(), 2, isMy);
     }
 
     $("a[method='post']").click(function (e) {
@@ -53,18 +57,20 @@ $(document).ready(function () {
     });
 
     $('#pick_common1').on('change', function () {
-        pick_common(this.value, 1);
+        var isMy = (location.toString().split('/').pop() === 'my') ? 0 : 1;
+        pick_common(this.value, 1, isMy);
     });
 
     $('#pick_common2').on('change', function () {
-        pick_common(this.value, 2);
+        var isMy = (location.toString().split('/').pop() === 'my') ? 0 : 1;
+        pick_common(this.value, 2, isMy);
     });
 
-    function pick_common(id, row) {
+    function pick_common(id, row, admin = 0) {
         $('#most_common' + row).empty();
         $('#toprow_common' + row).hide();
         $('#loding_common' + row).show();
-        request('/manage/api/getMostCommon', { id: id, row: row }).then(function (r) {
+        request('/manage/api/getMostCommon', { id: id, row: row, admin: admin }).then(function (r) {
             $('#loding_common' + row).hide();
             $('#toprow_common' + row).show();
             if (r.length > 0) {
@@ -88,6 +94,14 @@ $(document).ready(function () {
             window.location.href = '/manage/reports/list/' + this.value + addValue;
         } else {
             window.location.href = '/manage/reports/all' + addValue;
+        }
+    });
+
+    $('#payloadListSession').on('change', function () {
+        if (this.value !== '0') {
+            window.location.href = '/manage/persistent/list/' + this.value;
+        } else {
+            window.location.href = '/manage/persistent/all';
         }
     });
 
@@ -166,6 +180,45 @@ $(document).ready(function () {
         $('#reportid').val($(this).attr('report-id'));
         $('#shareid').val("https://" + window.location.hostname + "/manage/reports/share/" + $(this).attr('share-id'));
     });
+
+    $(".execute-selected").click(function () {
+        $.each($("input[name='selected']:checked"), function () {
+            const id = $(this).val();
+            const url = $(this).attr('url')
+            console.log(id);
+            command = $('#command').val();
+            request(url, { 'execute': '', command: command }).then(function (r) {
+                $('#command').val('');
+            });
+        });
+    });
+
+    $('#execute').click(function () {
+        command = $('#command').val();
+        request(window.location.pathname, { 'execute': '', command: command }).then(function (r) {
+            $('#command').val('');
+        });
+    });
+
+    if (location.toString().split('/')[5] === 'session') {
+        window.setInterval(function () {
+            request(window.location.pathname, { 'getconsole': '' }).then(function (r) {
+                $('#console').val(r.console);
+            });
+        }, 10000);
+    }
+
+    if (location.toString().split('/')[4] === "persistent") {
+        var startTime = new Date();
+        setInterval(function () {
+            var elapsedTime = new Date() - startTime;
+            var seconds = Math.round(elapsedTime / 1000);
+            $("#last").text(seconds + "s ago");
+        }, 1000);
+        setInterval(function () {
+            location.reload();
+        }, 120000);
+    }
 
     $(".render").click(function () {
         const byteCharacters = unescape(encodeURIComponent($('#dom').val()));

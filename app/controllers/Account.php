@@ -104,6 +104,7 @@ class Account extends Controller
                     redirect('/manage/account/mfa');
                 } else {
                     $this->session->createSession($user);
+                    $this->log('Succesfully logged in');
                     redirect('dashboard/index');
                 }
             } catch (Exception $e) {
@@ -119,13 +120,13 @@ class Account extends Controller
      *
      * @return string
      */
-    public function mfa() 
+    public function mfa()
     {
         $this->isLoggedOutOrExit();
         $this->view->setTitle('Login');
         $this->view->renderTemplate('account/mfa');
 
-        if($this->session->data('temp') != true) {
+        if ($this->session->data('temp') != true) {
             redirect('dashboard/index');
             exit();
         }
@@ -145,7 +146,64 @@ class Account extends Controller
                 }
 
                 $this->session->createSession($user);
+                $this->log('Succesfully logged in with MFA');
                 redirect('dashboard/index');
+            } catch (Exception $e) {
+                $this->view->renderMessage($e->getMessage());
+            }
+        }
+
+        return $this->showContent();
+    }
+
+    /**
+     * Renders the signup page and returns the content.
+     *
+     * @return string
+     */
+    public function signup()
+    {
+        $this->isLoggedOutOrExit();
+        $this->view->setTitle('Sign up');
+        $this->view->renderTemplate('account/signup');
+
+        $this->view->renderCondition('isEnabled', signupEnabled);
+
+        if ($this->isPOST()) {
+            try {
+                if(!signupEnabled) {
+                    throw new Exception("Signup is disabled");
+                }
+
+                $this->validateCsrfToken();
+
+                $username = $this->getPostValue('username');
+                $password = $this->getPostValue('password');
+                $domain = $this->getPostValue('domain');
+
+                if (preg_match('/[^A-Za-z0-9]/', $domain)) {
+                    throw new Exception("Invalid characters in the domain. Use a-Z0-9");
+                }
+
+                if (!$this->model('Payload')->isAvailable("{$domain}." . host)) {
+                    throw new Exception('Payload domain is already in use');
+                }
+
+                if (strlen($domain) < 1 || strlen($username) > 25) {
+                    throw new Exception("Domain needs to be between 1-25 long");
+                }
+
+                if (!preg_match('/^(?=.{1,255}$)[a-z0-9][a-z0-9-]{0,62}(?<!-)(\.[a-z0-9][a-z0-9-]{0,62}(?<!-))*\.?$/i', host)) {
+                    throw new Exception("Host is not a valid hostname");
+                }
+
+                $user = $this->model('User')->create($username, $password, 1);
+                $user = $this->model('User')->login($username, $password);
+                $this->model('Payload')->add($user['id'], "{$domain}." . host);
+                $this->session->createSession($user);
+                $this->log('Succesfully created account');
+
+                redirect('manage/dashboard/index');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
@@ -175,6 +233,7 @@ class Account extends Controller
             throw new Exception('The retyped password is not the same as the new password');
         }
 
+        $this->log('Changed password');
         $this->model('User')->setPassword($user['id'], $newPassword);
     }
 
@@ -213,6 +272,7 @@ class Account extends Controller
             }
             $secret = '';
         }
+        $this->log('Updated MFA settings');
         $this->model('User')->setSecret($user['id'], $secret);
     }
 
@@ -242,7 +302,7 @@ class Account extends Controller
         $telegramChatID = $this->getPostValue('chatid');
         if (!empty($telegramToken) || !empty($telegramChatID)) {
             if (!preg_match('/^[a-zA-Z0-9:_-]+$/', $telegramToken)) {
-                throw new Exception('This does not look like an valid Telegram bot token');
+                throw new Exception('This does not look like a valid Telegram bot token');
             }
 
             if (!preg_match('/^[0-9-]*$/', $telegramChatID)) {
@@ -256,7 +316,7 @@ class Account extends Controller
         $slackWebhook = $this->getPostValue('slack_webhook');
         if (!empty($slackWebhook)) {
             if (!preg_match('/https:\/\/hooks\.slack\.com\/services\/([a-zA-Z0-9]+)\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)$/', $slackWebhook)) {
-                throw new Exception('This does not look like an valid Slack webhook URL');
+                throw new Exception('This does not look like a valid Slack webhook URL');
             }
         }
         $alerts->set($user['id'], 3, $slackOn !== null, $slackWebhook);
@@ -266,9 +326,11 @@ class Account extends Controller
         $discordWebhook = $this->getPostValue('discord_webhook');
         if (!empty($discordWebhook)) {
             if (!preg_match('/https:\/\/(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-zA-Z0-9_-]+)$/', $discordWebhook)) {
-                throw new Exception('This does not look like an valid Discord webhook URL');
+                throw new Exception('This does not look like a valid Discord webhook URL');
             }
         }
         $alerts->set($user['id'], 4, $discordOn !== null, $discordWebhook);
+
+        $this->log('Editted personal alert settings');
     }
 }

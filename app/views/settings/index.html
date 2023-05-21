@@ -55,6 +55,13 @@
                                     <label class="control-label" for="dompart">Max DOM length in alerts</label>
                                     <input class="form-control" name="dompart" type="text" value="{%data dompart}">
                                 </div>
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input {%checked logging} class="chkbox" name="loggingon" type="checkbox">
+                                        <span class="checkbox-custom rectangular"></span>
+                                    </label>
+                                    <p class="checkbox-text">Enable logging</p>
+                                </div>
                                 <button name="application" type="submit" class="btn">Save</button>
                             </form>
                         </div>
@@ -138,6 +145,14 @@
                                     <label class="control-label" for="customjs">Custom javascript</label>
                                     <small>Add custom javascript which will be added to <i>all</i> payloads</small>
                                     <textarea class="form-control" name="customjs" rows=5>{%data customjs}</textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input {%checked persistent} class="chkbox" name="persistenton" type="checkbox">
+                                        <span class="checkbox-custom rectangular"></span>
+                                    </label>
+                                    <p class="checkbox-text">Allow enabling of persistent mode</p>
                                 </div>
 
                                 <button name="global-payload" type="submit" class="btn">Save</button>

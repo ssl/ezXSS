@@ -25,10 +25,22 @@ class Update extends Controller
                 // Check if the version is 3.x and is valid for migration
                 if (preg_match('/^3\./', $version)) {
                     if ($version == '3.10' || $version == '3.11') {
+                        if(version !== '4.0') {
+                            throw new Exception('Please first update to 4.0 before migrating 3.x to 4.x');
+                        }
                         $this->ezXSS3migrate();
                     } else {
                         throw new Exception('Please first update to 3.10 before migrating to 4.x');
                     }
+                }
+
+                if ($version == '4.0' && version === '4.1') {
+                    // Update the database tables and rows
+                    $sql = file_get_contents(__DIR__ . '/../../ezXSS4.1.sql');
+                    $database = Database::openConnection();
+                    $database->exec($sql);
+
+                    $this->model('Setting')->set('version', version);
                 }
 
                 // Future updates come here!

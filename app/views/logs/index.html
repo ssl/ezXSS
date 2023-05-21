@@ -1,0 +1,68 @@
+<div class="wrapper">
+
+    {menu}
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Logs</h3>
+                            <small>The log data page allows to view all the saved logs data, including descriptions, user information, and IP addresses associated with each activity.</small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            {message}
+
+            <div class="row">
+
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Information</div>
+                        <div class="panel-body">
+                            {%if hasLogs}
+                            <div class="table-responsive">
+
+                                <table id="logs" class="table" style="white-space: nowrap;width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Description</th>
+                                            <th>IP</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reports-list">
+                                        {%foreach log}
+                                        <tr>
+                                            <td>{log->user}</td>
+                                            <td>{log->description}</td>
+                                            <td>{log->ip}</td>
+                                            <td data-sort="{log->time}">{log->date}</td>
+                                        </tr>
+                                        {%/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {%/if}
+
+                            {%!if hasLogs}
+                            <p>There are no logs yet.</p>
+                            {%/!if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- Reports JS -->
+<script src="/assets/js/dataTables/jquery.dataTables.js"></script>
+<script src="/assets/js/dataTables/bootstrap.dataTables.js"></script>
+<script src="/assets/js/dataTables/init.js"></script>

@@ -15,8 +15,8 @@ class Controller
      * @var object
      */
     public $session;
-    
-    
+
+
     /**
      * View
      * 
@@ -136,6 +136,12 @@ class Controller
                 if ($this->session->data('rank') != $account['rank']) {
                     throw new Exception("Rank has been changed");
                 }
+
+                // Log if the user ip has been changed
+                if ($this->session->data('ip') != userip) {
+                    $this->log('New IP address in session');
+                    $this->session->set('ip', userip);
+                }
             }
         } catch (Exception $e) {
             // If session failed to validate, clear the session
@@ -228,6 +234,120 @@ class Controller
     }
 
     /**
+     * Parses user agent and returns string with browser and OS
+     * 
+     * @param string $userAgent The user agent string
+     * @return string
+     */
+    public function parseUserAgent($userAgent)
+    {
+        $browser = "Unknown";
+        $os = "Unknown";
+
+        if($userAgent === 'Not collected') {
+            return $userAgent;
+        }
+
+        $browsers = [
+            '/MSIE/i' => 'IE',
+            '/Trident/i' => 'IE',
+            '/Edge/i' => 'Edge',
+            '/Edg/i' => 'Edge',
+            '/Firefox/i' => 'Firefox',
+            '/OPR/i' => 'Opera',
+            '/Chrome/i' => 'Chrome',
+            '/Opera/i' => 'Opera',
+            '/UCBrowser/i' => 'UC Browser',
+            '/SamsungBrowser/i' => 'SamsungBrowser',
+            '/YaBrowser/i' => 'Yandex',
+            '/Vivaldi/i' => 'Vivaldi',
+            '/Brave/i' => 'Brave',
+            '/Safari/i' => 'Safari',
+            '/PlayStation/i' => 'PlayStation'
+        ];
+
+        $oses = [
+            '/Googlebot/i' => 'Googlebot',
+            '/Windows/i' => 'Windows',
+            '/Mac/i' => 'macOS',
+            '/Linux/i' => 'Linux',
+            '/Unix/i' => 'Unix',
+            '/Android/i' => 'Android',
+            '/iOS/i' => 'iOS',
+            '/BlackBerry/i' => 'BlackBerry',
+            '/FirefoxOS/i' => 'Firefox OS',
+            '/Windows Phone/i' => 'Windows Phone',
+            '/CrOS/i' => 'ChromeOS',
+            '/YandexBot/i' => 'YandexBot',
+            '/PlayStation/i' => 'PlayStation',
+        ];
+
+        // Get the browser
+        foreach ($browsers as $regex => $name) {
+            if (preg_match($regex, $userAgent)) {
+                $browser = $name;
+                break;
+            }
+        }
+
+        // Get the operating system
+        foreach ($oses as $regex => $name) {
+            if (preg_match($regex, $userAgent)) {
+                $os = $name;
+                break;
+            }
+        }
+
+        return "{$os} with {$browser}";
+    }
+
+    /**
+     * Parses timestamp and returns string with last x
+     * 
+     * @param string $timestamp The timestamp
+     * @param string $syntax Syntax type
+     * @return string
+     */
+    public function parseTimestamp($timestamp, $syntax = 'short')
+    {
+        if($timestamp === 0) {
+            return 'never';
+        }
+
+        $elapsed = time() - $timestamp;
+
+        if ($elapsed < 60) {
+            return ($syntax == 'short') ? $elapsed . 'sec' : $elapsed . ' seconds ago';
+        } elseif ($elapsed < 3600) {
+            $minutes = floor($elapsed / 60);
+            return ($syntax == 'short') ? $minutes . 'min' : $minutes . ' minutes ago';
+        } elseif ($elapsed < 86400) {
+            $hours = floor($elapsed / 3600);
+            return ($syntax == 'short') ? $hours . 'hr' : $hours . ' hours ago';
+        } elseif ($elapsed < 2592000) {
+            $days = floor($elapsed / 86400);
+            return ($syntax == 'short') ? $days . 'days' : $days . ' days ago';
+        } else {
+            $months = floor($elapsed / 2592000);
+            return ($syntax == 'short') ? $months . 'mon' : $months . ' months ago';
+        }
+    }
+
+    /**
+     * Log item
+     *
+     * @param string $description The description
+     * @return void
+     */
+    public function log($description)
+    {
+        if($this->model('Setting')->get('logging') === '1') {
+            $userId = $this->session->data('id');
+            $this->model('Log')->add($userId !== '' ? $userId : 0, $description, userip);
+        }
+    }
+
+    /**
      * Checks if platform is in kill switch mode
      *
      * @return void
@@ -258,7 +378,7 @@ class Controller
     private function checkIfInstalled()
     {
         try {
-            if(path !== '/manage/install') {
+            if (path !== '/manage/install') {
                 // Fetch current version will throw exception if no database exists
                 $this->model('Setting')->get('version');
             }
@@ -275,9 +395,9 @@ class Controller
     private function checkForUpdates()
     {
         try {
-            if(path !== '/manage/update' && path !== '/manage/install') {
+            if (path !== '/manage/update' && path !== '/manage/install') {
                 $version = $this->model('Setting')->get('version');
-                if($version !== version) {
+                if ($version !== version) {
                     throw new Exception('ezXSS is not up-to-date');
                 }
             }

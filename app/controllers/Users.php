@@ -46,6 +46,7 @@ class Users extends Controller
 
                 // Try to create user
                 $this->model('User')->create($username, $password, $rank);
+                $this->log("Created new user {$username} with rank {$rank}");
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
@@ -115,6 +116,7 @@ class Users extends Controller
                         throw new Exception('Invalid rank');
                     }
                     $userModel->setRank($user['id'], $rank);
+                    $this->log("Eddited user {$username}");
                 }
 
                 // Check if posted data is adding payload
@@ -168,6 +170,7 @@ class Users extends Controller
             }
 
             $this->model('User')->deleteById($id);
+            $this->log('Deleted user ' . $user['username']);
             redirect('/manage/users');
         }
 

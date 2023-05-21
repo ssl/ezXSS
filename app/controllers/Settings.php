@@ -24,7 +24,8 @@ class Settings extends Controller
                     $theme = $this->getPostValue('theme');
                     $filter = $this->getPostValue('filter');
                     $dompart = $this->getPostValue('dompart');
-                    $this->applicationSettings($timezone, $theme, $filter, $dompart);
+                    $logging = $this->getPostValue('loggingon');
+                    $this->applicationSettings($timezone, $theme, $filter, $dompart, $logging);
                 }
 
                 // Check if posted data is changing global payload settings
@@ -54,6 +55,8 @@ class Settings extends Controller
                     $url = $this->getPostValue('callback_url');
                     $this->callbackAlertSettings($callbackOn, $url);
                 }
+
+                $this->log('Updated admin settings');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
@@ -83,6 +86,9 @@ class Settings extends Controller
         $settings = $this->model('Setting');
         $filterSave = $settings->get('filter-save');
         $filterAlert = $settings->get('filter-alert');
+
+        $this->view->renderChecked('logging', $settings->get('logging') === '1');
+        $this->view->renderChecked('persistent', $settings->get('persistent') === '1');
 
         // Renders data of correct selected filter
         $this->view->renderData('filter1', $filterSave == 1 && $filterAlert == 1 ? 'selected' : '');
@@ -128,10 +134,11 @@ class Settings extends Controller
      * @param string $theme The theme name
      * @param string $filter The filter option
      * @param string $dompart The length of the dom part
+     * @param string $logging Enable logging
      * @throws Exception
      * @return void
      */
-    private function applicationSettings($timezone, $theme, $filter, $dompart)
+    private function applicationSettings($timezone, $theme, $filter, $dompart, $logging)
     {
         // Validate timezone
         if (!in_array($timezone, timezone_identifiers_list(), true)) {
@@ -159,6 +166,7 @@ class Settings extends Controller
         $this->model('Setting')->set('filter-alert', $filterAlert);
         $this->model('Setting')->set('timezone', $timezone);
         $this->model('Setting')->set('theme', $theme);
+        $this->model('Setting')->set('logging', $logging !== null ? '1' : '0');
     }
 
     /**
@@ -179,6 +187,9 @@ class Settings extends Controller
         }
 
         $this->model('Setting')->set("customjs", $this->getPostValue('customjs'));
+
+        $persistent = $this->getPostValue('persistenton');
+        $this->model('Setting')->set('persistent', $persistent !== null ? '1' : '0');
     }
 
     /**
@@ -205,7 +216,7 @@ class Settings extends Controller
         $telegramChatID = $this->getPostValue('chatid');
         if (!empty($telegramToken) || !empty($telegramChatID)) {
             if (!preg_match('/^[a-zA-Z0-9:_-]+$/', $telegramToken)) {
-                throw new Exception('This does not look like an valid Telegram bot token');
+                throw new Exception('This does not look like a valid Telegram bot token');
             }
 
             if (!preg_match('/^[0-9-]*$/', $telegramChatID)) {
@@ -219,7 +230,7 @@ class Settings extends Controller
         $slackWebhook = $this->getPostValue('slack_webhook');
         if (!empty($slackWebhook)) {
             if (!preg_match('/https:\/\/hooks\.slack\.com\/services\/([a-zA-Z0-9]+)\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)$/', $slackWebhook)) {
-                throw new Exception('This does not look like an valid Slack webhook URL');
+                throw new Exception('This does not look like a valid Slack webhook URL');
             }
         }
         $alerts->set(0, 3, $slackOn !== null, $slackWebhook);
@@ -229,7 +240,7 @@ class Settings extends Controller
         $discordWebhook = $this->getPostValue('discord_webhook');
         if (!empty($discordWebhook)) {
             if (!preg_match('/https:\/\/(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-zA-Z0-9_-]+)$/', $discordWebhook)) {
-                throw new Exception('This does not look like an valid Discord webhook URL');
+                throw new Exception('This does not look like a valid Discord webhook URL');
             }
         }
         $alerts->set(0, 4, $discordOn !== null, $discordWebhook);

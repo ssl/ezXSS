@@ -1,7 +1,30 @@
 {%if isLoggedIn}
 <div class="navbar-header">
     <div id="mobile-menu">
-        <div class="left-nav-toggle"><a href="#"><i class="fa fa-bars"></i></a></div>
+        <a href="#" class="left-nav-toggle">MENU</a>
+    </div>
+    <div id="mobile-dropdown">
+        <ul class="nav ezxss-nav" style="width:80%">
+            
+            <li class="{currentPage[dashboard/my]}"><a href="/manage/dashboard/my">My Dashboard</a></li>
+            <li class="{currentPage[account]}"><a href="/manage/account">Account</a></li>
+            <li class="{currentPage[payload*]}"><a href="/manage/payload">Payload</a></li>
+
+            {%if userIsAdmin}
+            <li class="nav-category">Admin</li>
+            <li class="{currentPage[dashboard]}"><a href="/manage/dashboard">Dashboard</a></li>
+            <li class="{currentPage[settings]}"><a href="/manage/settings">Settings</a></li>
+            <li class="{currentPage[users*]}"><a href="/manage/users">Users</a></li>
+            <li class="{currentPage[logs*]}"><a href="/manage/logs">Logs</a></li>
+            {%/if}
+
+            <li class="nav-category">Reports</li>
+            <li class="{currentPage[reports*1]}"><a href="/manage/reports/all">All reports</a></li>
+            <li class="{currentPage[reports*0]}"><a href="/manage/reports/all/?archive=1">Archived reports</a></li>
+            
+            <li class="nav-category">Persistent</li>
+            <li class="{currentPage[persistent*]}"><a href="/manage/persistent/all">All sessions</a></li>
+        </ul>
     </div>
 </div>
 <aside class="navigation">
@@ -22,12 +45,16 @@
             <li class="{currentPage[dashboard]}"><a href="/manage/dashboard">Dashboard</a></li>
             <li class="{currentPage[settings]}"><a href="/manage/settings">Settings</a></li>
             <li class="{currentPage[users*]}"><a href="/manage/users">Users</a></li>
+            <li class="{currentPage[logs*]}"><a href="/manage/logs">Logs</a></li>
             {%/if}
 
             <li class="nav-category">Reports</li>
             <li class="{currentPage[reports*1]}"><a href="/manage/reports/all">All reports</a></li>
             <li class="{currentPage[reports*0]}"><a href="/manage/reports/all/?archive=1">Archived reports</a></li>
             
+            <li class="nav-category">Persistent</li>
+            <li class="{currentPage[persistent*]}"><a href="/manage/persistent/all">All sessions</a></li>
+
         </ul>
     </nav>
 </aside>
