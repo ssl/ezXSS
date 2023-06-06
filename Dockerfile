@@ -18,6 +18,7 @@ RUN chown root:msmtp /var/log/msmtp.log
 RUN echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
 
 COPY . /var/www/html
+RUN chmod 777 /var/www/html/assets/img
 
 ENTRYPOINT ["docker-php-entrypoint"]
 CMD ["apache2-foreground"]
