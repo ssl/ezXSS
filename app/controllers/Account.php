@@ -139,7 +139,7 @@ class Account extends Controller
                 $password = $this->session->data('password');
                 $code = $this->getPostValue('code');
 
-                $user = $this->model('User')->login($username, $password);
+                $user = $this->model('User')->login($username, $password, true);
 
                 if (getAuthCode($user['secret']) != $code) {
                     throw new Exception('Code is incorrect');

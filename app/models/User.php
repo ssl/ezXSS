@@ -17,7 +17,7 @@ class User_model extends Model
      * @throws Exception
      * @return bool
      */
-    public function login($username, $password)
+    public function login($username, $password, $mfa = false)
     {
 
         $database = Database::openConnection();
@@ -29,8 +29,14 @@ class User_model extends Model
 
         $user = $database->fetch();
 
-        if (!password_verify($password, $user['password'])) {
-            throw new Exception("Login combination not found");
+        if ($mfa) {
+            if(!hash_equals($password, $user['password'])) {
+                throw new Exception("Login combination not found");
+            }
+        } else {
+            if (!password_verify($password, $user['password'])) {
+                throw new Exception("Login combination not found");
+            }
         }
 
         if ($user['rank'] == 0) {
