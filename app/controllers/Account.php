@@ -231,7 +231,7 @@ class Account extends Controller
         }
 
         $this->log('Changed password');
-        $this->model('User')->setPassword($user['id'], $newPassword, true);
+        $this->model('User')->setPassword($user['id'], $newPassword);
     }
 
     /**
