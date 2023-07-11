@@ -123,7 +123,7 @@ class Controller
                 $account = $this->model('User')->getById($this->session->data('id'));
 
                 // Check if the password has been changed
-                if ($this->session->data('password_hash') != md5($account['password'])) {
+                if (!password_verify($account['password'], $this->session->data('password_hash'))) {
                     throw new Exception("Password has been changed");
                 }
 

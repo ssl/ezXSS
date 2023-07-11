@@ -103,7 +103,7 @@ class Users extends Controller
                         if ($user['id'] == $this->session->data('id')) {
                             throw new Exception("Can't edit your own users password here");
                         }
-                        $userModel->setPassword($user['id'], $password);
+                        $userModel->setPassword($user['id'], $password, true);
                     }
 
                     // Check if posted data wants to change username

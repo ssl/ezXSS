@@ -55,7 +55,7 @@ class Session
         $_SESSION['username'] = $user['username'];
         $_SESSION['id'] = $user['id'];
         $_SESSION['rank'] = intval($user['rank']);
-        $_SESSION['password_hash'] = md5($user['password']);
+        $_SESSION['password_hash'] = password_hash($user['password'], PASSWORD_BCRYPT, ['cost' => 14]);
         $_SESSION['ip'] = userip;
     }
 
@@ -81,8 +81,7 @@ class Session
     {
         $_SESSION['loggedIn'] = false;
         $_SESSION['temp'] = true;
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['password'] = $user['password'];
+        $_SESSION['id'] = $user['id'];
     }
 
     /**
