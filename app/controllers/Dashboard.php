@@ -69,9 +69,9 @@ class Dashboard extends Controller
         } catch (Exception $e) {
             $release = [['release' => '?', 'body' => 'Error loading', 'zipball_url' => '?']];
         }
-        $this->view->renderData('repoVersion', $release[0]['release']);
-        $this->view->renderData('repoBody', $release[0]['body']);
-        $this->view->renderData('repoUrl', $release[0]['zipball_url']);
+        $this->view->renderData('repoVersion', $release[0]['release'] ?? '?');
+        $this->view->renderData('repoBody', $release[0]['body'] ?? 'Error loading');
+        $this->view->renderData('repoUrl', $release[0]['zipball_url'] ?? '?');
 
         return $this->showContent();
     }

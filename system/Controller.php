@@ -269,6 +269,7 @@ class Controller
         $oses = [
             '/Googlebot/i' => 'Googlebot',
             '/Windows/i' => 'Windows',
+            '/iPhone/i' => 'iPhone',
             '/Mac/i' => 'macOS',
             '/Linux/i' => 'Linux',
             '/Unix/i' => 'Unix',
