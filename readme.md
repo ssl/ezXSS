@@ -36,7 +36,7 @@
 
 ## Required
 * Server or webhosting with PHP 7.1 or up
-* Domain name (consider a short one)
+* Domain name (consider a short one or check out [shortboost](https://github.com/ssl/shortboost))
 * SSL Certificate to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL)
 
 ## Installation
