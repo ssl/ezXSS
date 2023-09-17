@@ -81,8 +81,7 @@ class Session
     {
         $_SESSION['loggedIn'] = false;
         $_SESSION['temp'] = true;
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['password'] = $user['password'];
+        $_SESSION['id'] = $user['id'];
     }
 
     /**

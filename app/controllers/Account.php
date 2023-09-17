@@ -99,7 +99,6 @@ class Account extends Controller
                 $user = $this->model('User')->login($username, $password);
 
                 if (strlen($user['secret']) === 16) {
-                    $user['password'] = $password;
                     $this->session->createTempSession($user);
                     redirect('/manage/account/mfa');
                 } else {
@@ -135,11 +134,8 @@ class Account extends Controller
             try {
                 $this->validateCsrfToken();
 
-                $username = $this->session->data('username');
-                $password = $this->session->data('password');
                 $code = $this->getPostValue('code');
-
-                $user = $this->model('User')->login($username, $password);
+                $user = $this->model('User')->getById($this->session->data('id'));
 
                 if (getAuthCode($user['secret']) != $code) {
                     throw new Exception('Code is incorrect');

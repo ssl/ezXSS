@@ -15,7 +15,7 @@ class User_model extends Model
      * @param string $username The username
      * @param string $password The password
      * @throws Exception
-     * @return bool
+     * @return array
      */
     public function login($username, $password)
     {
