@@ -117,6 +117,9 @@ class Users extends Controller
                     }
                     $userModel->setRank($user['id'], $rank);
                     $this->log("Eddited user {$username}");
+                    if($rank == 0) {
+                        $this->log("Banned user {$username}");
+                    }
                 }
 
                 // Check if posted data is adding payload
@@ -196,6 +199,8 @@ class Users extends Controller
         // Delete payload
         $this->model('Payload')->getById($id);
         $this->model('Payload')->deleteById($id);
+
+        $this->log("Deleted payload {$id}");
 
         return json_encode([1]);
     }

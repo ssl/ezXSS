@@ -13,8 +13,8 @@ class Payload extends Controller
         $this->view->setTitle('Payload');
         $this->view->renderTemplate('payload/index');
 
-        $payloadList = $this->payloadList();
-        if (!empty($this->payloadList())) {
+        $payloadList = $this->payloadList(2);
+        if (!empty($this->payloadList(2))) {
             redirect('/manage/payload/edit/' . $payloadList[0]);
         }
 
@@ -35,7 +35,7 @@ class Payload extends Controller
         $this->view->renderTemplate('payload/edit');
 
         // Check payload permissions
-        $payloadList = $this->payloadList();
+        $payloadList = $this->payloadList(2);
         if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
             throw new Exception('You dont have permissions to this payload');
         }
@@ -162,7 +162,7 @@ class Payload extends Controller
             $this->validateCsrfToken();
 
             // Check payload permissions
-            $payloadList = $this->payloadList();
+            $payloadList = $this->payloadList(2);
             if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
                 throw new Exception('You dont have permissions to this payload');
             }
@@ -190,29 +190,6 @@ class Payload extends Controller
         } catch (Exception $e) {
             return json_encode(['error' => e($e)]);
         }
-    }
-
-    /**
-     * Returns all payloads that the user is allowed to see/edit
-     * 
-     * @return array
-     */
-    private function payloadList()
-    {
-        $payloadList = [];
-        if ($this->isAdmin()) {
-            // Add default/fallback payload to list for admins
-            array_push($payloadList, 1);
-        }
-
-        // Add all payloads from user to list
-        $user = $this->model('User')->getById($this->session->data('id'));
-        $payloads = $this->model('Payload')->getAllByUserId($user['id']);
-        foreach ($payloads as $payload) {
-            array_push($payloadList, $payload['id']);
-        }
-
-        return $payloadList;
     }
 
     /**

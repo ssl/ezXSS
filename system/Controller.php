@@ -412,11 +412,19 @@ class Controller
      * 
      * @return array
      */
-    public function payloadList()
+    public function payloadList($type=1)
     {
         $payloadList = [];
-        // '0' correspondents to 'all'
-        array_push($payloadList, 0);
+
+        if($type === 1) {
+            // '0' correspondents to 'all'
+            array_push($payloadList, 0);
+        } else {
+            if ($this->isAdmin()) {
+                // Add default/fallback payload to list for admins
+                array_push($payloadList, 1);
+            }
+        }
 
         // Push all payloads of user to list
         $user = $this->model('User')->getById($this->session->data('id'));

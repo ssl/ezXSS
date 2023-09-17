@@ -167,6 +167,7 @@ class Settings extends Controller
         $this->model('Setting')->set('timezone', $timezone);
         $this->model('Setting')->set('theme', $theme);
         $this->model('Setting')->set('logging', $logging !== null ? '1' : '0');
+        $this->log("Updated application settings");
     }
 
     /**
@@ -190,6 +191,7 @@ class Settings extends Controller
 
         $persistent = $this->getPostValue('persistenton');
         $this->model('Setting')->set('persistent', $persistent !== null ? '1' : '0');
+        $this->log("Updated payload settings");
     }
 
     /**
@@ -244,6 +246,7 @@ class Settings extends Controller
             }
         }
         $alerts->set(0, 4, $discordOn !== null, $discordWebhook);
+        $this->log("Updated alert settings");
     }
 
     /**
@@ -295,5 +298,6 @@ class Settings extends Controller
             throw new Exception('Invalid callback URL');
         }
         $this->model('Setting')->set("callback-url", $url);
+        $this->log("Updated callback settings");
     }
 }
