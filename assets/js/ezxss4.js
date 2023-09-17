@@ -33,8 +33,9 @@ $(document).ready(function () {
 
     $("a[method='post']").click(function (e) {
         e.preventDefault();
+        var currentUrl = window.location.href;
         request($(this).attr('href'), {}).then(function (r) {
-            location.reload();
+            window.location.href = currentUrl;
         });
     });
 
