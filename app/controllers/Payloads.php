@@ -168,16 +168,20 @@ class Payloads extends Controller
         // Check if the report should be saved or alerted
         $doubleReport = false;
         if ($this->model('Setting')->get('filter-save') == 0 || $this->model('Setting')->get('filter-alert') == 0) {
-            if ($this->model('Report')->searchForDublicates($data->cookies ?? '', $data->dom ?? '', $data->origin, $data->referer, $data->uri, $data->{'user-agent'}, $data->ip)) {
+            $searchId = $this->model('Report')->searchForDublicates($data->cookies ?? '', $data->dom ?? '', $data->origin, $data->referer, $data->uri, $data->{'user-agent'}, $data->ip);
+            echo 'searchid: ' . $searchId;
+            if ($searchId !== false) {
                 if ($this->model('Setting')->get('filter-save') == 0 && $this->model('Setting')->get('filter-alert') == 0) {
+                    echo 'no: ';
                     return 'github.com/ssl/ezXSS';
                 } else {
-                    $doubleReport = true;
+                    echo 'yes: ' . $searchId;
+                    $doubleReport = $searchId;
                 }
             }
         }
 
-        if (($doubleReport && ($this->model('Setting')->get('filter-save') == 1 || $this->model('Setting')->get('filter-alert') == 1)) || (!$doubleReport)) {
+        if (($doubleReport !== false && ($this->model('Setting')->get('filter-save') == 1 || $this->model('Setting')->get('filter-alert') == 1)) || $doubleReport === false) {
 
             // Create an image from the screenshot data
             if (!empty($data->screenshot)) {
@@ -199,27 +203,39 @@ class Payloads extends Controller
             }
 
             // Save the report
-            $shareId = sha1(bin2hex(openssl_random_pseudo_bytes(32)) . time());
-            $data->id = $this->model('Report')->add(
-                $shareId,
-                $data->cookies ?? '',
-                $data->dom ?? '',
-                $data->origin,
-                $data->referer,
-                $data->uri,
-                $data->{'user-agent'},
-                $data->ip,
-                ($data->screenshotName ?? ''),
-                json_encode($data->localstorage ?? ''),
-                json_encode($data->sessionstorage ?? ''),
-                $data->payload
-            );
-            $data->domain = host;
+            if (($doubleReport !== false && $this->model('Setting')->get('filter-save') == 1) || $doubleReport === false) {
+                echo 'yes: ' . $doubleReport;
+                $shareId = sha1(bin2hex(openssl_random_pseudo_bytes(32)) . time());
+                $data->id = $this->model('Report')->add(
+                    $shareId,
+                    $data->cookies ?? '',
+                    $data->dom ?? '',
+                    $data->origin,
+                    $data->referer,
+                    $data->uri,
+                    $data->{'user-agent'},
+                    $data->ip,
+                    ($data->screenshotName ?? ''),
+                    json_encode($data->localstorage ?? ''),
+                    json_encode($data->sessionstorage ?? ''),
+                    $data->payload
+                );
+                $data->domain = host;
+            } else {
+                echo 'else';
+                if($doubleReport !== false && $this->model('Setting')->get('filter-alert') == 1) {
+                    echo 'ELSEYES';
+                    var_dump($data);
+                    $data = (object) $this->model('Report')->getById($doubleReport);
+                    var_dump($data);
+                }
+            }
             $data->time = time();
             $data->timestamp = date("c", strtotime("now"));
 
             // Send out alerts
-            if (($doubleReport && $this->model('Setting')->get('filter-alert') == 1) || (!$doubleReport)) {
+            if (($doubleReport !== false && $this->model('Setting')->get('filter-alert') == 1) || $doubleReport === false) {
+                echo 'alert!';
                 try {
                     $this->alert($data);
                 } catch (Exception $e) {

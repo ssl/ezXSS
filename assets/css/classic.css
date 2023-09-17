@@ -495,9 +495,6 @@ th{color:#ffffff}
 .menu-active {
     background-color: #23284b;
 }
-.checkbox-text {
-  /**padding-bottom: 5px;**/
-}
 .method-content {
   display:none;
 }

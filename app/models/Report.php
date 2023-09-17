@@ -203,7 +203,7 @@ class Report_model extends Model
     public function searchForDublicates($cookies, $dom, $origin, $referer, $uri, $userAgent, $ip)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT id FROM reports WHERE cookies = :cookies AND dom = :dom AND origin = :origin AND referer = :referer AND uri = :uri AND `user-agent` = :userAgent AND ip = :ip LIMIT 1');
+        $database->prepare('SELECT id FROM reports WHERE cookies = :cookies AND dom = :dom AND origin = :origin AND referer = :referer AND uri = :uri AND `user-agent` = :userAgent AND ip = :ip ORDER BY id DESC LIMIT 1');
         $database->bindValue(':cookies', $cookies);
         $database->bindValue(':dom', $dom);
         $database->bindValue(':origin', $origin);
@@ -217,7 +217,8 @@ class Report_model extends Model
         }
 
         if ($database->countRows() > 0) {
-            return true;
+            $data = $database->fetch();
+            return $data['id'];
         }
 
         return false;
