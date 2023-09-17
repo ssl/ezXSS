@@ -116,53 +116,7 @@ class Reports extends Controller
             $payloads[] = ['id' => $val, 'name' => ucfirst($name), 'selected' => $val == $id ? 'selected' : ''];
         }
         $this->view->renderDataset('payload', $payloads);
-
-        // Checks if requested id is 'all'
-        if (+$id === 0) {
-            if ($this->isAdmin()) {
-                // Show all reports
-                $reports = $this->model('Report')->getAll();
-            } else {
-                // Show all reports of allowed payloads
-                $reports = [];
-                foreach ($payloadList as $payloadId) {
-                    if ($payloadId !== 0) {
-                        $payload = $this->model('Payload')->getById($payloadId);
-                        $payloadUri = '//' . $payload['payload'];
-                        if (strpos($payload['payload'], '/') === false) {
-                            $payloadUri .= '/%';
-                        }
-                        $reports = array_merge($reports, $this->model('Report')->getAllByPayload($payloadUri));
-                    }
-                }
-            }
-        } else {
-            // Show reports of payload
-            $payload = $this->model('Payload')->getById($id);
-
-            $payloadUri = '//' . $payload['payload'];
-            if (strpos($payload['payload'], '/') === false) {
-                $payloadUri .= '/%';
-            }
-            $reports = $this->model('Report')->getAllByPayload($payloadUri);
-        }
-
-        // Remove or keep reports depending the requested archive value
-        $archive = $this->getGetValue('archive') == '1' ? true : false;
-        foreach ($reports as $key => $value) {
-            $reports[$key]['uri'] = substr($reports[$key]['uri'], 0, 85);
-            $reports[$key]['ip'] = substr($reports[$key]['ip'], 0, 25);
-            $reports[$key]['payload'] = substr($reports[$key]['payload'], 0, 50);
-
-            if (($reports[$key]['archive'] == '0' && $archive) ||
-                ($reports[$key]['archive'] == '1' && !$archive)
-            ) {
-                unset($reports[$key]);
-            }
-        }
-        $this->view->renderCondition('hasReports', count($reports) > 0);
-        $this->view->renderDataset('report', $reports);
-
+        
         return $this->showContent();
     }
 
@@ -242,26 +196,5 @@ class Reports extends Controller
         }
 
         return false;
-    }
-
-    /**
-     * Returns the payload list array
-     * 
-     * @return array
-     */
-    private function payloadList()
-    {
-        $payloadList = [];
-        // '0' correspondents to 'all'
-        array_push($payloadList, 0);
-
-        // Push all payloads of user to list
-        $user = $this->model('User')->getById($this->session->data('id'));
-        $payloads = $this->model('Payload')->getAllByUserId($user['id']);
-        foreach ($payloads as $payload) {
-            array_push($payloadList, $payload['id']);
-        }
-
-        return $payloadList;
     }
 }

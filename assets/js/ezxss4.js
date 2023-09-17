@@ -158,7 +158,7 @@ $(document).ready(function () {
         });
     });
 
-    $(".delete").click(function () {
+    $(document).on('click', '.delete', function() {
         var id = $(this).attr('report-id');
         request("/manage/reports/delete/" + id).then(function (r) {
             if (window.location.href.indexOf('/view/') !== -1) {
@@ -169,14 +169,14 @@ $(document).ready(function () {
         });
     });
 
-    $(".archive").click(function () {
+    $(document).on('click', '.archive', function() {
         var id = $(this).attr('report-id');
         request("/manage/reports/archive/" + id).then(function (r) {
             $("#" + id).fadeOut("slow", function () { });
         });
     });
 
-    $(".share").click(function () {
+    $(document).on('click', '.share', function() {
         $('#reportid').val($(this).attr('report-id'));
         $('#shareid').val("https://" + window.location.hostname + "/manage/reports/share/" + $(this).attr('share-id'));
     });

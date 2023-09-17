@@ -34,9 +34,7 @@
                     <div class="panel panel-filled">
                         <div class="panel-heading">Information</div>
                         <div class="panel-body">
-                            {%if hasReports}
                             <div class="table-responsive">
-
                                 <table id="reports" class="table" style="white-space: nowrap;width:100%;">
                                     <thead>
                                         <tr>
@@ -54,48 +52,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="reports-list">
-                                        {%foreach report}
-                                        <tr id="{report->id}">
-                                            <td scope=row style="width:50px;border-color:#5b6187">
-                                                <label class="reports-checkbox-label" for="chk_{report->id}">
-                                                    <input class="chkbox" type="checkbox" name="selected"
-                                                        value="{report->id}" id="chk_{report->id}"
-                                                        report-id="{report->id}">
-                                                    <span class="reports-checkbox-custom rectangular"></span>
-                                                </label>
-
-                                                <div class="btn-group btn-view" style="width:100px;max-width:100px;"
-                                                    role=group>
-                                                    <a href="/manage/reports/view/{report->id}"
-                                                        class="btn pretty-border">View</a>
-                                                    <div class=btn-group role=group>
-                                                        <button type=button
-                                                            class="btn btn-default dropdown-toggle pretty-border"
-                                                            data-toggle=dropdown aria-haspopup=true aria-expanded=true>
-                                                            <span class=caret></span>
-                                                        </button>
-
-                                                        <div class=dropdown-backdrop></div>
-
-                                                        <ul class=dropdown-menu>
-                                                            <li><a class="share" report-id="{report->id}"
-                                                                    share-id="{report->shareid}" data-toggle="modal"
-                                                                    data-target="#shareModal">Share</a></li>
-                                                            <li><a class="delete" report-id="{report->id}">Delete</a>
-                                                            </li>
-                                                            <li><a class="archive" report-id="{report->id}">Archive</a>
-                                                            </li>
-                                                        </ul>
-
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><b>{report->id}</b></td>
-                                            <td>{report->uri}</td>
-                                            <td>{report->ip}</td>
-                                            <td>{report->payload}</td>
-                                        </tr>
-                                        {%/foreach}
+                                        
                                     </tbody>
                                 </table>
 
@@ -107,11 +64,6 @@
                                     </div><br>
                                 </div>
                             </div>
-                            {%/if}
-
-                            {%!if hasReports}
-                            <p>There are no reports yet for this payload.</p>
-                            {%/!if}
                         </div>
                     </div>
                 </div>
