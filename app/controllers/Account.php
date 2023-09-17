@@ -181,7 +181,7 @@ class Account extends Controller
                 $password = $this->getPostValue('password');
                 $domain = $this->getPostValue('domain');
 
-                if (preg_match('/[^A-Za-z0-9]/', $domain)) {
+                if ($domain === null || preg_match('/[^A-Za-z0-9]/', $domain)) {
                     throw new Exception("Invalid characters in the domain. Use a-Z0-9");
                 }
 
