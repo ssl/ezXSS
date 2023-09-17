@@ -603,3 +603,9 @@ table.dataTable td.dt-control{text-align:center;cursor:pointer}table.dataTable t
 #reports tbody td:nth-child(5) {
     width: 1%;
 }
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: none;
+  border-radius: 0;
+}
