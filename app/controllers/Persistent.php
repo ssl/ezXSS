@@ -279,25 +279,4 @@ class Persistent extends Controller
 
         return false;
     }
-
-    /**
-     * Returns the payload list array
-     * 
-     * @return array
-     */
-    private function payloadList()
-    {
-        $payloadList = [];
-        // '0' correspondents to 'all'
-        array_push($payloadList, 0);
-
-        // Push all payloads of user to list
-        $user = $this->model('User')->getById($this->session->data('id'));
-        $payloads = $this->model('Payload')->getAllByUserId($user['id']);
-        foreach ($payloads as $payload) {
-            array_push($payloadList, $payload['id']);
-        }
-
-        return $payloadList;
-    }
 }
