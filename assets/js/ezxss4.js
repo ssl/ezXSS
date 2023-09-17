@@ -18,6 +18,23 @@ $(document).ready(function () {
         $('#mobile-dropdown').slideToggle();
     });
 
+    if (window.location.pathname.match(/^\/manage\/payload\/edit\/\d+$/)) {
+        var label = $('.shortboost');
+        var originalDomain = label.attr('domain');
+        var replacedDomain = shortboost(originalDomain);
+        if (originalDomain !== replacedDomain) {
+            label.text('shortboost!');
+        }
+
+        label.on('click', function() {
+            $('.scriptsrc').each(function() {
+                let currentValue = $(this).val();
+                let newValue = currentValue.replace(new RegExp(originalDomain, 'g'), replacedDomain);
+                $(this).val(newValue);
+            });
+        });
+    }
+    
     if (location.toString().split('/')[4] === 'dashboard') {
         request('/manage/api/statistics', { page: location.toString().split('/').pop() }).then(function (r) {
             $.each(r, function (key, value) {
@@ -303,3 +320,16 @@ $(document).ready(function () {
         document.onselectstart = function () { return false; };
     });
 });
+
+function shortboost(str) {
+    const replacements = {
+        "ij": "ĳ", "bar": "㍴", "ov": "㍵", "na": "㎁", "ma": "㎃", "ka": "㎄", "kb": "㎅", "mb": "㎆", "gb": "㎇", "cal": "㎈", "kcal": "㎉", "pf": "㎊", "nf": "㎋", "mg": "㎎", "kg": "㎏", "hz": "㎐", "khz": "㎑", "mhz": "㎒", "ghz": "㎓", "thz": "㎔", "ml": "㎖", "dl": "㎗", "kl": "㎘", "fm": "㎙", "nm": "㎚", "mm": "㎜", "cm": "㎝", "km": "㎞", "mm2": "㎟", "cm2": "㎠", "m2": "㎡", "km2": "㎢", "mm3": "㎣", "cm3": "㎤", "m3": "㎥", "km3": "㎦", "pa": "㎩", "kpa": "㎪", "mpa": "㎫", "gpa": "㎬", "rad": "㎭", "ps": "㎰", "ns": "㎱", "ms": "㎳", "pv": "㎴", "nv": "㎵", "mv": "㎷", "kv": "㎸", "pw": "㎺", "nw": "㎻", "mw": "㎽", "kw": "㎾", "bq": "㏃", "cc": "㏄", "cd": "㏅", "db": "㏈", "gy": "㏉", "ha": "㏊", "hp": "㏋", "in": "㏌", "kk": "㏍", "kt": "㏏", "lm": "㏐", "ln": "㏑", "log": "㏒", "lx": "㏓", "mb": "㏔", "mil": "㏕", "mol": "㏖", "ph": "㏗", "pm": "㏘", "ppm": "㏙", "pr": "㏚", "sr": "㏛", "sv": "㏜", "wb": "㏝", "no": "№", "tm": "™", "tel": "℡", "rs": "₨", "sm": "℠", "gal": "㏿", "ff": "ﬀ", "fi": "ﬁ", "fl": "ﬂ", "ffi": "ﬃ", "ffl": "ﬄ", "st": "ﬅ", "dm": "㍷", "dm2": "㍸", "dm3": "㍹", "iu": "㍺", "pc": "㍶", "hg": "㋌", "erg": "㋍", "ev": "㋎", "ltd": "㋏", "hpa": "㍱", "da": "㍲", "pte": "㉐", "ix": "ⅸ", "ii": "ⅱ", "iii": "ⅲ", "iv": "ⅳ", "xi": "Ⅺ", "xii": "Ⅻ", "vi": "Ⅵ", "vii": "Ⅶ", "viii": "Ⅷ", "nj": "Ǌ", "dz": "Ǳ", "lj": "Ǉ", "10": "⑩", "11": "⑪", "12": "⑫", "13": "⑬", "14": "⑭", "15": "⑮", "16": "⑯", "17": "⑰", "18": "⑱", "19": "⑲", "20": "⑳", "21": "㉑", "22": "㉒", "23": "㉓", "24": "㉔", "25": "㉕", "26": "㉖", "27": "㉗", "28": "㉘", "29": "㉙", "30": "㉚", "31": "㉛", "32": "㉜", "33": "㉝", "34": "㉞", "35": "㉟", "36": "㊱", "37": "㊲", "38": "㊳", "39": "㊴", "40": "㊵", "41": "㊶", "42": "㊷", "43": "㊸", "44": "㊹", "45": "㊺", "46": "㊻", "47": "㊼", "48": "㊽", "49": "㊾", "50": "㊿"
+    };
+
+    for (let key in replacements) {
+        const regex = new RegExp(key, 'g');
+        str = str.replace(regex, replacements[key]);
+    }
+    
+    return str;
+}

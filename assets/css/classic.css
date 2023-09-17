@@ -606,3 +606,7 @@ select {
   background-image: none;
   border-radius: 0;
 }
+.shortboost {
+  float: right;
+  cursor: pointer;
+}
