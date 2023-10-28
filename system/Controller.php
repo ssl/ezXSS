@@ -159,6 +159,9 @@ class Controller
     {
         $this->validateSession();
         if (!$this->session->isLoggedIn()) {
+            if (preg_match('/^\/manage\/([a-z0-9\/?&=]+)$/i', $_SERVER['REQUEST_URI'])) {
+                $this->session->set('redirect', $_SERVER['REQUEST_URI']);
+            }
             redirect('/manage/account/login');
         }
     }

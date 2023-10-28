@@ -104,7 +104,12 @@ class Account extends Controller
                 } else {
                     $this->session->createSession($user);
                     $this->log('Succesfully logged in');
-                    redirect('dashboard/index');
+
+                    if($this->session->data('redirect') !== '') {
+                        redirect($this->session->data('redirect'));
+                    } else {
+                        redirect('dashboard/index');
+                    }
                 }
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
@@ -143,7 +148,12 @@ class Account extends Controller
 
                 $this->session->createSession($user);
                 $this->log('Succesfully logged in with MFA');
-                redirect('dashboard/index');
+                
+                if($this->session->data('redirect') !== '') {
+                    redirect($this->session->data('redirect'));
+                } else {
+                    redirect('dashboard/index');
+                }
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
