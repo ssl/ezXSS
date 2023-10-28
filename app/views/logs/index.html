@@ -24,9 +24,7 @@
                     <div class="panel panel-filled">
                         <div class="panel-heading">Information</div>
                         <div class="panel-body">
-                            {%if hasLogs}
                             <div class="table-responsive">
-
                                 <table id="logs" class="table" style="white-space: nowrap;width:100%;">
                                     <thead>
                                         <tr>
@@ -37,32 +35,18 @@
                                         </tr>
                                     </thead>
                                     <tbody id="reports-list">
-                                        {%foreach log}
-                                        <tr>
-                                            <td>{log->user}</td>
-                                            <td>{log->description}</td>
-                                            <td>{log->ip}</td>
-                                            <td data-sort="{log->time}">{log->date}</td>
-                                        </tr>
-                                        {%/foreach}
+
                                     </tbody>
                                 </table>
                             </div>
-                            {%/if}
-
-                            {%!if hasLogs}
-                            <p>There are no logs yet.</p>
-                            {%/!if}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
 </div>
 
-<!-- Reports JS -->
 <script src="/assets/js/dataTables/jquery.dataTables.js"></script>
 <script src="/assets/js/dataTables/bootstrap.dataTables.js"></script>
 <script src="/assets/js/dataTables/init.js"></script>

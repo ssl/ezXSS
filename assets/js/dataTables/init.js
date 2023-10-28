@@ -62,8 +62,28 @@ $(document).ready(function () {
         order: [[6, 'desc']],
     });
 
-    $('#logs').DataTable({
-        "pageLength": 25,
+    new DataTable('#logs', {
+        "ajax": {
+            "url": "/manage/api/logs",
+            "type": "POST",
+            "data": function (d) {
+                d.csrf = csrf;
+            }
+        },
+        columns: [
+            { data: 'user', },
+            { data: 'description', },
+            { data: 'ip', },
+            { 
+                data: 'date',
+                render: function (data, type, row, meta) {
+                    if (type === 'sort') {
+                        return row.time;
+                    }
+                    return data;
+                }
+            },
+        ],
         order: [[3, 'desc']],
     });
 });
