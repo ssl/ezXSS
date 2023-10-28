@@ -34,6 +34,24 @@ $(document).ready(function () {
             });
         });
     }
+
+    const inputs = document.querySelectorAll('.scriptsrc');
+    inputs.forEach(input => {
+        input.addEventListener('click', function() {
+            const textToCopy = this.value;
+            const tempInput = document.createElement('input');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            this.classList.add('clicked');
+            setTimeout(() => {
+                this.classList.remove('clicked');
+            }, 400);
+        });
+    });
     
     if (location.toString().split('/')[4] === 'dashboard') {
         request('/manage/api/statistics', { page: location.toString().split('/').pop() }).then(function (r) {

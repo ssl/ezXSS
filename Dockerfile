@@ -18,8 +18,8 @@ RUN if [ "$USE_MAIL_ALERTS" = "true" ]; then \
         cp ./msmtprc /etc/msmtprc; \
         chmod 640 /etc/msmtprc; \
         touch /var/log/msmtp.log; \
-        chown root:msmtp /etc/msmtprc; \
-        chown root:msmtp /var/log/msmtp.log; \
+        chown root:www-data /etc/msmtprc; \
+        chown root:www-data /var/log/msmtp.log; \
         echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini; \
         set +e; \
     fi
