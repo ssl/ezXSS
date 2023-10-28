@@ -34,9 +34,7 @@
                     <div class="panel panel-filled">
                         <div class="panel-heading">Information <span id="last" style="float:right">0s ago</span></div>
                         <div class="panel-body">
-                            {%if hasSessions}
                             <div class="table-responsive">
-
                                 <table id="persistent" class="table" style="white-space: nowrap;width:100%;">
                                     <thead>
                                         <tr>
@@ -44,7 +42,7 @@
                                                 <label class="reports-checkbox-label">
                                                     <input id="select-all" name="select-all" type="checkbox">
                                                     <span class="reports-checkbox-custom rectangular"
-                                                        style="top:4px!important"></span>
+                                                        style="top:7px!important"></span>
                                                 </label>
                                                 Client ID
                                             </th>
@@ -57,25 +55,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="reports-list">
-                                        {%foreach session}
-                                        <tr>
-                                            <td scope=row style="width:50px;border-color:#5b6187">
-                                                <label class="reports-checkbox-label" for="chk_{session->id}">
-                                                    <input class="chkbox" type="checkbox" name="selected"
-                                                        value="{session->id}" id="chk_{session->id}"
-                                                        url="/manage/persistent/session/{session->clientid}~{session->origin}">
-                                                    <span class="reports-checkbox-custom rectangular"></span>
-                                                </label>
-                                                <a href="/manage/persistent/session/{session->clientid}~{session->origin}">{session->clientid}</a>
-                                            </td>
-                                            <td>{session->browser}</td>
-                                            <td>{session->ip}</td>
-                                            <td>{session->shorturi}</td>
-                                            <td>{session->payload}</td>
-                                            <td>{session->requests}</td>
-                                            <td data-sort="{session->time}">{session->last}</td>
-                                        </tr>
-                                        {%/foreach}
+                                        
                                     </tbody>
                                 </table>
 
@@ -86,11 +66,6 @@
                                     </div><br>
                                 </div>
                             </div>
-                            {%/if}
-
-                            {%!if hasSessions}
-                            <p>There are no sessions yet for this payload.</p>
-                            {%/!if}
                         </div>
                     </div>
                 </div>

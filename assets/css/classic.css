@@ -617,3 +617,8 @@ input.scriptsrc {
 input.scriptsrc.clicked {
   background-color: rgba(255, 255, 255, 0.5);
 }
+.persistent-column {
+  width: 50px;
+  border-color: #5b6187;
+  padding-top:0px!important;
+}

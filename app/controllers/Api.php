@@ -269,6 +269,11 @@ class Api extends Controller
         return $cookieNames;
     }
 
+    /**
+     * Renders the list of all reports within payload and returns the content.
+     * 
+     * @return string
+     */
     public function reports()
     {
         $id = $this->getPostValue('id');
@@ -325,6 +330,65 @@ class Api extends Controller
         return json_encode(["data" => array_values($reports)]);
     }
 
+    /**
+     * Renders the list of all sessions within payload and returns the content.
+     * 
+     * @return string
+     */
+    public function sessions()
+    {
+        $id = $this->getPostValue('id');
+
+        // Check payload permissions
+        $payloadList = $this->payloadList();
+        if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
+            throw new Exception('You dont have permissions to this payload');
+        }
+
+        // Checks if requested id is 'all'
+        if (+$id === 0) {
+            if ($this->isAdmin()) {
+                // Show all sessions
+                $sessions = $this->model('Session')->getAll();
+            } else {
+                // Show all sessions of allowed payloads
+                $sessions = [];
+                foreach ($payloadList as $payloadId) {
+                    if ($payloadId !== 0) {
+                        $payload = $this->model('Payload')->getById($payloadId);
+                        $payloadUri = '//' . $payload['payload'];
+                        if (strpos($payload['payload'], '/') === false) {
+                            $payloadUri .= '/%';
+                        }
+                        $sessions = array_merge($sessions, $this->model('Session')->getAllByPayload($payloadUri));
+                    }
+                }
+            }
+        } else {
+            // Show sessions of payload
+            $payload = $this->model('Payload')->getById($id);
+
+            $payloadUri = '//' . $payload['payload'];
+            if (strpos($payload['payload'], '/') === false) {
+                $payloadUri .= '/%';
+            }
+            $sessions = $this->model('Session')->getAllByPayload($payloadUri);
+        }
+
+        foreach ($sessions as $key => $value) {
+            $sessions[$key]['browser'] = $this->parseUserAgent($sessions[$key]['user-agent']);
+            $sessions[$key]['last'] = $this->parseTimestamp($sessions[$key]['time'], 'long');
+            $sessions[$key]['shorturi'] = substr($sessions[$key]['uri'], 0, 50);
+        }
+
+        return json_encode(["data" => array_values($sessions)]);
+    }
+
+    /**
+     * Renders the logs content and returns the content.
+     * 
+     * @return string
+     */
     public function logs() 
     {
         $logs = $this->model('Log')->getAll();

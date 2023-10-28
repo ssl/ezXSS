@@ -45,45 +45,6 @@ class Persistent extends Controller
         }
         $this->view->renderDataset('payload', $payloads);
 
-        // Checks if requested id is 'all'
-        if (+$id === 0) {
-            if ($this->isAdmin()) {
-                // Show all sessions
-                $sessions = $this->model('Session')->getAll();
-            } else {
-                // Show all sessions of allowed payloads
-                $sessions = [];
-                foreach ($payloadList as $payloadId) {
-                    if ($payloadId !== 0) {
-                        $payload = $this->model('Payload')->getById($payloadId);
-                        $payloadUri = '//' . $payload['payload'];
-                        if (strpos($payload['payload'], '/') === false) {
-                            $payloadUri .= '/%';
-                        }
-                        $sessions = array_merge($sessions, $this->model('Session')->getAllByPayload($payloadUri));
-                    }
-                }
-            }
-        } else {
-            // Show sessions of payload
-            $payload = $this->model('Payload')->getById($id);
-
-            $payloadUri = '//' . $payload['payload'];
-            if (strpos($payload['payload'], '/') === false) {
-                $payloadUri .= '/%';
-            }
-            $sessions = $this->model('Session')->getAllByPayload($payloadUri);
-        }
-
-        foreach ($sessions as $key => $value) {
-            $sessions[$key]['browser'] = $this->parseUserAgent($sessions[$key]['user-agent']);
-            $sessions[$key]['last'] = $this->parseTimestamp($sessions[$key]['time'], 'long');
-            $sessions[$key]['shorturi'] = substr($sessions[$key]['uri'], 0, 50);
-        }
-
-        $this->view->renderCondition('hasSessions', count($sessions) > 0);
-        $this->view->renderDataset('session', $sessions);
-
         return $this->showContent();
     }
 

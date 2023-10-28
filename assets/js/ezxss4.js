@@ -244,18 +244,6 @@ $(document).ready(function () {
         }, 10000);
     }
 
-    if (location.toString().split('/')[4] === "persistent") {
-        var startTime = new Date();
-        setInterval(function () {
-            var elapsedTime = new Date() - startTime;
-            var seconds = Math.round(elapsedTime / 1000);
-            $("#last").text(seconds + "s ago");
-        }, 1000);
-        setInterval(function () {
-            location.reload();
-        }, 120000);
-    }
-
     $(".render").click(function () {
         const byteCharacters = unescape(encodeURIComponent($('#dom').val()));
         const byteArrays = [];
