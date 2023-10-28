@@ -136,4 +136,12 @@ $(document).ready(function () {
         ],
         order: [[3, 'desc']],
     });
+
+    $('#simple-table').DataTable({
+        columnDefs: [
+            { orderable: false, targets: [0] }
+        ],
+            "pageLength": 25,
+        order: [[0, 'desc']],
+    });
 });
