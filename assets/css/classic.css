@@ -610,3 +610,10 @@ select {
   float: right;
   cursor: pointer;
 }
+input.scriptsrc {
+  cursor: copy;
+  transition: background-color 0.5s;
+}
+input.scriptsrc.clicked {
+  background-color: rgba(255, 255, 255, 0.5);
+}
