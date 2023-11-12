@@ -459,6 +459,6 @@ class View
      */
     public function setContentType($type)
     {
-        header('Content-Type: ' . $type);
+        header('Content-Type: ' . $type . '; charset=UTF-8');
     }
 }
