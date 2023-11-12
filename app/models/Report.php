@@ -26,6 +26,24 @@ class Report_model extends Model
     }
 
     /**
+     * Get all reports by archive status
+     * 
+     * @param string $archive Archive status
+     * @return array
+     */
+    public function getAllByArchive($archive)
+    {
+        $database = Database::openConnection();
+        $database->prepare('SELECT id,uri,ip,payload,shareid FROM reports WHERE archive = :archive ORDER BY id DESC');
+        $database->bindValue(':archive', $archive);
+        $database->execute();
+
+        $data = $database->fetchAll();
+
+        return $data;
+    }
+
+    /**
      * Get report by share id
      * 
      * @param mixed $id The share id
@@ -51,13 +69,15 @@ class Report_model extends Model
     /**
      * Get report by payload
      * @param string $payload The payload
+     * @param string $archive Archive status
      * @throws Exception
      * @return array
      */
-    public function getAllByPayload($payload)
+    public function getAllByPayload($payload, $archive)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT id,uri,ip,payload,archive,shareid FROM reports WHERE payload LIKE :payload ORDER BY id DESC');
+        $database->prepare('SELECT id,uri,ip,payload,shareid FROM reports WHERE payload LIKE :payload AND archive = :archive ORDER BY id DESC');
+        $database->bindValue(':archive', $archive);
         $database->bindValue(':payload', $payload);
 
         if (!$database->execute()) {

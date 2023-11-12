@@ -277,6 +277,7 @@ class Api extends Controller
     public function reports()
     {
         $id = $this->getPostValue('id');
+        $archive = $this->getPostValue('archive') == '1' ? 1 : 0;
 
         // Check payload permissions
         $payloadList = $this->payloadList();
@@ -288,7 +289,7 @@ class Api extends Controller
         if (+$id === 0) {
             if ($this->isAdmin()) {
                 // Show all reports
-                $reports = $this->model('Report')->getAll();
+                $reports = $this->model('Report')->getAllByArchive($archive);
             } else {
                 // Show all reports of allowed payloads
                 $reports = [];
@@ -299,7 +300,7 @@ class Api extends Controller
                         if (strpos($payload['payload'], '/') === false) {
                             $payloadUri .= '/%';
                         }
-                        $reports = array_merge($reports, $this->model('Report')->getAllByPayload($payloadUri));
+                        $reports = array_merge($reports, $this->model('Report')->getAllByPayload($payloadUri, $archive));
                     }
                 }
             }
@@ -311,20 +312,7 @@ class Api extends Controller
             if (strpos($payload['payload'], '/') === false) {
                 $payloadUri .= '/%';
             }
-            $reports = $this->model('Report')->getAllByPayload($payloadUri);
-        }
-
-        // Remove or keep reports depending the requested archive value
-        $archive = $this->getPostValue('archive') == '1' ? true : false;
-        foreach ($reports as $key => $value) {
-            $reports[$key]['ip'] = substr($reports[$key]['ip'], 0, 25);
-            $reports[$key]['payload'] = substr($reports[$key]['payload'], 0, 50);
-
-            if (($reports[$key]['archive'] == '0' && $archive) ||
-                ($reports[$key]['archive'] == '1' && !$archive)
-            ) {
-                unset($reports[$key]);
-            }
+            $reports = $this->model('Report')->getAllByPayload($payloadUri, $archive);
         }
 
         return json_encode(["data" => array_values($reports)]);
