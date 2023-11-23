@@ -168,14 +168,11 @@ class Payloads extends Controller
         // Check if the report should be saved or alerted
         $doubleReport = false;
         if ($this->model('Setting')->get('filter-save') == 0 || $this->model('Setting')->get('filter-alert') == 0) {
-            $searchId = $this->model('Report')->searchForDublicates($data->cookies ?? '', $data->dom ?? '', $data->origin, $data->referer, $data->uri, $data->{'user-agent'}, $data->ip);
-            echo 'searchid: ' . $searchId;
+            $searchId = $this->model('Report')->searchForDublicates($data->cookies ?? '', $data->origin, $data->referer, $data->uri, $data->{'user-agent'}, $data->ip);
             if ($searchId !== false) {
                 if ($this->model('Setting')->get('filter-save') == 0 && $this->model('Setting')->get('filter-alert') == 0) {
-                    echo 'no: ';
                     return 'github.com/ssl/ezXSS';
                 } else {
-                    echo 'yes: ' . $searchId;
                     $doubleReport = $searchId;
                 }
             }
@@ -192,7 +189,7 @@ class Payloads extends Controller
                     ) . bin2hex(openssl_random_pseudo_bytes(5));
                     $saveImage = fopen(__DIR__ . "/../../assets/img/report-{$data->screenshotName}.png", 'w');
                     if(!$saveImage) {
-                        throw new Exception('Unable to save screenshots to server, check permissions');
+                        throw new Exception('Unable to save screenshots to server, read the wiki and check permissions');
                     }
                     fwrite($saveImage, $screenshot);
                     fclose($saveImage);
@@ -204,7 +201,6 @@ class Payloads extends Controller
 
             // Save the report
             if (($doubleReport !== false && $this->model('Setting')->get('filter-save') == 1) || $doubleReport === false) {
-                echo 'yes: ' . $doubleReport;
                 $shareId = sha1(bin2hex(openssl_random_pseudo_bytes(32)) . time());
                 $data->id = $this->model('Report')->add(
                     $shareId,
@@ -222,12 +218,8 @@ class Payloads extends Controller
                 );
                 $data->domain = host;
             } else {
-                echo 'else';
                 if($doubleReport !== false && $this->model('Setting')->get('filter-alert') == 1) {
-                    echo 'ELSEYES';
-                    var_dump($data);
                     $data = (object) $this->model('Report')->getById($doubleReport);
-                    var_dump($data);
                 }
             }
             $data->time = time();
@@ -235,7 +227,6 @@ class Payloads extends Controller
 
             // Send out alerts
             if (($doubleReport !== false && $this->model('Setting')->get('filter-alert') == 1) || $doubleReport === false) {
-                echo 'alert!';
                 try {
                     $this->alert($data);
                 } catch (Exception $e) {
