@@ -29,7 +29,7 @@ class View
         header('Referrer-Policy: strict-origin-when-cross-origin');
 
         // Add CSP header to manage
-        if(explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))[1] === 'manage') {
+        if(explode('/', $_SERVER['REQUEST_URI'] ?? '/')[1] === 'manage') {
             header("Content-Security-Policy: default-src 'self'; img-src 'self' data: chart.googleapis.com; font-src fonts.gstatic.com; script-src 'self' 'nonce-csrf'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';");
         }
     }

@@ -65,7 +65,6 @@ CREATE TABLE `reports` (
   `id` int(11) NOT NULL,
   `shareid` varchar(50) NOT NULL,
   `cookies` mediumtext,
-  `dom` longtext,
   `origin` varchar(500) DEFAULT NULL,
   `referer` varchar(1000) DEFAULT NULL,
   `payload` varchar(500) DEFAULT NULL,
@@ -74,9 +73,21 @@ CREATE TABLE `reports` (
   `ip` varchar(50) DEFAULT NULL,
   `time` int(11) DEFAULT NULL,
   `archive` int(11) DEFAULT '0',
-  `screenshot` longtext,
-  `localstorage` longtext,
-  `sessionstorage` longtext
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reports_data`
+--
+
+CREATE TABLE `reports_data` (
+    `id` INT(11) NOT NULL,
+    `reportid` INT(11) NOT NULL,
+    `dom` longtext,
+    `screenshot` longtext,
+    `localstorage` longtext,
+    `sessionstorage` longtext
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -215,6 +226,12 @@ ALTER TABLE `reports`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `reports`
+--
+ALTER TABLE `reports_data`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `settings`
 --
 ALTER TABLE `settings`
@@ -291,3 +308,12 @@ COMMIT;
 ALTER TABLE `console`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 COMMIT;
+
+--
+-- INDEX for tables
+--
+
+ALTER TABLE reports ADD INDEX(archive);
+ALTER TABLE reports ADD INDEX(payload);
+ALTER TABLE reports ADD INDEX(id);
+ALTER TABLE reports_data ADD INDEX(reportid);

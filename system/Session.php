@@ -10,7 +10,7 @@ class Session
     {
         // Creates a session if there is non yet
         if (session_status() === PHP_SESSION_NONE &&
-            explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))[1] === 'manage') {
+            explode('/', $_SERVER['REQUEST_URI'] ?? '/')[1] === 'manage') {
             session_name(!httpmode ? '__Host-EZXSS' : 'EZXSS');
             if(PHP_VERSION_ID < 70300) {
                 session_set_cookie_params(6000000, '/; samesite=Lax', null, !httpmode, true);
