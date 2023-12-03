@@ -197,7 +197,7 @@ class Persistent extends Controller
 
         $this->view->renderData('time', date('F j, Y, g:i a', $request['time']));
 
-        foreach ($this->rows as $value) {
+        foreach (array_slice($this->rows, 0, -2) as $value) {
             $this->view->renderData($value, $request[$value]);
         }
 
