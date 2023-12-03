@@ -13,7 +13,7 @@ class Logs extends Controller
 
         $this->view->setTitle('Logs');
         $this->view->renderTemplate('logs/index');
-        
+
         return $this->showContent();
     }
 }

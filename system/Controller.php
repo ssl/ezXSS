@@ -247,7 +247,7 @@ class Controller
         $browser = "Unknown";
         $os = "Unknown";
 
-        if($userAgent === 'Not collected') {
+        if ($userAgent === 'Not collected') {
             return $userAgent;
         }
 
@@ -314,7 +314,7 @@ class Controller
      */
     public function parseTimestamp($timestamp, $syntax = 'short')
     {
-        if($timestamp === 0) {
+        if ($timestamp === 0) {
             return 'never';
         }
 
@@ -345,7 +345,7 @@ class Controller
      */
     public function log($description)
     {
-        if($this->model('Setting')->get('logging') === '1') {
+        if ($this->model('Setting')->get('logging') === '1') {
             $userId = $this->session->data('id');
             $this->model('Log')->add($userId !== '' ? $userId : 0, $description, userip);
         }
@@ -415,11 +415,11 @@ class Controller
      * 
      * @return array
      */
-    public function payloadList($type=1)
+    public function payloadList($type = 1)
     {
         $payloadList = [];
 
-        if($type === 1) {
+        if ($type === 1) {
             // '0' correspondents to 'all'
             array_push($payloadList, 0);
         } else {

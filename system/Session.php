@@ -9,10 +9,12 @@ class Session
     public function __construct()
     {
         // Creates a session if there is non yet
-        if (session_status() === PHP_SESSION_NONE &&
-            explode('/', $_SERVER['REQUEST_URI'] ?? '/')[1] === 'manage') {
+        if (
+            session_status() === PHP_SESSION_NONE &&
+            explode('/', $_SERVER['REQUEST_URI'] ?? '/')[1] === 'manage'
+        ) {
             session_name(!httpmode ? '__Host-EZXSS' : 'EZXSS');
-            if(PHP_VERSION_ID < 70300) {
+            if (PHP_VERSION_ID < 70300) {
                 session_set_cookie_params(6000000, '/; samesite=Lax', null, !httpmode, true);
             } else {
                 session_set_cookie_params([

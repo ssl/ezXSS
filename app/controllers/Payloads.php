@@ -15,7 +15,7 @@ class Payloads extends Controller
     public function __construct()
     {
         parent::__construct();
-        
+
         // Add CORS headers
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Headers: origin, x-requested-with, content-type');
@@ -51,7 +51,7 @@ class Payloads extends Controller
         $screenshot = $payload['collect_screenshot'] ? $this->view->getPayload('screenshot') : '';
 
         // Create the persistent payload
-        if($payload['persistent']) {
+        if ($payload['persistent']) {
             $persistent = $this->view->getPayload('persist');
         }
 
@@ -102,7 +102,7 @@ class Payloads extends Controller
         // Decode the JSON data
         $data = json_decode(file_get_contents('php://input'), false);
 
-        if(empty($data) || !is_object($data)) {
+        if (empty($data) || !is_object($data)) {
             return 'github.com/ssl/ezXSS';
         }
 
@@ -161,7 +161,7 @@ class Payloads extends Controller
         }
 
         // Check if callback should be threated as persistent mode
-        if(isset($data->method) && $data->method === 'persist') {
+        if (isset($data->method) && $data->method === 'persist') {
             return $this->persistCallback($data);
         }
 
@@ -188,7 +188,7 @@ class Payloads extends Controller
                         $data->uri . time() . bin2hex(openssl_random_pseudo_bytes(16))
                     ) . bin2hex(openssl_random_pseudo_bytes(5));
                     $saveImage = fopen(__DIR__ . "/../../assets/img/report-{$data->screenshotName}.png", 'w');
-                    if(!$saveImage) {
+                    if (!$saveImage) {
                         throw new Exception('Unable to save screenshots to server, read the wiki and check permissions');
                     }
                     fwrite($saveImage, $screenshot);
@@ -218,7 +218,7 @@ class Payloads extends Controller
                 );
                 $data->domain = host;
             } else {
-                if($doubleReport !== false && $this->model('Setting')->get('filter-alert') == 1) {
+                if ($doubleReport !== false && $this->model('Setting')->get('filter-alert') == 1) {
                     $data = (object) $this->model('Report')->getById($doubleReport);
                 }
             }
@@ -249,12 +249,12 @@ class Payloads extends Controller
         $tryInit = false;
 
         // A new request has been made
-        if($data->type === 'init') {
+        if ($data->type === 'init') {
             $tryInit = true;
         }
 
         // Session is pinged and is waiting for pong
-        if($data->type === 'ping') {
+        if ($data->type === 'ping') {
             try {
                 $session = $this->model('Session')->getByClientId($data->clientid ?? '', $data->origin);
 
@@ -262,12 +262,12 @@ class Payloads extends Controller
                 $this->model('Session')->setSingleValue($session['id'], 'console', $data->console ?? '');
 
                 return $this->model('Console')->getNext($data->clientid ?? '', $data->origin);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 $tryInit = true;
             }
         }
 
-        if($tryInit) {
+        if ($tryInit) {
             // Save the request data
             $data->id = $this->model('Session')->add(
                 $data->clientid ?? '',
@@ -433,8 +433,8 @@ class Payloads extends Controller
     {
         // Escapes data for alert
         $escapedData = json_decode(json_encode($data), false);
-        array_walk_recursive($escapedData, function(&$item) {
-            if(is_string($item)) {
+        array_walk_recursive($escapedData, function (&$item) {
+            if (is_string($item)) {
                 $item = e($item);
             }
         });
@@ -493,8 +493,8 @@ class Payloads extends Controller
     {
         // Escapes data for alert
         $escapedData = json_decode(json_encode($data), false);
-        array_walk_recursive($escapedData, function(&$item) {
-            if(is_string($item)) {
+        array_walk_recursive($escapedData, function (&$item) {
+            if (is_string($item)) {
                 $item = addslashes($item);
             }
         });
@@ -533,12 +533,12 @@ class Payloads extends Controller
 
         try {
             // Attempt to retrieve the payload by the full path
-            $url = (array_key_exists(2, $splitUrl) ? $splitUrl[2] : '' ). '/' . (array_key_exists(3, $splitUrl) ? $splitUrl[3] : '');
+            $url = (array_key_exists(2, $splitUrl) ? $splitUrl[2] : '') . '/' . (array_key_exists(3, $splitUrl) ? $splitUrl[3] : '');
             $payload = $this->model('Payload')->getByPayload($url);
         } catch (Exception $e) {
             try {
                 // If the payload is not found by the full path, try to retrieve it by the domain name
-                $payload = $this->model('Payload')->getByPayload((array_key_exists(2, $splitUrl) ? $splitUrl[2] : '' ));
+                $payload = $this->model('Payload')->getByPayload((array_key_exists(2, $splitUrl) ? $splitUrl[2] : ''));
             } catch (Exception $e) {
                 // If the payload is still not found, fallback to the default payload
                 $payload = $this->model('Payload')->getById(1);

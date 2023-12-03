@@ -1,6 +1,6 @@
 <?php
 
-class Persistent extends Controller 
+class Persistent extends Controller
 {
     /**
      * Summary of rows
@@ -55,7 +55,7 @@ class Persistent extends Controller
      * @throws Exception
      * @return string
      */
-    public function session($clientId) 
+    public function session($clientId)
     {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Online');
@@ -71,7 +71,7 @@ class Persistent extends Controller
 
         $session = $this->model('Session')->getByClientId($clientId, $origin);
 
-        if($this->isPOST()) {
+        if ($this->isPOST()) {
             try {
                 $this->validateCsrfToken();
 
@@ -146,7 +146,7 @@ class Persistent extends Controller
      * @throws Exception
      * @return string
      */
-    public function requests($clientId) 
+    public function requests($clientId)
     {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Online');

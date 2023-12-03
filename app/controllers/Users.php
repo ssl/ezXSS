@@ -117,7 +117,7 @@ class Users extends Controller
                     }
                     $userModel->setRank($user['id'], $rank);
                     $this->log("Eddited user {$username}");
-                    if($rank == 0) {
+                    if ($rank == 0) {
                         $this->log("Banned user {$username}");
                     }
                 }

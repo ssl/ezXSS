@@ -98,8 +98,21 @@ class Settings extends Controller
 
         // Renders checkboxes
         $renderSettings = [
-            'collect_uri', 'collect_ip', 'collect_referer', 'collect_user-agent', 'collect_cookies', 'collect_localstorage', 'collect_sessionstorage',
-            'collect_dom', 'collect_origin', 'collect_screenshot', 'alert-mail', 'alert-telegram', 'alert-slack', 'alert-discord', 'alert-callback'
+            'collect_uri',
+            'collect_ip',
+            'collect_referer',
+            'collect_user-agent',
+            'collect_cookies',
+            'collect_localstorage',
+            'collect_sessionstorage',
+            'collect_dom',
+            'collect_origin',
+            'collect_screenshot',
+            'alert-mail',
+            'alert-telegram',
+            'alert-slack',
+            'alert-discord',
+            'alert-callback'
         ];
         foreach ($renderSettings as $setting) {
             $this->view->renderChecked($setting, $settings->get($setting) == 1);
@@ -253,7 +266,6 @@ class Settings extends Controller
      * Kills the ezXSS platform
      * 
      * @param string $password
-     * @return string
      */
     private function killSwitch($password)
     {

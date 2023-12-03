@@ -104,7 +104,7 @@ class Api extends Controller
             $this->model('User')->setRow2($this->session->data('id'), $id);
         }
 
-        if($admin) {
+        if ($admin) {
             $allReports = $this->model('Report')->getAllCommonData();
         } else {
             $user = $this->model('User')->getById($this->session->data('id'));
@@ -125,12 +125,12 @@ class Api extends Controller
         if (in_array($id, [1, 2, 4, 5])) {
             // Loop through the reports and count dublicates
             foreach ($allReports as $report) {
-                if($rows[$id] == 'user-agent') {
+                if ($rows[$id] == 'user-agent') {
                     $value = $this->parseUserAgent($report[$rows[$id]]);
                 } else {
                     $value = $report[$rows[$id]];
                 }
-                
+
                 if (isset($results[$value])) {
                     $results[$value]++;
                 } else {
@@ -146,7 +146,7 @@ class Api extends Controller
             foreach ($allReports as $cookie) {
                 $foundCookies = $this->parseCookies($cookie['cookies']);
                 foreach ($foundCookies as $foundCookie) {
-                    if($foundCookie !== '') {
+                    if ($foundCookie !== '') {
                         $cookies[] = $foundCookie;
                     }
                 }
@@ -166,7 +166,7 @@ class Api extends Controller
         arsort($results);
         foreach ($results as $value => $count) {
             $data[] = ["value" => $value, "count" => $count];
-            if (count($data) == 10) {
+            if (count($data) === 10) {
                 break;
             }
         }
@@ -202,12 +202,12 @@ class Api extends Controller
         }
 
         $statistics = [
-            'total'        => count($allReports),
-            'week'         => 0,
-            'weekdomains'  => 0,
+            'total' => count($allReports),
+            'week' => 0,
+            'weekdomains' => 0,
             'totaldomains' => 0,
-            'collected'    => 0,
-            'last'         => 'never',
+            'collected' => 0,
+            'last' => 'never',
         ];
         $uniqueDomains = [];
         $uniqueDomainsWeek = [];
@@ -277,7 +277,7 @@ class Api extends Controller
     public function reports()
     {
         $id = $this->getPostValue('id');
-        $archive = $this->getPostValue('archive') == '1' ? 1 : 0;
+        $archive = $this->getPostValue('archive') === '1' ? 1 : 0;
 
         // Check payload permissions
         $payloadList = $this->payloadList();
@@ -377,12 +377,12 @@ class Api extends Controller
      * 
      * @return string
      */
-    public function logs() 
+    public function logs()
     {
         $logs = $this->model('Log')->getAll();
 
         foreach ($logs as $key => $value) {
-            if($logs[$key]['user_id'] !== 0) {
+            if ($logs[$key]['user_id'] !== 0) {
                 try {
                     $user = $this->model('User')->getById($logs[$key]['user_id']);
                     $logs[$key]['user'] = $user['username'];
