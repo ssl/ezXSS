@@ -26,7 +26,7 @@
                         <div class="panel-body">
                             <div class="table-responsive">
 
-                                <table class="table" style="white-space: nowrap;">
+                                <table id="users" class="table" style="white-space: nowrap;">
                                     <thead>
                                         <tr>
                                             <th style="width:6%">ID</th>
@@ -37,17 +37,8 @@
                                             <th style="width:10%">Delete</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="reports-list">
-                                        {%foreach user}
-                                        <tr>
-                                            <td scope="row"><b>{user->id}</b></td>
-                                            <td>{user->username}</td>
-                                            <td>{user->rank}</td>
-                                            <td>{user->payloads}</td>
-                                            <td><a href="/manage/users/edit/{user->id}">Edit</a></td>
-                                            <td><a href="/manage/users/delete/{user->id}">Delete</a></td>
-                                        </tr>
-                                        {%/foreach}
+                                    <tbody>
+                                        
                                     </tbody>
                                 </table>
 
@@ -95,3 +86,7 @@
         </div>
     </section>
 </div>
+
+<script src="/assets/js/dataTables/jquery.dataTables.js"></script>
+<script src="/assets/js/dataTables/bootstrap.dataTables.js"></script>
+<script src="/assets/js/dataTables/init.js"></script>

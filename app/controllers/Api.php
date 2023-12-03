@@ -399,6 +399,35 @@ class Api extends Controller
     }
 
     /**
+     * Renders the users content and returns the content.
+     * 
+     * @return string
+     */
+    public function users()
+    {
+        $ranks = [0 => 'Banned', 1 => 'User', 7 => 'Admin'];
+
+        $users = $this->model('User')->getAllUsers();
+
+        foreach ($users as &$user) {
+            // Translate rank id to readable name
+            $user['rank'] = $ranks[$user['rank']];
+
+            // Create list of all payloads of user
+            $payloads = $this->model('Payload')->getAllByUserId($user['id']);
+            $payloadString = $user['rank'] == 'Admin' ? '*, ' : '';
+            foreach ($payloads as $payload) {
+                $payloadString .= e($payload['payload']) . ', ';
+            }
+            $payloadString = $payloadString === '' ? $payloadString : substr($payloadString, 0, -2);
+            $payloadString = (strlen($payloadString) > 35) ? substr($payloadString, 0, 35) . '...' : $payloadString;
+            $user['payloads'] = $payloadString;
+        }
+
+        return json_encode(["data" => array_values($users)]);
+    }
+
+    /**
      * Renders error message
      * 
      * @param string $error The error message

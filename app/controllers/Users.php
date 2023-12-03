@@ -52,24 +52,6 @@ class Users extends Controller
             }
         }
 
-        // Renders user list on page
-        $users = $this->model('User')->getAllUsers();
-        foreach ($users as &$user) {
-            // Translate rank id to readable name
-            $user['rank'] = $this->ranks[$user['rank']];
-
-            // Create list of all payloads of user
-            $payloads = $this->model('Payload')->getAllByUserId($user['id']);
-            $payloadString = $user['rank'] == 'Admin' ? '*, ' : '';
-            foreach ($payloads as $payload) {
-                $payloadString .= e($payload['payload']) . ', ';
-            }
-            $payloadString = $payloadString === '' ? $payloadString : substr($payloadString, 0, -2);
-            $payloadString = (strlen($payloadString) > 35) ? substr($payloadString, 0, 35) . '...' : $payloadString;
-            $user['payloads'] = $payloadString;
-        }
-        $this->view->renderDataset('user', $users);
-
         return $this->showContent();
     }
 
