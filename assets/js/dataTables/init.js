@@ -137,6 +137,39 @@ $(document).ready(function () {
         order: [[3, 'desc']],
     });
 
+    new DataTable('#users', {
+        "ajax": {
+            "url": "/manage/api/users",
+            "type": "POST",
+            "data": function (d) {
+                d.csrf = csrf;
+            }
+        },
+        columns: [
+            { data: 'id', },
+            { data: 'username', },
+            { data: 'rank', },
+            { data: 'payloads', },
+            { 
+                data: 'id',
+                orderable: false,
+                render: function (data, type, row) {
+                    return `<a href="/manage/users/edit/` + data + `">Edit</a>`;
+                }
+            },
+            { 
+                data: 'id',
+                orderable: false,
+                render: function (data, type, row) {
+                    return `<a href="/manage/users/delete/` + data + `">Delete</a>`;
+                }
+            },
+        ],
+        order: [[0, 'asc']],
+        scrollY: false,
+        scrollX: false,
+    });
+
     $('#simple-table').DataTable({
         columnDefs: [
             { orderable: false, targets: [0] }
