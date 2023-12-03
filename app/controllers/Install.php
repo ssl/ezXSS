@@ -16,9 +16,10 @@ class Install extends Controller
         try {
             $this->model('Setting')->get('version');
             redirect('dashboard/index');
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
-        if($this->isPOST()) {
+        if ($this->isPOST()) {
             try {
                 $this->validateCsrfToken();
                 $username = $this->getPostValue('username');
@@ -28,11 +29,11 @@ class Install extends Controller
                 if (preg_match('/[^A-Za-z0-9]/', $username)) {
                     throw new Exception("Invalid characters in the username. Use a-Z0-9");
                 }
-        
+
                 if (strlen($username) < 3 || strlen($username) > 25) {
                     throw new Exception("Username needs to be between 3-25 long");
                 }
-        
+
                 if (
                     strlen($password) < 8 || !preg_match('@[A-Z]@', $password) ||
                     !preg_match('@[0-9]@', $password) || !preg_match('@[^\w]@', $password)
@@ -44,7 +45,7 @@ class Install extends Controller
                 $sql = file_get_contents(__DIR__ . '/../../ezXSS4.sql');
                 $database = Database::openConnection();
                 $database->exec($sql);
-                $database->exec('ALTER DATABASE `'.DB_NAME.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;');
+                $database->exec('ALTER DATABASE `' . DB_NAME . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;');
 
                 // Create and login user
                 $this->model('User')->create($username, $password, 7);

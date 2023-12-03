@@ -31,7 +31,7 @@ class Session_model extends Model
      * @param string $clientId The client id
      * @param string $origin The origin
      * @throws Exception
-     * @return array
+     * @return string
      */
     public function getAllConsole($clientId, $origin)
     {
@@ -212,7 +212,6 @@ class Session_model extends Model
      * @param string $clientId The client id
      * @param string $origin The origin
      * @throws Exception
-     * @return array
      */
     public function deleteAll($clientId, $origin)
     {

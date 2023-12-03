@@ -25,7 +25,7 @@ class Update extends Controller
                 // Check if the version is 3.x and is valid for migration
                 if (preg_match('/^3\./', $version)) {
                     if ($version == '3.10' || $version == '3.11') {
-                        if(version !== '4.0') {
+                        if (version !== '4.0') {
                             throw new Exception('Please first update to 4.0 before migrating 3.x to 4.x');
                         }
                         $this->ezXSS3migrate();

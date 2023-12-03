@@ -217,7 +217,7 @@ class Report_model extends Model
             throw new Exception('Something unexpected went wrong');
         }
         $reportId = $database->lastInsertId();
-        
+
         $database->prepare("INSERT INTO $this->table_data (reportid, dom, screenshot, localstorage, sessionstorage) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage)");
         $database->bindValue(':reportid', $reportId);
         $database->bindValue(':dom', $dom);
@@ -259,7 +259,7 @@ class Report_model extends Model
         if ($database->countRows() > 0) {
             $report = $database->fetch();
             $report_data = $this->getReportData($report['id']);
-            if($report_data['dom'] === $dom) {
+            if ($report_data['dom'] === $dom) {
                 return $report['id'];
             }
         }
@@ -352,6 +352,6 @@ class Report_model extends Model
             $report_data = $database->fetch();
         }
 
-        return $report_data ?? [ 'dom' => '', 'screenshot' => '', 'localstorage' => '','sessionstorage' => ''];
+        return $report_data ?? ['dom' => '', 'screenshot' => '', 'localstorage' => '', 'sessionstorage' => ''];
     }
 }

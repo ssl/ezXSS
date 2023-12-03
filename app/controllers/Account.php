@@ -105,7 +105,7 @@ class Account extends Controller
                     $this->session->createSession($user);
                     $this->log('Succesfully logged in');
 
-                    if($this->session->data('redirect') !== '') {
+                    if ($this->session->data('redirect') !== '') {
                         redirect($this->session->data('redirect'));
                     } else {
                         redirect('dashboard/index');
@@ -148,8 +148,8 @@ class Account extends Controller
 
                 $this->session->createSession($user);
                 $this->log('Succesfully logged in with MFA');
-                
-                if($this->session->data('redirect') !== '') {
+
+                if ($this->session->data('redirect') !== '') {
                     redirect($this->session->data('redirect'));
                 } else {
                     redirect('dashboard/index');
@@ -177,7 +177,7 @@ class Account extends Controller
 
         if ($this->isPOST()) {
             try {
-                if(!signupEnabled) {
+                if (!signupEnabled) {
                     throw new Exception("Signup is disabled");
                 }
 
@@ -256,7 +256,7 @@ class Account extends Controller
         $user = $this->model('User')->getById($this->session->data('id'));
         $secretCode = $user['secret'];
 
-        if (strlen($secret) == 16) {
+        if (strlen($secret) === 16) {
             if (strlen($secretCode) === 16) {
                 throw new Exception('2FA settings are already enabled');
             }

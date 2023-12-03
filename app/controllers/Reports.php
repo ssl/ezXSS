@@ -11,8 +11,6 @@ class Reports extends Controller
 
     /**
      * Redirects to all reports
-     * 
-     * @return never
      */
     public function index()
     {
@@ -116,7 +114,7 @@ class Reports extends Controller
             $payloads[] = ['id' => $val, 'name' => ucfirst($name), 'selected' => $val == $id ? 'selected' : ''];
         }
         $this->view->renderDataset('payload', $payloads);
-        
+
         return $this->showContent();
     }
 

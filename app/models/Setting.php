@@ -32,14 +32,15 @@ class Setting_model extends Model
      * @throws Exception
      * @return bool
      */
-    public function set($setting, $value) {
+    public function set($setting, $value)
+    {
         $database = Database::openConnection();
 
         $database->prepare("UPDATE $this->table SET value = :value WHERE setting = :setting");
         $database->bindValue(':setting', $setting);
         $database->bindValue(':value', $value);
-        
-        if(!$database->execute()) {
+
+        if (!$database->execute()) {
             throw new Exception('Something unexpected went wrong');
         }
 

@@ -29,7 +29,7 @@ class View
         header('Referrer-Policy: strict-origin-when-cross-origin');
 
         // Add CSP header to manage
-        if(explode('/', $_SERVER['REQUEST_URI'] ?? '/')[1] === 'manage') {
+        if (explode('/', $_SERVER['REQUEST_URI'] ?? '/')[1] === 'manage') {
             header("Content-Security-Policy: default-src 'self'; img-src 'self' data: chart.googleapis.com; font-src fonts.gstatic.com; script-src 'self' 'nonce-csrf'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';");
         }
     }
@@ -119,7 +119,7 @@ class View
         $this->content = $content;
 
         // Render the other side of the boolean (also known as `else`)
-        if(!$falseCondition) {
+        if (!$falseCondition) {
             $this->renderCondition($condition, !$bool, true);
         }
     }
@@ -201,7 +201,7 @@ class View
             if (method_exists($this, $value)) {
                 $content = str_replace(
                     $matches[0][$key],
-                    e($this->$value((string)($matches[2][$key]))),
+                    e($this->$value((string) ($matches[2][$key]))),
                     $content
                 );
             }
@@ -260,7 +260,7 @@ class View
      * @throws Exception
      * @return string
      */
-    public function getAlert($alert) 
+    public function getAlert($alert)
     {
         $file = __DIR__ . "/../app/views/alerts/$alert";
         if (!is_file($file)) {
@@ -276,7 +276,8 @@ class View
      * @param string|object $data The data
      * @return string
      */
-    public function renderAlertData($template, $data) {
+    public function renderAlertData($template, $data)
+    {
         $content = $template;
         preg_match_all('/{{(.*?)}}/', $template, $matches);
         foreach ($matches[1] as $key => $value) {
@@ -300,7 +301,7 @@ class View
      */
     public function surroundBody($view)
     {
-        $content  = $this->getHtml('system/header');
+        $content = $this->getHtml('system/header');
         $content .= $this->getHtml($view);
         $content .= $this->getHtml('system/footer');
         $content = str_replace('{menu}', $this->getHtml('system/menu'), $content);
@@ -406,12 +407,12 @@ class View
 
         // Check current page for reporting pages
         if ((substr($page, -2) === '*0' || substr($page, -2) === '*1') && isset($uriParts[2]) && $uriParts[2] == 'reports') {
-            if(isset($_GET['archive']) && $_GET['archive'] == '1') {
-                if(substr($page, -2) === '*0') {
+            if (isset($_GET['archive']) && $_GET['archive'] == '1') {
+                if (substr($page, -2) === '*0') {
                     return 'menu-active';
                 }
             } else {
-                if(substr($page, -2) === '*1') {
+                if (substr($page, -2) === '*1') {
                     return 'menu-active';
                 }
             }

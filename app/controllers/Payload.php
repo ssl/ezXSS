@@ -51,7 +51,7 @@ class Payload extends Controller
 
                 // Check if posted data is editing persistent mode
                 if ($this->getPostValue('persistent') !== null) {
-                    if($this->model('Setting')->get('persistent') !== '1' && $this->getPostValue('persistent-mode') !== null) {
+                    if ($this->model('Setting')->get('persistent') !== '1' && $this->getPostValue('persistent-mode') !== null) {
                         throw new Exception('Persistent mode is globally disabled by the ezXSS admin');
                     }
                     $this->model('Payload')->setSingleValue($id, "persistent", ($this->getPostValue('persistent-mode') !== null) ? 1 : 0);
@@ -253,7 +253,7 @@ class Payload extends Controller
         // Validate domain string
         if (!preg_match('/^(?:(?:(?!\*)[a-zA-Z\d][a-zA-Z\d\-*]{0,61})?[a-zA-Z\d]\.){0,1}(?!\d+)(?!.*\*\*)[a-zA-Z\d*]{1,63}(?:\.(?:(?:(?!\*)[a-zA-Z\d][a-zA-Z\d\-*]{0,61})?[a-zA-Z\d]\.){0,1}(?!\d+)(?!.*\*\*)[a-zA-Z\d*]{1,63})*$/', $domain)) {
             throw new Exception('This does not look like a valid domain');
-        }        
+        }
 
         $newString = $payload['blacklist'] . '~' . $domain;
         $this->model('Payload')->setSingleValue($id, "blacklist", $newString);
