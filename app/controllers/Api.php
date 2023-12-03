@@ -379,6 +379,8 @@ class Api extends Controller
      */
     public function logs()
     {
+        $this->isAdminOrExit();
+
         $logs = $this->model('Log')->getAll();
 
         foreach ($logs as $key => $value) {
@@ -405,6 +407,8 @@ class Api extends Controller
      */
     public function users()
     {
+        $this->isAdminOrExit();
+        
         $ranks = [0 => 'Banned', 1 => 'User', 7 => 'Admin'];
 
         $users = $this->model('User')->getAllUsers();
