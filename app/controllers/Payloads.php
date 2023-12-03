@@ -241,7 +241,7 @@ class Payloads extends Controller
      * Persistent callback function that receives all incoming data from persistent mode
      *
      * @param object $data The data coming from the callback function
-     * @return void
+     * @return string
      */
     private function persistCallback($data)
     {

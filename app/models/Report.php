@@ -13,7 +13,7 @@ class Report_model extends Model
     /**
      * Get all reports
      * 
-     * @return array
+     * @return array|object
      */
     public function getAll()
     {
@@ -260,7 +260,7 @@ class Report_model extends Model
             $report = $database->fetch();
             $report_data = $this->getReportData($report['id']);
             if($report_data['dom'] === $dom) {
-                return $data['id'];
+                return $report['id'];
             }
         }
 
