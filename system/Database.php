@@ -96,7 +96,7 @@ class Database
      * Get all rows of table
      *
      * @param string $table The table
-     * @return object
+     * @return object|null
      */
     public function getAll($table)
     {
@@ -141,7 +141,7 @@ class Database
     /**
      * Executes prepared query
      *
-     * @return void
+     * @return bool
      */
     public function execute()
     {
@@ -152,7 +152,7 @@ class Database
      * Executes query
      *
      * @param string query The query
-     * @return void
+     * @return bool|int
      */
     public function exec($query)
     {
@@ -162,7 +162,7 @@ class Database
     /**
      * Returns all rows
      *
-     * @return object
+     * @return array
      */
     public function fetchAll()
     {
@@ -172,7 +172,7 @@ class Database
     /**
      * Returns single row
      *
-     * @return void
+     * @return mixed
      */
     public function fetch()
     {
