@@ -17,7 +17,7 @@ class Session_model extends Model
     public function getAll()
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM `sessions` p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM `sessions` GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.time DESC;');
+        $database->prepare("SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM $this->table p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM $this->table GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.time DESC");
         $database->execute();
 
         $data = $database->fetchAll();
@@ -36,7 +36,7 @@ class Session_model extends Model
     public function getAllConsole($clientId, $origin)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT `console` FROM `sessions` WHERE clientid = :clientid AND origin = :origin AND console != "" ORDER BY id DESC');
+        $database->prepare("SELECT console FROM $this->table WHERE clientid = :clientid AND origin = :origin AND console != '' ORDER BY id DESC");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->execute();
@@ -66,13 +66,13 @@ class Session_model extends Model
     public function getByClientId($clientId, $origin)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM `sessions` WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC LIMIT 1');
+        $database->prepare("SELECT * FROM $this->table WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC LIMIT 1");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->execute();
 
         if ($database->countRows() === 0) {
-            throw new Exception("Session not found");
+            throw new Exception('Session not found');
         }
 
         $report = $database->fetch();
@@ -82,6 +82,7 @@ class Session_model extends Model
 
     /**
      * Get session by payload
+     * 
      * @param string $payload The payload
      * @throws Exception
      * @return array
@@ -89,11 +90,11 @@ class Session_model extends Model
     public function getAllByPayload($payload)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM `sessions` p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM `sessions` GROUP BY clientid ) last_row ON p.id = last_row.max_id WHERE payload LIKE :payload ORDER BY p.time DESC;');
+        $database->prepare("SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM $this->table p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM $this->table GROUP BY clientid ) last_row ON p.id = last_row.max_id WHERE payload LIKE :payload ORDER BY p.time DESC");
         $database->bindValue(':payload', $payload);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return $database->fetchAll();
@@ -101,6 +102,7 @@ class Session_model extends Model
 
     /**
      * Get all session requests by client id
+     * 
      * @param string $payload The payload
      * @throws Exception
      * @return array
@@ -108,12 +110,12 @@ class Session_model extends Model
     public function getAllByClientId($clientId, $origin)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM `sessions` WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC');
+        $database->prepare("SELECT * FROM $this->table WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return $database->fetchAll();
@@ -129,7 +131,7 @@ class Session_model extends Model
     public function getRequestCount($clientId)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT clientid FROM `sessions` WHERE clientid = :clientid');
+        $database->prepare("SELECT clientid FROM $this->table WHERE clientid = :clientid");
         $database->bindValue(':clientid', $clientId);
         $database->execute();
 
@@ -158,7 +160,7 @@ class Session_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('INSERT INTO `sessions` (`clientid`, `cookies`, `dom`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `localstorage`, `sessionstorage`, `payload`, `console`) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :localstorage, :sessionstorage, :payload, :console)');
+        $database->prepare("INSERT INTO $this->table (clientid, cookies, dom, origin, referer, uri, `user-agent`, ip, time, localstorage, sessionstorage, payload, console) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :localstorage, :sessionstorage, :payload, :console)");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':cookies', $cookies);
         $database->bindValue(':dom', $dom);
@@ -174,7 +176,7 @@ class Session_model extends Model
         $database->bindValue(':console', $console);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return $database->lastInsertId();
@@ -182,6 +184,7 @@ class Session_model extends Model
 
     /**
      * Set session value of single item by id
+     * 
      * @param int $id The session id
      * @param string $column The column name
      * @param string $value The new value
@@ -192,12 +195,12 @@ class Session_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('UPDATE `sessions` SET `' . $column . '` = :value WHERE id = :id');
+        $database->prepare("UPDATE $this->table SET $column = :value WHERE id = :id");
         $database->bindValue(':value', $value);
         $database->bindValue(':id', $id);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return true;
@@ -214,7 +217,7 @@ class Session_model extends Model
     public function deleteAll($clientId, $origin)
     {
         $database = Database::openConnection();
-        $database->prepare('DELETE FROM `sessions` WHERE clientid = :clientid AND origin = :origin');
+        $database->prepare("DELETE FROM $this->table WHERE clientid = :clientid AND origin = :origin");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->execute();

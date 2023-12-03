@@ -26,6 +26,7 @@ class Payload_model extends Model
 
     /**
      * Set payload value of single item by id
+     * 
      * @param int $id The setting id
      * @param string $column The column name
      * @param string $value The new value
@@ -36,12 +37,12 @@ class Payload_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('UPDATE `payloads` SET `' . $column . '` = :value WHERE id = :id');
+        $database->prepare("UPDATE $this->table SET $column = :value WHERE id = :id");
         $database->bindValue(':value', $value);
         $database->bindValue(':id', $id);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return true;
@@ -57,11 +58,11 @@ class Payload_model extends Model
     public function getAllByUserId($id)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM payloads WHERE user_id = :user_id ORDER BY id ASC');
+        $database->prepare("SELECT * FROM $this->table WHERE user_id = :user_id ORDER BY id ASC");
         $database->bindValue(':user_id', $id);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         $data = $database->fetchAll();
@@ -81,12 +82,12 @@ class Payload_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('INSERT INTO `payloads` (`payload`, `user_id`) VALUES (:payload, :user_id);');
+        $database->prepare("INSERT INTO $this->table (payload, user_id) VALUES (:payload, :user_id);");
         $database->bindValue(':payload', $payload);
         $database->bindValue(':user_id', $userId);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return true;
@@ -102,12 +103,12 @@ class Payload_model extends Model
     public function getByPayload($payload)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM payloads WHERE payload = :payload ORDER BY id ASC LIMIT 1');
+        $database->prepare("SELECT * FROM $this->table WHERE payload = :payload ORDER BY id ASC LIMIT 1");
         $database->bindValue(':payload', $payload);
         $database->execute();
 
         if ($database->countRows() === 0) {
-            throw new Exception("Payload not found");
+            throw new Exception('Payload not found');
         }
 
         $payload = $database->fetch();
@@ -125,7 +126,7 @@ class Payload_model extends Model
     public function isAvailable($payload)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM payloads WHERE payload = :payload ORDER BY id ASC LIMIT 1');
+        $database->prepare("SELECT * FROM $this->table WHERE payload = :payload ORDER BY id ASC LIMIT 1");
         $database->bindValue(':payload', $payload);
         $database->execute();
 

@@ -24,20 +24,20 @@ class Alert_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('SELECT * FROM `alerts` WHERE user_id = :user_id AND method_id = :method_id LIMIT 1');
+        $database->prepare("SELECT * FROM $this->table WHERE user_id = :user_id AND method_id = :method_id LIMIT 1");
         $database->bindValue(':user_id', $userId);
         $database->bindValue(':method_id', $methodId);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         if ($database->countRows() == 0) {
             // Create new alerting setting
-            $database->prepare('INSERT INTO `alerts` (`user_id`, `method_id`, `enabled`, `value1`, `value2`) VALUES (:user_id, :method_id, :enabled, :value1, :value2);');
+            $database->prepare("INSERT INTO $this->table (user_id, method_id, enabled, value1, value2) VALUES (:user_id, :method_id, :enabled, :value1, :value2);");
         } else {
-            // Update
-            $database->prepare('UPDATE `alerts` SET `enabled` = :enabled, `value1` = :value1, `value2` = :value2 WHERE `user_id` = :user_id AND `method_id` = :method_id');
+            // Update alert setting
+            $database->prepare("UPDATE $this->table SET enabled = :enabled, value1 = :value1, value2 = :value2 WHERE user_id = :user_id AND method_id = :method_id");
         }
         $database->bindValue(':user_id', $userId);
         $database->bindValue(':method_id', $methodId);
@@ -46,7 +46,7 @@ class Alert_model extends Model
         $database->bindValue(':value2', $value2);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return true;
@@ -65,12 +65,12 @@ class Alert_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('SELECT * FROM `alerts` WHERE `user_id` = :user_id AND `method_id` = :method_id LIMIT 1');
+        $database->prepare("SELECT * FROM $this->table WHERE user_id = :user_id AND method_id = :method_id LIMIT 1");
         $database->bindValue(':user_id', $userId);
         $database->bindValue(':method_id', $methodId);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         if ($database->countRows() == 0) {
@@ -97,11 +97,11 @@ class Alert_model extends Model
     public function getAllByMethodId($id)
     {
         $database = Database::openConnection();
-        $database->prepare('SELECT * FROM alerts WHERE method_id = :method_id AND `enabled` = 1 ORDER BY id ASC');
+        $database->prepare("SELECT * FROM $this->table WHERE method_id = :method_id AND enabled = 1 ORDER BY id ASC");
         $database->bindValue(':method_id', $id);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         $data = $database->fetchAll();
