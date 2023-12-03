@@ -217,9 +217,9 @@ class Report_model extends Model
             throw new Exception('Something unexpected went wrong');
         }
         $reportId = $database->lastInsertId();
-
-        $database->execute("INSERT INTO $this->table_data (reportid, dom, screenshot, localstorage, sessionstorage) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage)");
-        $database->bindValue(':reportid', $reportid);
+        
+        $database->prepare("INSERT INTO $this->table_data (reportid, dom, screenshot, localstorage, sessionstorage) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage)");
+        $database->bindValue(':reportid', $reportId);
         $database->bindValue(':dom', $dom);
         $database->bindValue(':screenshot', $screenshotName);
         $database->bindValue(':localstorage', $localStorage);
@@ -241,7 +241,7 @@ class Report_model extends Model
      * @throws Exception
      * @return bool
      */
-    public function searchForDublicates($cookies, $origin, $referer, $uri, $userAgent, $ip)
+    public function searchForDublicates($cookies, $origin, $referer, $uri, $userAgent, $dom, $ip)
     {
         $database = Database::openConnection();
         $database->prepare("SELECT id FROM $this->table WHERE cookies = :cookies AND origin = :origin AND referer = :referer AND uri = :uri AND `user-agent` = :userAgent AND ip = :ip ORDER BY id DESC LIMIT 1");
@@ -257,8 +257,11 @@ class Report_model extends Model
         }
 
         if ($database->countRows() > 0) {
-            $data = $database->fetch();
-            return $data['id'];
+            $report = $database->fetch();
+            $report_data = $this->getReportData($report['id']);
+            if($report_data['dom'] === $dom) {
+                return $data['id'];
+            }
         }
 
         return false;
