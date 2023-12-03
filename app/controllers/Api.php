@@ -408,7 +408,7 @@ class Api extends Controller
     public function users()
     {
         $this->isAdminOrExit();
-        
+
         $ranks = [0 => 'Banned', 1 => 'User', 7 => 'Admin'];
 
         $users = $this->model('User')->getAllUsers();
@@ -416,6 +416,9 @@ class Api extends Controller
         foreach ($users as &$user) {
             // Translate rank id to readable name
             $user['rank'] = $ranks[$user['rank']];
+            
+            unset($user['password']);
+            unset($user['secret']);
 
             // Create list of all payloads of user
             $payloads = $this->model('Payload')->getAllByUserId($user['id']);
