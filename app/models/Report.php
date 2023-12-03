@@ -74,7 +74,7 @@ class Report_model extends Model
         $database->execute();
 
         if ($database->countRows() === 0) {
-            throw new Exception("Report not found");
+            throw new Exception('Report not found');
         }
 
         $report = $database->fetch();
@@ -85,6 +85,7 @@ class Report_model extends Model
 
     /**
      * Get report by payload
+     * 
      * @param string $payload The payload
      * @param string $archive Archive status
      * @throws Exception
@@ -98,7 +99,7 @@ class Report_model extends Model
         $database->bindValue(':payload', $payload);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return $database->fetchAll();
@@ -116,7 +117,7 @@ class Report_model extends Model
         $database->prepare("SELECT origin,time,referer FROM $this->table ORDER BY id ASC");
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return $database->fetchAll();
@@ -136,7 +137,7 @@ class Report_model extends Model
         $database->bindValue(':payload', $payload);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return $database->fetchAll();
@@ -156,7 +157,7 @@ class Report_model extends Model
         $database->bindValue(':payload', $payload);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return $database->fetchAll();
@@ -174,7 +175,7 @@ class Report_model extends Model
         $database->prepare("SELECT origin,ip,cookies,`user-agent`,payload FROM $this->table ORDER BY id ASC");
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return $database->fetchAll();
@@ -201,7 +202,7 @@ class Report_model extends Model
     public function add($shareId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshotName, $localStorage, $sessionStorage, $payload)
     {
         $database = Database::openConnection();
-        $database->prepare("INSERT INTO $this->table (`shareid`, `cookies`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `payload`) VALUES (:shareid, :cookies, :origin, :referer, :uri, :userAgent, :ip, :time, :payload)");
+        $database->prepare("INSERT INTO $this->table (shareid, cookies, origin, referer, uri, `user-agent`, ip, time, payload) VALUES (:shareid, :cookies, :origin, :referer, :uri, :userAgent, :ip, :time, :payload)");
         $database->bindValue(':shareid', $shareId);
         $database->bindValue(':cookies', $cookies);
         $database->bindValue(':origin', $origin);
@@ -213,11 +214,11 @@ class Report_model extends Model
         $database->bindValue(':payload', $payload);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
         $reportId = $database->lastInsertId();
 
-        $database->execute("INSERT INTO $this->table_data (`reportid`, `dom`, `screenshot`, `localstorage`, `sessionstorage`) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage)");
+        $database->execute("INSERT INTO $this->table_data (reportid, dom, screenshot, localstorage, sessionstorage) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage)");
         $database->bindValue(':reportid', $reportid);
         $database->bindValue(':dom', $dom);
         $database->bindValue(':screenshot', $screenshotName);
@@ -252,7 +253,7 @@ class Report_model extends Model
         $database->bindValue(':ip', $ip);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         if ($database->countRows() > 0) {
@@ -265,6 +266,7 @@ class Report_model extends Model
 
     /**
      * Set report value of single item by id
+     * 
      * @param int $id The report id
      * @param string $column The column name
      * @param string $value The new value
@@ -275,12 +277,12 @@ class Report_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET `' . $column . '` = :value WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET $column = :value WHERE id = :id");
         $database->bindValue(':value', $value);
         $database->bindValue(':id', $id);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return true;
@@ -300,12 +302,12 @@ class Report_model extends Model
         $report = $this->getById($id);
         $archive = $report['archive'] == '0' ? '1' : '0';
 
-        $database->prepare("UPDATE $this->table SET `archive` = :archive WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET archive = :archive WHERE id = :id");
         $database->bindValue(':archive', $archive);
         $database->bindValue(':id', $id);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return true;
@@ -319,10 +321,10 @@ class Report_model extends Model
     public function getAllInvalid()
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT id,payload FROM $this->table WHERE `payload` LIKE '%Collected page via %' OR `payload` IS NULL OR `payload` = ''");
+        $database->prepare("SELECT id,payload FROM $this->table WHERE payload LIKE '%Collected page via %' OR payload IS NULL OR payload = ''");
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         $data = $database->fetchAll();

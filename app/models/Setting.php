@@ -35,12 +35,12 @@ class Setting_model extends Model
     public function set($setting, $value) {
         $database = Database::openConnection();
 
-        $database->prepare('UPDATE `settings` SET value = :value WHERE setting = :setting');
+        $database->prepare("UPDATE $this->table SET value = :value WHERE setting = :setting");
         $database->bindValue(':setting', $setting);
         $database->bindValue(':value', $value);
         
         if(!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return true;
@@ -57,15 +57,15 @@ class Setting_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare('SELECT * FROM `settings` WHERE setting = :setting LIMIT 1');
+        $database->prepare("SELECT * FROM $this->table WHERE setting = :setting LIMIT 1");
         $database->bindValue(':setting', $setting);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         if ($database->countRows() == 0) {
-            throw new Exception("Setting not found");
+            throw new Exception('Setting not found');
         }
 
         $setting = $database->fetch();

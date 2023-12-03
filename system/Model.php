@@ -68,7 +68,7 @@ class Model
         $database->deleteById($this->table, $id);
 
         if (!$database->execute()) {
-            throw new Exception("Something unexpected went wrong");
+            throw new Exception('Something unexpected went wrong');
         }
 
         return true;
