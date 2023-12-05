@@ -87,7 +87,7 @@ class Controller
 
         // Get content and add correct theme stylsheet
         $content = $this->view->showContent();
-        $content = str_replace('{theme}', '<link rel="stylesheet" href="/assets/css/' . e($theme) . '.css">', $content);
+        $content = $theme != 'classic' ? str_replace('{theme}', '<link rel="stylesheet" href="/assets/css/' . e($theme) . '.css">', $content) : str_replace('{theme}', '', $content);
         return $content;
     }
 
