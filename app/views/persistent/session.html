@@ -68,7 +68,7 @@
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
                                     <label class="control-label" for="ipport">Proxy domain and port</label>
-                                    <input class="form-control" name="ipport" type="text" placeholder="{domain[]}:30055">
+                                    <input class="form-control" name="ipport" id="ipport" type="text" placeholder="{domain[]}:30055">
                                 </div>
 
                                 <label class="checkbox-label">
@@ -105,7 +105,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="secret">Execute javascript</label>
+                                <label class="control-label" for="command">Execute javascript</label>
                                 <div class="input-group">
                                     <input type="text" name="command" id="command" placeholder="console.log(1);"
                                         class="form-control">
@@ -147,14 +147,14 @@
                                             <td>Local Storage</td>
                                             <td style="padding-right:0px"><textarea spellcheck=false
                                                     style="resize:vertical" class="form-control"
-                                                    rows="2">{%data localstorage}</textarea>
+                                                    rows="2" id="localstorage">{%data localstorage}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Session Storage</td>
                                             <td style="padding-right:0px"><textarea spellcheck=false
                                                     style="resize:vertical" class="form-control"
-                                                    rows="2">{%data sessionstorage}</textarea>
+                                                    rows="2" id="sessionstorage">{%data sessionstorage}</textarea>
                                             </td>
                                         </tr>
                                         <tr>

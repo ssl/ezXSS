@@ -27,16 +27,16 @@
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
-                                    <label class="control-label">Current password</label>
-                                    <input class="form-control" name="currentpassword" type="password">
+                                    <label class="control-label" for="currentpassword">Current password</label>
+                                    <input class="form-control" name="currentpassword" id="currentpassword" type="password">
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label">New password</label>
-                                    <input class="form-control" name="newpassword" type="password">
+                                    <label class="control-label" for="newpassword">New password</label>
+                                    <input class="form-control" name="newpassword" id="newpassword" type="password">
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label">New password</label>
-                                    <input class="form-control" name="newpassword2" type="password">
+                                    <label class="control-label" for="newpassword2">New password</label>
+                                    <input class="form-control" name="newpassword2" id="newpassword2" type="password">
                                 </div>
                                 <button name="password" type="submit" class="btn">Save</button>
                             </form>
@@ -125,15 +125,15 @@
 
                                 <div id="method-content-1" class="method-content">
 
-                                    <label class="checkbox-label">
-                                        <input {%checked mailOn} class="chkbox" name="mailon" type="checkbox">
+                                    <label class="checkbox-label" for="mailon">
+                                        <input {%checked mailOn} class="chkbox" id="mailon" name="mailon" type="checkbox">
                                         <span class="checkbox-custom rectangular"></span>
                                     </label>
                                     <p class="checkbox-text">Enable email alerts</p>
 
                                     <div class="form-group">
-                                        <label class="control-label">Send mail to</label>
-                                        <input type="text" name="mail" class="form-control" value="{%data email}">
+                                        <label class="control-label" for="mail">Send mail to</label>
+                                        <input type="text" id="mail" name="mail" class="form-control" value="{%data email}">
                                     </div>
                                     <button name="alert" type="submit" class="btn">Save</button>
 
@@ -141,8 +141,8 @@
 
                                 <div id="method-content-2" class="method-content">
 
-                                    <label class="checkbox-label">
-                                        <input {%checked telegramOn} class="chkbox" name="telegramon" type="checkbox">
+                                    <label class="checkbox-label" for="telegramon">
+                                        <input {%checked telegramOn} class="chkbox" id="telegramon" name="telegramon" type="checkbox">
                                         <span class="checkbox-custom rectangular"></span>
                                     </label>
                                     <p class="checkbox-text">Enable Telegram alerts</p>
@@ -158,7 +158,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="control-label">Chat ID</label>
+                                        <label class="control-label" for="chatid">Chat ID</label>
                                         <input type="text" name="chatid" id="chatid" class="form-control"
                                             placeholder="123456789" value="{%data telegramChatID}">
                                     </div>
@@ -168,15 +168,15 @@
 
                                 <div id="method-content-3" class="method-content">
 
-                                    <label class="checkbox-label">
-                                        <input {%checked slackOn} class="chkbox" name="slackon" type="checkbox">
+                                    <label class="checkbox-label" for="slackon">
+                                        <input {%checked slackOn} class="chkbox" id="slackon" name="slackon" type="checkbox">
                                         <span class="checkbox-custom rectangular"></span>
                                     </label>
                                     <p class="checkbox-text">Enable Slack alerts</p>
 
                                     <div class="form-group">
-                                        <label class="control-label">Webhook URL</label>
-                                        <input type="text" name="slack_webhook" class="form-control"
+                                        <label class="control-label" for="slack_webhook">Webhook URL</label>
+                                        <input type="text" id="slack_webhook" name="slack_webhook" class="form-control"
                                             placeholder="https://hooks.slack.com/services/T00000000/B00000000/XXXX..."
                                             value="{%data slackWebhook}">
                                     </div>
@@ -186,15 +186,15 @@
 
                                 <div id="method-content-4" class="method-content">
 
-                                    <label class="checkbox-label">
-                                        <input {%checked discordOn} class="chkbox" name="discordon" type="checkbox">
+                                    <label class="checkbox-label" for="discordon">
+                                        <input {%checked discordOn} class="chkbox" id="discordon" name="discordon" type="checkbox">
                                         <span class="checkbox-custom rectangular"></span>
                                     </label>
                                     <p class="checkbox-text">Enable Discord alerts</p>
 
                                     <div class="form-group">
-                                        <label class="control-label">Webhook URL</label>
-                                        <input type="text" name="discord_webhook" class="form-control"
+                                        <label class="control-label" for="discord_webhook">Webhook URL</label>
+                                        <input type="text" name="discord_webhook" id="discord_webhook" class="form-control"
                                             placeholder="https://discordapp.com/api/webhooks/1038928198292..."
                                             value="{%data discordWebhook}">
                                     </div>

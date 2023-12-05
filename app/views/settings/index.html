@@ -28,7 +28,7 @@
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
                                     <label class="control-label" for="timezone">Timezone</label>
-                                    <select class="form-control" name="timezone">
+                                    <select class="form-control" name="timezone" id="timezone">
                                         {%foreach timezone}
                                         {timezone->html}
                                         {%/foreach}
@@ -36,7 +36,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label" for="theme">Theme</label>
-                                    <select class="form-control" name="theme">
+                                    <select class="form-control" name="theme" id="theme">
                                         {%foreach theme}
                                         {theme->html}
                                         {%/foreach}
@@ -53,7 +53,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label" for="dompart">Max DOM length in alerts</label>
-                                    <input class="form-control" name="dompart" type="text" value="{%data dompart}">
+                                    <input class="form-control" name="dompart" id="dompart" type="text" value="{%data dompart}">
                                 </div>
                                 <div class="form-group">
                                     <label class="checkbox-label">
@@ -144,7 +144,7 @@
                                 <div class="form-group">
                                     <label class="control-label" for="customjs">Custom javascript</label>
                                     <small>Add custom javascript which will be added to <i>all</i> payloads</small>
-                                    <textarea class="form-control" name="customjs" rows=5>{%data customjs}</textarea>
+                                    <textarea class="form-control" name="customjs" id="customjs" rows=5>{%data customjs}</textarea>
                                 </div>
 
                                 <div class="form-group">
@@ -170,7 +170,7 @@
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
                                     <label class="control-label" for="password">Password to revert</label>
-                                    <input class="form-control" name="password" type="text">
+                                    <input class="form-control" name="password" id="password" type="text">
                                 </div>
                                 <button name="killswitch" type="submit" class="btn">Kill</button>
                             </form>
@@ -212,8 +212,8 @@
                                     <p class="checkbox-text">Enable global email alerts</p>
 
                                     <div class="form-group">
-                                        <label class="control-label">Send mail to</label>
-                                        <input type="text" name="mail" class="form-control" value="{%data email}">
+                                        <label class="control-label" for="mail">Send mail to</label>
+                                        <input type="text" name="mail" id="mail" class="form-control" value="{%data email}">
                                     </div>
                                     <button name="global-alert" type="submit" class="btn">Save</button>
 
@@ -239,7 +239,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="control-label">Chat ID</label>
+                                        <label class="control-label" for="chatid">Chat ID</label>
                                         <input type="text" name="chatid" id="chatid" class="form-control"
                                             placeholder="123456789" value="{%data telegramChatID}">
                                     </div>
@@ -256,8 +256,8 @@
                                     <p class="checkbox-text">Enable global Slack alerts</p>
 
                                     <div class="form-group">
-                                        <label class="control-label">Webhook URL</label>
-                                        <input type="text" name="slack_webhook" class="form-control"
+                                        <label class="control-label" for="slack_webhook">Webhook URL</label>
+                                        <input type="text" name="slack_webhook" id="slack_webhook" class="form-control"
                                             placeholder="https://hooks.slack.com/services/T00000000/B00000000/XXXX..."
                                             value="{%data slackWebhook}">
                                     </div>
@@ -274,8 +274,8 @@
                                     <p class="checkbox-text">Enable global Discord alerts</p>
 
                                     <div class="form-group">
-                                        <label class="control-label">Webhook URL</label>
-                                        <input type="text" name="discord_webhook" class="form-control"
+                                        <label class="control-label" for="discord_webhook">Webhook URL</label>
+                                        <input type="text" name="discord_webhook" id="discord_webhook" class="form-control"
                                             placeholder="https://discordapp.com/api/webhooks/1038928198292..."
                                             value="{%data discordWebhook}">
                                     </div>
@@ -344,7 +344,7 @@
                                     <label class="control-label" for="callback_url">Callback url</label>
                                     <small>ezXSS will post forward
                                         all reports in JSON format to the URL</small>
-                                    <input class="form-control" name="callback_url"
+                                    <input class="form-control" name="callback_url" id="callback_url"
                                         placeholder="https://example.com/callback.php" type="text"
                                         value="{%data callbackURL}">
                                 </div>
