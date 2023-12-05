@@ -195,7 +195,7 @@ class Session_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET $column = :value WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `$column` = :value WHERE id = :id");
         $database->bindValue(':value', $value);
         $database->bindValue(':id', $id);
 
