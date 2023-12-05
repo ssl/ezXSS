@@ -573,7 +573,7 @@ table.dataTable td.dt-control{text-align:center;cursor:pointer}table.dataTable t
   margin-left: 5px;
   height: 22px;
   display: inline;
-  width: 145px;
+  width: 100px;
   border: #343a60 1px solid;
   background-color: #343a60;
 }
