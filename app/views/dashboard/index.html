@@ -156,12 +156,12 @@
                         <div class="panel-heading">Version Status</div>
                         <div class="panel-body">
                             <div class="form-group">
-                                <label class="control-label">Your version</label>
-                                <input class="form-control" disabled value="v{version[]}">
+                                <label class="control-label" for="version">Your version</label>
+                                <input class="form-control" disabled id="version" value="v{version[]}">
                             </div>
                             <div class="form-group">
-                                <label class="control-label">Changelog of v{%data repoVersion} (latest release)</label>
-                                <textarea class="form-control" disabled rows=13>{%data repoBody}</textarea>
+                                <label class="control-label" for="changelog">Changelog of v{%data repoVersion} (latest release)</label>
+                                <textarea class="form-control" disabled id="changelog" rows=13>{%data repoBody}</textarea>
                             </div>
                             <a class="btn" href="{%data repoUrl}">Download v{%data repoVersion}</a>
                         </div>
