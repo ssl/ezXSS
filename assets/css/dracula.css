@@ -1,0 +1,13 @@
+.transparent{background-color:transparent!important}
+body,html{background:hsl(247.2deg 32.47% 15.1%)!important}
+.content:before{background-color:hsl(247.2deg 32.47% 15.1%)}
+.navigation:before{background-color:hsl(247.2deg 32.47% 15.1%);border-right:1px solid hsl(247.5,33.33333333333333%,25%)}
+.ezxss-nav{border-right:1px solid hsl(247.5,33.33333333333333%,25%)}
+.checkbox-label input:checked~.checkbox-custom::after{border:solid #d5dd0d;border-width:0 2px 2px 0}
+.theme,.theme :not(img,svg),.theme body{color:hsl(292.5,33.33333333333333%,80%)!important;background-color:hsl(247.5,33.33333333333333%,15%)!important;border-color:hsl(247.5,33.33333333333333%,25%)!important}
+.theme input,.theme input *,.theme textarea,.theme textarea *{background-color:hsl(247.2deg 32.47% 15.1%)!important}
+.theme button,.theme button *{color:hsl(348.75,100%,80%)!important;background-color:transparent!important}
+.theme a,.theme a *{color:hsl(348.75,100%,80%)!important;background-color:transparent!important}
+.theme a:hover,.theme a:hover *{color:hsl(388.75,120%,80%)!important;background-color:transparent!important}
+.theme a:active,.theme a:active *{color:hsl(308.75,120%,80%)!important;background-color:transparent!important}
+.theme a:visited,.theme a:visited *{color:hsl(308.75,120%,80%)!important;background-color:transparent!important}
