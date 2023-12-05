@@ -261,6 +261,24 @@ $(document).ready(function () {
         })
     })
 
+    $('.kill-selected').click(function () {
+        $.each($("input[name='selected']:checked"), function () {
+            const url = $(this).attr('url')
+            request(url, { kill: '' }).then(function (r) {
+                $('#command').val('')
+            })
+        })
+    })
+
+    $('.persistent-delete-selected').click(function () {
+        $.each($("input[name='selected']:checked"), function () {
+            const url = $(this).attr('url')
+            request(url, { delete: '' }).then(function (r) {
+                $('#command').val('')
+            })
+        })
+    })
+
     $('#execute').click(function () {
         command = $('#command').val()
         request(window.location.pathname, { execute: '', command: command }).then(
