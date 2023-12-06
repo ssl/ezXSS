@@ -201,7 +201,7 @@ class Payloads extends Controller
 
             // Save the report
             if (($doubleReport !== false && $this->model('Setting')->get('filter-save') == 1) || $doubleReport === false) {
-                $shareId = sha1(bin2hex(openssl_random_pseudo_bytes(32)) . time());
+                $shareId = sha1(bin2hex(openssl_random_pseudo_bytes(32)) . time()) . substr(md5(time()), 4, 10);
                 $data->id = $this->model('Report')->add(
                     $shareId,
                     $data->cookies ?? '',

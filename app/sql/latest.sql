@@ -72,8 +72,8 @@ CREATE TABLE `reports` (
   `user-agent` varchar(500) DEFAULT NULL,
   `ip` varchar(50) DEFAULT NULL,
   `time` int(11) DEFAULT NULL,
-  `archive` int(11) DEFAULT '0',
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+  `archive` int(11) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -88,7 +88,7 @@ CREATE TABLE `reports_data` (
     `screenshot` longtext,
     `localstorage` longtext,
     `sessionstorage` longtext
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -100,7 +100,7 @@ CREATE TABLE `settings` (
   `id` int(11) NOT NULL,
   `setting` varchar(500) NOT NULL,
   `value` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `settings`
@@ -279,6 +279,11 @@ ALTER TABLE `payloads`
 -- AUTO_INCREMENT for table `reports`
 --
 ALTER TABLE `reports`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT for table `reports_data`
+--
+ALTER TABLE `reports_data`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `settings`

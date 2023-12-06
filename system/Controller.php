@@ -244,8 +244,8 @@ class Controller
      */
     public function parseUserAgent($userAgent)
     {
-        $browser = "Unknown";
-        $os = "Unknown";
+        $browser = 'Unknown';
+        $os = 'Unknown';
 
         if ($userAgent === 'Not collected') {
             return $userAgent;
@@ -302,7 +302,9 @@ class Controller
             }
         }
 
-        return "{$os} with {$browser}";
+        $browser = $os === 'Unknown' && $browser === 'Unknown' ? 'Unknown' : "{$os} with {$browser}";
+
+        return $browser;
     }
 
     /**

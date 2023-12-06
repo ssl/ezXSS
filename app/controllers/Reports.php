@@ -53,6 +53,7 @@ class Reports extends Controller
         $screenshot = !empty($report['screenshot']) ? '<img src="/assets/img/report-' . e($report['screenshot']) . '.png" style="max-width:100%">' : '';
         $this->view->renderData('screenshot', $screenshot, true);
         $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
+        $this->view->renderData('browser', $this->parseUserAgent($report['user-agent']), true);
 
         foreach ($this->rows as $value) {
             $this->view->renderData($value, $report[$value]);

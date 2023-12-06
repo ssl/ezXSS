@@ -7,7 +7,7 @@ class Report_model extends Model
      * 
      * @var string
      */
-    public $table = 'reports2';
+    public $table = 'reports';
     public $table_data = 'reports_data';
 
     /**

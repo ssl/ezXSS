@@ -48,12 +48,19 @@
                                             <td>{%data payload}</td>
                                         </tr>
                                         <tr>
+                                            <td>Browser</td>
+                                            <td>{%data browser}</td>
+                                        </tr>
+                                        <tr>
                                             <td>User Agent</td>
                                             <td>{%data user-agent}</td>
                                         </tr>
                                         <tr>
                                             <td>Cookies</td>
-                                            <td id="cookies">{%data cookies}</td>
+                                            <td style="padding-right:0px"><textarea spellcheck=false
+                                                style="resize:vertical" class="form-control"
+                                                rows="4" id="cookies">{%data cookies}</textarea>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Local Storage</td>
