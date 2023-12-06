@@ -9,7 +9,7 @@ CREATE TABLE `reports_data` (
     `screenshot` longtext,
     `localstorage` longtext,
     `sessionstorage` longtext
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Indexes for table `reports_data`
@@ -17,6 +17,12 @@ CREATE TABLE `reports_data` (
 
 ALTER TABLE `reports_data`
   ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for table `reports_data`
+--
+ALTER TABLE `reports_data`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- Move data from `reports` to `reports_data`
