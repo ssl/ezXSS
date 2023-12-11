@@ -41,5 +41,3 @@ Get a fast view below or view the whole report on https://{{domain}}/manage/repo
 ```
 {{timestamp}}
 ```
-*Screenshot*
-{{screenshot}}

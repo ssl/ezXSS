@@ -25,8 +25,6 @@ RUN if [ "$USE_MAIL_ALERTS" = "true" ]; then \
     fi
 
 
-RUN chmod 777 /var/www/html/assets/img
-
 ENTRYPOINT ["docker-php-entrypoint"]
 CMD ["apache2-foreground"]
 
