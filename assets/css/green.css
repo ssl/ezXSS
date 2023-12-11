@@ -6,10 +6,9 @@
 .theme pre,
 .theme code,
 .theme code span {background-color: hsl(0, 0%, 35%) !important;}
-.theme a, .theme a * {color: hsl(68, 80%, 80%) !important;background-color: hsl(0, 0%, 25%) !important;}
+.theme a, .theme a * {color: hsl(68, 80%, 50%) !important;background-color: hsl(0, 0%, 25%) !important;}
 .theme a:hover, .theme a:hover * {color: hsl(128, 100%, 90%) !important;}
-.theme a:active, .theme a:active * {color: hsl(68, 80%, 50%) !important;}
-.theme a:visited, .theme a:visited * {color: hsl(68, 80%, 50%) !important;}
+.theme a:active, .theme a:active * {color: hsl(128, 100%, 90%) !important;}
 .content:before {background-color: #404040;}
 .navigation:before {background-color: #404040;border-right: 1px solid #595959;}
 .ezxss-nav {border-right: 1px solid #595959;}
