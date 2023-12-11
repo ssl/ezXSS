@@ -56,6 +56,39 @@ class Update extends Controller
     }
 
     /**
+     * Migrate old screenshots images to database
+     * 
+     * @return void
+     */
+    public function migrateScreenshots() 
+    {
+        $files = glob(__DIR__ . '/../../assets/img/report-*.png');
+
+        if ($files === []) {
+            throw new Exception('No screenshots left to migrate');
+        }
+
+        $errors = [];
+        foreach ($files as $file) {
+            try {
+                $screenshotName = str_replace('report-', '', pathinfo($file, PATHINFO_FILENAME));
+                $screenshotData = base64_encode(file_get_contents($file));
+
+                $reportId = $this->model('Report')->getIdByScreenshot($screenshotName);
+                $this->model('Report')->setSingleDataValue($reportId, 'screenshot', $screenshotData);
+
+                unlink($file);
+            } catch (Exception $e) {
+                $errors[] = "Error in migrating ({$e}) for " . basename($file);
+            }
+        }
+
+        if (debug && $errors !== []) {
+            throw new Exception(implode("   ", $errors));
+        }
+    }
+
+    /**
      * Migrate ezXSS 3 database to ezXSS 4
      * 
      * @return void

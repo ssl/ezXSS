@@ -192,14 +192,14 @@ class Report_model extends Model
      * @param string $uri The url
      * @param string $userAgent The user agent
      * @param string $ip The IP
-     * @param string $screenshotName The name of the screenshot
+     * @param string $screenshotBase The base64 of the screenshot
      * @param string $localStorage The local storage
      * @param string $sessionStorage The session storage
      * @param string $payload The payload name
      * @throws Exception
      * @return string
      */
-    public function add($shareId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshotName, $localStorage, $sessionStorage, $payload)
+    public function add($shareId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshotBase, $localStorage, $sessionStorage, $payload)
     {
         $database = Database::openConnection();
         $database->prepare("INSERT INTO $this->table (shareid, cookies, origin, referer, uri, `user-agent`, ip, time, payload) VALUES (:shareid, :cookies, :origin, :referer, :uri, :userAgent, :ip, :time, :payload)");
@@ -221,7 +221,7 @@ class Report_model extends Model
         $database->prepare("INSERT INTO $this->table_data (reportid, dom, screenshot, localstorage, sessionstorage) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage)");
         $database->bindValue(':reportid', $reportId);
         $database->bindValue(':dom', $dom);
-        $database->bindValue(':screenshot', $screenshotName);
+        $database->bindValue(':screenshot', $screenshotBase);
         $database->bindValue(':localstorage', $localStorage);
         $database->bindValue(':sessionstorage', $sessionStorage);
         $database->execute();
@@ -292,6 +292,30 @@ class Report_model extends Model
     }
 
     /**
+     * Set report data value of single item by id
+     * 
+     * @param int $id The report id
+     * @param string $column The column name
+     * @param string $value The new value
+     * @throws Exception
+     * @return bool
+     */
+    public function setSingleDataValue($id, $column, $value)
+    {
+        $database = Database::openConnection();
+
+        $database->prepare("UPDATE $this->table_data SET `$column` = :value WHERE id = :id");
+        $database->bindValue(':value', $value);
+        $database->bindValue(':id', $id);
+
+        if (!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        return true;
+    }
+
+    /**
      * Archive report by id
      * 
      * @param string $id The report id
@@ -314,6 +338,29 @@ class Report_model extends Model
         }
 
         return true;
+    }
+
+    /**
+     * Get report id by screenshot name
+     * 
+     * @param mixed $id The screenshot name
+     * @throws Exception
+     * @return array
+     */
+    public function getIdByScreenshot($screenshotName)
+    {
+        $database = Database::openConnection();
+        $database->prepare("SELECT * FROM $this->table_data WHERE screenshot = :screenshot LIMIT 1");
+        $database->bindValue(':screenshot', $screenshotName);
+        $database->execute();
+
+        if ($database->countRows() === 0) {
+            throw new Exception('Report not found');
+        }
+
+        $data = $database->fetch();
+
+        return $data['reportid'];
     }
 
     /**

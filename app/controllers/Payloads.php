@@ -183,19 +183,9 @@ class Payloads extends Controller
             // Create an image from the screenshot data
             if (!empty($data->screenshot)) {
                 try {
-                    $screenshot = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data->screenshot));
-                    $data->screenshotName = time() . md5(
-                        $data->uri . time() . bin2hex(openssl_random_pseudo_bytes(16))
-                    ) . bin2hex(openssl_random_pseudo_bytes(5));
-                    $saveImage = fopen(__DIR__ . "/../../assets/img/report-{$data->screenshotName}.png", 'w');
-                    if (!$saveImage) {
-                        throw new Exception('Unable to save screenshots to server, read the wiki and check permissions');
-                    }
-                    fwrite($saveImage, $screenshot);
-                    fclose($saveImage);
+                    $data->screenshotBase = base64_encode(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data->screenshot), true));
                 } catch (Exception $e) {
-                    $this->log($e->getMessage());
-                    $data->screenshotName = '';
+                    $data->screenshotBase = '';
                 }
             }
 
@@ -211,7 +201,7 @@ class Payloads extends Controller
                     $data->uri,
                     $data->{'user-agent'},
                     $data->ip,
-                    ($data->screenshotName ?? ''),
+                    ($data->screenshotBase ?? ''),
                     json_encode($data->localstorage ?? ''),
                     json_encode($data->sessionstorage ?? ''),
                     $data->payload
@@ -298,7 +288,7 @@ class Payloads extends Controller
     {
         // Callback alerting
         if ($this->model('Setting')->get('alert-callback') == 1) {
-            $this->callbackAlert($data);
+            $this->callbackAlert();
         }
 
         // Check if the DOM should be truncated
@@ -348,7 +338,7 @@ class Payloads extends Controller
 
             foreach ($alerts as $alert) {
                 if ($alert['user_id'] === 0) {
-                    // Global alerting that allways sends if enabled
+                    // Global alerting that always sends if enabled
                     $this->slackAlert($data, $alert['value1']);
                 } elseif ($payload['user_id'] !== 0 && $alert['user_id'] === $payload['user_id']) {
                     // Sends alert to user that owns the payload
@@ -377,10 +367,9 @@ class Payloads extends Controller
     /**
      * Sends out alert to custom callback url
      * 
-     * @param object $data The data to be displayed in the alert message
      * @return void
      */
-    private function callbackAlert($data)
+    private function callbackAlert()
     {
         // Send alert to custom callback url
         $url = (parse_url($this->model('Setting')->get('callback-url'), PHP_URL_SCHEME) ? '' : 'https://') . $this->model('Setting')->get('callback-url');
@@ -390,7 +379,6 @@ class Payloads extends Controller
         curl_setopt($ch, CURLOPT_TIMEOUT, 20);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents('php://input'));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_exec($ch);
     }
@@ -405,21 +393,30 @@ class Payloads extends Controller
      */
     private function telegramAlert($data, $bottoken, $chatid)
     {
-        if (!empty($data->screenshot)) {
-            $data->screenshot = "https://{$data->domain}/assets/img/report-{$data->screenshotName}.png";
-        }
-
         // Create Telegram alert template
         $alertTemplate = $this->view->getAlert('telegram.md');
         $alertTemplate = $this->view->renderAlertData($alertTemplate, $data);
 
         // Send alert to telegram bot API
         $ch = curl_init("https://api.telegram.org/bot{$bottoken}/sendMessage");
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['chat_id' => $chatid, 'parse_mode' => 'markdown', 'disable_web_page_preview' => false, 'text' => $alertTemplate]));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['chat_id' => $chatid, 'parse_mode' => 'markdown', 'text' => $alertTemplate]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_exec($ch);
+
+        // Send photo with screenshot
+        if (!empty($data->screenshot)) {
+            $screenshotFile = 'data://application/octet-stream;base64,' . $data->screenshotBase;
+            $curlFile = new \CURLFile($screenshotFile, 'image/png', 'screenshot.png');
+
+            $ch = curl_init("https://api.telegram.org/bot{$bottoken}/sendPhoto");
+            curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-type: multipart/form-data']);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, ['chat_id' => $chatid, 'photo' => $curlFile, 'caption' => "Screenshot from XSS Report #{$data->id}"]);
+            curl_exec($ch);
+        }
     }
 
     /**
@@ -440,21 +437,43 @@ class Payloads extends Controller
         });
 
         if (!empty($data->screenshot)) {
-            $escapedData->screenshot = "<img style=\"max-width:100%;\" src=\"https://{$data->domain}/assets/img/report-{$data->screenshotName}.png\">";
+            $attachment = chunk_split($escapedData->screenshotBase);
+            $escapedData->screenshot = '<img style="max-width:100%;" src="cid:ezXSS">';
         }
 
         // Create mail alert template
         $alertTemplate = $this->view->getAlert('mail.html');
         $alertTemplate = $this->view->renderAlertData($alertTemplate, $escapedData);
 
-        $headers[] = 'From: ezXSS';
+        // Headers
+        $boundary = md5(uniqid(time(), true));
         $headers[] = 'MIME-Version: 1.0';
-        $headers[] = 'Content-type: text/html; charset=iso-8859-1';
+        $headers[] = 'From: ezXSS';
+        $headers[] = "Content-Type: multipart/mixed; boundary=\"ez$boundary\"";
+
+        // Multipart to include alert template
+        $multipart[] = "--ez$boundary";
+        $multipart[] = 'Content-Type: text/html; charset=utf-8';
+        $multipart[] = 'Content-Transfer-Encoding: Quot-Printed';
+        $multipart[] = "\n$alertTemplate\n";
+
+        // Multipart to include screenshot
+        if(!empty($data->screenshot)) {
+            $multipart[] = "--ez$boundary";
+            $multipart[] = 'Content-Type: image/png; file_name="screenshot.png"';
+            $multipart[] = 'Content-ID: <ezXSS>';
+            $multipart[] = 'Content-Transfer-Encoding: base64';
+            $multipart[] = 'Content-Disposition: inline; filename="screenshot.png"';
+            $multipart[] = "\n$attachment\n";
+        }
+        $multipart[] = "--ez$boundary--";
+
+        // Send the mail
         mail(
             $email,
             '[ezXSS] XSS on ' . $data->uri,
-            $alertTemplate,
-            implode("\r\n", $headers)
+            implode("\n", $multipart),
+            implode("\n", $headers)
         );
     }
 
@@ -477,7 +496,6 @@ class Payloads extends Controller
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['type' => 'mrkdwn', 'text' => $alertTemplate]));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_exec($ch);
     }
@@ -499,8 +517,11 @@ class Payloads extends Controller
             }
         });
 
+        // Check if a screenshot is provided
         if (!empty($data->screenshot)) {
-            $escapedData->screenshot = "https://{$data->domain}/assets/img/report-{$data->screenshotName}.png";
+            $screenshotFile = 'data://application/octet-stream;base64,' . $escapedData->screenshotBase;
+            $curlFile = new \CURLFile($screenshotFile, 'image/png', 'screenshot.png');
+            $escapedData->screenshot = "attachment://screenshot.png";
         }
 
         // Create Discord alert template
@@ -510,13 +531,12 @@ class Payloads extends Controller
 
         // Send alert to Discord webhook
         $ch = curl_init($webhookURL);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-type: multipart/form-data']);
         curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $discordMessage);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, !empty($curlFile) ? ['payload_json' => $discordMessage, 'file' => $curlFile] : ['payload_json' => $discordMessage]);
         curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_exec($ch);
     }
 
