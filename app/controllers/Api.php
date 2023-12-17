@@ -3,6 +3,13 @@
 class Api extends Controller
 {
     /**
+     * Defines the json body
+     * 
+     * @var bool
+     */
+    private $jsonBody = [];
+
+    /**
      * Contains functionality that always needs to be done for these type of requests
      */
     public function __construct()
@@ -12,9 +19,27 @@ class Api extends Controller
         // Set content type to json
         $this->view->setContentType('application/json');
 
-        // Validate session
-        $this->isLoggedInOrExit();
-        $this->validateCsrfToken();
+        // Validate request
+        if(isset($_SERVER['HTTP_ORIGIN']) && ($_SERVER['HTTP_ORIGIN'] === 'https://' . host || $_SERVER['HTTP_ORIGIN'] === 'http://' . host)) {
+            // In-house request, check headers and session
+            if (!isset($_SERVER['CONTENT_TYPE']) || strtolower($_SERVER['CONTENT_TYPE']) !== 'application/json') {
+                error($this->showError('Bad content type'));
+            }
+
+            $this->validateSession();
+            if (!$this->session->isLoggedIn()) {
+                error($this->showError('Not logged in'), 403);
+            }
+        } else {
+            error($this->showError('Bad request'));
+        }
+
+        // Set json body
+        $this->jsonBody = json_decode(file_get_contents('php://input'), true);
+
+        if ($this->jsonBody === null && json_last_error() !== JSON_ERROR_NONE) {
+            error($this->showError('Bad JSON format'));
+        }
     }
 
     /**
@@ -28,14 +53,14 @@ class Api extends Controller
         $alertIds = ['1' => 'mail', '2' => 'telegram', '3' => 'slack', '4' => 'discord'];
 
         try {
-            $alertId = $this->getPostValue('alertId');
+            $alertId = $this->getJSONValue('alertId');
 
-            if (!is_string($alertId) || !isset($alertIds[$alertId])) {
+            if (!is_int($alertId) || !isset($alertIds[$alertId])) {
                 throw new Exception('Invalid alert');
             }
 
             $enabled = $this->model('Setting')->get('alert-' . $alertIds[$alertId]);
-            return json_encode(['enabled' => e($enabled)]);
+            return json_encode(['enabled' => intval($enabled)]);
         } catch (Exception $e) {
             return $this->showError($e->getMessage());
         }
@@ -48,7 +73,7 @@ class Api extends Controller
      */
     public function getChatId()
     {
-        $bottoken = $this->getPostValue('bottoken');
+        $bottoken = $this->getJSONValue('bottoken');
 
         // Validate bottoken string
         if (!preg_match('/^[a-zA-Z0-9:_-]+$/', $bottoken)) {
@@ -81,9 +106,9 @@ class Api extends Controller
      */
     public function getMostCommon()
     {
-        $id = $this->getPostValue('id');
-        $row = $this->getPostValue('row');
-        $admin = $this->getPostValue('admin') === '1';
+        $id = $this->getJSONValue('id');
+        $row = $this->getJSONValue('row');
+        $admin = $this->getJSONValue('admin');
         $data = [];
         $results = [];
 
@@ -98,7 +123,7 @@ class Api extends Controller
         }
 
         // Save row/id combination of user
-        if ($row === '1') {
+        if ($row === 1) {
             $this->model('User')->setRow1($this->session->data('id'), $id);
         } else {
             $this->model('User')->setRow2($this->session->data('id'), $id);
@@ -140,7 +165,7 @@ class Api extends Controller
         }
 
         // Get top cookies
-        if ($id === '3') {
+        if ($id === 3) {
             $cookies = [];
             // Loop through the cookies of each report and parse them as seperate cookies
             foreach ($allReports as $cookie) {
@@ -184,7 +209,7 @@ class Api extends Controller
         $allReports = [];
 
         // Check if requested statistics is for admin or user
-        if ($this->getPostValue('page') === 'dashboard') {
+        if ($this->getJSONValue('page') === 'dashboard') {
             $this->isAdminOrExit();
             $allReports = $this->model('Report')->getAllStaticticsData();
         } else {
@@ -276,13 +301,13 @@ class Api extends Controller
      */
     public function reports()
     {
-        $id = $this->getPostValue('id');
-        $archive = $this->getPostValue('archive') === '1' ? 1 : 0;
+        $id = $this->getJSONValue('id');
+        $archive = $this->getJSONValue('archive') === 1 ? 1 : 0;
 
         // Check payload permissions
         $payloadList = $this->payloadList();
         if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
-            return $this->showEcho('Something went wrong');
+            return $this->showError('Something went wrong');
         }
 
         // Checks if requested id is 'all'
@@ -315,7 +340,7 @@ class Api extends Controller
             $reports = $this->model('Report')->getAllByPayload($payloadUri, $archive);
         }
 
-        return json_encode(["data" => array_values($reports)]);
+        return $this->showData($reports);
     }
 
     /**
@@ -325,12 +350,12 @@ class Api extends Controller
      */
     public function sessions()
     {
-        $id = $this->getPostValue('id');
+        $id = $this->getJSONValue('id');
 
         // Check payload permissions
         $payloadList = $this->payloadList();
         if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
-            throw new Exception('You dont have permissions to this payload');
+            return $this->showError('You dont have permissions to this payload');
         }
 
         // Checks if requested id is 'all'
@@ -369,7 +394,7 @@ class Api extends Controller
             $sessions[$key]['shorturi'] = substr($sessions[$key]['uri'], 0, 50);
         }
 
-        return json_encode(["data" => array_values($sessions)]);
+        return $this->showData($sessions);
     }
 
     /**
@@ -397,7 +422,7 @@ class Api extends Controller
             $logs[$key]['date'] = date('F j, Y, g:i a', $logs[$key]['time']);
         }
 
-        return json_encode(["data" => array_values($logs)]);
+        return $this->showData($logs);
     }
 
     /**
@@ -431,7 +456,34 @@ class Api extends Controller
             $user['payloads'] = $payloadString;
         }
 
-        return json_encode(["data" => array_values($users)]);
+        return $this->showData($users);
+    }
+
+    /**
+     * Returns JSON value
+     *
+     * @param string $param The param
+     * @return string|null
+     */
+    public function getJSONValue($param)
+    {
+        return isset($this->jsonBody[$param]) && is_string($this->jsonBody[$param]) || is_int($this->jsonBody[$param]) ? $this->jsonBody[$param] : null;
+    }
+
+    /**
+     * Throws error if session is not admin
+     * 
+     * @param string $error The error message
+     * @return string|void
+     */
+    public function isAdminOrExit()
+    {
+
+        $this->isLoggedInOrExit();
+        if (!$this->isAdmin()) {
+            echo $this->showError('This functionality requires admin rights');
+            exit();
+        }
     }
 
     /**
@@ -473,6 +525,21 @@ class Api extends Controller
         return json_encode(
             [
                 'echo' => e($string)
+            ]
+        );
+    }
+
+    /**
+     * Renders data message from array
+     * 
+     * @param array $array The array
+     * @return string
+     */
+    private function showData($array)
+    {
+        return json_encode(
+            [
+                'data' => array_values($array)
             ]
         );
     }

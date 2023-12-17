@@ -1,12 +1,15 @@
 $(document).ready(function () {
+    $.fn.dataTable.ext.errMode = 'none';
+    
     new DataTable('#reports', {
         "ajax": {
             "url": "/manage/api/reports",
+            "contentType": "application/json",
             "type": "POST",
             "data": function (d) {
                 d.id = window.location.pathname.split('/').filter(Boolean).pop() === 'all' ? 0 : window.location.pathname.split('/').filter(Boolean).pop();
-                d.archive = (window.location.search.indexOf('archive=1') !== -1 ? '1' : '0');
-                d.csrf = csrf;
+                d.archive = (window.location.search.indexOf('archive=1') !== -1 ? 1 : 0);
+                return JSON.stringify(d);
             }
         },
         columns: [
@@ -57,10 +60,11 @@ $(document).ready(function () {
     var dataTablePersistent = new DataTable('#persistent', {
         "ajax": {
             "url": "/manage/api/sessions",
+            "contentType": "application/json",
             "type": "POST",
             "data": function (d) {
                 d.id = window.location.pathname.split('/').filter(Boolean).pop() === 'all' ? 0 : window.location.pathname.split('/').filter(Boolean).pop();
-                d.csrf = csrf;
+                return JSON.stringify(d);
             }
         },
         columns: [
@@ -115,9 +119,10 @@ $(document).ready(function () {
     new DataTable('#logs', {
         "ajax": {
             "url": "/manage/api/logs",
+            "contentType": "application/json",
             "type": "POST",
             "data": function (d) {
-                d.csrf = csrf;
+                return JSON.stringify(d);
             }
         },
         columns: [
@@ -140,9 +145,10 @@ $(document).ready(function () {
     new DataTable('#users', {
         "ajax": {
             "url": "/manage/api/users",
+            "contentType": "application/json",
             "type": "POST",
             "data": function (d) {
-                d.csrf = csrf;
+                return JSON.stringify(d);
             }
         },
         columns: [

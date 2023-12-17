@@ -1,16 +1,23 @@
 function request(action, data = {}) {
-    data['csrf'] = csrf
-    return $.ajax({
-        type: 'post',
-        dataType: 'json',
-        url: action,
-        data: data
-    }).always(function (data, statusText, xhr) {
-        if (statusText !== 'success') {
-            //window.location.href = window.location.href;
-        }
-    })
+    if(action.startsWith('/manage/api/')) {
+        return $.ajax({
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            url: action,
+            data: JSON.stringify(data)
+        });
+    } else {
+        data.csrf = csrf;
+        return $.ajax({
+            type: 'post',
+            dataType: 'json',
+            url: action,
+            data: data
+        });
+    }
 }
+
 
 $(document).ready(function () {
     $('.left-nav-toggle').click(function () {
@@ -82,11 +89,11 @@ $(document).ready(function () {
         $('.method-content').hide()
         $('#method-pick').hide()
 
-        const alertId = this.value
+        const alertId = parseInt(this.value)
         request('/manage/api/getAlertStatus', { alertId: alertId }).then(function (
             r
         ) {
-            if (r.enabled == 1) {
+            if (r.enabled === 1) {
                 $('#method-content-' + alertId).show()
             } else {
                 $('#method-disabled').show()
@@ -113,7 +120,7 @@ $(document).ready(function () {
         $('#toprow_common' + row).hide()
         $('#loding_common' + row).show()
         request('/manage/api/getMostCommon', {
-            id: id,
+            id: parseInt(id),
             row: row,
             admin: admin
         }).then(function (r) {
