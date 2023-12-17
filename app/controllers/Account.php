@@ -178,7 +178,7 @@ class Account extends Controller
         if ($this->isPOST()) {
             try {
                 if (!signupEnabled) {
-                    throw new Exception("Signup is disabled");
+                    throw new Exception('Signup is disabled');
                 }
 
                 $this->validateCsrfToken();
@@ -188,7 +188,7 @@ class Account extends Controller
                 $domain = $this->getPostValue('domain');
 
                 if ($domain === null || preg_match('/[^A-Za-z0-9]/', $domain)) {
-                    throw new Exception("Invalid characters in the domain. Use a-Z0-9");
+                    throw new Exception('Invalid characters in the domain. Use a-Z0-9');
                 }
 
                 if (!$this->model('Payload')->isAvailable("{$domain}." . host)) {
@@ -196,11 +196,11 @@ class Account extends Controller
                 }
 
                 if (strlen($domain) < 1 || strlen($username) > 25) {
-                    throw new Exception("Domain needs to be between 1-25 long");
+                    throw new Exception('Domain needs to be between 1-25 long');
                 }
 
                 if (!preg_match('/^(?=.{1,255}$)[a-z0-9][a-z0-9-]{0,62}(?<!-)(\.[a-z0-9][a-z0-9-]{0,62}(?<!-))*\.?$/i', host)) {
-                    throw new Exception("Host is not a valid hostname");
+                    throw new Exception('Host is not a valid hostname');
                 }
 
                 $user = $this->model('User')->create($username, $password, 1);

@@ -20,7 +20,7 @@ class Api extends Controller
         $this->view->setContentType('application/json');
 
         // Validate request
-        if(isset($_SERVER['HTTP_ORIGIN']) && ($_SERVER['HTTP_ORIGIN'] === 'https://' . host || $_SERVER['HTTP_ORIGIN'] === 'http://' . host)) {
+        if (isset($_SERVER['HTTP_ORIGIN']) && ($_SERVER['HTTP_ORIGIN'] === 'https://' . host || $_SERVER['HTTP_ORIGIN'] === 'http://' . host)) {
             // In-house request, check headers and session
             if (!isset($_SERVER['CONTENT_TYPE']) || strtolower($_SERVER['CONTENT_TYPE']) !== 'application/json') {
                 error($this->showError('Bad content type'));
@@ -81,7 +81,7 @@ class Api extends Controller
         }
 
         // Get last chat from bot
-        $api = curl_init("https://api.telegram.org/bot{$bottoken}/getUpdates");
+        $api = curl_init('https://api.telegram.org/bot{$bottoken}/getUpdates');
         curl_setopt($api, CURLOPT_RETURNTRANSFER, true);
         $results = json_decode(curl_exec($api), true);
 
@@ -190,13 +190,13 @@ class Api extends Controller
         // Create top 10 of most common
         arsort($results);
         foreach ($results as $value => $count) {
-            $data[] = ["value" => $value, "count" => $count];
+            $data[] = ['value' => $value, 'count' => $count];
             if (count($data) === 10) {
                 break;
             }
         }
 
-        return json_encode($data);
+        return $this->showMessage($data);
     }
 
     /**
@@ -265,7 +265,7 @@ class Api extends Controller
         $lastReport = end($allReports);
         $statistics['last'] = $this->parseTimestamp($lastReport !== false ? $lastReport['time'] : 0);
 
-        return json_encode($statistics);
+        return $this->showMessage($statistics);
     }
 
     /**
@@ -441,7 +441,7 @@ class Api extends Controller
         foreach ($users as &$user) {
             // Translate rank id to readable name
             $user['rank'] = $ranks[$user['rank']];
-            
+
             unset($user['password']);
             unset($user['secret']);
             unset($user['notepad']);

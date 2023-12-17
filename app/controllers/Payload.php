@@ -54,12 +54,12 @@ class Payload extends Controller
                     if ($this->model('Setting')->get('persistent') !== '1' && $this->getPostValue('persistent-mode') !== null) {
                         throw new Exception('Persistent mode is globally disabled by the ezXSS admin');
                     }
-                    $this->model('Payload')->setSingleValue($id, "persistent", ($this->getPostValue('persistent-mode') !== null) ? 1 : 0);
+                    $this->model('Payload')->setSingleValue($id, 'persistent', ($this->getPostValue('persistent-mode') !== null) ? 1 : 0);
                 }
 
                 // Check if posted data is editing custom js
                 if ($this->getPostValue('secondary-payload') !== null) {
-                    $this->model('Payload')->setSingleValue($id, "customjs", $this->getPostValue('customjs'));
+                    $this->model('Payload')->setSingleValue($id, 'customjs', $this->getPostValue('customjs'));
                 }
 
                 // Check if posted data is editing extracting pages
@@ -235,7 +235,7 @@ class Payload extends Controller
         }
 
         $newString = $payload['pages'] . '~' . $path;
-        $this->model('Payload')->setSingleValue($id, "pages", $newString);
+        $this->model('Payload')->setSingleValue($id, 'pages', $newString);
     }
 
     /**
@@ -256,7 +256,7 @@ class Payload extends Controller
         }
 
         $newString = $payload['blacklist'] . '~' . $domain;
-        $this->model('Payload')->setSingleValue($id, "blacklist", $newString);
+        $this->model('Payload')->setSingleValue($id, 'blacklist', $newString);
     }
 
     /**
@@ -277,6 +277,6 @@ class Payload extends Controller
         }
 
         $newString = $payload['whitelist'] . '~' . $domain;
-        $this->model('Payload')->setSingleValue($id, "whitelist", $newString);
+        $this->model('Payload')->setSingleValue($id, 'whitelist', $newString);
     }
 }

@@ -41,7 +41,7 @@ class Settings extends Controller
                 // Check if posted data is enabling killswitch
                 if ($this->getPostValue('killswitch') !== null) {
                     $password = $this->getPostValue('password');
-                    if($password !== '') {
+                    if ($password !== '') {
                         $this->killSwitch($password);
                     }
                 }
@@ -57,8 +57,6 @@ class Settings extends Controller
                     $url = $this->getPostValue('callback_url');
                     $this->callbackAlertSettings($callbackOn, $url);
                 }
-
-                $this->log('Updated admin settings');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
@@ -80,7 +78,7 @@ class Settings extends Controller
         foreach ($files as $file) {
             $themeName = e(str_replace('.css', '', $file));
             $selected = $theme == $themeName ? 'selected' : '';
-            $themes[$themeName]['html'] = "<option $selected value=\"$themeName\">" . ucfirst($themeName) . "</option>";
+            $themes[$themeName]['html'] = "<option $selected value=\"$themeName\">" . ucfirst($themeName) . '</option>';
         }
         $this->view->renderDataset('theme', $themes, true);
 
@@ -182,7 +180,7 @@ class Settings extends Controller
         $this->model('Setting')->set('timezone', $timezone);
         $this->model('Setting')->set('theme', $theme);
         $this->model('Setting')->set('logging', $logging !== null ? '1' : '0');
-        $this->log("Updated application settings");
+        $this->log('Updated admin application settings');
     }
 
     /**
@@ -202,11 +200,11 @@ class Settings extends Controller
             }
         }
 
-        $this->model('Setting')->set("customjs", $this->getPostValue('customjs'));
+        $this->model('Setting')->set('customjs', $this->getPostValue('customjs'));
 
         $persistent = $this->getPostValue('persistenton');
         $this->model('Setting')->set('persistent', $persistent !== null ? '1' : '0');
-        $this->log("Updated payload settings");
+        $this->log('Updated admin payload settings');
     }
 
     /**
@@ -261,7 +259,7 @@ class Settings extends Controller
             }
         }
         $alerts->set(0, 4, $discordOn !== null, $discordWebhook);
-        $this->log("Updated alert settings");
+        $this->log('Updated admin alert settings');
     }
 
     /**
@@ -271,7 +269,8 @@ class Settings extends Controller
      */
     private function killSwitch($password)
     {
-        $this->model('Setting')->set("killswitch", $password);
+        $this->model('Setting')->set('killswitch', $password);
+        $this->log('Enabled kill switch');
         $this->view->renderErrorPage("ezXSS is now killed with password $password");
     }
 
@@ -283,16 +282,17 @@ class Settings extends Controller
     private function alertMethods()
     {
         $mailOn = $this->getPostValue('mailon') !== null ? '1' : '0';
-        $this->model('Setting')->set("alert-mail", $mailOn);
+        $this->model('Setting')->set('alert-mail', $mailOn);
 
         $telegramOn = $this->getPostValue('telegramon') !== null ? '1' : '0';
-        $this->model('Setting')->set("alert-telegram", $telegramOn);
+        $this->model('Setting')->set('alert-telegram', $telegramOn);
 
         $slackOn = $this->getPostValue('slackon') !== null ? '1' : '0';
-        $this->model('Setting')->set("alert-slack", $slackOn);
+        $this->model('Setting')->set('alert-slack', $slackOn);
 
         $discordOn = $this->getPostValue('discordon') !== null ? '1' : '0';
-        $this->model('Setting')->set("alert-discord", $discordOn);
+        $this->model('Setting')->set('alert-discord', $discordOn);
+        $this->log('Updated admin alert method settings');
     }
 
     /**
@@ -305,13 +305,13 @@ class Settings extends Controller
      */
     private function callbackAlertSettings($callbackOn, $url)
     {
-        $this->model('Setting')->set("alert-callback", $callbackOn !== null ? '1' : '0');
+        $this->model('Setting')->set('alert-callback', $callbackOn !== null ? '1' : '0');
 
         // Validate callback url
-        if (!empty($url) && (strpos($url, "http") !== 0 || filter_var($url, FILTER_VALIDATE_URL) === false)) {
+        if (!empty($url) && (strpos($url, 'http') !== 0 || filter_var($url, FILTER_VALIDATE_URL) === false)) {
             throw new Exception('Invalid callback URL');
         }
-        $this->model('Setting')->set("callback-url", $url);
-        $this->log("Updated callback settings");
+        $this->model('Setting')->set('callback-url', $url);
+        $this->log('Updated admin callback settings');
     }
 }

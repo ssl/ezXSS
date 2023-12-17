@@ -85,7 +85,7 @@ class Persistent extends Controller
 
                 // Check if posted data is killing persistent
                 if ($this->getPostValue('kill') !== null) {
-                    $this->model('Console')->add($clientId, $origin, "ez_stop()");
+                    $this->model('Console')->add($clientId, $origin, 'ez_stop()');
                     throw new Exception('Kill commando send to session');
                 }
 

@@ -51,9 +51,9 @@ class Controller
 
     /**
      * Load model
-     * 
+     *
      * @param string $name The model name
-     * @return class
+     * @return mixed|null The loaded model or null if not found
      */
     public function model($name)
     {
@@ -65,6 +65,8 @@ class Controller
                 require $file;
                 $modelName = $name . '_model';
                 $this->model[$name] = new $modelName();
+            } else {
+                return null;
             }
         }
 
@@ -103,9 +105,9 @@ class Controller
 
         if (!$this->session->isValidCsrfToken($csrf)) {
             if (!httpmode && !(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1') || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) {
-                throw new Exception("ezXSS does not work without SSL");
+                throw new Exception('ezXSS does not work without SSL');
             }
-            throw new Exception("Invalid CSRF token");
+            throw new Exception('Invalid CSRF token');
         }
     }
 
@@ -124,17 +126,17 @@ class Controller
 
                 // Check if the password has been changed
                 if ($this->session->data('password_hash') != md5($account['password'])) {
-                    throw new Exception("Password has been changed");
+                    throw new Exception('Password has been changed');
                 }
 
                 // Check if the username has been changed
                 if ($this->session->data('username') != $account['username']) {
-                    throw new Exception("Username has been changed");
+                    throw new Exception('Username has been changed');
                 }
 
                 // Check if the rank has been changed
                 if ($this->session->data('rank') != $account['rank']) {
-                    throw new Exception("Rank has been changed");
+                    throw new Exception('Rank has been changed');
                 }
 
                 // Log if the user ip has been changed
