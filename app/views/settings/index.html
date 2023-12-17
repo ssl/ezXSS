@@ -9,7 +9,8 @@
                     <div class="view-header">
                         <div class="header-title">
                             <h3 class="m-b-xs">Settings</h3>
-                            <small>The admin settings page allows you to customize and configure various aspects of the ezXSS platform.</small>
+                            <small>The admin settings page allows you to customize and configure various aspects of the
+                                ezXSS platform.</small>
                         </div>
                     </div>
                     <hr>
@@ -53,7 +54,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label" for="dompart">Max DOM length in alerts</label>
-                                    <input class="form-control" name="dompart" id="dompart" type="text" value="{%data dompart}">
+                                    <input class="form-control" name="dompart" id="dompart" type="text"
+                                        value="{%data dompart}">
                                 </div>
                                 <div class="form-group">
                                     <label class="checkbox-label">
@@ -144,7 +146,8 @@
                                 <div class="form-group">
                                     <label class="control-label" for="customjs">Custom javascript</label>
                                     <small>Add custom javascript which will be added to <i>all</i> payloads</small>
-                                    <textarea class="form-control" name="customjs" id="customjs" rows=5>{%data customjs}</textarea>
+                                    <textarea class="form-control" name="customjs" id="customjs"
+                                        rows=5>{%data customjs}</textarea>
                                 </div>
 
                                 <div class="form-group">
@@ -213,7 +216,8 @@
 
                                     <div class="form-group">
                                         <label class="control-label" for="mail">Send mail to</label>
-                                        <input type="text" name="mail" id="mail" class="form-control" value="{%data email}">
+                                        <input type="text" name="mail" id="mail" class="form-control"
+                                            value="{%data email}">
                                     </div>
                                     <button name="global-alert" type="submit" class="btn">Save</button>
 
@@ -275,7 +279,8 @@
 
                                     <div class="form-group">
                                         <label class="control-label" for="discord_webhook">Webhook URL</label>
-                                        <input type="text" name="discord_webhook" id="discord_webhook" class="form-control"
+                                        <input type="text" name="discord_webhook" id="discord_webhook"
+                                            class="form-control"
                                             placeholder="https://discordapp.com/api/webhooks/1038928198292..."
                                             value="{%data discordWebhook}">
                                     </div>
@@ -360,8 +365,8 @@
 </div>
 
 <div class="modal fade" id="getChatId" role="dialog">
-    <div class="modal-dialog" style="width:430px;">
-        <div class="modal-content">
+    <div class="modal-dialog">
+        <div class="modal-content modal-content-center">
             <div class="modal-header">
                 <button class="close" data-dismiss="modal" type="button">&times;</button>
                 <h3 class="m-b-xs">Get Telegram Chat ID</h3>

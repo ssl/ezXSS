@@ -67,6 +67,7 @@ button,input,textarea{font-family:inherit;font-size:inherit;line-height:inherit}
 .table>thead:first-child>tr:first-child>td{border-top:0}
 textarea{border-color:#5b6188;width:100%}
 .report{table-layout:fixed;width:100%}
+.fixed-layout{table-layout:fixed;}
 textarea{resize:none}
 .table>thead>tr>td{padding:8px;vertical-align:middle}
 textarea{background-color:transparent;width:100%;height:100px}
@@ -171,6 +172,8 @@ button.close{appearance:none;-webkit-appearance:none;padding:0;cursor:pointer;ba
 .modal.in .modal-dialog{-webkit-transform:translate(0,0);-ms-transform:translate(0,0);-o-transform:translate(0,0);transform:translate(0,0)}
 .modal-open .modal{overflow-x:hidden;overflow-y:auto}
 .modal-dialog{position:relative;width:auto;margin:10px}
+.modal-content-center{text-align: center;}
+.span-white{color:white}
 .modal-content{position:relative;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #999;border:1px solid rgba(0,0,0,.2);border-radius:6px;outline:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);box-shadow:0 3px 9px rgba(0,0,0,.5)}
 .modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000}
 .modal-backdrop.fade{opacity:0}
@@ -505,3 +508,30 @@ select{-webkit-appearance:none;appearance:none;background-image:none;border-radi
 input.scriptsrc{cursor:copy;transition:background-color .5s}
 input.scriptsrc.clicked{background-color:rgba(255,255,255,.5)}
 .persistent-column{width:50px;border-color:#5b6187;padding-top:0!important}
+.pointer{cursor:pointer}
+#mobile-dropdown{display:none}
+#mobile-dropdown .ezxss-nav{width:80%}
+.report-img{max-width:100%}
+#toprow_common1, #toprow_common2 {display:none;}
+.toprow_count{width:15%}
+.version-banner{height:493px}
+table#logs{white-space: nowrap!important;width:100%!important;}
+table#persistent{white-space: nowrap!important;width:100%!important;}
+table#reports{white-space: nowrap!important;width:100%!important;}
+table#users{white-space: nowrap!important;}
+table.simple{white-space: nowrap!important;}
+#simple-table{white-space: nowrap!important;width:100%!important;}
+.payload-panel{padding-bottom: 2px; max-height: 402px; overflow-y: auto;}
+.scn-payload-panel{height:270px}
+.persistent-panel{padding-bottom:0px!important}
+.persistent-panel form .btn {margin-top:-35px;float:right;}
+.settings-panel{padding:19px}
+#last{float:right}
+.request-box{padding-right:0px}
+.request-box textarea{resize:vertical}
+.payload-list{margin-bottom:15px}
+.no-left{margin-left:0px}
+.persistent-table-id{width:120px}
+.persistent-table-id label span{top:7px!important}
+.report-table-id{width:120px}
+.report-table-id label span{top:4px!important}

@@ -2,7 +2,7 @@
 
     {menu}
 
-    <section class="content" {%!if isLoggedIn}style="margin-left:0px"{%/!if}>
+    <section class="content {%!if isLoggedIn}no-left{%/!if}">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
@@ -10,10 +10,12 @@
                         <div class="header-title">
                             <h3 class="m-b-xs">View report</h3>
                             {%if isLoggedIn}
-                            <small>The report page allows you to manage, share, and delete your report. Also holds all the information like URL, cookies, HTML DOM and more.</small>
+                            <small>The report page allows you to manage, share, and delete your report. Also holds all
+                                the information like URL, cookies, HTML DOM and more.</small>
                             {%/if}
                             {%!if isLoggedIn}
-                            <small>Displays various details about the report, such as the payload, URL, cookies, HTML DOM, and more, allowing to analyze and interpret the data.</small>
+                            <small>Displays various details about the report, such as the payload, URL, cookies, HTML
+                                DOM, and more, allowing to analyze and interpret the data.</small>
                             {%/!if}
                         </div>
                     </div>
@@ -57,30 +59,26 @@
                                         </tr>
                                         <tr>
                                             <td>Cookies</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                style="resize:vertical" class="form-control"
-                                                rows="4" id="cookies">{%data cookies}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="4" id="cookies">{%data cookies}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Local Storage</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                    style="resize:vertical" class="form-control"
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
                                                     rows="4" id="localstorage">{%data localstorage}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Session Storage</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                    style="resize:vertical" class="form-control"
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
                                                     rows="4" id="sessionstorage">{%data sessionstorage}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>DOM</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                    style="resize:vertical" class="form-control" rows="12.5"
-                                                    id="dom">{%data dom}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="12.5" id="dom">{%data dom}</textarea>
                                             </td>
                                         </tr>
                                         <tr>

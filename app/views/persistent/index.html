@@ -9,7 +9,8 @@
                     <div class="view-header">
                         <div class="header-title">
                             <h3 class="m-b-xs">All sessions</h3>
-                            <small>The sessions page allows you to view, search and delete all of your payload's persistent sessions. Use it to track online and offline sessions.
+                            <small>The sessions page allows you to view, search and delete all of your payload's
+                                persistent sessions. Use it to track online and offline sessions.
                             </small>
                         </div>
                     </div>
@@ -32,17 +33,16 @@
 
                 <div class="col-lg-12">
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Information <span id="last" style="float:right">0s ago</span></div>
+                        <div class="panel-heading">Information <span id="last">0s ago</span></div>
                         <div class="panel-body">
                             <div class="table-responsive">
-                                <table id="persistent" class="table" style="white-space: nowrap;width:100%;">
+                                <table id="persistent" class="table">
                                     <thead>
                                         <tr>
-                                            <th style="width:120px">
+                                            <th class="persistent-table-id">
                                                 <label class="reports-checkbox-label">
                                                     <input id="select-all" name="select-all" type="checkbox">
-                                                    <span class="reports-checkbox-custom rectangular"
-                                                        style="top:7px!important"></span>
+                                                    <span class="reports-checkbox-custom rectangular"></span>
                                                 </label>
                                                 Client ID
                                             </th>
@@ -86,7 +86,8 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="control-label" for="command">Command</label>
-                        <input class="form-control" name="command" id="command" type="text" placeholder="console.log(1);">
+                        <input class="form-control" name="command" id="command" type="text"
+                            placeholder="console.log(1);">
                     </div>
                 </div>
                 <div class="modal-footer">
