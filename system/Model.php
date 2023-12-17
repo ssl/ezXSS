@@ -47,7 +47,7 @@ class Model
         $database->getById($this->table, $id);
 
         if ($database->countRows() === 0) {
-            throw new Exception("Not found");
+            throw new Exception('Not found');
         }
 
         $report = $database->fetch();

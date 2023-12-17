@@ -46,7 +46,6 @@ class Update extends Controller
                 // Future updates come here!
 
                 redirect('dashboard/index');
-                exit();
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
@@ -60,7 +59,7 @@ class Update extends Controller
      * 
      * @return void
      */
-    public function migrateScreenshots() 
+    public function migrateScreenshots()
     {
         $files = glob(__DIR__ . '/../../assets/img/report-*.png');
 
@@ -84,7 +83,7 @@ class Update extends Controller
         }
 
         if (debug && $errors !== []) {
-            throw new Exception(implode("   ", $errors));
+            throw new Exception(implode(' -- ', $errors));
         }
     }
 

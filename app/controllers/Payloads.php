@@ -213,7 +213,7 @@ class Payloads extends Controller
                 }
             }
             $data->time = time();
-            $data->timestamp = date("c", strtotime("now"));
+            $data->timestamp = date('c', strtotime('now'));
 
             // Send out alerts
             if (($doubleReport !== false && $this->model('Setting')->get('filter-alert') == 1) || $doubleReport === false) {
@@ -458,7 +458,7 @@ class Payloads extends Controller
         $multipart[] = "\n$alertTemplate\n";
 
         // Multipart to include screenshot
-        if(!empty($data->screenshot)) {
+        if (!empty($data->screenshot)) {
             $multipart[] = "--ez$boundary";
             $multipart[] = 'Content-Type: image/png; file_name="screenshot.png"';
             $multipart[] = 'Content-ID: <ezXSS>';
@@ -521,7 +521,7 @@ class Payloads extends Controller
         if (!empty($data->screenshot)) {
             $screenshotFile = 'data://application/octet-stream;base64,' . $escapedData->screenshotBase;
             $curlFile = new \CURLFile($screenshotFile, 'image/png', 'screenshot.png');
-            $escapedData->screenshot = "attachment://screenshot.png";
+            $escapedData->screenshot = 'attachment://screenshot.png';
         }
 
         // Create Discord alert template

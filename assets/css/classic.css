@@ -526,7 +526,7 @@ table.simple{white-space: nowrap!important;}
 .persistent-panel{padding-bottom:0px!important}
 .persistent-panel form .btn {margin-top:-35px;float:right;}
 .settings-panel{padding:19px}
-#last{float:right}
+.last-time{float:right}
 .request-box{padding-right:0px}
 .request-box textarea{resize:vertical}
 .payload-list{margin-bottom:15px}

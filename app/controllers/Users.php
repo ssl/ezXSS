@@ -41,7 +41,7 @@ class Users extends Controller
 
                 // Validate rank type
                 if (!isset($this->ranks[$rank])) {
-                    throw new Exception("Invalid rank");
+                    throw new Exception('Invalid rank');
                 }
 
                 // Try to create user
@@ -83,7 +83,7 @@ class Users extends Controller
                     // Check if posted data wants to change password
                     if ($password != '') {
                         if ($user['id'] == $this->session->data('id')) {
-                            throw new Exception("Can't edit your own users password here");
+                            throw new Exception('You cannot change your own password here');
                         }
                         $userModel->setPassword($user['id'], $password);
                     }
@@ -110,7 +110,7 @@ class Users extends Controller
 
                     // Validate payload url
                     if (strpos($payload, 'http://') === 0 || strpos($payload, 'https://') === 0 || substr($payload, 0, 1) === '/') {
-                        throw new Exception("Payload needs to be in format without http://");
+                        throw new Exception('Payload needs to be in format without http://');
                     }
 
                     $this->model('Payload')->add($user['id'], $payload);
@@ -151,7 +151,7 @@ class Users extends Controller
 
             // Prevent deleting own user
             if ($user['id'] == $this->session->data('id')) {
-                throw new Exception("Can't delete your own user");
+                throw new Exception('You cannot delete your own account');
             }
 
             $this->model('User')->deleteById($id);
@@ -175,7 +175,7 @@ class Users extends Controller
 
         // Check if payload is not default payload
         if (!+$id) {
-            throw new Exception("Can't delete this payload");
+            throw new Exception('You cannot delete this');
         }
 
         // Delete payload
