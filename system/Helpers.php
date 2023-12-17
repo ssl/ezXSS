@@ -62,3 +62,16 @@ function redirect($location)
     header('Location: ' . $location);
     exit();
 }
+
+/**
+ * Returns plaintext error page
+ * 
+ * @param string $error The error message
+ * @return null
+ */
+function error($error, $status = 400)
+{
+    echo $error;
+    http_response_code($status);
+    exit();
+}
