@@ -11,7 +11,7 @@
 .theme a:active, .theme a:active * {color: hsl(128, 100%, 90%) !important;}
 .content:before {background-color: #404040;}
 .navigation:before {background-color: #404040;border-right: 1px solid #595959;}
-.ezxss-nav {border-right: 1px solid #595959;}
+.nav-head {border-right: 1px solid #595959;}
 .loader {border: 5px solid hsl(0, 0%, 35%) !important;border-top: 5px solid hsl(90, 66.66666666666666%, 80%) !important;}
 .checkbox-label input:checked ~ .checkbox-custom::after {border: solid #c7e31c;border-width: 0 2px 2px 0;}
 .login {background-color: #525151 !important;}

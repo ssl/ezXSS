@@ -41,7 +41,9 @@ class Settings extends Controller
                 // Check if posted data is enabling killswitch
                 if ($this->getPostValue('killswitch') !== null) {
                     $password = $this->getPostValue('password');
-                    $this->killSwitch($password);
+                    if($password !== '') {
+                        $this->killSwitch($password);
+                    }
                 }
 
                 // Check if posted data is changing alert method settings

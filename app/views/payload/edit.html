@@ -35,7 +35,7 @@
 
                     <div class="panel panel-filled">
                         <div class="panel-heading">Payloads</div>
-                        <div class="panel-body" style="padding-bottom: 2px; max-height: 402px; overflow-y: auto;">
+                        <div class="panel-body payload-panel">
                             <div class="form-group">
                                 <label class="control-label">SCRIPT src</label><label class="shortboost"
                                     domain="{%data domain}" class="control-label"></label>
@@ -91,7 +91,7 @@
 
                     <div class="panel panel-filled">
                         <div class="panel-heading">Persistent mode</div>
-                        <div class="panel-body" style="padding-bottom:0px">
+                        <div class="panel-body persistent-panel">
                             <form class="form" id="persistent" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
@@ -102,8 +102,7 @@
                                     </label>
                                     <p class="checkbox-text">Enable persistent mode [<a
                                             href="https://github.com/ssl/ezXSS/wiki" target=_blank>?</a>]</p>
-                                    <button name="persistent" type="submit" class="btn"
-                                        style="margin-top:-35px;float:right;">Save</button>
+                                    <button name="persistent" type="submit" class="btn">Save</button>
                                 </div>
                             </form>
                         </div>
@@ -187,7 +186,7 @@
                         </div>
                     </div>
 
-                    <div class="panel panel-filled" style="height:270px">
+                    <div class="panel panel-filled scn-payload-panel">
                         <div class="panel-heading">Secondary Payload</div>
                         <div class="panel-body">
                             <form class="form" id="secondary-payload" method="post">
@@ -222,10 +221,10 @@
                             {%if hasPages}
                             <p><b>Pages:</b></p>
                             {%foreach pages}
-                            <div id="p{pages->id}" class="input-group" style="margin-bottom:15px">
+                            <div id="p{pages->id}" class="input-group payload-list">
                                 <input class="form-control" disabled type="text" value="{pages->value}">
-                                <span class="input-group-addon"><a class="remove-item" data="{pages->value}"
-                                        divid="p{pages->id}" style="cursor:pointer">Remove</a></span>
+                                <span class="input-group-addon"><a class="remove-item pointer" data="{pages->value}"
+                                        divid="p{pages->id}">Remove</a></span>
                             </div>
                             {%/foreach}
                             {%/if}
@@ -254,10 +253,10 @@
                             {%if hasBlacklist}
                             <p><b>Domains:</b></p>
                             {%foreach blacklist}
-                            <div id="b{blacklist->id}" class="input-group" style="margin-bottom:15px">
+                            <div id="b{blacklist->id}" class="input-group payload-list">
                                 <input class="form-control" disabled type="text" value="{blacklist->value}">
-                                <span class="input-group-addon"><a class="remove-item" data="{blacklist->value}"
-                                        divid="b{blacklist->id}" style="cursor:pointer">Remove</a></span>
+                                <span class="input-group-addon"><a class="remove-item pointer" data="{blacklist->value}"
+                                        divid="b{blacklist->id}">Remove</a></span>
                             </div>
                             {%/foreach}
                             {%/if}
@@ -287,10 +286,10 @@
                             {%if hasWhitelist}
                             <p><b>Domains:</b></p>
                             {%foreach whitelist}
-                            <div id="w{whitelist->id}" class="input-group" style="margin-bottom:15px">
+                            <div id="w{whitelist->id}" class="input-group payload-list">
                                 <input class="form-control" disabled type="text" value="{whitelist->value}">
-                                <span class="input-group-addon"><a class="remove-item" data="{whitelist->value}"
-                                        divid="w{whitelist->id}" style="cursor:pointer">Remove</a></span>
+                                <span class="input-group-addon"><a class="remove-item pointer" data="{whitelist->value}"
+                                        divid="w{whitelist->id}">Remove</a></span>
                             </div>
                             {%/foreach}
                             {%/if}

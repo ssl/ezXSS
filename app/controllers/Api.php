@@ -444,6 +444,7 @@ class Api extends Controller
             
             unset($user['password']);
             unset($user['secret']);
+            unset($user['notepad']);
 
             // Create list of all payloads of user
             $payloads = $this->model('Payload')->getAllByUserId($user['id']);

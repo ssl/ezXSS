@@ -2,14 +2,15 @@
 
     {menu}
 
-    <section class="content" {%!if isLoggedIn}style="margin-left:0px" {%/!if}>
+    <section class="content {%!if isLoggedIn}no-left{%/!if}">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="view-header">
                         <div class="header-title">
                             <h3 class="m-b-xs">Session requests</h3>
-                            <small>This page holds all the information like URL, cookies, HTML DOM and more of a single request.
+                            <small>This page holds all the information like URL, cookies, HTML DOM and more of a single
+                                request.
                             </small>
                         </div>
                     </div>
@@ -45,30 +46,26 @@
                                         </tr>
                                         <tr>
                                             <td>Cookies</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                style="resize:vertical" class="form-control"
-                                                rows="2" id="cookies">{%data cookies}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="4" id="cookies">{%data cookies}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Local Storage</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                    style="resize:vertical" class="form-control"
-                                                    rows="2" id="localstorage">{%data localstorage}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="4" id="localstorage">{%data localstorage}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Session Storage</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                    style="resize:vertical" class="form-control"
-                                                    rows="2" id="sessionstorage">{%data sessionstorage}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="4" id="sessionstorage">{%data sessionstorage}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>DOM</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                    style="resize:vertical" class="form-control" rows="12.5"
-                                                    id="dom">{%data dom}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="12.5" id="dom">{%data dom}</textarea>
                                             </td>
                                         </tr>
                                         <tr>

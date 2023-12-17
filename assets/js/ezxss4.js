@@ -118,13 +118,13 @@ $(document).ready(function () {
     function pick_common(id, row, admin = 0) {
         $('#most_common' + row).empty()
         $('#toprow_common' + row).hide()
-        $('#loding_common' + row).show()
+        $('#loading_common' + row).show()
         request('/manage/api/getMostCommon', {
             id: parseInt(id),
             row: row,
             admin: admin
         }).then(function (r) {
-            $('#loding_common' + row).hide()
+            $('#loading_common' + row).hide()
             $('#toprow_common' + row).show()
             if (r.length > 0) {
                 $.each(r, function (key, value) {

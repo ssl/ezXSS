@@ -2,14 +2,15 @@
 
     {menu}
 
-    <section class="content" {%!if isLoggedIn}style="margin-left:0px"{%/!if}>
+    <section class="content {%!if isLoggedIn}no-left{%/!if}">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="view-header">
                         <div class="header-title">
                             <h3 class="m-b-xs">Persistent session</h3>
-                            <small>The session page allows you to manage, proxy, and delete your session. Also holds all the information like URL, cookies, HTML DOM and more.
+                            <small>The session page allows you to manage, proxy, and delete your session. Also holds all
+                                the information like URL, cookies, HTML DOM and more.
                             </small>
                         </div>
                     </div>
@@ -48,7 +49,8 @@
                                     </tr>
                                     <tr>
                                         <td>Requests</td>
-                                        <td><a href="/manage/persistent/requests/{%data clientid}~{%data origin}">{%data requests}</a></td>
+                                        <td><a href="/manage/persistent/requests/{%data clientid}~{%data origin}">{%data
+                                                requests}</a></td>
                                     </tr>
                                     <tr>
                                         <td>Last online</td>
@@ -68,7 +70,8 @@
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
                                     <label class="control-label" for="ipport">Proxy domain and port</label>
-                                    <input class="form-control" name="ipport" id="ipport" type="text" placeholder="{domain[]}:30055">
+                                    <input class="form-control" name="ipport" id="ipport" type="text"
+                                        placeholder="{domain[]}:30055">
                                 </div>
 
                                 <label class="checkbox-label">
@@ -84,7 +87,7 @@
 
                     <div class="panel panel-filled">
                         <div class="panel-heading">Settings</div>
-                        <div class="panel-body" style="padding:19px">
+                        <div class="panel-body settings-panel">
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <button name="delete" type="submit" class="btn">Delete</button>
@@ -101,7 +104,8 @@
                         <div class="panel-heading">Console</div>
                         <div class="panel-body">
                             <div class="form-group">
-                                <textarea class="form-control" name="console" id="console" rows=5>{%data console}</textarea>
+                                <textarea class="form-control" name="console" id="console"
+                                    rows=5>{%data console}</textarea>
                             </div>
 
                             <div class="form-group">
@@ -109,7 +113,8 @@
                                 <div class="input-group">
                                     <input type="text" name="command" id="command" placeholder="console.log(1);"
                                         class="form-control">
-                                    <span class="input-group-addon"><a name="execute" id="execute" style="cursor:pointer">Send</a></span>
+                                    <span class="input-group-addon"><a name="execute" id="execute"
+                                            class="pointer">Send</a></span>
                                 </div>
                             </div>
                         </div>
@@ -141,30 +146,26 @@
                                         </tr>
                                         <tr>
                                             <td>Cookies</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                style="resize:vertical" class="form-control"
-                                                rows="2" id="cookies">{%data cookies}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="4" id="cookies">{%data cookies}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Local Storage</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                    style="resize:vertical" class="form-control"
-                                                    rows="2" id="localstorage">{%data localstorage}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="4" id="localstorage">{%data localstorage}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Session Storage</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                    style="resize:vertical" class="form-control"
-                                                    rows="2" id="sessionstorage">{%data sessionstorage}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="4" id="sessionstorage">{%data sessionstorage}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>DOM</td>
-                                            <td style="padding-right:0px"><textarea spellcheck=false
-                                                    style="resize:vertical" class="form-control" rows="12.5"
-                                                    id="dom">{%data dom}</textarea>
+                                            <td class="request-box"><textarea spellcheck=false class="form-control"
+                                                    rows="12.5" id="dom">{%data dom}</textarea>
                                             </td>
                                         </tr>
                                         <tr>
