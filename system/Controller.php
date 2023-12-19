@@ -403,7 +403,7 @@ class Controller
     private function checkForUpdates()
     {
         try {
-            if (path !== '/manage/update' && path !== '/manage/install') {
+            if (explode('?', path)[0] !== '/manage/update' && path !== '/manage/install') {
                 $version = $this->model('Setting')->get('version');
                 if ($version !== version) {
                     throw new Exception('ezXSS is not up-to-date');

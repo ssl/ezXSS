@@ -59,7 +59,7 @@ class View
     {
         $content = $this->getContent();
 
-        $content = str_replace('{message}', '<div class="alert" role="alert">' . e($message) . '</div>', $content);
+        $content = str_replace('{message}', '<div class="alert" role="alert">' . nl2br(e($message)) . '</div>', $content);
 
         $this->content = $content;
     }

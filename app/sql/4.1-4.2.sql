@@ -46,3 +46,6 @@ ALTER TABLE reports ADD INDEX(archive);
 ALTER TABLE reports ADD INDEX(payload);
 ALTER TABLE reports ADD INDEX(id);
 ALTER TABLE reports_data ADD INDEX(reportid);
+
+ALTER TABLE reports ENGINE INNODB;
+ALTER TABLE settings ENGINE INNODB;

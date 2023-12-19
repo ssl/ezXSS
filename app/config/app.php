@@ -10,7 +10,7 @@ define('httpmode', false);
 define('signupEnabled', false);
 
 // Current ezXSS version. Do not edit this
-define('version', '4.1');
+define('version', '4.2');
 
 // Defines the current host
 define('host', e($_SERVER['HTTP_HOST']));

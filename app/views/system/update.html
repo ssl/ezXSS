@@ -9,6 +9,9 @@
                 <b class="transparent">Thanks for using ezXSS.</b><br><br>
                 You've updated your setup to {version[]}. Click the
                 button below to update your database.<br><br>
+                This update moves some big storage columns from the reports table to a new table.
+                Moving data can take a while, depending on your table size.<br><br>
+                <b>{%data tablesize}</b><br><br>
                 <button class="btn">Update</button>
             </form>
         </div><br>
