@@ -18,34 +18,62 @@ class Update extends Controller
             throw new Exception('ezXSS is already up-to-date');
         }
 
+        try {
+            $this->view->renderData('tablesize', 'Table size: ' . ceil(($this->getReportsSize() * 1.1) / (1024*1024)) . ' MB');
+        } catch (Exception) {
+            $this->view->renderData('tablesize', 'Error in retrieving table size. Proceed with caution');
+        }
+
         if ($this->isPOST()) {
             try {
                 $this->validateCsrfToken();
 
-                // Check if the version is 3.x and is valid for migration
-                if (preg_match('/^3\./', $version)) {
-                    if ($version == '3.10' || $version == '3.11') {
-                        if (version !== '4.0') {
-                            throw new Exception('Please first update to 4.0 before migrating 3.x to 4.x');
-                        }
-                        $this->ezXSS3migrate();
-                    } else {
-                        throw new Exception('Please first update to 3.10 before migrating to 4.x');
-                    }
+                // Check if the version is 1.x or 2.x
+                if (preg_match('/^1\./', $version) || preg_match('/^2\./', $version)) {
+                    throw new Exception('Please first update to 3.0 before migrating to 4.x');
                 }
 
-                if ($version == '4.0' && version === '4.1') {
-                    // Update the database tables and rows
-                    $sql = file_get_contents(__DIR__ . '/../../ezXSS4.1.sql');
+                //todo: 3.x - 3.10
+
+                // Update the database from 3.10/3.11 to 4.0
+                if ($version === '3.10' || $version === '3.11') {
+                    $this->ezXSS3migrate();
+                    $version = '4.0';
+                    $this->model('Setting')->set('version', $version);
+                }
+
+                // Update the database from 4.0 to 4.1
+                if ($version === '4.0') {
+                    $sql = file_get_contents(__DIR__ . '/../sql/4.0-4.1.sql');
                     $database = Database::openConnection();
                     $database->exec($sql);
-
-                    $this->model('Setting')->set('version', version);
+                    $version = '4.1';
+                    $this->model('Setting')->set('version', $version);
                 }
 
-                // Future updates come here!
+                // Update the database from 4.1 to 4.2
+                if ($version === '4.1') {
+                    try {
+                        // Check if disk has enough free space
+                        $tableSize = $this->getReportsSize();
+                        if($tableSize * 1.1 > disk_free_space('/')) {
+                            $freeSpace = ceil(disk_free_space('/') / (1024*1024));
+                            $tableSize = ceil(($tableSize * 1.1) / (1024*1024));
+                            throw new Exception("Error in updating. Free space on disk is {$freeSpace} MB and temporary needed space for table is {$tableSize} MB. Please upgrade disk");
+                        }
+                    } catch (Exception $e) {
+                        if($this->getGetValue('disablechecks') !== '1') {
+                            throw new Exception($e->getMessage() . "\r\nYou can disable this check by adding ?disablechecks=1 to the URL\r\nWARNING: If table is larger than free disk size, database can get corrupted");
+                        }
+                    }
 
-                redirect('dashboard/index');
+                    $sql = file_get_contents(__DIR__ . '/../sql/4.1-4.2.sql');
+                    $database = Database::openConnection();
+                    $database->exec($sql);
+                }
+
+                $this->model('Setting')->set('version', version);
+                redirect('update/migrateScreenshots');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
@@ -61,29 +89,33 @@ class Update extends Controller
      */
     public function migrateScreenshots()
     {
-        $files = glob(__DIR__ . '/../../assets/img/report-*.png');
+        try {
+            $screenshots = glob(__DIR__ . '/../../assets/img/report-*.png');
 
-        if ($files === []) {
-            throw new Exception('No screenshots left to migrate');
+            if ($screenshots === []) {
+                throw new Exception('No screenshots left to migrate');
+            }
+        } catch (Exception $e) {
+            redirect('dashboard/index');
         }
 
         $errors = [];
-        foreach ($files as $file) {
+        foreach ($screenshots as $screenshot) {
             try {
-                $screenshotName = str_replace('report-', '', pathinfo($file, PATHINFO_FILENAME));
-                $screenshotData = base64_encode(file_get_contents($file));
+                $screenshotName = str_replace('report-', '', pathinfo($screenshot, PATHINFO_FILENAME));
+                $screenshotData = base64_encode(file_get_contents($screenshot));
 
                 $reportId = $this->model('Report')->getIdByScreenshot($screenshotName);
                 $this->model('Report')->setSingleDataValue($reportId, 'screenshot', $screenshotData);
 
-                unlink($file);
+                unlink($screenshot);
             } catch (Exception $e) {
-                $errors[] = "Error in migrating ({$e}) for " . basename($file);
+                $errors[] = "Error in migrating ({$e}) for " . basename($screenshot);
             }
         }
 
         if (debug && $errors !== []) {
-            throw new Exception(implode(' -- ', $errors));
+            throw new Exception(implode("\r\n", $errors));
         }
     }
 
@@ -99,7 +131,7 @@ class Update extends Controller
         $notepad = $this->model('Setting')->get('notepad');
 
         // Update the database tables and rows
-        $sql = file_get_contents(__DIR__ . '/../../ezXSS3migrate.sql');
+        $sql = file_get_contents(__DIR__ . '/../sql/3.x-4.0.sql');
         $database = Database::openConnection();
         $database->exec($sql);
         $database->exec('ALTER DATABASE `' . DB_NAME . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;');
@@ -126,5 +158,18 @@ class Update extends Controller
                 $this->model('Report')->setSingleValue($report['id'], 'referer', $report['payload']);
             }
         }
+    }
+
+    /**
+     * Get size in bytes from reports table
+     * 
+     * @return int
+     */
+    private function getReportsSize() {
+        $database = Database::openConnection();
+        $database->prepare('SELECT data_length + index_length AS total_size FROM information_schema.tables WHERE table_schema = "' . DB_NAME . '" AND table_name = "reports"');
+        $database->execute();
+        $tableSize = $database->fetch();
+        return $tableSize['total_size'];
     }
 }
