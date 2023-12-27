@@ -28,16 +28,23 @@ class Update extends Controller
             try {
                 $this->validateCsrfToken();
 
-                // Check if the version is 1.x or 2.x
-                if (preg_match('/^1\./', $version) || preg_match('/^2\./', $version)) {
-                    throw new Exception('Please first update to 3.0 before migrating to 4.x');
+                // Check if the version is 1.x
+                if (preg_match('/^1\./', $version)) {
+                    throw new Exception('ezXSS 1.x is deprecated. Please re-install on new database');
                 }
 
-                //todo: 3.x - 3.10
+                // Update the database from 2.x to 3.0
+                if (preg_match('/^2\./', $version)) {
+                    $sql = file_get_contents(__DIR__ . '/../sql/2.x-3.0.sql');
+                    $database = Database::openConnection();
+                    $database->exec($sql);
+                    $version = '3.0';
+                    $this->model('Setting')->set('version', $version);
+                }
 
-                // Update the database from 3.10/3.11 to 4.0
-                if ($version === '3.10' || $version === '3.11') {
-                    $this->ezXSS3migrate();
+                // Update the database from 3.x to 4.0
+                if (preg_match('/^3\./', $version)) {
+                    $this->ezXSS3migrate($version);
                     $version = '4.0';
                     $this->model('Setting')->set('version', $version);
                 }
@@ -66,7 +73,6 @@ class Update extends Controller
                             throw new Exception($e->getMessage() . "\r\nYou can disable this check by adding ?disablechecks=1 to the URL\r\nWARNING: If table is larger than free disk size, database can get corrupted");
                         }
                     }
-
                     $sql = file_get_contents(__DIR__ . '/../sql/4.1-4.2.sql');
                     $database = Database::openConnection();
                     $database->exec($sql);
@@ -118,32 +124,33 @@ class Update extends Controller
     }
 
     /**
-     * Compress all uncompressed reports data
-     * 
-     * @return void
-     */
-    public function compressData() {
-        //todo
-    }
-
-    /**
      * Migrate ezXSS 3 database to ezXSS 4
      * 
      * @return void
      */
-    private function ezXSS3migrate()
+    private function ezXSS3migrate($version)
     {
+        // Check if version is 3.9 or lower and update
+        $updateQueries = ['3.0' => '3.5', '3.5' => '3.6', '3.6' => '3.9', '3.9' => '3.10'];
+        foreach ($updateQueries as $fromVersion => $toVersion) {
+            if (version_compare($version, $toVersion, '<')) {
+                $sql = file_get_contents(__DIR__ . "/../sql/{$fromVersion}-{$toVersion}.sql");
+                $database = Database::openConnection();
+                $database->exec($sql);
+                $version = $toVersion;
+                $this->model('Setting')->set('version', $version);
+            }
+        }
+
         // Store old data
         $password = $this->model('Setting')->get('password');
         $notepad = $this->model('Setting')->get('notepad');
 
         // Update the database tables and rows
-        $sql = file_get_contents(__DIR__ . '/../sql/3.x-4.0.sql');
+        $sql = file_get_contents(__DIR__ . '/../sql/3.10-4.0.sql');
         $database = Database::openConnection();
         $database->exec($sql);
         $database->exec('ALTER DATABASE `' . DB_NAME . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;');
-
-        $this->model('Setting')->set('version', version);
 
         // Create new user and update old 
         $user = $this->model('User')->create('admin', 'Temp1234!', 7);
