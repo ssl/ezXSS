@@ -219,6 +219,7 @@ class Report_model extends Model
         $reportId = $database->lastInsertId();
 
         // Compress data if enabled
+        $compressed = false;
         if ($this->getCompressStatus() === 1) {
             $dom = base64_encode(gzdeflate($dom, 9));
             $screenshot = strlen($screenshot) === 52 || empty($screenshot) ? $screenshot : base64_encode(gzdeflate(base64_decode($screenshot), 9));
