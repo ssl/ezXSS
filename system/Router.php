@@ -61,7 +61,6 @@ class Router
             $args = isset($parts[1]) && !empty($parts[1]) ? [$parts[1]] : [];
             $method = $args === [] ? 'index' : 'custom';
             $method = $args === ['callback'] ? 'callback' : $method;
-            $method = $args === ['ping'] ? 'ping' : $method;
 
             require_once(__DIR__ . "/../app/controllers/$controller.php");
         }
