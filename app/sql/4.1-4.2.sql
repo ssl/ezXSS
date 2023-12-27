@@ -1,4 +1,10 @@
 --
+-- Add new settings
+--
+
+INSERT INTO `settings` (`setting`, `value`) VALUES ('storescreenshot', '0'), ('compress', '0');
+
+--
 -- Table structure for table `reports_data`
 --
 
@@ -8,7 +14,8 @@ CREATE TABLE `reports_data` (
     `dom` longtext,
     `screenshot` longtext,
     `localstorage` longtext,
-    `sessionstorage` longtext
+    `sessionstorage` longtext,
+    `compressed` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --

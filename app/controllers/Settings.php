@@ -23,9 +23,10 @@ class Settings extends Controller
                     $timezone = $this->getPostValue('timezone');
                     $theme = $this->getPostValue('theme');
                     $filter = $this->getPostValue('filter');
-                    $dompart = $this->getPostValue('dompart');
-                    $logging = $this->getPostValue('loggingon');
-                    $this->applicationSettings($timezone, $theme, $filter, $dompart, $logging);
+                    $logging = $this->getPostValue('logging');
+                    $storescreenshot = $this->getPostValue('storescreenshot');
+                    $compress = $this->getPostValue('compress');
+                    $this->applicationSettings($timezone, $theme, $filter, $logging, $storescreenshot, $compress);
                 }
 
                 // Check if posted data is changing global payload settings
@@ -87,7 +88,15 @@ class Settings extends Controller
         $filterSave = $settings->get('filter-save');
         $filterAlert = $settings->get('filter-alert');
 
-        $this->view->renderChecked('logging', $settings->get('logging') === '1');
+        $this->view->renderData('logging0', $settings->get('logging') == 0 ? 'selected' : '');
+        $this->view->renderData('logging1', $settings->get('logging') == 1 ? 'selected' : '');
+
+        $this->view->renderData('screenshot0', $settings->get('storescreenshot') == 0 ? 'selected' : '');
+        $this->view->renderData('screenshot1', $settings->get('storescreenshot') == 1 ? 'selected' : '');
+
+        $this->view->renderData('compress0', $settings->get('compress') == 0 ? 'selected' : '');
+        $this->view->renderData('compress1', $settings->get('compress') == 1 ? 'selected' : '');
+
         $this->view->renderChecked('persistent', $settings->get('persistent') === '1');
 
         // Renders data of correct selected filter
@@ -134,7 +143,6 @@ class Settings extends Controller
 
         // Render last data parts
         $this->view->renderData('customjs', $settings->get('customjs'));
-        $this->view->renderData('dompart', $settings->get('dompart'));
         $this->view->renderData('callbackURL', $settings->get('callback-url'));
 
         return $this->showContent();
@@ -146,12 +154,13 @@ class Settings extends Controller
      * @param string $timezone The timezone to set
      * @param string $theme The theme name
      * @param string $filter The filter option
-     * @param string $dompart The length of the dom part
      * @param string $logging Enable logging
+     * @param string $storescreenshot Method of screenshot storage
+     * @param string $compress Enable compressing
      * @throws Exception
      * @return void
      */
-    private function applicationSettings($timezone, $theme, $filter, $dompart, $logging)
+    private function applicationSettings($timezone, $theme, $filter, $logging, $storescreenshot, $compress)
     {
         // Validate timezone
         if (!in_array($timezone, timezone_identifiers_list(), true)) {
@@ -164,22 +173,18 @@ class Settings extends Controller
             throw new Exception('This theme is not installed');
         }
 
-        // Check if type is digit
-        if (!ctype_digit($dompart)) {
-            throw new Exception('The dom length needs to be digits');
-        }
-
         // Set the value based on the posted filter
         $filterSave = ($filter == 1 || $filter == 2) ? 1 : 0;
         $filterAlert = ($filter == 1 || $filter == 3) ? 1 : 0;
 
         // Save settings
-        $this->model('Setting')->set('dompart', $dompart);
         $this->model('Setting')->set('filter-save', $filterSave);
         $this->model('Setting')->set('filter-alert', $filterAlert);
         $this->model('Setting')->set('timezone', $timezone);
         $this->model('Setting')->set('theme', $theme);
-        $this->model('Setting')->set('logging', $logging !== null ? '1' : '0');
+        $this->model('Setting')->set('logging', $logging === '1' ? '1' : '0');
+        $this->model('Setting')->set('storescreenshot', $storescreenshot === '1' ? '1' : '0');
+        $this->model('Setting')->set('compress', $compress === '1' ? '1' : '0');
         $this->log('Updated admin application settings');
     }
 

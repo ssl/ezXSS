@@ -64,7 +64,6 @@ INSERT INTO `payloads` (`id`, `payload`, `user_id`, `pages`, `blacklist`, `white
 CREATE TABLE `reports` (
   `id` int(11) NOT NULL,
   `shareid` varchar(50) NOT NULL,
-  `cookies` mediumtext,
   `origin` varchar(500) DEFAULT NULL,
   `referer` varchar(1000) DEFAULT NULL,
   `payload` varchar(500) DEFAULT NULL,
@@ -72,6 +71,7 @@ CREATE TABLE `reports` (
   `user-agent` varchar(500) DEFAULT NULL,
   `ip` varchar(50) DEFAULT NULL,
   `time` int(11) DEFAULT NULL,
+  `cookies` mediumtext,
   `archive` int(11) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -87,7 +87,8 @@ CREATE TABLE `reports_data` (
     `dom` longtext,
     `screenshot` longtext,
     `localstorage` longtext,
-    `sessionstorage` longtext
+    `sessionstorage` longtext,
+    `compressed` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -133,7 +134,9 @@ INSERT INTO `settings` (`id`, `setting`, `value`) VALUES
 (25, 'alert-slack', '1'),
 (26, 'alert-discord', '1'),
 (27, 'logging', '0'),
-(28, 'persistent', '0');
+(28, 'persistent', '0'),
+(29, 'storescreenshot', '0'),
+(30, 'compress', '0');
 
 -- --------------------------------------------------------
 

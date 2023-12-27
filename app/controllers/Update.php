@@ -73,7 +73,7 @@ class Update extends Controller
                 }
 
                 $this->model('Setting')->set('version', version);
-                redirect('update/migrateScreenshots');
+                redirect('dashboard');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());
             }
@@ -89,14 +89,10 @@ class Update extends Controller
      */
     public function migrateScreenshots()
     {
-        try {
-            $screenshots = glob(__DIR__ . '/../../assets/img/report-*.png');
+        $screenshots = glob(__DIR__ . '/../../assets/img/report-*.png');
 
-            if ($screenshots === []) {
-                throw new Exception('No screenshots left to migrate');
-            }
-        } catch (Exception $e) {
-            redirect('dashboard/index');
+        if ($screenshots === []) {
+            throw new Exception('No screenshots left to migrate');
         }
 
         $errors = [];
@@ -116,7 +112,18 @@ class Update extends Controller
 
         if (debug && $errors !== []) {
             throw new Exception(implode("\r\n", $errors));
+        } else {
+            throw new Exception('All screenshots migrated');
         }
+    }
+
+    /**
+     * Compress all uncompressed reports data
+     * 
+     * @return void
+     */
+    public function compressData() {
+        //todo
     }
 
     /**

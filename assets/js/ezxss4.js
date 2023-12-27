@@ -344,10 +344,12 @@ $(document).ready(function () {
                 httpOnly: false,
                 name: cookieName,
                 path: '/',
-                sameSite: 'unspecified',
+                sameSite: 'no_restriction',
                 secure: false,
                 session: false,
-                storeId: '0',
+                storeId: 'firefox-default',
+                partitionKey: null,
+                firstPartyDomain: '',
                 value: cookieValue,
                 id: index + 1
             }
