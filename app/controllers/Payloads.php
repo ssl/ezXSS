@@ -122,6 +122,10 @@ class Payloads extends Controller
         $data->payload = substr($data->payload ?? '', 0, 500);
         $data->{'user-agent'} = substr($data->{'user-agent'} ?? '', 0, 500);
 
+        if(empty($data->payload)) {
+            return 'github.com/ssl/ezXSS';
+        }
+
         // Check black and whitelist
         $payload = $this->getPayloadByUrl($data->payload);
 
