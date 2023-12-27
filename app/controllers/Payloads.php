@@ -450,7 +450,7 @@ class Payloads extends Controller
     private function mailAlert($data, $email)
     {
         // Escapes data for alert
-        $escapedData = json_decode(json_encode($data), false);
+        $escapedData = json_decode(json_encode($data), false) ?? [];
         array_walk_recursive($escapedData, function (&$item) {
             if (is_string($item)) {
                 $item = e($item);
@@ -494,7 +494,7 @@ class Payloads extends Controller
         // Send the mail
         mail(
             $email,
-            '[ezXSS] XSS on ' . $escapedData->uri,
+            '[ezXSS] XSS on ' . $escapedData->uri ?? '',
             implode("\n", $multipart),
             implode("\n", $headers)
         );
@@ -533,7 +533,7 @@ class Payloads extends Controller
     private function discordAlert($data, $webhookURL)
     {
         // Escapes data for alert
-        $escapedData = json_decode(json_encode($data), false);
+        $escapedData = json_decode(json_encode($data), false) ?? [];
         array_walk_recursive($escapedData, function (&$item) {
             if (is_string($item)) {
                 $item = addslashes($item);

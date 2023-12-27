@@ -50,7 +50,7 @@ class Reports extends Controller
         }
 
         // Render all rows
-        if(!empty($report['screenshot'])) {
+        if(!empty($report['screenshot'] ?? '')) {
             $screenshot = strlen($report['screenshot']) === 52 ? '<img class="report-img" src="/assets/img/report-' . e($report['screenshot']) . '.png">' : '<img class="report-img" src="data:image/png;base64,' . e($report['screenshot']) . '">';
         }
         $this->view->renderData('screenshot', $screenshot ?? '', true);
