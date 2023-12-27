@@ -192,14 +192,14 @@ class Report_model extends Model
      * @param string $uri The url
      * @param string $userAgent The user agent
      * @param string $ip The IP
-     * @param string $screenshotBase The base64 of the screenshot
+     * @param string $screenshot The name/base64 of the screenshot
      * @param string $localStorage The local storage
      * @param string $sessionStorage The session storage
      * @param string $payload The payload name
      * @throws Exception
      * @return string
      */
-    public function add($shareId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshotBase, $localStorage, $sessionStorage, $payload)
+    public function add($shareId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshot, $localStorage, $sessionStorage, $payload)
     {
         $database = Database::openConnection();
         $database->prepare("INSERT INTO $this->table (shareid, cookies, origin, referer, uri, `user-agent`, ip, time, payload) VALUES (:shareid, :cookies, :origin, :referer, :uri, :userAgent, :ip, :time, :payload)");
@@ -218,12 +218,22 @@ class Report_model extends Model
         }
         $reportId = $database->lastInsertId();
 
-        $database->prepare("INSERT INTO $this->table_data (reportid, dom, screenshot, localstorage, sessionstorage) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage)");
+        // Compress data if enabled
+        if ($this->getCompressStatus() === 1) {
+            $dom = base64_encode(gzdeflate($dom, 9));
+            $screenshot = strlen($screenshot) === 52 || empty($screenshot) ? $screenshot : base64_encode(gzdeflate(base64_decode($screenshot), 9));
+            $localStorage = $localStorage === '{}' ? '{}' : base64_encode(gzdeflate($localStorage, 9));
+            $sessionStorage = $sessionStorage === '{}' ? '{}' : base64_encode(gzdeflate($sessionStorage, 9));
+            $compressed = true;
+        }
+
+        $database->prepare("INSERT INTO $this->table_data (reportid, dom, screenshot, localstorage, sessionstorage, compressed) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage, :compressed)");
         $database->bindValue(':reportid', $reportId);
         $database->bindValue(':dom', $dom);
-        $database->bindValue(':screenshot', $screenshotBase);
+        $database->bindValue(':screenshot', $screenshot);
         $database->bindValue(':localstorage', $localStorage);
         $database->bindValue(':sessionstorage', $sessionStorage);
+        $database->bindValue('compressed', $compressed === true ? 1 : 0);
         $database->execute();
 
         return $reportId;
@@ -302,8 +312,11 @@ class Report_model extends Model
      */
     public function setSingleDataValue($id, $column, $value)
     {
-        $database = Database::openConnection();
+        if ($this->getCompressStatus() === 1) {
+            $value = $column === 'screenshot' ? base64_encode(gzdeflate(base64_decode($value), 9)) : base64_encode(gzdeflate($value, 9));
+        }
 
+        $database = Database::openConnection();
         $database->prepare("UPDATE $this->table_data SET `$column` = :value WHERE id = :id");
         $database->bindValue(':value', $value);
         $database->bindValue(':id', $id);
@@ -350,7 +363,7 @@ class Report_model extends Model
     public function getIdByScreenshot($screenshotName)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT * FROM $this->table_data WHERE screenshot = :screenshot LIMIT 1");
+        $database->prepare("SELECT reportid FROM $this->table_data WHERE screenshot = :screenshot LIMIT 1");
         $database->bindValue(':screenshot', $screenshotName);
         $database->execute();
 
@@ -391,7 +404,7 @@ class Report_model extends Model
     private function getReportData($id)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT dom,screenshot,localstorage,sessionstorage FROM $this->table_data WHERE reportid = :reportid LIMIT 1");
+        $database->prepare("SELECT dom,screenshot,localstorage,sessionstorage,compressed FROM $this->table_data WHERE reportid = :reportid LIMIT 1");
         $database->bindValue(':reportid', $id);
         $database->execute();
 
@@ -399,6 +412,33 @@ class Report_model extends Model
             $report_data = $database->fetch();
         }
 
+        // Decompress if compressed
+        if($report_data['compressed'] ?? 0 == 1) {
+            $report_data['dom'] = gzinflate(base64_decode($report_data['dom']));
+            $report_data['screenshot'] = strlen($report_data['screenshot']) === 52 || empty($report_data['screenshot']) ? $report_data['screenshot'] : base64_encode(gzinflate(base64_decode($report_data['screenshot'])));
+            $report_data['localstorage'] = $report_data['localstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['localstorage']));
+            $report_data['sessionstorage'] = $report_data['sessionstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['sessionstorage']));
+        }
+
         return $report_data ?? ['dom' => '', 'screenshot' => '', 'localstorage' => '', 'sessionstorage' => ''];
+    }
+
+    /**
+     * Get compress status
+     * 
+     * @return bool
+     */
+    private function getCompressStatus()
+    {
+        try {
+            $database = Database::openConnection();
+            $database->prepare("SELECT value FROM settings WHERE setting = 'compress' LIMIT 1");
+            $database->execute();
+            $status = $database->fetch();
+
+            return $status['value'] == 1 ? 1 : 0;
+        } catch (Exception $e) {
+            return 0;
+        }
     }
 }

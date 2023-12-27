@@ -53,16 +53,25 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label" for="dompart">Max DOM length in alerts</label>
-                                    <input class="form-control" name="dompart" id="dompart" type="text"
-                                        value="{%data dompart}">
+                                    <label class="control-label" for="logging">Store ezXSS users logs</label>
+                                    <select class="form-control" id="logging" name="logging">
+                                        <option {%data logging0} value="0">No</option>
+                                        <option {%data logging1} value="1">Yes</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label class="checkbox-label">
-                                        <input {%checked logging} class="chkbox" name="loggingon" type="checkbox">
-                                        <span class="checkbox-custom rectangular"></span>
-                                    </label>
-                                    <p class="checkbox-text">Enable logging</p>
+                                    <label class="control-label" for="storescreenshot">Store payload screenshots as</label>
+                                    <select class="form-control" id="storescreenshot" name="storescreenshot">
+                                        <option {%data screenshot0} value="0">PNG file in assets folder</option>
+                                        <option {%data screenshot1} value="1">Encoded in database</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="compress">Compress and encode reports data</label>
+                                    <select class="form-control" id="compress" name="compress">
+                                        <option {%data compress0} value="0">No</option>
+                                        <option {%data compress1} value="1">Yes</option>
+                                    </select>
                                 </div>
                                 <button name="application" type="submit" class="btn">Save</button>
                             </form>
@@ -144,18 +153,18 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="control-label" for="customjs">Custom javascript</label>
-                                    <small>Add custom javascript which will be added to <i>all</i> payloads</small>
-                                    <textarea class="form-control" name="customjs" id="customjs"
-                                        rows=5>{%data customjs}</textarea>
-                                </div>
-
-                                <div class="form-group">
                                     <label class="checkbox-label">
                                         <input {%checked persistent} class="chkbox" name="persistenton" type="checkbox">
                                         <span class="checkbox-custom rectangular"></span>
                                     </label>
-                                    <p class="checkbox-text">Allow enabling of persistent mode</p>
+                                    <p class="checkbox-text">Persistent mode</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label" for="customjs">Custom javascript</label>
+                                    <small>Add custom javascript which will be added to <i>all</i> payloads</small>
+                                    <textarea class="form-control" name="customjs" id="customjs"
+                                        rows=5>{%data customjs}</textarea>
                                 </div>
 
                                 <button name="global-payload" type="submit" class="btn">Save</button>

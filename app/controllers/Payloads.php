@@ -183,9 +183,29 @@ class Payloads extends Controller
             // Create an image from the screenshot data
             if (!empty($data->screenshot)) {
                 try {
-                    $data->screenshotBase = base64_encode(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data->screenshot), true));
+                    $screenshot = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data->screenshot), true);
+                    if(!$screenshot) {
+                        throw new Exception('Invalid screenshot data posted to callback');
+                    }
+                    $data->screenshotBase = base64_encode($screenshot);
+                    if($this->model('Setting')->get('storescreenshot') == 0) {
+                        // Store screenshot as file on server
+                        $data->screenshotData = time() . md5(
+                            $data->uri . time() . bin2hex(openssl_random_pseudo_bytes(16))
+                        ) . bin2hex(openssl_random_pseudo_bytes(5));
+                        $saveImage = fopen(__DIR__ . "/../../assets/img/report-{$data->screenshotData}.png", 'w');
+                        if(!$saveImage) {
+                            throw new Exception('Unable to save screenshots to server, check permissions');
+                        }
+                        fwrite($saveImage, $screenshot);
+                        fclose($saveImage);
+                    } else {
+                        // Store screenshot as base64 in database
+                        $data->screenshotData = $data->screenshotBase;
+                    }
                 } catch (Exception $e) {
-                    $data->screenshotBase = '';
+                    $this->log($e->getMessage());
+                    $data->screenshotData = '';
                 }
             }
 
@@ -201,7 +221,7 @@ class Payloads extends Controller
                     $data->uri,
                     $data->{'user-agent'},
                     $data->ip,
-                    ($data->screenshotBase ?? ''),
+                    $data->screenshotData ?? '',
                     json_encode($data->localstorage ?? ''),
                     json_encode($data->sessionstorage ?? ''),
                     $data->payload
@@ -220,6 +240,7 @@ class Payloads extends Controller
                 try {
                     $this->alert($data);
                 } catch (Exception $e) {
+                    $this->log($e->getMessage());
                 }
             }
         }
@@ -294,7 +315,7 @@ class Payloads extends Controller
         // Check if the DOM should be truncated
         if ($this->model('Setting')->get('dompart') > 0 && strlen($data->dom ?? '') > $this->model('Setting')->get('dompart')) {
             $data->dom = substr($data->dom ?? '', 0, $this->model('Setting')->get('dompart')) .
-                '&#13;&#10;&#13;&#10;View full dom on the report page or change this setting on /settings';
+                '&#13;&#10;&#13;&#10;View full DOM on the report page';
         }
 
         $payload = $this->getPayloadByUrl($data->payload);
@@ -306,7 +327,7 @@ class Payloads extends Controller
 
             foreach ($alerts as $alert) {
                 if ($alert['user_id'] === 0) {
-                    // Global alerting that allways sends if enabled
+                    // Global alerting that always sends if enabled
                     $this->mailAlert($data, $alert['value1']);
                 } elseif ($payload['user_id'] !== 0 && $alert['user_id'] === $payload['user_id']) {
                     // Sends alert to user that owns the payload
@@ -322,7 +343,7 @@ class Payloads extends Controller
 
             foreach ($alerts as $alert) {
                 if ($alert['user_id'] === 0) {
-                    // Global alerting that allways sends if enabled
+                    // Global alerting that always sends if enabled
                     $this->telegramAlert($data, $alert['value1'], $alert['value2']);
                 } elseif ($payload['user_id'] !== 0 && $alert['user_id'] === $payload['user_id']) {
                     // Sends alert to user that owns the payload
@@ -354,7 +375,7 @@ class Payloads extends Controller
 
             foreach ($alerts as $alert) {
                 if ($alert['user_id'] === 0) {
-                    // Global alerting that allways sends if enabled
+                    // Global alerting that always sends if enabled
                     $this->discordAlert($data, $alert['value1']);
                 } elseif ($payload['user_id'] !== 0 && $alert['user_id'] === $payload['user_id']) {
                     // Sends alert to user that owns the payload
@@ -406,7 +427,7 @@ class Payloads extends Controller
         curl_exec($ch);
 
         // Send photo with screenshot
-        if (!empty($data->screenshot)) {
+        if (!empty($data->screenshotBase)) {
             $screenshotFile = 'data://application/octet-stream;base64,' . $data->screenshotBase;
             $curlFile = new \CURLFile($screenshotFile, 'image/png', 'screenshot.png');
 
@@ -436,9 +457,11 @@ class Payloads extends Controller
             }
         });
 
-        if (!empty($data->screenshot)) {
+        if (!empty($data->screenshotBase)) {
             $attachment = chunk_split($escapedData->screenshotBase);
             $escapedData->screenshot = '<img style="max-width:100%;" src="cid:ezXSS">';
+        } else {
+            $escapedData->screenshot = '';
         }
 
         // Create mail alert template
@@ -458,7 +481,7 @@ class Payloads extends Controller
         $multipart[] = "\n$alertTemplate\n";
 
         // Multipart to include screenshot
-        if (!empty($data->screenshot)) {
+        if (!empty($data->screenshotBase)) {
             $multipart[] = "--ez$boundary";
             $multipart[] = 'Content-Type: image/png; file_name="screenshot.png"';
             $multipart[] = 'Content-ID: <ezXSS>';
@@ -471,7 +494,7 @@ class Payloads extends Controller
         // Send the mail
         mail(
             $email,
-            '[ezXSS] XSS on ' . $data->uri,
+            '[ezXSS] XSS on ' . $escapedData->uri,
             implode("\n", $multipart),
             implode("\n", $headers)
         );
@@ -518,10 +541,12 @@ class Payloads extends Controller
         });
 
         // Check if a screenshot is provided
-        if (!empty($data->screenshot)) {
+        if (!empty($data->screenshotBase)) {
             $screenshotFile = 'data://application/octet-stream;base64,' . $escapedData->screenshotBase;
             $curlFile = new \CURLFile($screenshotFile, 'image/png', 'screenshot.png');
             $escapedData->screenshot = 'attachment://screenshot.png';
+        } else {
+            $escapedData->screenshot = '';
         }
 
         // Create Discord alert template

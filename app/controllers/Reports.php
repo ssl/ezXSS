@@ -50,8 +50,10 @@ class Reports extends Controller
         }
 
         // Render all rows
-        $screenshot = !empty($report['screenshot']) ? '<img class="report-img" src="data:image/png;base64,' . e($report['screenshot']) . '">' : '';
-        $this->view->renderData('screenshot', $screenshot, true);
+        if(!empty($report['screenshot'])) {
+            $screenshot = strlen($report['screenshot']) === 52 ? '<img class="report-img" src="/assets/img/report-' . e($report['screenshot']) . '.png">' : '<img class="report-img" src="data:image/png;base64,' . e($report['screenshot']) . '">';
+        }
+        $this->view->renderData('screenshot', $screenshot ?? '', true);
         $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
         $this->view->renderData('browser', $this->parseUserAgent($report['user-agent']), true);
 
