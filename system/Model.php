@@ -73,4 +73,23 @@ class Model
 
         return true;
     }
+
+     /**
+     * Get compress status
+     * 
+     * @return bool
+     */
+    public function getCompressStatus()
+    {
+        try {
+            $database = Database::openConnection();
+            $database->prepare("SELECT value FROM settings WHERE setting = 'compress' LIMIT 1");
+            $database->execute();
+            $status = $database->fetch();
+
+            return $status['value'] == 1 ? 1 : 0;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
 }

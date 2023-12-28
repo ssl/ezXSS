@@ -8,6 +8,7 @@ class Session_model extends Model
      * @var string
      */
     public $table = 'sessions';
+    public $table_data = 'sessions_data';
 
     /**
      * Get all sessions
@@ -26,6 +27,21 @@ class Session_model extends Model
     }
 
     /**
+     * Get session by id
+     * 
+     * @param mixed $id The session id
+     * @throws Exception
+     * @return array
+     */
+    public function getById($id)
+    {
+        $session = parent::getById($id);
+        $session_data = $this->getSessionData($session['id']);
+
+        return array_merge($session, $session_data);
+    }
+
+    /**
      * Get all console data
      * 
      * @param string $clientId The client id
@@ -35,21 +51,12 @@ class Session_model extends Model
      */
     public function getAllConsole($clientId, $origin)
     {
-        $database = Database::openConnection();
-        $database->prepare("SELECT console FROM $this->table WHERE clientid = :clientid AND origin = :origin AND console != '' ORDER BY id DESC");
-        $database->bindValue(':clientid', $clientId);
-        $database->bindValue(':origin', $origin);
-        $database->execute();
-
-        if ($database->countRows() === 0) {
-            return '';
-        }
-
         $console = '';
-        $sessions = $database->fetchAll();
+        $sessions = $this->getAllByClientId($clientId, $origin);
 
-        foreach ($sessions as $value) {
-            $console .= $value['console'];
+        foreach ($sessions as $session) {
+            $session_data = $this->getSessionData($session['id']);
+            $console .= $session_data['console'];
         }
 
         return $console;
@@ -74,10 +81,11 @@ class Session_model extends Model
         if ($database->countRows() === 0) {
             throw new Exception('Session not found');
         }
+        $session = $database->fetch();
 
-        $report = $database->fetch();
+        $session_data = $this->getSessionData($session['id']);
 
-        return $report;
+        return array_merge($session, $session_data);
     }
 
     /**
@@ -160,26 +168,42 @@ class Session_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("INSERT INTO $this->table (clientid, cookies, dom, origin, referer, uri, `user-agent`, ip, time, localstorage, sessionstorage, payload, console) VALUES (:clientid, :cookies, :dom, :origin, :referer, :uri, :userAgent, :ip, :time, :localstorage, :sessionstorage, :payload, :console)");
+        $database->prepare("INSERT INTO $this->table (clientid, cookies, origin, referer, uri, `user-agent`, ip, time, payload) VALUES (:clientid, :cookies, :origin, :referer, :uri, :userAgent, :ip, :time, :payload)");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':cookies', $cookies);
-        $database->bindValue(':dom', $dom);
         $database->bindValue(':origin', $origin);
         $database->bindValue(':referer', $referer);
         $database->bindValue(':uri', $uri);
         $database->bindValue(':userAgent', $userAgent);
         $database->bindValue(':ip', $ip);
         $database->bindValue(':time', time());
-        $database->bindValue(':localstorage', $localStorage);
-        $database->bindValue(':sessionstorage', $sessionStorage);
         $database->bindValue(':payload', $payload);
-        $database->bindValue(':console', $console);
 
         if (!$database->execute()) {
             throw new Exception('Something unexpected went wrong');
         }
+        $sessionId = $database->lastInsertId();
 
-        return $database->lastInsertId();
+        // Compress data if enabled
+        $compressed = false;
+        if ($this->getCompressStatus() === 1) {
+            $dom = base64_encode(gzdeflate($dom, 9));
+            $localStorage = $localStorage === '{}' ? '{}' : base64_encode(gzdeflate($localStorage, 9));
+            $sessionStorage = $sessionStorage === '{}' ? '{}' : base64_encode(gzdeflate($sessionStorage, 9));
+            $console = empty($console) ? '' : base64_encode(gzdeflate($sessionStorage, 9));
+            $compressed = true;
+        }
+
+        $database->prepare("INSERT INTO $this->table_data (sessionid, dom, localstorage, sessionstorage, console, compressed) VALUES (:sessionid, :dom, :localstorage, :sessionstorage, :console, :compressed)");
+        $database->bindValue(':sessionid', $sessionId);
+        $database->bindValue(':dom', $dom);
+        $database->bindValue(':localstorage', $localStorage);
+        $database->bindValue(':sessionstorage', $sessionStorage);
+        $database->bindValue(':console', $console);
+        $database->bindValue('compressed', $compressed === true ? 1 : 0);
+        $database->execute();
+
+        return $sessionId;
     }
 
     /**
@@ -207,6 +231,33 @@ class Session_model extends Model
     }
 
     /**
+     * Set session data value of single item by id
+     * 
+     * @param int $id The session id
+     * @param string $column The column name
+     * @param string $value The new value
+     * @throws Exception
+     * @return bool
+     */
+    public function setSingleDataValue($id, $column, $value)
+    {
+        if ($this->getCompressStatus() === 1) {
+            $value = empty($value) ? $value : base64_encode(gzdeflate($value, 9));
+        }
+
+        $database = Database::openConnection();
+        $database->prepare("UPDATE $this->table_data SET `$column` = :value WHERE sessionid = :sessionid");
+        $database->bindValue(':value', $value);
+        $database->bindValue(':sessionid', $id);
+
+        if (!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        return true;
+    }
+
+    /**
      * Delete all by client id
      * 
      * @param string $clientId The client id
@@ -215,10 +266,45 @@ class Session_model extends Model
      */
     public function deleteAll($clientId, $origin)
     {
+        $sessions = $this->getAllByClientId($clientId, $origin);
+
+        foreach ($sessions as $session) {
+            $database = Database::openConnection();
+            $database->prepare("DELETE FROM $this->table WHERE id = :id");
+            $database->bindValue(':id', $session['id']);
+            $database->execute();
+
+            $database->prepare("DELETE FROM $this->table_data WHERE sessionid = :sessionid");
+            $database->bindValue(':sessionid', $session['id']);
+            $database->execute();
+        }
+    }
+
+    /**
+     * Get big data from session by id
+     * 
+     * @param int $id The session id
+     * @return array
+     */
+    private function getSessionData($id)
+    {
         $database = Database::openConnection();
-        $database->prepare("DELETE FROM $this->table WHERE clientid = :clientid AND origin = :origin");
-        $database->bindValue(':clientid', $clientId);
-        $database->bindValue(':origin', $origin);
+        $database->prepare("SELECT dom,localstorage,sessionstorage,console,compressed FROM $this->table_data WHERE sessionid = :sessionid LIMIT 1");
+        $database->bindValue(':sessionid', $id);
         $database->execute();
+
+        if ($database->countRows() === 1) {
+            $session_data = $database->fetch();
+        }
+
+        // Decompress if compressed
+        if($session_data['compressed'] ?? 0 == 1) {
+            $session_data['dom'] = gzinflate(base64_decode($session_data['dom'])) ?? '';
+            $session_data['localstorage'] = $session_data['localstorage'] === '{}' ? '{}' : gzinflate(base64_decode($session_data['localstorage'])) ?? '';
+            $session_data['sessionstorage'] = $session_data['sessionstorage'] === '{}' ? '{}' : gzinflate(base64_decode($session_data['sessionstorage'])) ?? '';
+            $session_data['console'] = empty($session_data['console']) ? '' : gzinflate(base64_decode($session_data['console'])) ?? '';
+        }
+
+        return $session_data ?? ['dom' => '', 'localstorage' => '', 'sessionstorage' => '', 'console' => ''];
     }
 }
