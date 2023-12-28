@@ -318,9 +318,9 @@ class Report_model extends Model
         }
 
         $database = Database::openConnection();
-        $database->prepare("UPDATE $this->table_data SET `$column` = :value WHERE id = :id");
+        $database->prepare("UPDATE $this->table_data SET `$column` = :value WHERE reportid = :reportid");
         $database->bindValue(':value', $value);
-        $database->bindValue(':id', $id);
+        $database->bindValue(':reportid', $id);
 
         if (!$database->execute()) {
             throw new Exception('Something unexpected went wrong');
@@ -416,30 +416,11 @@ class Report_model extends Model
         // Decompress if compressed
         if($report_data['compressed'] ?? 0 == 1) {
             $report_data['dom'] = gzinflate(base64_decode($report_data['dom']));
-            $report_data['screenshot'] = strlen($report_data['screenshot']) === 52 || empty($report_data['screenshot']) ? $report_data['screenshot'] : base64_encode(gzinflate(base64_decode($report_data['screenshot'])));
-            $report_data['localstorage'] = $report_data['localstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['localstorage']));
-            $report_data['sessionstorage'] = $report_data['sessionstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['sessionstorage']));
+            $report_data['screenshot'] = strlen($report_data['screenshot']) === 52 || empty($report_data['screenshot']) ? $report_data['screenshot'] : base64_encode(gzinflate(base64_decode($report_data['screenshot']))) ?? '';
+            $report_data['localstorage'] = $report_data['localstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['localstorage'])) ?? '';
+            $report_data['sessionstorage'] = $report_data['sessionstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['sessionstorage'])) ?? '';
         }
 
         return $report_data ?? ['dom' => '', 'screenshot' => '', 'localstorage' => '', 'sessionstorage' => ''];
-    }
-
-    /**
-     * Get compress status
-     * 
-     * @return bool
-     */
-    private function getCompressStatus()
-    {
-        try {
-            $database = Database::openConnection();
-            $database->prepare("SELECT value FROM settings WHERE setting = 'compress' LIMIT 1");
-            $database->execute();
-            $status = $database->fetch();
-
-            return $status['value'] == 1 ? 1 : 0;
-        } catch (Exception $e) {
-            return 0;
-        }
     }
 }
