@@ -207,11 +207,13 @@ class Api extends Controller
     public function statistics()
     {
         $allReports = [];
+        $allSessions = [];
 
         // Check if requested statistics is for admin or user
         if ($this->getJSONValue('page') === 'dashboard') {
             $this->isAdminOrExit();
             $allReports = $this->model('Report')->getAllStaticticsData();
+            $allSessions = $this->model('Session')->getAllStaticticsData();
         } else {
             $user = $this->model('User')->getById($this->session->data('id'));
             $payloads = $this->model('Payload')->getAllByUserId($user['id']);
@@ -223,6 +225,7 @@ class Api extends Controller
                     $payloadUri .= '/%';
                 }
                 $allReports = array_merge($allReports, $this->model('Report')->getAllStaticticsDataByPayload($payloadUri));
+                $allSessions = array_merge($allSessions, $this->model('Session')->getAllStaticticsDataByPayload($payloadUri));
             }
         }
 
@@ -233,10 +236,17 @@ class Api extends Controller
             'totaldomains' => 0,
             'collected' => 0,
             'last' => 'never',
+            'sessionrequests' => count($allSessions),
+            'sessionclients' => 0,
+            'totalsessiondomains' => 0,
+            'weekrequests' => 0,
+            'weekclients' => 0,
+            'lastclient' => 'never',
         ];
+
+        // Reports data
         $uniqueDomains = [];
         $uniqueDomainsWeek = [];
-
         foreach ($allReports as $report) {
             // Counts report from last week
             if ($report['time'] > time() - 604800) {
@@ -261,9 +271,41 @@ class Api extends Controller
             }
         }
 
-        // Get the time of the last report
+        // Session data
+        $uniqueDomains = [];
+        $uniqueClients = [];
+        $uniqueClientsWeek = [];
+        foreach ($allSessions as $session) {
+            // Counts requests from last week
+            if ($session['time'] > time() - 604800) {
+                $statistics['weekrequests']++;
+
+                // Counts unique clients from last week
+                if (!in_array($session['clientid'], $uniqueClientsWeek, true)) {
+                    $uniqueClientsWeek[] = $session['clientid'];
+                    $statistics['weekclients']++;
+                }
+            }
+
+            // Counts unique clients
+            if (!in_array($session['clientid'], $uniqueClients, true)) {
+                $uniqueClients[] = $session['clientid'];
+                $statistics['sessionclients']++;
+            }
+
+            // Counts unique domains
+            if (!in_array($session['origin'], $uniqueDomains, true)) {
+                $uniqueDomains[] = $session['origin'];
+                $statistics['totalsessiondomains']++;
+            }
+        }
+
+        // Get the time of the last report and session
         $lastReport = end($allReports);
         $statistics['last'] = $this->parseTimestamp($lastReport !== false ? $lastReport['time'] : 0);
+
+        $lastSession = end($allSessions);
+        $statistics['lastclient'] = $this->parseTimestamp($lastSession !== false ? $lastSession['time'] : 0);
 
         return $this->showMessage($statistics);
     }

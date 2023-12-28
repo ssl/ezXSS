@@ -18,7 +18,7 @@ class Session_model extends Model
     public function getAll()
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM $this->table p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM $this->table GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.time DESC");
+        $database->prepare("SELECT p.id, p.clientid, p.ip, p.uri, p.payload, p.time, p.origin, p.`user-agent`, last_row.requests FROM $this->table p INNER JOIN ( SELECT MAX(id) as max_id, clientid, COUNT(*) as requests FROM $this->table GROUP BY clientid ) last_row ON p.id = last_row.max_id ORDER BY p.time DESC LIMIT 100000");
         $database->execute();
 
         $data = $database->fetchAll();
@@ -144,6 +144,44 @@ class Session_model extends Model
         $database->execute();
 
         return $database->countRows();
+    }
+
+    /**
+     * Get all statictics data
+     * 
+     * @throws Exception
+     * @return array
+     */
+    public function getAllStaticticsData()
+    {
+        $database = Database::openConnection();
+        $database->prepare("SELECT clientid,origin,time FROM $this->table ORDER BY id ASC");
+
+        if (!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        return $database->fetchAll();
+    }
+
+    /**
+     * Get all statictics data by payload
+     * 
+     * @param string $payload The payload
+     * @throws Exception
+     * @return array
+     */
+    public function getAllStaticticsDataByPayload($payload)
+    {
+        $database = Database::openConnection();
+        $database->prepare("SELECT clientid,origin,time,payload FROM $this->table WHERE payload LIKE :payload ORDER BY id ASC");
+        $database->bindValue(':payload', $payload);
+
+        if (!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        return $database->fetchAll();
     }
 
     /**
