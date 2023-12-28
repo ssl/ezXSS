@@ -18,7 +18,7 @@ class Report_model extends Model
     public function getAll()
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT id,uri,ip,payload,archive,shareid FROM $this->table ORDER BY id DESC");
+        $database->prepare("SELECT id,uri,ip,payload,archive,shareid FROM $this->table ORDER BY id DESC LIMIT 100000");
         $database->execute();
 
         $data = $database->fetchAll();
