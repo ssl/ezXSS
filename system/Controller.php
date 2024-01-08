@@ -326,23 +326,23 @@ class Controller
 
         if ($elapsed < 60) {
             $text = $elapsed == 1 ? 'second' : 'seconds';
-            return ($syntax == 'short') ? $elapsed . 'sec' : $elapsed . " {$text} ago";
+            return ($syntax == 'short') ? $elapsed . ' sec' : $elapsed . " {$text} ago";
         } elseif ($elapsed < 3600) {
             $minutes = floor($elapsed / 60);
             $text = $minutes == 1 ? 'minute' : 'minutes';
-            return ($syntax == 'short') ? $minutes . 'min' : $minutes . " {$text} ago";
+            return ($syntax == 'short') ? $minutes . ' min' : $minutes . " {$text} ago";
         } elseif ($elapsed < 86400) {
             $hours = floor($elapsed / 3600);
             $text = $hours == 1 ? 'hour' : 'hours';
-            return ($syntax == 'short') ? $hours . 'hr' : $hours . " {$text} ago";
+            return ($syntax == 'short') ? $hours . ' hr' : $hours . " {$text} ago";
         } elseif ($elapsed < 2592000) {
             $days = floor($elapsed / 86400);
             $text = $days == 1 ? 'day' : 'days';
-            return ($syntax == 'short') ? $days . $text : $days . " {$text} ago";
+            return ($syntax == 'short') ? $days . ' ' . $text : $days . " {$text} ago";
         } else {
             $months = floor($elapsed / 2592000);
             $text = $months == 1 ? 'month' : 'months';
-            return ($syntax == 'short') ? $months . 'mon' : $months . " {$text} ago";
+            return ($syntax == 'short') ? $months . ' mon' : $months . " {$text} ago";
         }
     }
 

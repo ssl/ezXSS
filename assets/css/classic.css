@@ -512,9 +512,9 @@ input.scriptsrc.clicked{background-color:rgba(255,255,255,.5)}
 #mobile-dropdown{display:none}
 #mobile-dropdown .ezxss-nav{width:80%}
 .report-img{max-width:100%}
-#toprow_common1, #toprow_common2 {display:none;}
-.toprow_count{width:15%}
-.version-banner{height:493px}
+#toprow_common1, #toprow_common2 {display:none}
+.toprow-count{width:20%;text-align:right}
+.version-banner{height:496px}
 table#logs{white-space: nowrap!important;width:100%!important;}
 table#persistent{white-space: nowrap!important;width:100%!important;}
 table#reports{white-space: nowrap!important;width:100%!important;}
@@ -536,3 +536,7 @@ table.simple{white-space: nowrap!important;}
 .report-table-id{width:120px}
 .report-table-id label span{top:4px!important}
 .session-panel{padding-bottom:1px!important}
+.toprow-value{width:100%}
+#most_common1 td,#most_common2 td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#most_common1 td:nth-child(2),#most_common2 td:nth-child(2){text-align:right}
+#notepad-settings{margin-top:3px}
