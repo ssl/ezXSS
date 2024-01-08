@@ -114,7 +114,7 @@ class Reports extends Controller
         // Retrieve and render all payloads of user for listing
         $payloads = [];
         foreach ($payloadList as $val) {
-            $name = !$val ? 'All reports' : $this->model('Payload')->getById($val)['payload'];
+            $name = !$val ? 'All payloads' : $this->model('Payload')->getById($val)['payload'];
             $payloads[] = ['id' => $val, 'name' => ucfirst($name), 'selected' => $val == $id ? 'selected' : ''];
         }
         $this->view->renderDataset('payload', $payloads);
