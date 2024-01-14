@@ -270,6 +270,12 @@ ALTER TABLE `sessions`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `sessions_data`
+--
+ALTER TABLE `sessions_data`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `logs`
 --
 ALTER TABLE `logs`

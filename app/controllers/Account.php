@@ -32,7 +32,7 @@ class Account extends Controller
 
                 // Check if posted data is changing MFA
                 if ($this->getPostValue('mfa') !== null) {
-                    $secret = $this->getPostValue('secret');
+                    $secret = $this->getPostValue('secret') ?? '';
                     $code = $this->getPostValue('code');
                     $this->mfaSettings($secret, $code);
                 }
@@ -142,7 +142,7 @@ class Account extends Controller
                 $code = $this->getPostValue('code');
                 $user = $this->model('User')->getById($this->session->data('id'));
 
-                if (getAuthCode($user['secret']) != $code) {
+                if (getAuthCode($user['secret']) !== $code) {
                     throw new Exception('Code is incorrect');
                 }
 
@@ -265,7 +265,7 @@ class Account extends Controller
                 throw new Exception('Secret length needs to be 16 characters long');
             }
 
-            if (getAuthCode($secret) != $code) {
+            if (getAuthCode($secret) !== $code) {
                 throw new Exception('Code is incorrect.');
             }
         } else {
@@ -273,7 +273,7 @@ class Account extends Controller
                 throw new Exception('2FA settings are already disabled');
             }
 
-            if (getAuthCode($secretCode) != $code) {
+            if (getAuthCode($secretCode) !== $code) {
                 throw new Exception('Code is incorrect');
             }
             $secret = '';
