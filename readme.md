@@ -34,6 +34,8 @@
     * Extract additional defined pages
 * much much more, and, its just ez :-)
 
+Payloads trigger on Chrome 3+, IE 8+, Firefox 4+, Opera 10.5+, Safari 4+, Android 5+ and Edge.
+
 ## Required
 * Server or webhosting with PHP 7.1 or up
 * Domain name (consider a short one or check out [shortboost](https://github.com/ssl/shortboost))

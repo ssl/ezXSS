@@ -100,7 +100,7 @@ $(document).ready(function () {
                 }
             },
         ],
-        order: [[3, 'desc']],
+        order: [[6, 'desc']],
     });
 
     if (location.toString().split('/')[4] === "persistent") {
