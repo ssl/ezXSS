@@ -1,40 +1,60 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>ezXSS Payload Tester</title>
-        <style>.block{width:20px;height:20px;display:inline-block}.title{background-color:rgb(43,49,87);color:rgb(94,100,139);padding:5px}</style>
-    </head>
-    <body>
-        <h1 class="title">ezXSS Payload Tester</h1>
-        <p>This URL fires the ezXSS payload</p>
-        <a href="javascript:location.reload(true)">Reload page</a>
-        
-        <!-- Screenshot color tester -->
-        <hr><div class="block" style="background-color:red"></div>
-        <div class="block" style="background-color:green"></div>
-        <div class="block" style="background-color:blue"></div>
-        <div class="block" style="background-color:yellow"></div>
-        <div class="block" style="background-color:orange"></div><br>
-        <div class="block" style="background-color:black"></div>
-        <div class="block" style="background-color:white"></div>
-        <div class="block" style="background-color:purple"></div>
-        <div class="block" style="background-color:pink"></div>
-        <div class="block" style="background-color:gray"></div>
-        <p>github.com/ssl/ezXSS</p>
+<head>
+    <title>ezXSS Payload Tester</title>
+    <style>.block{width:20px;height:20px;display:inline-block}.circle{width:20px;height:20px;display:inline-block;border-radius:10px}.title{background-color:rgb(43,49,87);color:rgb(94,100,139);padding:5px}</style>
+</head>
+<body>
+    <h1 class="title">ezXSS Payload Tester</h1>
+    <p>This URL fires the ezXSS payload</p>
+    <a href="javascript:location.reload(true)">Reload page</a>
 
-        <!-- Add test data to storage -->
-        <script>
-            sessionStorage.setItem("ezsessionStorageTester", Date.now());
-            localStorage.setItem("ezlocalStorageTester", Date.now());
-            document.cookie = "ezCookieTester=" + Date.now();
-        </script>
+    <!-- Screenshot color tester -->
+    <hr>
+    <div class="block" style="background-color:red"></div>
+    <div class="block" style="background-color:green"></div>
+    <div class="block" style="background-color:blue"></div>
+    <div class="block" style="background-color:yellow"></div>
+    <div class="block" style="background-color:orange"></div>
+    <div class="circle" style="background-color:red"></div>
+    <div class="circle" style="background-color:green"></div>
+    <div class="circle" style="background-color:blue"></div>
+    <div class="circle" style="background-color:yellow"></div>
+    <div class="circle" style="background-color:orange"></div><br>
+    <div class="block" style="background-color:black"></div>
+    <div class="block" style="background-color:white"></div>
+    <div class="block" style="background-color:purple"></div>
+    <div class="block" style="background-color:pink"></div>
+    <div class="block" style="background-color:gray"></div>
+    <div class="circle" style="background-color:black"></div>
+    <div class="circle" style="background-color:white"></div>
+    <div class="circle" style="background-color:purple"></div>
+    <div class="circle" style="background-color:pink"></div>
+    <div class="circle" style="background-color:gray"></div>
+    <p>github.com/ssl/ezXSS</p>
+    <div id="colors"></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            for (var i = 0; i < 10; i++) {
+                const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                document.getElementById('colors').innerHTML += `<div class='block' style='background-color: ${color}'></div>`;
+            };
+        });
+    </script>
 
-        <!-- Load payload from main domain -->
-        <script src="/"></script>
-        <hr>
-        <script>
-            document.write('ezXSS payload initialized: <b>' + (typeof ez_nW === "function" ? 'yes' : 'no') + '</b>');
-            document.write('<br>ezXSS persistent initialized: <b>' + (typeof ez_persist === "function" ? 'yes' : 'no') + '</b>');
-        </script>
-    </body>
+    <!-- Add test data to storage -->
+    <script>
+        sessionStorage.setItem("ezsessionStorageTester", Date.now());
+        localStorage.setItem("ezlocalStorageTester", Date.now());
+        document.cookie = "ezCookieTester=" + Date.now();
+    </script>
+
+    <!-- Load payload from main domain -->
+    <script src="/"></script>
+    <hr>
+    <script>
+        document.write('ezXSS payload initialized: <b>' + (typeof ez_nW === "function" ? 'yes' : 'no') + '</b>');
+        document.write('<br>ezXSS persistent initialized: <b>' + (typeof ez_persist === "function" ? 'yes' : 'no') + '</b>');
+    </script>
+</body>
 </html>
