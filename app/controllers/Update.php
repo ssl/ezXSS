@@ -19,9 +19,15 @@ class Update extends Controller
         }
 
         try {
-            $this->view->renderData('tablesize', 'Table size: ' . ceil(($this->getReportsSize() * 1.1) / (1024*1024)) . ' MB');
+            $this->view->renderData('tablesize', 'Tables size: ' . ceil(($this->getTablesSize() * 1.1) / (1024*1024)) . ' MB');
         } catch (Exception) {
-            $this->view->renderData('tablesize', 'Error in retrieving table size. Proceed with caution');
+            $this->view->renderData('tablesize', 'Error in retrieving tables size. Proceed with caution');
+        }
+
+        try {
+            $this->view->renderData('disksize', 'Free disk space: ' . ceil(disk_free_space('/') / (1024*1024)) . ' MB');
+        } catch (Exception) {
+            $this->view->renderData('disksize', 'Error in retrieving free disk space. Proceed with caution');
         }
 
         if ($this->isPOST()) {
@@ -62,7 +68,7 @@ class Update extends Controller
                 if ($version === '4.1') {
                     try {
                         // Check if disk has enough free space
-                        $tableSize = $this->getReportsSize();
+                        $tableSize = $this->getTablesSize();
                         if($tableSize * 1.1 > disk_free_space('/')) {
                             $freeSpace = ceil(disk_free_space('/') / (1024*1024));
                             $tableSize = ceil(($tableSize * 1.1) / (1024*1024));
@@ -175,13 +181,13 @@ class Update extends Controller
     }
 
     /**
-     * Get size in bytes from reports table
+     * Get size in bytes from reports and session table
      * 
      * @return int
      */
-    private function getReportsSize() {
+    private function getTablesSize() {
         $database = Database::openConnection();
-        $database->prepare('SELECT data_length + index_length AS total_size FROM information_schema.tables WHERE table_schema = "' . DB_NAME . '" AND table_name = "reports"');
+        $database->prepare('SELECT SUM(data_length + index_length) AS total_size FROM information_schema.tables WHERE table_schema = "' . DB_NAME . '" AND table_name IN ("reports", "sessions")');
         $database->execute();
         $tableSize = $database->fetch();
         return $tableSize['total_size'];

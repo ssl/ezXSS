@@ -81,7 +81,7 @@ class Api extends Controller
         }
 
         // Get last chat from bot
-        $api = curl_init('https://api.telegram.org/bot{$bottoken}/getUpdates');
+        $api = curl_init("https://api.telegram.org/bot{$bottoken}/getUpdates");
         curl_setopt($api, CURLOPT_RETURNTRANSFER, true);
         $results = json_decode(curl_exec($api), true);
 
