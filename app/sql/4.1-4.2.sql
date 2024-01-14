@@ -93,6 +93,7 @@ DROP COLUMN console;
 ALTER TABLE reports ADD INDEX(archive);
 ALTER TABLE reports ADD INDEX(payload);
 ALTER TABLE reports ADD INDEX(id);
+ALTER TABLE reports ADD INDEX(shareid);
 ALTER TABLE reports_data ADD INDEX(reportid);
 
 ALTER TABLE sessions ADD INDEX(id);
