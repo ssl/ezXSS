@@ -150,7 +150,7 @@ class Payloads extends Controller
         if ($payload['whitelist'] !== '' && $payload['whitelist'] !== null) {
             $foundWhitelist = false;
             foreach ($whitelistDomains as $whitelistDomain) {
-                if ($data->origin == $whitelistDomain) {
+                if ($data->origin !== '' && $data->origin == $whitelistDomain) {
                     $foundWhitelist = true;
                 }
                 if (strpos($whitelistDomain, '*') !== false) {
@@ -173,7 +173,7 @@ class Payloads extends Controller
         // Check if the report should be saved or alerted
         $doubleReport = false;
         if ($this->model('Setting')->get('filter-save') == 0 || $this->model('Setting')->get('filter-alert') == 0) {
-            $searchId = $this->model('Report')->searchForDublicates($data->cookies ?? '', $data->origin, $data->referer, $data->uri, $data->{'user-agent'}, $data->dom, $data->ip);
+            $searchId = $this->model('Report')->searchForDublicates($data->cookies ?? '', $data->origin, $data->referer, $data->uri, $data->{'user-agent'}, $data->dom ?? '', $data->ip);
             if ($searchId !== false) {
                 if ($this->model('Setting')->get('filter-save') == 0 && $this->model('Setting')->get('filter-alert') == 0) {
                     return 'github.com/ssl/ezXSS';
@@ -184,7 +184,6 @@ class Payloads extends Controller
         }
 
         if (($doubleReport !== false && ($this->model('Setting')->get('filter-save') == 1 || $this->model('Setting')->get('filter-alert') == 1)) || $doubleReport === false) {
-
             // Create an image from the screenshot data
             if (!empty($data->screenshot)) {
                 try {
@@ -320,7 +319,7 @@ class Payloads extends Controller
         // Check if the DOM should be truncated
         if ($this->model('Setting')->get('dompart') > 0 && strlen($data->dom ?? '') > $this->model('Setting')->get('dompart')) {
             $data->dom = substr($data->dom ?? '', 0, $this->model('Setting')->get('dompart')) .
-                '&#13;&#10;&#13;&#10;View full DOM on the report page';
+                "\r\nView the full DOM on the report page";
         }
 
         $payload = $this->getPayloadByUrl($data->payload);
@@ -458,7 +457,7 @@ class Payloads extends Controller
     private function mailAlert($data, $email)
     {
         // Escapes data for alert
-        $escapedData = json_decode(json_encode($data), false) ?? [];
+        $escapedData = json_decode(json_encode($data), false) ?? json_decode('{}', false);
         array_walk_recursive($escapedData, function (&$item) {
             if (is_string($item)) {
                 $item = e($item);
@@ -503,7 +502,7 @@ class Payloads extends Controller
         mail(
             $email,
             '[ezXSS] XSS on ' . $escapedData->uri ?? '',
-            implode("\n", $multipart),
+            implode("\n", str_replace(chr(0), '', $multipart)),
             implode("\n", $headers)
         );
     }

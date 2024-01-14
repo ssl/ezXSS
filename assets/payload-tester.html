@@ -65,8 +65,9 @@
     <hr>
     <script>
         try {
-            document.write('ezXSS payload initialized: <b>' + (typeof ez_nW === "function" ? 'yes' : 'no') + '</b>');
-            document.write('<br>ezXSS persistent initialized: <b>' + (typeof ez_persist === "function" ? 'yes' : 'no') + '</b>');
+            document.write('ezXSS payload initialized: <b>' + (typeof ez_nW === "function" ? 'yes' : 'no') + '</b><br>');
+            document.write('ezXSS screenshot initialized: <b>' + (typeof html2canvas === "function" ? 'yes' : 'no') + '</b><br>');
+            document.write('ezXSS persistent initialized: <b>' + (typeof ez_persist === "function" ? 'yes' : 'no') + '</b>');
         } catch (t) {}
     </script>
 </body>
