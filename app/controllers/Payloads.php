@@ -405,6 +405,7 @@ class Payloads extends Controller
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents('php://input'));
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_exec($ch);
     }
 
@@ -428,6 +429,7 @@ class Payloads extends Controller
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['chat_id' => $chatid, 'parse_mode' => 'markdown', 'text' => $alertTemplate]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_exec($ch);
 
         // Send photo with screenshot
@@ -440,6 +442,7 @@ class Payloads extends Controller
             curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-type: multipart/form-data']);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
             curl_setopt($ch, CURLOPT_POSTFIELDS, ['chat_id' => $chatid, 'photo' => $curlFile, 'caption' => "Screenshot from XSS Report #{$data->id}"]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_exec($ch);
         }
     }
@@ -524,6 +527,7 @@ class Payloads extends Controller
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['type' => 'mrkdwn', 'text' => $alertTemplate]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_exec($ch);
     }
 
@@ -566,6 +570,7 @@ class Payloads extends Controller
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, !empty($curlFile) ? ['payload_json' => $discordMessage, 'file' => $curlFile] : ['payload_json' => $discordMessage]);
         curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_exec($ch);
     }
 
