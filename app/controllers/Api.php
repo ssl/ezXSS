@@ -226,6 +226,8 @@ class Api extends Controller
                 }
                 $allReports = array_merge($allReports, $this->model('Report')->getAllStaticticsDataByPayload($payloadUri));
                 $allSessions = array_merge($allSessions, $this->model('Session')->getAllStaticticsDataByPayload($payloadUri));
+                usort($allReports, function($a, $b) { return $a['time'] - $b['time']; });
+                usort($allSessions, function($a, $b) { return $a['time'] - $b['time']; });
             }
         }
 
