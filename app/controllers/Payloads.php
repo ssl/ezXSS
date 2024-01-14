@@ -114,6 +114,7 @@ class Payloads extends Controller
 
         // Remove the protocol from the origin URL
         $data->origin = str_replace(['https://', 'http://'], '', $data->origin ?? '');
+        $data->origin = ($data->origin === '' && $data->uri !== '') ? (parse_url($data->uri ?? '')['host'] ?? '') : $data->origin;
 
         // Truncate very long strings
         $data->uri = substr($data->uri ?? '', 0, 1000);
@@ -134,7 +135,7 @@ class Payloads extends Controller
 
         // Check for blacklisted domains
         foreach ($blacklistDomains as $blockedDomain) {
-            if ($data->origin == $blockedDomain) {
+            if ($data->origin !== '' && $data->origin == $blockedDomain) {
                 return 'github.com/ssl/ezXSS';
             }
             if (strpos($blockedDomain, '*') !== false) {
