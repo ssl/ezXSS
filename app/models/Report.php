@@ -35,7 +35,7 @@ class Report_model extends Model
     public function getAllByArchive($archive)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT id,uri,ip,payload,shareid FROM $this->table WHERE archive = :archive ORDER BY id DESC");
+        $database->prepare("SELECT id,uri,ip,payload,shareid,`user-agent`,time FROM $this->table WHERE archive = :archive ORDER BY id DESC");
         $database->bindValue(':archive', $archive);
         $database->execute();
 
@@ -94,7 +94,7 @@ class Report_model extends Model
     public function getAllByPayload($payload, $archive)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT id,uri,ip,payload,shareid FROM $this->table WHERE payload LIKE :payload AND archive = :archive ORDER BY id DESC");
+        $database->prepare("SELECT id,uri,ip,payload,shareid,`user-agent`,time FROM $this->table WHERE payload LIKE :payload AND archive = :archive ORDER BY id DESC");
         $database->bindValue(':archive', $archive);
         $database->bindValue(':payload', $payload);
 

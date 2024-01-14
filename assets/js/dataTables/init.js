@@ -43,10 +43,12 @@ $(document).ready(function () {
                     </div>`;
                 }
             },
-            { data: 'id', },
-            { data: 'uri', },
-            { data: 'ip', },
-            { data: 'payload', className: 'dt-body-right' }
+            { data: 'id' },
+            { data: 'uri' },
+            { data: 'ip' },
+            { data: 'browser' },
+            { data: 'payload' },
+            { data: 'last' }
         ],
         columnDefs: [{ targets: 2, className: "truncate" }],
         createdRow: function (row, data, dataIndex) {
@@ -84,10 +86,10 @@ $(document).ready(function () {
                 }
             },
             { data: 'browser', },
-            { data: 'ip', },
-            { data: 'shorturi', },
-            { data: 'payload', },
-            { data: 'requests', },
+            { data: 'ip' },
+            { data: 'shorturi' },
+            { data: 'payload' },
+            { data: 'requests' },
             { 
                 data: 'last',
                 render: function (data, type, row, meta) {
