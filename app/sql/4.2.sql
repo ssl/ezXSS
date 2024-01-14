@@ -178,6 +178,23 @@ CREATE TABLE `sessions` (
   `console` longtext
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sessions_data`
+--
+
+CREATE TABLE `sessions_data` (
+    `id` INT(11) NOT NULL,
+    `sessionid` INT(11) NOT NULL,
+    `dom` longtext,
+    `localstorage` longtext,
+    `sessionstorage` longtext,
+    `console` longtext,
+    `compressed` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- --------------------------------------------------------
 
 --
@@ -305,6 +322,12 @@ ALTER TABLE `sessions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 COMMIT;
 --
+-- AUTO_INCREMENT for table `sessions_data`
+--
+ALTER TABLE `sessions_data`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+COMMIT;
+--
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
@@ -324,4 +347,11 @@ COMMIT;
 ALTER TABLE reports ADD INDEX(archive);
 ALTER TABLE reports ADD INDEX(payload);
 ALTER TABLE reports ADD INDEX(id);
+ALTER TABLE reports ADD INDEX(shareid);
 ALTER TABLE reports_data ADD INDEX(reportid);
+
+ALTER TABLE sessions ADD INDEX(id);
+ALTER TABLE sessions ADD INDEX(payload);
+ALTER TABLE sessions ADD INDEX(clientid);
+ALTER TABLE sessions ADD INDEX(origin);
+ALTER TABLE sessions_data ADD INDEX(sessionid);
