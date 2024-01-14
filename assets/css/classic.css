@@ -500,7 +500,7 @@ div.table-responsive>div.dataTables_wrapper>div.row>div[class^=col-]:last-child{
 .common-selectbox{margin-left:5px;height:22px;display:inline;width:100px;border:0;background-color:#343a60}
 #mobile-dropdown{display:none}
 #mobile-icon{width:35px;height:5px;background-color:#000;margin:6px 0}
-.truncate{max-width:500px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.truncate{max-width:600px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dt-body-left{width:1%}
 #reports tbody td:nth-child(5){width:1%}
 select{-webkit-appearance:none;appearance:none;background-image:none;border-radius:0}

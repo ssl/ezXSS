@@ -382,6 +382,11 @@ class Api extends Controller
             $reports = $this->model('Report')->getAllByPayload($payloadUri, $archive);
         }
 
+        foreach ($reports as $key => $value) {
+            $reports[$key]['browser'] = $this->parseUserAgent($reports[$key]['user-agent']);
+            $reports[$key]['last'] = $this->parseTimestamp($reports[$key]['time'], 'long');
+        }
+
         return $this->showData($reports);
     }
 
