@@ -4,9 +4,30 @@ RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
 RUN echo "RemoteIPHeader X-Forwarded-For" >> /etc/apache2/conf-enabled/remoteip.conf
 RUN echo "RemoteIPInternalProxy 172.16.0.0/12" >> /etc/apache2/conf-enabled/remoteip.conf
-RUN a2enmod rewrite headers remoteip
+RUN a2enmod rewrite headers remoteip ssl
 
 RUN docker-php-ext-install pdo_mysql
+
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/server.key -out /etc/ssl/certs/server.crt -subj "/C=US/ST=CA/L=SanFrancisco/O=MyOrg/OU=MyUnit/CN=localhost"
+
+RUN a2enmod ssl
+
+RUN echo "<VirtualHost *:443>\n\
+    ServerAdmin webmaster@localhost\n\
+    DocumentRoot /var/www/html\n\
+    SSLEngine on\n\
+    SSLCertificateFile /etc/ssl/certs/server.crt\n\
+    SSLCertificateKeyFile /etc/ssl/private/server.key\n\
+    ErrorLog \${APACHE_LOG_DIR}/error.log\n\
+    CustomLog \${APACHE_LOG_DIR}/access.log combined\n\
+    <Directory /var/www/html>\n\
+        Options Indexes FollowSymLinks\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+</VirtualHost>" > /etc/apache2/sites-available/default-ssl.conf
+
+RUN a2ensite default-ssl
 
 COPY . /var/www/html
 
