@@ -392,8 +392,8 @@ class Controller
     {
         try {
             if (path !== '/manage/install') {
-                // Fetch current version will throw exception if no database exists
-                $this->model('Setting')->get('version');
+                // Fetch timezone will throw exception if no database exists
+                $this->model('Setting')->get('timezone');
             }
         } catch (Exception $e) {
             redirect('/manage/install');

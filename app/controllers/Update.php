@@ -12,8 +12,25 @@ class Update extends Controller
         $this->view->setTitle('Update');
         $this->view->renderTemplate('system/update');
 
+        // Get database ezXSS version
+        try {
+            $version = $this->model('Setting')->get('version');
+        } catch (Exception) {
+            // If version is not found, install might be from before 3.5
+            $version = '1.0';
+            try {
+                // Secret setting is introduced in 2.0
+                $this->model('Setting')->get('secret');
+                $version = '2.0';
+            } catch (Exception) {}
+            try {
+                // Screenshot setting is introduced in 3.0
+                $this->model('Setting')->get('screenshot');
+                $version = '3.0';
+            } catch (Exception) {}
+        }
+
         // Make sure the platform is not already up-to-date
-        $version = $this->model('Setting')->get('version');
         if ($version === version) {
             throw new Exception('ezXSS is already up-to-date');
         }
@@ -36,7 +53,7 @@ class Update extends Controller
 
                 // Check if the version is 1.x
                 if (preg_match('/^1\./', $version)) {
-                    throw new Exception('ezXSS 1.x is deprecated. Please re-install on new database');
+                    throw new Exception('ezXSS 1.x is deprecated. Please re-install on new empty database');
                 }
 
                 // Update the database from 2.x to 3.0
@@ -45,7 +62,6 @@ class Update extends Controller
                     $database = Database::openConnection();
                     $database->exec($sql);
                     $version = '3.0';
-                    $this->model('Setting')->set('version', $version);
                 }
 
                 // Update the database from 3.x to 4.0
