@@ -14,7 +14,7 @@ class Install extends Controller
 
         // Make sure the platform is not already installed
         try {
-            $this->model('Setting')->get('version');
+            $this->model('Setting')->get('timezone');
             redirect('dashboard/index');
         } catch (Exception $e) {
         }
