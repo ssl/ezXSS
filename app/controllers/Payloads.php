@@ -20,6 +20,11 @@ class Payloads extends Controller
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Headers: origin, x-requested-with, content-type');
         header('Access-Control-Allow-Methods: GET, POST');
+
+        // Cache headers
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
     }
 
     /**
