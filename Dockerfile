@@ -8,16 +8,22 @@ RUN a2enmod rewrite headers remoteip ssl
 
 RUN docker-php-ext-install pdo_mysql
 
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/server.key -out /etc/ssl/certs/server.crt -subj "/C=US/ST=CA/L=SanFrancisco/O=MyOrg/OU=MyUnit/CN=localhost"
+RUN apt-get update && \
+    apt-get install -y certbot python3-certbot-apache && \
+    rm -rf /var/lib/apt/lists/*
+
 
 RUN a2enmod ssl
+RUN a2ensite default-ssl
+
+RUN certbot --apache --non-interactive --agree-tos --email webmaster@${DOMAIN} -d ${DOMAIN}
 
 RUN echo "<VirtualHost *:443>\n\
-    ServerAdmin webmaster@localhost\n\
+    ServerAdmin webmaster@${DOMAIN}\n\
     DocumentRoot /var/www/html\n\
     SSLEngine on\n\
-    SSLCertificateFile /etc/ssl/certs/server.crt\n\
-    SSLCertificateKeyFile /etc/ssl/private/server.key\n\
+    SSLCertificateFile /etc/letsencrypt/live/${DOMAIN}/fullchain.pem\n\
+    SSLCertificateKeyFile /etc/letsencrypt/live/${DOMAIN}/privkey.pem\n\
     ErrorLog \${APACHE_LOG_DIR}/error.log\n\
     CustomLog \${APACHE_LOG_DIR}/access.log combined\n\
     <Directory /var/www/html>\n\
@@ -26,8 +32,6 @@ RUN echo "<VirtualHost *:443>\n\
         Require all granted\n\
     </Directory>\n\
 </VirtualHost>" > /etc/apache2/sites-available/default-ssl.conf
-
-RUN a2ensite default-ssl
 
 COPY . /var/www/html
 
