@@ -14,9 +14,18 @@ RUN apt-get update && \
 
 
 RUN a2enmod ssl
-RUN a2ensite default-ssl
 
-RUN certbot --apache --non-interactive --agree-tos --email webmaster@${DOMAIN} -d ${DOMAIN}
+RUN certbot certonly --non-interactive --agree-tos --email webmaster@${DOMAIN} --webroot --webroot-path=/data/letsencrypt -d ${DOMAIN}
+
+RUN echo "<VirtualHost *:80>\n\
+    ServerAdmin webmaster@${DOMAIN}\n\
+    DocumentRoot /var/www/html\n\
+    Alias /.well-known/acme-challenge /var/www/letsencrypt/data/.well-known/acme-challenge
+   
+    </Directory>\n\
+</VirtualHost>" > /etc/apache2/sites-available/000-no-ssl-default.conf
+
+RUN a2ensite no-ssl-default
 
 RUN echo "<VirtualHost *:443>\n\
     ServerAdmin webmaster@${DOMAIN}\n\
@@ -32,6 +41,8 @@ RUN echo "<VirtualHost *:443>\n\
         Require all granted\n\
     </Directory>\n\
 </VirtualHost>" > /etc/apache2/sites-available/default-ssl.conf
+
+RUN a2ensite default-ssl
 
 COPY . /var/www/html
 
