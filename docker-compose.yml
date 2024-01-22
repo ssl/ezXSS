@@ -18,6 +18,7 @@ services:
       dockerfile: ./Dockerfile
       args:
         - USE_MAIL_ALERTS=${useMailAlerts}
+        - DOMAIN=${domain}
     ports:
       - "${dockerHttpPort:-80}:80"
       - "${dockerHttpsPort:-443}:443"
