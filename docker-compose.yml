@@ -24,6 +24,8 @@ services:
       - "${dockerHttpsPort:-443}:443"
     volumes:
       - .:/var/www/html
+      - letsencrypt/certs:/etc/letsencrypt
+      - letsencrypt/data:/data/letsencrypt
     restart: always
     depends_on:
       - ezxssdb
