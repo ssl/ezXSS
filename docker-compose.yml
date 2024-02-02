@@ -18,6 +18,7 @@ services:
       dockerfile: ./Dockerfile
       args:
         - USE_MAIL_ALERTS=${useMailAlerts}
+        - INSTALL_CERTIFICATE=${autoInstallCertificate}
         - DOMAIN=${domain}
     ports:
       - "${dockerHttpPort:-80}:80"

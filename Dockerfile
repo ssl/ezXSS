@@ -15,34 +15,36 @@ RUN apt-get update && \
 
 RUN a2enmod ssl
 
-RUN certbot certonly --non-interactive --agree-tos --email webmaster@${DOMAIN} --webroot --webroot-path=/data/letsencrypt -d ${DOMAIN}
+ARG INSTALL_CERTIFICATE
 
-RUN echo "<VirtualHost *:80>\n\
-    ServerAdmin webmaster@${DOMAIN}\n\
-    DocumentRoot /var/www/html\n\
-    Alias /.well-known/acme-challenge /var/www/letsencrypt/data/.well-known/acme-challenge
-   
-    </Directory>\n\
-</VirtualHost>" > /etc/apache2/sites-available/000-no-ssl-default.conf
+RUN if [ "$INSTALL_CERTIFICATE" = "true" ]; then \
+        certbot certonly --non-interactive --agree-tos --email webmaster@${DOMAIN} --webroot --webroot-path=/data/letsencrypt -d ${DOMAIN}; \
+    fi
 
-RUN a2ensite no-ssl-default
-
-RUN echo "<VirtualHost *:443>\n\
-    ServerAdmin webmaster@${DOMAIN}\n\
-    DocumentRoot /var/www/html\n\
-    SSLEngine on\n\
-    SSLCertificateFile /etc/letsencrypt/live/${DOMAIN}/fullchain.pem\n\
-    SSLCertificateKeyFile /etc/letsencrypt/live/${DOMAIN}/privkey.pem\n\
-    ErrorLog \${APACHE_LOG_DIR}/error.log\n\
-    CustomLog \${APACHE_LOG_DIR}/access.log combined\n\
-    <Directory /var/www/html>\n\
-        Options Indexes FollowSymLinks\n\
-        AllowOverride All\n\
-        Require all granted\n\
-    </Directory>\n\
-</VirtualHost>" > /etc/apache2/sites-available/default-ssl.conf
-
-RUN a2ensite default-ssl
+RUN if [ "$INSTALL_CERTIFICATE" = "true" ]; then \
+        echo "<VirtualHost *:80>\n\
+        ServerAdmin webmaster@${DOMAIN}\n\
+        DocumentRoot /var/www/html\n\
+        Alias /.well-known/acme-challenge /var/www/letsencrypt/data/.well-known/acme-challenge\n\
+        </Directory>\n\
+        </VirtualHost>" > /etc/apache2/sites-available/000-no-ssl-default.conf && \
+        a2ensite no-ssl-default && \
+        echo "<VirtualHost *:443>\n\
+        ServerAdmin webmaster@${DOMAIN}\n\
+        DocumentRoot /var/www/html\n\
+        SSLEngine on\n\
+        SSLCertificateFile /etc/letsencrypt/live/${DOMAIN}/fullchain.pem\n\
+        SSLCertificateKeyFile /etc/letsencrypt/live/${DOMAIN}/privkey.pem\n\
+        ErrorLog \${APACHE_LOG_DIR}/error.log\n\
+        CustomLog \${APACHE_LOG_DIR}/access.log combined\n\
+        <Directory /var/www/html>\n\
+            Options Indexes FollowSymLinks\n\
+            AllowOverride All\n\
+            Require all granted\n\
+        </Directory>\n\
+        </VirtualHost>" > /etc/apache2/sites-available/default-ssl.conf && \
+        a2ensite default-ssl; \
+    fi
 
 COPY . /var/www/html
 
@@ -64,4 +66,3 @@ RUN chmod 777 /var/www/html/assets/img
 
 ENTRYPOINT ["docker-php-entrypoint"]
 CMD ["apache2-foreground"]
-
