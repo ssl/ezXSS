@@ -70,8 +70,8 @@ $(document).ready(function () {
                 $('#' + key).html(value)
             })
         })
-
-        var isMy = location.toString().split('/').pop() === 'my' ? 0 : 1
+        
+        var isMy = location.toString().split('/').pop() === 'my' && location.toString().split('/').pop() !== 'index' ? 0 : 1
 
         pick_common($('#pick_common1').val(), 1, isMy)
         pick_common($('#pick_common2').val(), 2, isMy)

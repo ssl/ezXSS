@@ -86,6 +86,28 @@ class View
     }
 
     /**
+     * Updates all the data parameters with the correct data with newlines
+     *
+     * @param string $param The param
+     * @param string $value The value
+     * @param bool $plain Text or HTML
+     * @return void
+     */
+    public function renderDataWithLines($param, $value, $plain = false)
+    {
+        $content = $this->getContent();
+        $value = $plain ? ($value ?? '') : (e($value) ?? '');
+
+        if ($value === '') {
+            $content = preg_replace("/{%data $param.*?\n/", '', $content);
+        } else {
+            $content = str_replace('{%data ' . $param . '}', "\n" . $value, $content);
+        }
+
+        $this->content = $content;
+    }
+
+    /**
      * Updates all if statements in the view template based on the given boolean
      *
      * @param string $condition The condition name
