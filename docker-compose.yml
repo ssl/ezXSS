@@ -23,7 +23,7 @@ services:
       - "${dockerHttpsPort:-443}:443"
     volumes:
       - .:/var/www/html
-    restart: no
+    restart: always
     depends_on:
       - ezxssdb
     environment:

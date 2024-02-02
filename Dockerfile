@@ -35,4 +35,3 @@ RUN chmod 777 /var/www/html/assets/img
 
 # Set the entrypoint script to initialize everything
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["apache2-foreground"]
