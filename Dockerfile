@@ -1,68 +1,38 @@
 FROM php:8-apache
 
+# PHP and Apache configuration
 RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
-
 RUN echo "RemoteIPHeader X-Forwarded-For" >> /etc/apache2/conf-enabled/remoteip.conf
 RUN echo "RemoteIPInternalProxy 172.16.0.0/12" >> /etc/apache2/conf-enabled/remoteip.conf
-RUN a2enmod rewrite headers remoteip ssl
-
+RUN a2enmod rewrite headers remoteip
 RUN docker-php-ext-install pdo_mysql
 
+# Install necessary packages
 RUN apt-get update && \
-    apt-get install -y certbot python3-certbot-apache && \
+    apt-get install -y certbot python3-certbot-apache msmtp && \
     rm -rf /var/lib/apt/lists/*
 
-
+# Configure Apache and SSL
 RUN a2enmod ssl
+COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-ARG INSTALL_CERTIFICATE
-
-RUN if [ "$INSTALL_CERTIFICATE" = "true" ]; then \
-        certbot certonly --non-interactive --agree-tos --email webmaster@${DOMAIN} --webroot --webroot-path=/data/letsencrypt -d ${DOMAIN}; \
-    fi
-
-RUN if [ "$INSTALL_CERTIFICATE" = "true" ]; then \
-        echo "<VirtualHost *:80>\n\
-        ServerAdmin webmaster@${DOMAIN}\n\
-        DocumentRoot /var/www/html\n\
-        Alias /.well-known/acme-challenge /var/www/letsencrypt/data/.well-known/acme-challenge\n\
-        </Directory>\n\
-        </VirtualHost>" > /etc/apache2/sites-available/000-no-ssl-default.conf && \
-        a2ensite no-ssl-default && \
-        echo "<VirtualHost *:443>\n\
-        ServerAdmin webmaster@${DOMAIN}\n\
-        DocumentRoot /var/www/html\n\
-        SSLEngine on\n\
-        SSLCertificateFile /etc/letsencrypt/live/${DOMAIN}/fullchain.pem\n\
-        SSLCertificateKeyFile /etc/letsencrypt/live/${DOMAIN}/privkey.pem\n\
-        ErrorLog \${APACHE_LOG_DIR}/error.log\n\
-        CustomLog \${APACHE_LOG_DIR}/access.log combined\n\
-        <Directory /var/www/html>\n\
-            Options Indexes FollowSymLinks\n\
-            AllowOverride All\n\
-            Require all granted\n\
-        </Directory>\n\
-        </VirtualHost>" > /etc/apache2/sites-available/default-ssl.conf && \
-        a2ensite default-ssl; \
-    fi
-
+# Copy the application files
 COPY . /var/www/html
 
 # Mail alerts service configuring
 ARG USE_MAIL_ALERTS
 RUN if [ "$USE_MAIL_ALERTS" = "true" ]; then \
-        set -e; \
-        apt-get update && apt-get install -y msmtp && rm -rf /var/lib/apt/lists/*;  \
         cp ./msmtprc /etc/msmtprc; \
         chmod 640 /etc/msmtprc; \
         touch /var/log/msmtp.log; \
         chown root:www-data /etc/msmtprc; \
         chown root:www-data /var/log/msmtp.log; \
         echo "sendmail_path = /usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini; \
-        set +e; \
     fi
 
 RUN chmod 777 /var/www/html/assets/img
 
-ENTRYPOINT ["docker-php-entrypoint"]
+# Set the entrypoint script to initialize everything
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]

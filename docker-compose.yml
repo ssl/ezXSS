@@ -18,15 +18,14 @@ services:
       dockerfile: ./Dockerfile
       args:
         - USE_MAIL_ALERTS=${useMailAlerts}
-        - INSTALL_CERTIFICATE=${autoInstallCertificate}
-        - DOMAIN=${domain}
     ports:
       - "${dockerHttpPort:-80}:80"
       - "${dockerHttpsPort:-443}:443"
     volumes:
       - .:/var/www/html
-      - letsencrypt/certs:/etc/letsencrypt
-      - letsencrypt/data:/data/letsencrypt
-    restart: always
+    restart: no
     depends_on:
       - ezxssdb
+    environment:
+      - INSTALL_CERTIFICATE=true
+      - DOMAIN=${domain}
