@@ -60,13 +60,13 @@ class Payloads extends Controller
             $persistent = $this->view->getPayload('persist');
         }
 
+        $this->view->renderData('payload', url);
         $this->view->renderData('noCollect', implode(',', $noCollect), true);
         $this->view->renderData('pages', implode(',', $pages), true);
-        $this->view->renderData('customjs', $payload['customjs'], true);
-        $this->view->renderData('globaljs', $this->model('Setting')->get('customjs'), true);
-        $this->view->renderData('screenshot', $screenshot, true);
-        $this->view->renderData('payload', url);
-        $this->view->renderData('persistent', $persistent ?? '', true);
+        $this->view->renderDataWithLines('customjs', $payload['customjs'], true);
+        $this->view->renderDataWithLines('globaljs', $this->model('Setting')->get('customjs'), true);
+        $this->view->renderDataWithLines('screenshot', $screenshot, true);
+        $this->view->renderDataWithLines('persistent', $persistent ?? '', true);
 
         return $this->view->getContent();
     }
