@@ -31,7 +31,7 @@ load_dotenv()
 host = os.getenv("prHost")
 websockets_port = os.getenv("prWebPort")
 proxy_port = os.getenv("prProxyPort")
-use_login = True if os.getenv("prUseLogin") == '1' else False
+use_login = True if os.getenv("prUseLogin") == '1' or os.getenv("prUseLogin") == 'true' else False
 username = os.getenv("prUser")
 password = os.getenv("prPassword")
 cert_file = os.getenv("prCertFile")
