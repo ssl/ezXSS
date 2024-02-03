@@ -41,6 +41,12 @@ obtain_certificate() {
         fi
     else
         echo "SSL certificate installation not requested. Skipping..."
+        if [ "$HTTPMODE" = "false" ]; then
+            if [ ! -e "/etc/apache2/sites-enabled/default-ssl.conf" ]; then
+                echo "Enabling SSL site configuration..."
+                a2ensite default-ssl.conf && apache2ctl graceful || { echo "Failed to enable SSL site or reload Apache"; exit 1; }
+            fi
+        fi
     fi
 }
 

@@ -29,3 +29,4 @@ services:
     environment:
       - INSTALL_CERTIFICATE=${autoInstallCertificate}
       - DOMAIN=${domain}
+      - HTTPMODE=${httpmode}
