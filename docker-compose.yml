@@ -27,5 +27,5 @@ services:
     depends_on:
       - ezxssdb
     environment:
-      - INSTALL_CERTIFICATE=true
+      - INSTALL_CERTIFICATE=${autoInstallCertificate}
       - DOMAIN=${domain}
