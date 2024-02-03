@@ -36,7 +36,7 @@ class Log_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("INSERT INTO $this->table (user_id, description, ip, time) VALUES (:user_id, :description, :ip, :time);");
+        $database->prepare("INSERT INTO $this->table (`user_id`, `description`, `ip`, `time`) VALUES (:user_id, :description, :ip, :time);");
         $database->bindValue(':user_id', $userId);
         $database->bindValue(':description', $description);
         $database->bindValue(':ip', $ip);

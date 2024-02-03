@@ -59,7 +59,7 @@ class User_model extends Model
             throw new Exception('Password not strong enough');
         }
 
-        $database->prepare("UPDATE $this->table SET password = :password WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `password` = :password WHERE `id` = :id");
         $database->bindValue(':id', $id);
         $database->bindValue(':password', !$hashed ? password_hash($password, PASSWORD_BCRYPT, ['cost' => 14]) : $password);
 
@@ -95,7 +95,7 @@ class User_model extends Model
             throw new Exception('Username needs to be between 3-25 long');
         }
 
-        $database->prepare("UPDATE $this->table SET username = :username WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `username` = :username WHERE `id` = :id");
         $database->bindValue(':id', $id);
         $database->bindValue(':username', $username);
 
@@ -118,7 +118,7 @@ class User_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET rank = :rank WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `rank` = :rank WHERE `id` = :id");
         $database->bindValue(':id', $id);
         $database->bindValue(':rank', $rank);
 
@@ -141,7 +141,7 @@ class User_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET secret = :secret WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `secret` = :secret WHERE `id` = :id");
         $database->bindValue(':id', $id);
         $database->bindValue(':secret', $secret);
 
@@ -164,7 +164,7 @@ class User_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET row1 = :value WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `row1` = :value WHERE `id` = :id");
         $database->bindValue(':id', $id);
         $database->bindValue(':value', $value);
 
@@ -187,7 +187,7 @@ class User_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET row2 = :value WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `row2` = :value WHERE `id` = :id");
         $database->bindValue(':id', $id);
         $database->bindValue(':value', $value);
 
@@ -210,7 +210,7 @@ class User_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET notepad = :value WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `notepad` = :value WHERE `id` = :id");
         $database->bindValue(':id', $id);
         $database->bindValue(':value', $value);
 
@@ -254,7 +254,7 @@ class User_model extends Model
             throw new Exception('Password not strong enough');
         }
 
-        $database->prepare("INSERT INTO $this->table (username, password, rank, secret, notepad) VALUES (:username, :password, :rank, :secret, :notepad)");
+        $database->prepare("INSERT INTO $this->table (`username`, `password`, `rank`, `secret`, `notepad`) VALUES (:username, :password, :rank, :secret, :notepad)");
         $database->bindValue(':username', $username);
         $database->bindValue(':password', password_hash($password, PASSWORD_BCRYPT, ['cost' => 14]));
         $database->bindValue(':rank', $rank);

@@ -36,7 +36,7 @@ class Setting_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET value = :value WHERE setting = :setting");
+        $database->prepare("UPDATE $this->table SET value = :value WHERE `setting` = :setting");
         $database->bindValue(':setting', $setting);
         $database->bindValue(':value', $value);
 
@@ -58,7 +58,7 @@ class Setting_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("SELECT * FROM $this->table WHERE setting = :setting LIMIT 1");
+        $database->prepare("SELECT * FROM $this->table WHERE `setting` = :setting LIMIT 1");
         $database->bindValue(':setting', $setting);
 
         if (!$database->execute()) {

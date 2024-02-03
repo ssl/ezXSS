@@ -22,7 +22,7 @@ class Console_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("INSERT INTO $this->table (clientid, origin, command) VALUES (:clientid, :origin, :command);");
+        $database->prepare("INSERT INTO $this->table (`clientid`, `origin`, `command`) VALUES (:clientid, :origin, :command);");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->bindValue(':command', $command);
@@ -46,7 +46,7 @@ class Console_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("SELECT id,command FROM $this->table WHERE clientid = :clientid AND origin = :origin AND executed = 0 ORDER BY id ASC LIMIT 1");
+        $database->prepare("SELECT `id`,`command` FROM $this->table WHERE `clientid` = :clientid AND `origin` = :origin AND `executed` = 0 ORDER BY `id` ASC LIMIT 1");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->execute();
@@ -56,7 +56,7 @@ class Console_model extends Model
         }
         $data = $database->fetch();
 
-        $database->prepare("UPDATE $this->table SET executed = 1 WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `executed` = 1 WHERE `id` = :id");
         $database->bindValue(':id', $data['id']);
         $database->execute();
 

@@ -73,7 +73,7 @@ class Session_model extends Model
     public function getByClientId($clientId, $origin)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT * FROM $this->table WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC LIMIT 1");
+        $database->prepare("SELECT * FROM $this->table WHERE `clientid` = :clientid AND `origin` = :origin ORDER BY `id` DESC LIMIT 1");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
         $database->execute();
@@ -118,7 +118,7 @@ class Session_model extends Model
     public function getAllByClientId($clientId, $origin)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT * FROM $this->table WHERE clientid = :clientid AND origin = :origin ORDER BY id DESC");
+        $database->prepare("SELECT * FROM $this->table WHERE `clientid` = :clientid AND `origin` = :origin ORDER BY id DESC");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':origin', $origin);
 
@@ -139,7 +139,7 @@ class Session_model extends Model
     public function getRequestCount($clientId)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT clientid FROM $this->table WHERE clientid = :clientid");
+        $database->prepare("SELECT `clientid` FROM $this->table WHERE `clientid` = :clientid");
         $database->bindValue(':clientid', $clientId);
         $database->execute();
 
@@ -155,7 +155,7 @@ class Session_model extends Model
     public function getAllStaticticsData()
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT clientid,origin,time FROM $this->table ORDER BY id ASC");
+        $database->prepare("SELECT `clientid`,`origin`,`time` FROM $this->table ORDER BY `id` ASC");
 
         if (!$database->execute()) {
             throw new Exception('Something unexpected went wrong');
@@ -174,7 +174,7 @@ class Session_model extends Model
     public function getAllStaticticsDataByPayload($payload)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT clientid,origin,time,payload FROM $this->table WHERE payload LIKE :payload ORDER BY id ASC");
+        $database->prepare("SELECT `clientid`,`origin`,`time`,`payload` FROM $this->table WHERE `payload` LIKE :payload ORDER BY `id` ASC");
         $database->bindValue(':payload', $payload);
 
         if (!$database->execute()) {
@@ -206,7 +206,7 @@ class Session_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("INSERT INTO $this->table (clientid, cookies, origin, referer, uri, `user-agent`, ip, time, payload) VALUES (:clientid, :cookies, :origin, :referer, :uri, :userAgent, :ip, :time, :payload)");
+        $database->prepare("INSERT INTO $this->table (`clientid`, `cookies`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `payload`) VALUES (:clientid, :cookies, :origin, :referer, :uri, :userAgent, :ip, :time, :payload)");
         $database->bindValue(':clientid', $clientId);
         $database->bindValue(':cookies', $cookies);
         $database->bindValue(':origin', $origin);
@@ -232,7 +232,7 @@ class Session_model extends Model
             $compressed = true;
         }
 
-        $database->prepare("INSERT INTO $this->table_data (sessionid, dom, localstorage, sessionstorage, console, compressed) VALUES (:sessionid, :dom, :localstorage, :sessionstorage, :console, :compressed)");
+        $database->prepare("INSERT INTO $this->table_data (`sessionid`, `dom`, `localstorage`, `sessionstorage`, `console`, `compressed`) VALUES (:sessionid, :dom, :localstorage, :sessionstorage, :console, :compressed)");
         $database->bindValue(':sessionid', $sessionId);
         $database->bindValue(':dom', $dom);
         $database->bindValue(':localstorage', $localStorage);
@@ -257,7 +257,7 @@ class Session_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET `$column` = :value WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `$column` = :value WHERE `id` = :id");
         $database->bindValue(':value', $value);
         $database->bindValue(':id', $id);
 
@@ -284,7 +284,7 @@ class Session_model extends Model
         }
 
         $database = Database::openConnection();
-        $database->prepare("UPDATE $this->table_data SET `$column` = :value WHERE sessionid = :sessionid");
+        $database->prepare("UPDATE $this->table_data SET `$column` = :value WHERE `sessionid` = :sessionid");
         $database->bindValue(':value', $value);
         $database->bindValue(':sessionid', $id);
 
@@ -308,11 +308,11 @@ class Session_model extends Model
 
         foreach ($sessions as $session) {
             $database = Database::openConnection();
-            $database->prepare("DELETE FROM $this->table WHERE id = :id");
+            $database->prepare("DELETE FROM $this->table WHERE `id` = :id");
             $database->bindValue(':id', $session['id']);
             $database->execute();
 
-            $database->prepare("DELETE FROM $this->table_data WHERE sessionid = :sessionid");
+            $database->prepare("DELETE FROM $this->table_data WHERE `sessionid` = :sessionid");
             $database->bindValue(':sessionid', $session['id']);
             $database->execute();
         }
@@ -327,7 +327,7 @@ class Session_model extends Model
     private function getSessionData($id)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT dom,localstorage,sessionstorage,console,compressed FROM $this->table_data WHERE sessionid = :sessionid LIMIT 1");
+        $database->prepare("SELECT `dom`,`localstorage`,`sessionstorage`,`console`,`compressed` FROM $this->table_data WHERE `sessionid` = :sessionid LIMIT 1");
         $database->bindValue(':sessionid', $id);
         $database->execute();
 

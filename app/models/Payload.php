@@ -37,7 +37,7 @@ class Payload_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("UPDATE $this->table SET `$column` = :value WHERE id = :id");
+        $database->prepare("UPDATE $this->table SET `$column` = :value WHERE `id` = :id");
         $database->bindValue(':value', $value);
         $database->bindValue(':id', $id);
 
@@ -58,7 +58,7 @@ class Payload_model extends Model
     public function getAllByUserId($id)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT * FROM $this->table WHERE user_id = :user_id ORDER BY id ASC");
+        $database->prepare("SELECT * FROM $this->table WHERE `user_id` = :user_id ORDER BY `id` ASC");
         $database->bindValue(':user_id', $id);
 
         if (!$database->execute()) {
@@ -82,7 +82,7 @@ class Payload_model extends Model
     {
         $database = Database::openConnection();
 
-        $database->prepare("INSERT INTO $this->table (payload, user_id) VALUES (:payload, :user_id);");
+        $database->prepare("INSERT INTO $this->table (`payload`, `user_id`) VALUES (:payload, :user_id);");
         $database->bindValue(':payload', $payload);
         $database->bindValue(':user_id', $userId);
 
@@ -103,7 +103,7 @@ class Payload_model extends Model
     public function getByPayload($payload)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT * FROM $this->table WHERE payload = :payload ORDER BY id ASC LIMIT 1");
+        $database->prepare("SELECT * FROM $this->table WHERE `payload` = :payload ORDER BY `id` ASC LIMIT 1");
         $database->bindValue(':payload', $payload);
         $database->execute();
 
@@ -126,7 +126,7 @@ class Payload_model extends Model
     public function isAvailable($payload)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT * FROM $this->table WHERE payload = :payload ORDER BY id ASC LIMIT 1");
+        $database->prepare("SELECT * FROM $this->table WHERE `payload` = :payload ORDER BY `id` ASC LIMIT 1");
         $database->bindValue(':payload', $payload);
         $database->execute();
 
