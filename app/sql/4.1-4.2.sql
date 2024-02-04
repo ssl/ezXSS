@@ -85,7 +85,3 @@ DROP COLUMN dom,
 DROP COLUMN localstorage,
 DROP COLUMN sessionstorage,
 DROP COLUMN console;
-
-ALTER TABLE `reports` CHANGE `payload` `payload` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
-ALTER TABLE `sessions` CHANGE `payload` `payload` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
-ALTER TABLE `sessions` CHANGE `origin` `origin` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
