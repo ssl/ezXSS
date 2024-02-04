@@ -66,7 +66,7 @@ CREATE TABLE `reports` (
   `shareid` varchar(50) NOT NULL,
   `origin` varchar(500) DEFAULT NULL,
   `referer` varchar(1000) DEFAULT NULL,
-  `payload` varchar(200) DEFAULT NULL,
+  `payload` varchar(255) DEFAULT NULL,
   `uri` varchar(1000) DEFAULT NULL,
   `user-agent` varchar(500) DEFAULT NULL,
   `ip` varchar(50) DEFAULT NULL,
