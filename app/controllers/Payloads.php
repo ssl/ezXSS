@@ -124,8 +124,8 @@ class Payloads extends Controller
         // Truncate very long strings
         $data->uri = substr($data->uri ?? '', 0, 1000);
         $data->referer = substr($data->referer ?? '', 0, 1000);
-        $data->origin = substr($data->origin ?? '', 0, 500);
-        $data->payload = substr($data->payload ?? '', 0, 500);
+        $data->origin = substr($data->origin ?? '', 0, 255);
+        $data->payload = substr($data->payload ?? '', 0, 255);
         $data->{'user-agent'} = substr($data->{'user-agent'} ?? '', 0, 500);
 
         if(empty($data->payload)) {

@@ -82,8 +82,8 @@ class Update extends Controller
 
                 // Update the database from 4.1 to 4.2
                 if ($version === '4.1') {
+                    // Check if disk has enough free space
                     try {
-                        // Check if disk has enough free space
                         $tableSize = $this->getTablesSize();
                         if($tableSize * 1.1 > disk_free_space('/')) {
                             $freeSpace = ceil(disk_free_space('/') / (1024*1024));
@@ -95,9 +95,21 @@ class Update extends Controller
                             throw new Exception($e->getMessage() . "\r\nYou can disable this check by adding ?disablechecks=1 to the URL\r\nWARNING: If table is larger than free disk size, database can get corrupted");
                         }
                     }
+
+                    // Update database to 4.2
                     $sql = file_get_contents(__DIR__ . '/../sql/4.1-4.2.sql');
                     $database = Database::openConnection();
                     $database->exec($sql);
+                    $this->model('Setting')->set('version', version);
+                    
+                    // Add indexes to database to speed up queries
+                    try {
+                        $sql = file_get_contents(__DIR__ . '/../sql/4.2-indexes.sql');
+                        $database = Database::openConnection();
+                        $database->exec($sql);
+                    } catch (Exception $e) {
+                        throw new Exception("Update has finished with errors. ezXSS was unable to add indexes to your database.\r\n" . $e->getMessage());
+                    }
                 }
 
                 $this->model('Setting')->set('version', version);
