@@ -22,12 +22,12 @@ class Update extends Controller
                 // Secret setting is introduced in 2.0
                 $this->model('Setting')->get('secret');
                 $version = '2.0';
-            } catch (Exception) {}
+            } catch (Exception $e) {}
             try {
                 // Screenshot setting is introduced in 3.0
                 $this->model('Setting')->get('screenshot');
                 $version = '3.0';
-            } catch (Exception) {}
+            } catch (Exception $e) {}
         }
 
         // Make sure the platform is not already up-to-date
