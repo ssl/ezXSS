@@ -15,7 +15,7 @@ class Update extends Controller
         // Get database ezXSS version
         try {
             $version = $this->model('Setting')->get('version');
-        } catch (Exception) {
+        } catch (Exception $e) {
             // If version is not found, install might be from before 3.5
             $version = '1.0';
             try {
@@ -37,13 +37,13 @@ class Update extends Controller
 
         try {
             $this->view->renderData('tablesize', 'Tables size: ' . ceil(($this->getTablesSize() * 1.1) / (1024*1024)) . ' MB');
-        } catch (Exception) {
+        } catch (Exception $e) {
             $this->view->renderData('tablesize', 'Error in retrieving tables size. Proceed with caution');
         }
 
         try {
             $this->view->renderData('disksize', 'Free disk space: ' . ceil(disk_free_space('/') / (1024*1024)) . ' MB');
-        } catch (Exception) {
+        } catch (Exception $e) {
             $this->view->renderData('disksize', 'Error in retrieving free disk space. Proceed with caution');
         }
 
