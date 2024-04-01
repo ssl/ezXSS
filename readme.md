@@ -65,6 +65,5 @@ I've personally worked for over 8 years on this project, taking hundreds of hour
 <a href="https://github.com/geeknik"><img src="https://github.com/geeknik.png" width="50px" alt="geeknik" /></a>&nbsp;&nbsp;
 <a href="https://github.com/GlitchSecure"><img src="https://github.com/GlitchSecure.png" width="50px" alt="GlitchSecure" /></a>&nbsp;&nbsp;
 <a href="https://github.com/vaadata"><img src="https://github.com/vaadata.png" width="50px" alt="VAADATA" /></a>&nbsp;&nbsp;
-<a href="https://github.com/yoerivegt"><img src="https://github.com/yoerivegt.png" width="50px" alt="yoerivegt" /></a>&nbsp;&nbsp;
 <br><br><a href="https://github.com/sponsors/ssl">Become a sponsor</a>
 </p>
