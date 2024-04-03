@@ -195,7 +195,7 @@ class Account extends Controller
                     throw new Exception('Payload domain is already in use');
                 }
 
-                if (strlen($domain) < 1 || strlen($username) > 25) {
+                if (strlen($domain) < 1 || strlen($domain) > 25) {
                     throw new Exception('Domain needs to be between 1-25 long');
                 }
 
