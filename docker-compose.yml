@@ -2,8 +2,7 @@ version: '3.7'
 
 services:
   ezxssdb:
-    image: mysql
-    command: --mysql_native_password=ON
+    image: mysql:latest
     restart: always
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
