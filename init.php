@@ -19,7 +19,7 @@ try {
 
     // Start routing
     $router = new Router();
-    echo $router->proccess($_SERVER['REQUEST_URI']);
+    echo $router->proccess(path);
 } catch (Exception $message) {
     // Any unexpected uncatched exception will show an error page
     if (!class_exists('View')) {
