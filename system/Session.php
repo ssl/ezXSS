@@ -74,6 +74,17 @@ class Session
     }
 
     /**
+     * Get a session item
+     *
+     * @param string $param The parameter
+     * @return void
+     */
+    public function get($param)
+    {
+        return $_SESSION[$param] ?? null;
+    }
+
+    /**
      * Create a temporary session
      *
      * @param array $user The user data

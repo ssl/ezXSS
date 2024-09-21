@@ -80,18 +80,19 @@ class Controller
      */
     public function showContent()
     {
-        // Check if a theme is set
+        // Try to get the theme; default to 'classic' on failure
         try {
             $theme = $this->model('Setting')->get('theme');
         } catch (Exception $e) {
             $theme = 'classic';
         }
 
-        // Get content and add correct theme stylsheet
+        // Retrieve content and replace theme placeholder with stylesheet link
         $content = $this->view->showContent();
-        $content = $theme != 'classic' ? str_replace('{theme}', '<link rel="stylesheet" href="/assets/css/' . e($theme) . '.css?v='.version.'">', $content) : str_replace('{theme}', '', $content);
-        return $content;
+        $stylesheet = $theme !== 'classic' ? '<link rel="stylesheet" href="/assets/css/' . e($theme) . '.css?v=' . version . '">' : '';
+        return str_replace('{theme}', $stylesheet, $content);
     }
+
 
     /**
      * Validate if the posted csrf token is valid
@@ -125,22 +126,22 @@ class Controller
                 $account = $this->model('User')->getById($this->session->data('id'));
 
                 // Check if the password has been changed
-                if ($this->session->data('password_hash') != md5($account['password'])) {
+                if ($this->session->get('password_hash') !== md5($account['password'])) {
                     throw new Exception('Password has been changed');
                 }
 
                 // Check if the username has been changed
-                if ($this->session->data('username') != $account['username']) {
+                if ($this->session->get('username') !== $account['username']) {
                     throw new Exception('Username has been changed');
                 }
 
                 // Check if the rank has been changed
-                if ($this->session->data('rank') != $account['rank']) {
+                if ($this->session->get('rank') !== $account['rank']) {
                     throw new Exception('Rank has been changed');
                 }
 
                 // Log if the user ip has been changed
-                if ($this->session->data('ip') != userip) {
+                if ($this->session->get('ip') !== userip) {
                     $this->log('New IP address in session');
                     $this->session->set('ip', userip);
                 }
@@ -325,24 +326,24 @@ class Controller
         $elapsed = time() - $timestamp;
 
         if ($elapsed < 60) {
-            $text = $elapsed == 1 ? 'second' : 'seconds';
-            return ($syntax == 'short') ? $elapsed . ' sec' : $elapsed . " {$text} ago";
+            $unit = ($elapsed == 1) ? 'second' : 'seconds';
+            return ($syntax == 'short') ? $elapsed . ' sec' : "$elapsed {$unit} ago";
         } elseif ($elapsed < 3600) {
             $minutes = floor($elapsed / 60);
-            $text = $minutes == 1 ? 'minute' : 'minutes';
-            return ($syntax == 'short') ? $minutes . ' min' : $minutes . " {$text} ago";
+            $unit = ($minutes == 1) ? 'minute' : 'minutes';
+            return ($syntax == 'short') ? $minutes . ' min' : "$minutes {$unit} ago";
         } elseif ($elapsed < 86400) {
             $hours = floor($elapsed / 3600);
-            $text = $hours == 1 ? 'hour' : 'hours';
-            return ($syntax == 'short') ? $hours . ' hr' : $hours . " {$text} ago";
+            $unit = ($hours == 1) ? 'hour' : 'hours';
+            return ($syntax == 'short') ? $hours . ' hr' : "$hours {$unit} ago";
         } elseif ($elapsed < 2592000) {
             $days = floor($elapsed / 86400);
-            $text = $days == 1 ? 'day' : 'days';
-            return ($syntax == 'short') ? $days . ' ' . $text : $days . " {$text} ago";
+            $unit = ($days == 1) ? 'day' : 'days';
+            return ($syntax == 'short') ? $days . ' ' . $unit : "$days {$unit} ago";
         } else {
             $months = floor($elapsed / 2592000);
-            $text = $months == 1 ? 'month' : 'months';
-            return ($syntax == 'short') ? $months . ' mon' : $months . " {$text} ago";
+            $unit = ($months == 1) ? 'month' : 'months';
+            return ($syntax == 'short') ? $months . ' mon' : "$months {$unit} ago";
         }
     }
 
