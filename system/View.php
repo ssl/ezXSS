@@ -30,7 +30,7 @@ class View
 
         // Add CSP header to manage
         if (explode('/', $_SERVER['REQUEST_URI'] ?? '/')[1] === 'manage') {
-            header("Content-Security-Policy: default-src 'self'; img-src 'self' data: chart.googleapis.com; font-src fonts.gstatic.com; script-src 'self' 'nonce-csrf'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';");
+            header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; font-src fonts.gstatic.com; script-src 'self' 'nonce-csrf'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';");
         }
     }
 
