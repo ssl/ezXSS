@@ -29,7 +29,7 @@ class View
         header('Referrer-Policy: strict-origin-when-cross-origin');
 
         // Add CSP header to manage
-        if (explode('/', $_SERVER['REQUEST_URI'] ?? '/')[1] === 'manage') {
+        if (explode('/', path)[1] === 'manage') {
             header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; font-src fonts.gstatic.com; script-src 'self' 'nonce-csrf'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';");
         }
     }
@@ -413,7 +413,7 @@ class View
      */
     public function fileName()
     {
-        return e(ltrim($_SERVER['REQUEST_URI'], '/'));
+        return e(ltrim(path, '/'));
     }
 
     /**
@@ -424,8 +424,7 @@ class View
      */
     public function currentPage($page)
     {
-        $uri = $_SERVER['REQUEST_URI'] ?? '';
-        $uriParts = explode('/', $uri);
+        $uriParts = explode('/', path);
 
         // Check current page for reporting pages
         if ((substr($page, -2) === '*0' || substr($page, -2) === '*1') && isset($uriParts[2]) && $uriParts[2] == 'reports') {

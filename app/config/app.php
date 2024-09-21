@@ -32,7 +32,7 @@ define('host', e($_SERVER['HTTP_HOST']));
 define('url', e("//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"));
 
 // Defines the current path
-define('path', e($_SERVER['REQUEST_URI']));
+define('path', e($_SERVER['REQUEST_URI'] ?? '/'));
 
 // Defines the IP of the user
 define('userip', $_SERVER['REMOTE_ADDR']);
