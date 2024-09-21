@@ -464,6 +464,16 @@ class View
     }
 
     /**
+     * Returns current protocol
+     *
+     * @return string
+     */
+    public function protocol()
+    {
+        return ishttps ? 'https' : 'http';
+    }
+
+    /**
      * Set's title
      *
      * @param string $title The new title
