@@ -64,17 +64,17 @@ $(document).ready(function () {
 
     if (location.toString().split('/')[4] === 'dashboard') {
         request('/manage/api/statistics', {
-            page: location.toString().split('/').pop()
+            page: location.toString().split('/').pop() === 'my' ? 'my' : 'dashboard'
         }).then(function (r) {
             $.each(r, function (key, value) {
                 $('#' + key).html(value)
             })
         })
         
-        var isMy = location.toString().split('/').pop() === 'my' && location.toString().split('/').pop() !== 'index' ? 0 : 1
+        var isAdmin = location.toString().split('/').pop() === 'my' ? 0 : 1
 
-        pick_common($('#pick_common1').val(), 1, isMy)
-        pick_common($('#pick_common2').val(), 2, isMy)
+        pick_common($('#pick_common1').val(), 1, isAdmin)
+        pick_common($('#pick_common2').val(), 2, isAdmin)
     }
 
     $("a[method='post']").click(function (e) {
@@ -106,13 +106,13 @@ $(document).ready(function () {
     })
 
     $('#pick_common1').on('change', function () {
-        var isMy = location.toString().split('/').pop() === 'my' ? 0 : 1
-        pick_common(this.value, 1, isMy)
+        var isAdmin = location.toString().split('/').pop() === 'my' ? 0 : 1
+        pick_common(this.value, 1, isAdmin)
     })
 
     $('#pick_common2').on('change', function () {
-        var isMy = location.toString().split('/').pop() === 'my' ? 0 : 1
-        pick_common(this.value, 2, isMy)
+        var isAdmin = location.toString().split('/').pop() === 'my' ? 0 : 1
+        pick_common(this.value, 2, isAdmin)
     })
 
     function pick_common(id, row, admin = 0) {
