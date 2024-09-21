@@ -40,7 +40,7 @@ Once an ezXSS payload is placed, the user must wait until it is triggered, at wh
 * much much more, and, its just ez :-)
 
 ## Required
-* Server or shared web hosting with PHP 7.1 or up
+* Server or shared web hosting with PHP 7.0 or up
 * Domain name (consider a short one or check out [shortboost](https://github.com/ssl/shortboost))
 * SSL Certificate to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL)
 
