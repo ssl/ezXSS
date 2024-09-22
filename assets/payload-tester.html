@@ -9,11 +9,6 @@
     <h1 class="title">ezXSS Payload Tester</h1>
     <p>This URL fires the ezXSS payload</p>
     <div id="browser"></div>
-    <script>
-        try {
-            document.getElementById('browser').innerHTML = '<p><b>Browser: </b>'+navigator.appName+' '+navigator.appVersion+'</p>';
-        } catch (t) {}
-    </script>
 
     <a href="javascript:location.reload(true)">Reload page</a>
 
@@ -41,7 +36,16 @@
     <div class="circle" style="background-color:gray"></div>
     <p>github.com/ssl/ezXSS</p>
     <div id="colors"></div>
+
     <script>
+        function e(i){return String(i).replace(/</g, '&lt;').replace(/>/g, '&gt;');}
+
+        // Browser details
+        try {
+            document.getElementById('browser').innerHTML = '<p><b>Browser: </b>'+e(navigator.appName)+' '+e(navigator.appVersion)+'</p>';
+        } catch (t) {}
+
+        // Random color tester
         try {
             document.addEventListener("DOMContentLoaded", function () {
                 for (var i = 0; i < 10; i++) {
@@ -50,19 +54,15 @@
                 };
             });
         } catch (t) {}
-    </script>
 
-    <!-- Add test data to storage -->
-    <script>
+        // Storage and cookie tester
         try {
             sessionStorage.setItem("sessionStorageTester", Date.now());
             localStorage.setItem("localStorageTester", Date.now());
             document.cookie = "CookieTester=" + Date.now();
         } catch (t) {}
-    </script>
 
-    <!-- Middle-man HTTP requests -->
-    <script>
+        // Middle-man HTTP requests
         (function () {
             try {
                 if (window.XMLHttpRequest) {
@@ -84,9 +84,9 @@
                     function logRequest(request) {
                         var tableBody = document.querySelector('#requests tbody');
                         var newRow = document.createElement('tr');
-                        newRow.innerHTML = '<td>' + request.method + '</td>' +
-                                        '<td>' + request.url + '</td>' +
-                                        '<td>' + request.status + '</td>';
+                        newRow.innerHTML = '<td>' + e(request.method) + '</td>' +
+                                        '<td>' + e(request.url) + '</td>' +
+                                        '<td>' + e(request.status) + '</td>';
                         tableBody.appendChild(newRow);
                         document.getElementById('table-wrap').style.display = 'block';
                     }
@@ -97,6 +97,7 @@
 
     <!-- Load payload from main domain -->
     <script src="/"></script>
+    
     <hr>
     <script>
         try {
@@ -118,7 +119,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Requests will be added here -->
+                
             </tbody>
         </table>
     </div>
