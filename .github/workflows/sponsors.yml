@@ -17,6 +17,7 @@ jobs:
         with:
           token: ${{ secrets.PAT }}
           file: 'readme.md'
+          template: '<a href="https://github.com/{{{ login }}}"><img src="{{{ avatarUrl }}}" width="60px" alt="{{{ login }}}" /></a>&nbsp;&nbsp;'
 
       - name: README
         uses: JamesIves/github-pages-deploy-action@v4
