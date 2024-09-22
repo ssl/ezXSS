@@ -36,7 +36,7 @@ Once an ezXSS payload is placed, the user must wait until it is triggered, at wh
     * Payload URL
     * Screenshot of the page
     * Extract additional defined pages
-* Triggers in all browsers, starting from Chrome 3+, IE 8+, Firefox 4+, Opera 10.5+, Safari 4+
+* Triggers in all browsers, starting from Chrome 3+, IE 6+, Firefox 4+, Opera 10.5+, Safari 4+
 * much much more, and, its just ez :-)
 
 ## Required

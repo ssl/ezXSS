@@ -104,11 +104,15 @@ class Payloads extends Controller
             return 'github.com/ssl/ezXSS';
         }
 
-        // Decode the JSON data
+        // Decode the JSON or form data
         $data = json_decode(file_get_contents('php://input'), false);
 
         if (empty($data) || !is_object($data)) {
-            return 'github.com/ssl/ezXSS';
+            $data = (object)$_POST;
+            
+            if (empty($data) || !is_object($data)) {
+                return 'github.com/ssl/ezXSS';
+            }
         }
 
         // Set a default value for the screenshot
