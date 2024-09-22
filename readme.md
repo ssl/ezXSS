@@ -62,8 +62,6 @@ Maintenance of this project is made possible by all the contributors and sponsor
 I've personally worked for over 8 years on this project, taking hundreds of hours from my time. Please kindly consider becoming a sponsor, so I can continue maintaining and improving ezXSS as well as creating and releasing new projects. Current sponsors:
 
 <p align="center">
-<a href="https://github.com/geeknik"><img src="https://github.com/geeknik.png" width="50px" alt="geeknik" /></a>&nbsp;&nbsp;
-<a href="https://github.com/GlitchSecure"><img src="https://github.com/GlitchSecure.png" width="50px" alt="GlitchSecure" /></a>&nbsp;&nbsp;
-<a href="https://github.com/vaadata"><img src="https://github.com/vaadata.png" width="50px" alt="VAADATA" /></a>&nbsp;&nbsp;
+<!-- sponsors --><!-- sponsors -->
 <br><br><a href="https://github.com/sponsors/ssl">Become a sponsor</a>
 </p>
