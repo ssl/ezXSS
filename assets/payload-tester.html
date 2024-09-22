@@ -18,7 +18,8 @@
     <a href="javascript:location.reload(true)">Reload page</a>
 
     <!-- Color tester -->
-    <hr><div class="block" style="background-color:red"></div>
+    <hr>
+    <div class="block" style="background-color:red"></div>
     <div class="block" style="background-color:green"></div>
     <div class="block" style="background-color:blue"></div>
     <div class="block" style="background-color:yellow"></div>
@@ -45,7 +46,7 @@
             document.addEventListener("DOMContentLoaded", function () {
                 for (var i = 0; i < 10; i++) {
                     var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                    document.getElementById('colors').innerHTML += '<div class="block" style="background-color: '+color+'"></div>';
+                    document.getElementById('colors').innerHTML += '<div class="block" style="background-color: ' + color + '"></div>';
                 };
             });
         } catch (t) {}
@@ -60,6 +61,40 @@
         } catch (t) {}
     </script>
 
+    <!-- Middle-man HTTP requests -->
+    <script>
+        (function () {
+            try {
+                if (window.XMLHttpRequest) {
+                    var originalXhrOpen = XMLHttpRequest.prototype.open;
+        
+                    XMLHttpRequest.prototype.open = function (method, url) {
+                        var xhr = this;
+                        var requestDetails = { method: method, url: url, status: null };
+
+                        if (xhr.addEventListener) {
+                            xhr.addEventListener('load', function () {
+                                requestDetails.status = xhr.status;
+                                logRequest(requestDetails);
+                            });
+                        }
+                        return originalXhrOpen.apply(this, arguments);
+                    };
+        
+                    function logRequest(request) {
+                        var tableBody = document.querySelector('#requests tbody');
+                        var newRow = document.createElement('tr');
+                        newRow.innerHTML = '<td>' + request.method + '</td>' +
+                                        '<td>' + request.url + '</td>' +
+                                        '<td>' + request.status + '</td>';
+                        tableBody.appendChild(newRow);
+                        document.getElementById('table-wrap').style.display = 'block';
+                    }
+                }
+            } catch (t) {}
+        })();
+    </script>
+
     <!-- Load payload from main domain -->
     <script src="/"></script>
     <hr>
@@ -70,5 +105,22 @@
             document.write('ezXSS persistent initialized: <b>' + (typeof ez_persist === "function" ? 'yes' : 'no') + '</b>');
         } catch (t) {}
     </script>
+
+    <!-- HTTP requests table -->
+    <div id="table-wrap" style="display:none">
+        <hr>
+        <table id="requests" border="1">
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>URL</th>
+                    <th>Status Code</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Requests will be added here -->
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
