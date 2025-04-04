@@ -16,8 +16,7 @@ class Install extends Controller
         try {
             $this->model('Setting')->get('timezone');
             redirect('dashboard/index');
-        } catch (Exception $e) {
-        }
+        } catch (Exception $e) {}
 
         if ($this->isPOST()) {
             try {
@@ -30,8 +29,8 @@ class Install extends Controller
                     throw new Exception('Invalid characters in the username. Use a-Z0-9');
                 }
 
-                if (strlen($username) < 3 || strlen($username) > 25) {
-                    throw new Exception('Username needs to be between 3-25 long');
+                if (strlen($username) < 2 || strlen($username) > 25) {
+                    throw new Exception('Username needs to be between 2-25 long');
                 }
 
                 if (

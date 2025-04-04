@@ -16,7 +16,7 @@ class Payloads extends Controller
     {
         parent::__construct();
 
-        // Add CORS headers
+        // CORS headers
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Headers: origin, x-requested-with, content-type');
         header('Access-Control-Allow-Methods: GET, POST');
@@ -130,20 +130,20 @@ class Payloads extends Controller
         $data->referer = substr($data->referer ?? '', 0, 1000);
         $data->origin = substr($data->origin ?? '', 0, 255);
         $data->payload = substr($data->payload ?? '', 0, 255);
-        $data->{'user-agent'} = substr($data->{'user-agent'} ?? '', 0, 500);
+        $data->useragent = substr($data->{'user-agent'} ?? '', 0, 500);
 
         if(empty($data->payload)) {
             return 'github.com/ssl/ezXSS';
         }
 
-        // Check black and whitelist
+        // Check allow and deny list
         $payload = $this->getPayloadByUrl($data->payload);
 
-        $blacklistDomains = explode('~', $payload['blacklist'] ?? '');
-        $whitelistDomains = explode('~', $payload['whitelist'] ?? '');
+        $denylistDomains = explode('~', $payload['blacklist'] ?? '');
+        $allowlistDomains = explode('~', $payload['whitelist'] ?? '');
 
-        // Check for blacklisted domains
-        foreach ($blacklistDomains as $blockedDomain) {
+        // Check for denylisted domains
+        foreach ($denylistDomains as $blockedDomain) {
             if ($data->origin !== '' && $data->origin == $blockedDomain) {
                 return 'github.com/ssl/ezXSS';
             }
@@ -155,21 +155,21 @@ class Payloads extends Controller
             }
         }
 
-        // Check for whitelisted domains
+        // Check for allowlisted domains
         if ($payload['whitelist'] !== '' && $payload['whitelist'] !== null) {
-            $foundWhitelist = false;
-            foreach ($whitelistDomains as $whitelistDomain) {
-                if ($data->origin !== '' && $data->origin == $whitelistDomain) {
-                    $foundWhitelist = true;
+            $foundAllowlist = false;
+            foreach ($allowlistDomains as $allowlistDomain) {
+                if ($data->origin !== '' && $data->origin == $allowlistDomain) {
+                    $foundAllowlist = true;
                 }
-                if (strpos($whitelistDomain, '*') !== false) {
-                    $whitelistDomain = str_replace('*', '(.*)', $whitelistDomain);
-                    if (preg_match('/^' . $whitelistDomain . '$/', $data->origin)) {
-                        $foundWhitelist = true;
+                if (strpos($allowlistDomain, '*') !== false) {
+                    $allowlistDomain = str_replace('*', '(.*)', $allowlistDomain);
+                    if (preg_match('/^' . $allowlistDomain . '$/', $data->origin)) {
+                        $foundAllowlist = true;
                     }
                 }
             }
-            if (!$foundWhitelist) {
+            if (!$foundAllowlist) {
                 return 'github.com/ssl/ezXSS';
             }
         }
@@ -182,7 +182,7 @@ class Payloads extends Controller
         // Check if the report should be saved or alerted
         $doubleReport = false;
         if ($this->model('Setting')->get('filter-save') == 0 || $this->model('Setting')->get('filter-alert') == 0) {
-            $searchId = $this->model('Report')->searchForDublicates($data->cookies ?? '', $data->origin, $data->referer, $data->uri, $data->{'user-agent'}, $data->dom ?? '', $data->ip);
+            $searchId = $this->model('Report')->searchForDublicates($data->cookies ?? '', $data->origin, $data->referer, $data->uri, $data->useragent, $data->dom ?? '', $data->ip);
             if ($searchId !== false) {
                 if ($this->model('Setting')->get('filter-save') == 0 && $this->model('Setting')->get('filter-alert') == 0) {
                     return 'github.com/ssl/ezXSS';
@@ -232,7 +232,7 @@ class Payloads extends Controller
                     $data->origin,
                     $data->referer,
                     $data->uri,
-                    $data->{'user-agent'},
+                    $data->useragent,
                     $data->ip,
                     $data->screenshotData ?? '',
                     json_encode($data->localstorage ?? ''),
@@ -300,7 +300,7 @@ class Payloads extends Controller
                 $data->origin,
                 $data->referer,
                 $data->uri,
-                $data->{'user-agent'},
+                $data->useragent,
                 $data->ip,
                 json_encode($data->localstorage ?? ''),
                 json_encode($data->sessionstorage ?? ''),

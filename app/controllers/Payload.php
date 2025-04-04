@@ -67,14 +67,14 @@ class Payload extends Controller
                     $this->setPages($id, $this->getPostValue('path'));
                 }
 
-                // Check if posted data is editing blacklisted domains
+                // Check if posted data is editing denylisted domains
                 if ($this->getPostValue('blacklist-domains') !== null) {
-                    $this->setBlacklist($id, $this->getPostValue('domain'));
+                    $this->setList($id, $this->getPostValue('domain'), 'deny');
                 }
 
-                // Check if posted data is editing whitelisted domains
+                // Check if posted data is editing allowlisted domains
                 if ($this->getPostValue('whitelist-domains') !== null) {
-                    $this->setWhitelist($id, $this->getPostValue('domain'));
+                    $this->setList($id, $this->getPostValue('domain'), 'allow');
                 }
 
                 $this->log("Updated payload #{$id} settings");
@@ -239,14 +239,15 @@ class Payload extends Controller
     }
 
     /**
-     * Add blacklisted domain to payload list
+     * Add allow/deny listed domain to payload list
      * 
      * @param string $id The payload id
      * @param string $domain The domain to add
+     * @param string $type The type of domain (allow/deny)
      * @throws Exception
      * @return void
      */
-    private function setBlacklist($id, $domain)
+    private function setList($id, $domain, $type)
     {
         $payload = $this->model('Payload')->getById($id);
 
@@ -255,28 +256,9 @@ class Payload extends Controller
             throw new Exception('This does not look like a valid domain');
         }
 
-        $newString = $payload['blacklist'] . '~' . $domain;
-        $this->model('Payload')->setSingleValue($id, 'blacklist', $newString);
-    }
+        $type = ($type === 'deny') ? 'blacklist' : 'whitelist';
 
-    /**
-     * Add blacklisted domain to payload list
-     * 
-     * @param string $id The payload id
-     * @param string $domain The domain to add
-     * @throws Exception
-     * @return void
-     */
-    private function setWhitelist($id, $domain)
-    {
-        $payload = $this->model('Payload')->getById($id);
-
-        // Validate domain string
-        if (!preg_match('/^(?:(?:(?!\*)[a-zA-Z\d][a-zA-Z\d\-*]{0,61})?[a-zA-Z\d]\.){0,1}(?!\d+)(?!.*\*\*)[a-zA-Z\d*]{1,63}(?:\.(?:(?:(?!\*)[a-zA-Z\d][a-zA-Z\d\-*]{0,61})?[a-zA-Z\d]\.){0,1}(?!\d+)(?!.*\*\*)[a-zA-Z\d*]{1,63})*$/', $domain)) {
-            throw new Exception('This does not look like a valid domain');
-        }
-
-        $newString = $payload['whitelist'] . '~' . $domain;
-        $this->model('Payload')->setSingleValue($id, 'whitelist', $newString);
+        $newString = $payload[$type] . '~' . $domain;
+        $this->model('Payload')->setSingleValue($id, $type, $newString);
     }
 }

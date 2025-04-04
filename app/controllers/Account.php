@@ -48,7 +48,7 @@ class Account extends Controller
         }
 
         // Get user data
-        $user = $this->model('User')->getById($this->session->data('id'));
+        $user = $this->user();
 
         // Generate MFA secret
         $secret = '';
@@ -140,7 +140,7 @@ class Account extends Controller
                 $this->validateCsrfToken();
 
                 $code = $this->getPostValue('code');
-                $user = $this->model('User')->getById($this->session->data('id'));
+                $user = $this->user();
 
                 if (getAuthCode($user['secret']) !== $code) {
                     throw new Exception('Code is incorrect');
@@ -229,7 +229,7 @@ class Account extends Controller
      */
     private function passwordSettings($currentPassword, $newPassword, $newPassword2)
     {
-        $user = $this->model('User')->getById($this->session->data('id'));
+        $user = $this->user();
 
         if (!password_verify($currentPassword, $user['password'])) {
             throw new Exception('Current password is incorrect');
@@ -253,7 +253,7 @@ class Account extends Controller
      */
     private function mfaSettings($secret, $code)
     {
-        $user = $this->model('User')->getById($this->session->data('id'));
+        $user = $this->user();
         $secretCode = $user['secret'];
 
         if (strlen($secret) === 16) {
@@ -292,7 +292,7 @@ class Account extends Controller
     {
         $alerts = $this->model('Alert');
 
-        $user = $this->model('User')->getById($this->session->data('id'));
+        $user = $this->user();
 
         // Mail
         $mailOn = $this->getPostValue('mailon');

@@ -219,7 +219,7 @@ class Persistent extends Controller
 
         // Get data about report and payloads of user
         $session = $this->model('Session')->getByClientId($clientId, $origin);
-        $user = $this->model('User')->getById($this->session->data('id'));
+        $user = $this->user();
         $payloads = $this->model('Payload')->getAllByUserId($user['id']);
 
         // Check all payloads if it correspondents to session 

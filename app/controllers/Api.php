@@ -90,9 +90,10 @@ class Api extends Controller
             return $this->showEcho('Something went wrong, your bot token is probably invalid');
         }
 
+        $result = end($results['result']);
         // Check if result contains any chat
-        if (isset($results['result'][0]['message']['chat']['id'])) {
-            return $this->showEcho('chatId:' . $results['result'][0]['message']['chat']['id']);
+        if (isset($result['message']['chat']['id'])) {
+            return $this->showEcho('chatId:' . $result['message']['chat']['id']);
         }
 
         // No recent chat found
@@ -132,7 +133,7 @@ class Api extends Controller
         if ($admin) {
             $allReports = $this->model('Report')->getAllCommonData();
         } else {
-            $user = $this->model('User')->getById($this->session->data('id'));
+            $user = $this->user();
             $payloads = $this->model('Payload')->getAllByUserId($user['id']);
             $allReports = [];
 
@@ -215,7 +216,7 @@ class Api extends Controller
             $allReports = $this->model('Report')->getAllStaticticsData();
             $allSessions = $this->model('Session')->getAllStaticticsData();
         } else {
-            $user = $this->model('User')->getById($this->session->data('id'));
+            $user = $this->user();
             $payloads = $this->model('Payload')->getAllByUserId($user['id']);
 
             // Merge all reports that belong to user
@@ -460,7 +461,7 @@ class Api extends Controller
         foreach ($logs as $key => $value) {
             if ($logs[$key]['user_id'] !== 0) {
                 try {
-                    $user = $this->model('User')->getById($logs[$key]['user_id']);
+                    $user = $this->user($logs[$key]['user_id']);
                     $logs[$key]['user'] = $user['username'];
                 } catch (Exception $e) {
                     $logs[$key]['user'] = 'Deleted user';

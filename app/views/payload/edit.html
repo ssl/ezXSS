@@ -10,7 +10,7 @@
                         <div class="header-title">
                             <h3 class="m-b-xs">Payload</h3>
                             <small>The payloads page lets you customize your payload settings, including extracting
-                                additional pages and managing white/blacklisted domains. Use it to edit what information
+                                additional pages and managing allow/deny listed domains. Use it to edit what information
                                 your payloads collect.</small>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
                 <div class="col-lg-6">
 
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Payloads</div>
+                        <div class="panel-heading">Payloads <a href="//{%data domain}/assets/payload-tester.html" target=_blank style="float:right">↗ tester</a></div>
                         <div class="panel-body payload-panel">
                             <div class="form-group">
                                 <label class="control-label">SCRIPT src</label><label class="shortboost"
@@ -238,7 +238,7 @@
 
                 <div class="col-lg-4">
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Blocked domains (blacklist)</div>
+                        <div class="panel-heading">Denylisted domains</div>
                         <div class="panel-body">
                             <form class="form" id="blacklist-domains" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
@@ -262,7 +262,7 @@
                             {%/if}
 
                             {%!if hasBlacklist}
-                            <p>There are no blacklisted domains yet for this payload.</p>
+                            <p>There are no denylisted domains yet for this payload.</p>
                             {%/!if}
 
                         </div>
@@ -271,7 +271,7 @@
 
                 <div class="col-lg-4">
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Allowed only domains (whitelist)</div>
+                        <div class="panel-heading">Allowlisted domains</div>
                         <div class="panel-body">
                             <form class="form" id="whitelist-domains" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
@@ -295,7 +295,7 @@
                             {%/if}
 
                             {%!if hasWhitelist}
-                            <p>There are no whitelisted domains yet for this payload.</p>
+                            <p>There are no allowlisted domains yet for this payload.</p>
                             {%/!if}
                         </div>
                     </div>

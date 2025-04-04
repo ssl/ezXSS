@@ -21,12 +21,18 @@ try {
     $router = new Router();
     echo $router->proccess(path);
 } catch (Exception $message) {
-    // Any unexpected uncatched exception will show an error page
-    if (!class_exists('View')) {
-        require_once __DIR__ . '/system/View.php';
+    try {
+        // Any unexpected uncatched exception will show an error page
+        if (!class_exists('View')) {
+            require_once __DIR__ . '/system/View.php';
+        }
+        $view = new View();
+        $view->setContentType('text/html');
+        echo $view->renderErrorPage($message->getMessage());
+        exit();
+    } catch (Exception $e) {
+        // If the error page also fails to load, show a plaintext error message
+        header('Content-Type: text/plain');
+        echo $message->getMessage();
     }
-    $view = new View();
-    $view->setContentType('text/html');
-    echo $view->renderErrorPage($message->getMessage());
-    exit();
 }

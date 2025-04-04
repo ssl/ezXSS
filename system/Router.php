@@ -51,6 +51,11 @@ class Router
                 if (!method_exists($controller, $method)) {
                     throw new Exception('404');
                 }
+
+                $reflection = new ReflectionMethod($controller, $method);
+                if (!$reflection->isPublic()) {
+                    throw new Exception('403');
+                }
             } catch (Exception $e) {
                 redirect('/manage/dashboard');
             }

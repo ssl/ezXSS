@@ -14,7 +14,7 @@ class Dashboard extends Controller
         $this->view->renderTemplate('dashboard/my');
 
         // Render the correct 'selected' box in the 2 rows
-        $user = $this->model('User')->getById($this->session->data('id'));
+        $user = $this->user();
         foreach (['1', '2'] as $row) {
             for ($i = 1; $i <= 5; $i++) {
                 $this->view->renderData("common_{$row}_{$i}", $user['row' . $row] == $i ? 'selected' : '');
@@ -44,7 +44,7 @@ class Dashboard extends Controller
         $this->view->renderTemplate('dashboard/index');
 
         // Render the correct 'selected' box in the 2 rows
-        $user = $this->model('User')->getById($this->session->data('id'));
+        $user = $this->user();
         foreach (['1', '2'] as $row) {
             for ($i = 1; $i <= 5; $i++) {
                 $this->view->renderData("common_{$row}_{$i}", $user['row' . $row] == $i ? 'selected' : '');

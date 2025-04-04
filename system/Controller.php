@@ -55,7 +55,7 @@ class Controller
      * @param string $name The model name
      * @return mixed|null The loaded model or null if not found
      */
-    public function model($name)
+    protected function model($name)
     {
         // Check if model has already been set
         if (!isset($this->model[$name])) {
@@ -78,7 +78,7 @@ class Controller
      * 
      * @return string
      */
-    public function showContent()
+    protected function showContent()
     {
         // Try to get the theme; default to 'classic' on failure
         try {
@@ -100,7 +100,7 @@ class Controller
      * @throws Exception
      * @return void
      */
-    public function validateCsrfToken()
+    protected function validateCsrfToken()
     {
         $csrf = $this->getPostValue('csrf');
 
@@ -118,25 +118,25 @@ class Controller
      * @throws Exception
      * @return void
      */
-    public function validateSession()
+    protected function validateSession()
     {
         try {
             if ($this->session->isLoggedIn()) {
-                // This tries getting the account by id, which fails if the account is deleted
-                $account = $this->model('User')->getById($this->session->data('id'));
+                // This tries getting the user by id, which fails if the user is deleted
+                $user = $this->user();
 
                 // Check if the password has been changed
-                if ($this->session->get('password_hash') !== md5($account['password'])) {
+                if ($this->session->get('password_hash') !== md5($user['password'])) {
                     throw new Exception('Password has been changed');
                 }
 
                 // Check if the username has been changed
-                if ($this->session->get('username') !== $account['username']) {
+                if ($this->session->get('username') !== $user['username']) {
                     throw new Exception('Username has been changed');
                 }
 
                 // Check if the rank has been changed
-                if ($this->session->get('rank') !== $account['rank']) {
+                if ($this->session->get('rank') !== $user['rank']) {
                     throw new Exception('Rank has been changed');
                 }
 
@@ -158,7 +158,7 @@ class Controller
      *
      * @return void
      */
-    public function isLoggedInOrExit()
+    protected function isLoggedInOrExit()
     {
         $this->validateSession();
         if (!$this->session->isLoggedIn()) {
@@ -174,7 +174,7 @@ class Controller
      *
      * @return void
      */
-    public function isLoggedOutOrExit()
+    protected function isLoggedOutOrExit()
     {
         if ($this->session->isLoggedIn()) {
             redirect('/manage/dashboard/index');
@@ -186,7 +186,7 @@ class Controller
      *
      * @return void
      */
-    public function isAdminOrExit()
+    protected function isAdminOrExit()
     {
         $this->isLoggedInOrExit();
         if (!$this->isAdmin()) {
@@ -199,7 +199,7 @@ class Controller
      *
      * @return boolean
      */
-    public function isAdmin()
+    protected function isAdmin()
     {
         return $this->session->data('rank') == 7;
     }
@@ -209,7 +209,7 @@ class Controller
      *
      * @return boolean
      */
-    public function isPOST()
+    protected function isPOST()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return true;
@@ -223,7 +223,7 @@ class Controller
      * @param string $param The param
      * @return string|null
      */
-    public function getPostValue($param)
+    protected function getPostValue($param)
     {
         return isset($_POST[$param]) && is_string($_POST[$param]) ? $_POST[$param] : null;
     }
@@ -234,7 +234,7 @@ class Controller
      * @param string $param The param
      * @return string|null
      */
-    public function getGetValue($param)
+    protected function getGetValue($param)
     {
         return isset($_GET[$param]) ? $_GET[$param] : null;
     }
@@ -245,7 +245,7 @@ class Controller
      * @param string $userAgent The user agent string
      * @return string
      */
-    public function parseUserAgent($userAgent)
+    protected function parseUserAgent($userAgent)
     {
         $browser = 'Unknown';
         $os = 'Unknown';
@@ -274,6 +274,9 @@ class Controller
 
         $oses = [
             '/Googlebot/i' => 'Googlebot',
+            '/bingbot/i' => 'Bingbot',
+            '/MicrosoftPreview/i' => 'Bingbot',
+            '/YandexBot/i' => 'YandexBot',
             '/Windows/i' => 'Windows',
             '/iPhone/i' => 'iPhone',
             '/Mac/i' => 'macOS',
@@ -317,7 +320,7 @@ class Controller
      * @param string $syntax Syntax type
      * @return string
      */
-    public function parseTimestamp($timestamp, $syntax = 'short')
+    protected function parseTimestamp($timestamp, $syntax = 'short')
     {
         if ($timestamp === 0) {
             return 'never';
@@ -353,12 +356,18 @@ class Controller
      * @param string $description The description
      * @return void
      */
-    public function log($description)
+    protected function log($description)
     {
         if ($this->model('Setting')->get('logging') === '1') {
             $userId = $this->session->data('id');
             $this->model('Log')->add($userId !== '' ? $userId : 0, $description, userip);
         }
+    }
+
+    protected function user($id = null)
+    {
+        $id = $id ?? $this->session->data('id');
+        return $this->model('User')->getById($id);
     }
 
     /**
@@ -425,7 +434,7 @@ class Controller
      * 
      * @return array
      */
-    public function payloadList($type = 1)
+    protected function payloadList($type = 1)
     {
         $payloadList = [];
 
@@ -440,7 +449,7 @@ class Controller
         }
 
         // Push all payloads of user to list
-        $user = $this->model('User')->getById($this->session->data('id'));
+        $user = $this->user();
         $payloads = $this->model('Payload')->getAllByUserId($user['id']);
         foreach ($payloads as $payload) {
             array_push($payloadList, $payload['id']);

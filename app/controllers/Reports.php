@@ -178,7 +178,7 @@ class Reports extends Controller
 
         // Get data about report and payloads of user
         $report = $this->model('Report')->getById($id);
-        $user = $this->model('User')->getById($this->session->data('id'));
+        $user = $this->user();
         $payloads = $this->model('Payload')->getAllByUserId($user['id']);
 
         // Check all payloads if it correspondents to report 

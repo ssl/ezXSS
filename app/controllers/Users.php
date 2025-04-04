@@ -143,7 +143,7 @@ class Users extends Controller
         $this->view->renderTemplate('users/delete');
 
         // Retrieve user by id
-        $user = $this->model('User')->getById($id);
+        $user = $this->user($id);
         $this->view->renderData('username', $user['username']);
 
         if ($this->isPOST()) {

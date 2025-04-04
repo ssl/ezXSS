@@ -1,8 +1,26 @@
 <?php
 
+// Current ezXSS version. Do not edit this
+define('version', '4.2');
+
+// Defines the current host
+define('host', e($_SERVER['HTTP_HOST']));
+
+// Defines the current url
+define('url', e("//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"));
+
+// Defines the current path
+define('path', e($_SERVER['REQUEST_URI'] ?? '/'));
+
+// Defines the IP of the user
+define('userip', $_SERVER['REMOTE_ADDR']);
+
+// Defines the current protocol
+define('ishttps', (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1') || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https'));
+
 // Checks if .env file is created
 if (!file_exists(__DIR__ . '/../../.env')) {
-    throw new Exception('You did not setup your config file yet.');
+    throw new Exception('No config file (.env) found. Go read the documentation first.');
 }
 
 // Parse config data
@@ -21,21 +39,3 @@ define('httpmode', $config['httpmode'] ?? '' === 'true' || $config['httpmode'] ?
 
 // Defines whenever sign up is enabled, do not enable this unless you are serving a public ezXSS installation - this allows anyone to register!
 define('signupEnabled', $config['signupEnabled'] ?? '' === 'true' || $config['signupEnabled'] ?? '' === '1' ? true : false);
-
-// Current ezXSS version. Do not edit this
-define('version', '4.2');
-
-// Defines the current host
-define('host', e($_SERVER['HTTP_HOST']));
-
-// Defines the current url
-define('url', e("//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"));
-
-// Defines the current path
-define('path', e($_SERVER['REQUEST_URI'] ?? '/'));
-
-// Defines the IP of the user
-define('userip', $_SERVER['REMOTE_ADDR']);
-
-// Defines the current protocol
-define('ishttps', (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1') || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https'));
