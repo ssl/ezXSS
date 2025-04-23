@@ -488,9 +488,6 @@ div.table-responsive>div.dataTables_wrapper>div.row>div[class^=col-]:last-child{
 .checkbox-label input:checked~.checkbox-custom{background-color:#fff;border-radius:5px;-webkit-transform:rotate(0) scale(1);-ms-transform:rotate(0) scale(1);transform:rotate(0) scale(1);opacity:1;border:2px solid #fff}
 .checkbox-label .checkbox-custom::after{position:absolute;content:"";left:12px;top:12px;height:0;width:0;border-radius:5px;border:solid #009bff;border-width:0 3px 3px 0;-webkit-transform:rotate(0) scale(0);-ms-transform:rotate(0) scale(0);transform:rotate(0) scale(0);opacity:1;transition:all .3s ease-out;-webkit-transition:all .3s ease-out;-moz-transition:all .3s ease-out;-ms-transition:all .3s ease-out;-o-transition:all .3s ease-out}
 .checkbox-label input:checked~.checkbox-custom::after{-webkit-transform:rotate(45deg) scale(1);-ms-transform:rotate(45deg) scale(1);transform:rotate(45deg) scale(1);opacity:1;left:8px;top:3px;width:6px;height:12px;border:solid #23284b;border-width:0 2px 2px 0;background-color:transparent;border-radius:0}
-@-moz-document url-prefix(){
-.checkbox-custom{margin-top:24px}
-}
 .reports-checkbox-label{display:inline-grid;position:relative;margin:auto;cursor:pointer;font-size:22px;line-height:24px;height:24px;width:30px;clear:both}
 .reports-checkbox-label input{position:absolute;opacity:0;cursor:pointer;margin:10px}
 .reports-checkbox-label .reports-checkbox-custom{position:absolute;top:8px;left:0;height:24px;width:24px;background-color:transparent;border-radius:5px;transition:all .3s ease-out;-webkit-transition:all .3s ease-out;-moz-transition:all .3s ease-out;-ms-transition:all .3s ease-out;-o-transition:all .3s ease-out;border:1px solid #3f446a}
