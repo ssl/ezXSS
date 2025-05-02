@@ -98,7 +98,7 @@ class Users extends Controller
                         throw new Exception('Invalid rank');
                     }
                     $userModel->setRank($user['id'], $rank);
-                    $this->log("Eddited user {$username}");
+                    $this->log("Edited user {$username}");
                     if ($rank == 0) {
                         $this->log("Banned user {$username}");
                     }

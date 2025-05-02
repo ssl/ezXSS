@@ -99,7 +99,6 @@ button,input{font-family:inherit;font-size:inherit;line-height:inherit}
 a{color:#337ab7;text-decoration:none}
 a:focus,a:hover{color:#23527c;text-decoration:underline}
 a:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}
-hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee}
 h3{font-family:inherit;font-weight:500;line-height:1.1;color:inherit}
 h3{margin-top:20px;margin-bottom:10px}
 h3{font-size:24px}
@@ -201,14 +200,14 @@ table{width:100%}
 label{color:#fff;font-weight:300;display:inline-block;max-width:100%;margin-bottom:5px;font-size:14px}
 :focus{outline:0}
 .form-group{margin-bottom:15px}
-.btn{display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:400;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px;color:#949ba2;background-color:transparent;border-color:#64698f;outline:0}
+.btn{display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:400;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px;color:#5d638a;background-color:transparent;border-color:#64698f;outline:0}
 .btn:focus{outline:0}
 .btn:hover{color:#fff;outline:0}
 th{width:150px}
 .btn:active{box-shadow:none}
 .btn{color:inherit;background-color:transparent}
-.btn-default{border-color:#585d6e}
-.btn-default{color:#949ba2;background-color:transparent;border-color:#616779}
+.btn-default{border-color:#64698f}
+.btn-default{color:#5d638a;background-color:transparent;border-color:#616779}
 .btn-default:focus{color:#fff;background-color:rgba(97,103,121,.1);border-color:#616779;outline:0;box-shadow:none}
 .btn-default:hover{color:#fff;background-color:rgba(97,103,121,.1);border-color:#616779}
 .btn-default:active{color:#fff;background-color:rgba(97,103,121,.1);border-color:#616779}
@@ -225,12 +224,12 @@ th{width:150px}
 .navigation:before{transition:left .3s ease-out;-webkit-transition:left .3s ease-out;content:'';position:fixed;top:0;bottom:0;z-index:-1;left:0;background-color:#2b3157;width:200px}
 a{color:#f6a821;text-decoration:none}
 a:focus,a:hover{color:#fff;outline:0}
-hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #686d93}
+hr{margin-top:21px;margin-bottom:20px;border:0;border-top:3px solid #2b3157;}
 .row{margin-left:-10px;margin-right:-10px}
 .col-lg-12{padding-left:10px;padding-right:10px}
 .left-nav-toggle{float:left;padding:25px 10px 8px 25px}
 .left-nav-toggle:hover a{color:#636c88}
-.left-nav-toggle a{font-size:30px;color:#949ba2}
+.left-nav-toggle a{font-size:30px;color:#5d638a}
 .left-nav-toggle a:focus,.left-nav-toggle a:hover{text-decoration:none}
 #mobile-menu{display:none}
 #mobile-menu{float:right}
@@ -249,10 +248,11 @@ hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #686d93}
 .panel.panel-filled{background-color:#2b3157}
 .view-header{margin:20px 0;min-height:50px}
 .view-header .header-title h3{margin-bottom:2px}
-.pagination>li>a{color:#949ba2;background-color:transparent;border:1px solid #585d6e}
+.pagination>li>a{color:#5d638a;background-color:transparent;border:1px solid #64698f}
 .pagination>li>a:focus,.pagination>li>a:hover{color:#fff;background-color:rgba(97,103,121,.1);border-color:#616779}
-.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover{color:#fff;background-color:rgba(97,103,121,.1);border-color:#616779}
+.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover{color:#fff;background-color:rgb(255 255 255 / 0%);border-color:#616779}
 .modal-backdrop.in{opacity:.1}
+.pagination>li:last-child>a{border-radius:0px 4px 4px 0px}
 h3{color:#fff}
 h3{margin-top:10px}
 .c-white{color:#fff;font-size:20px}
@@ -535,5 +535,5 @@ table.simple{white-space: nowrap!important;}
 .session-panel{padding-bottom:1px!important}
 .toprow-value{width:100%}
 #most_common1 td,#most_common2 td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#most_common1 td:nth-child(2),#most_common2 td:nth-child(2){text-align:right}
+#most_common1 td:nth-child(2),#most_common2 td:nth-child(2){text-align:right;padding:0px;}
 #notepad-settings{margin-top:3px}
