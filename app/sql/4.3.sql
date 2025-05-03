@@ -36,6 +36,7 @@ CREATE TABLE `payloads` (
   `blacklist` text,
   `whitelist` text,
   `customjs` text,
+  `customjs2` text,
   `collect_uri` tinyint(1) NOT NULL DEFAULT '1',
   `collect_ip` tinyint(1) NOT NULL DEFAULT '1',
   `collect_referer` tinyint(1) NOT NULL DEFAULT '1',
@@ -52,8 +53,8 @@ CREATE TABLE `payloads` (
 -- Dumping data for table `payloads`
 --
 
-INSERT INTO `payloads` (`id`, `payload`, `user_id`, `pages`, `blacklist`, `whitelist`, `customjs`, `collect_uri`, `collect_ip`, `collect_referer`, `collect_user-agent`, `collect_cookies`, `collect_localstorage`, `collect_sessionstorage`, `collect_dom`, `collect_origin`, `collect_screenshot`) VALUES
-(1, 'Fallback (default)', 0, '', '', '', '', 1, 1, 1, 1, 1, 1, 1, 1, 1, 0);
+INSERT INTO `payloads` (`id`, `payload`, `user_id`, `pages`, `blacklist`, `whitelist`, `customjs`, `customjs2`, `collect_uri`, `collect_ip`, `collect_referer`, `collect_user-agent`, `collect_cookies`, `collect_localstorage`, `collect_sessionstorage`, `collect_dom`, `collect_origin`, `collect_screenshot`) VALUES
+(1, 'Fallback (default)', 0, '', '', '', '', '', 1, 1, 1, 1, 1, 1, 1, 1, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -136,7 +137,8 @@ INSERT INTO `settings` (`id`, `setting`, `value`) VALUES
 (27, 'logging', '0'),
 (28, 'persistent', '0'),
 (29, 'storescreenshot', '0'),
-(30, 'compress', '0');
+(30, 'compress', '0'),
+(31, 'customjs2', '');
 
 -- --------------------------------------------------------
 

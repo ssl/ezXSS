@@ -45,21 +45,17 @@ class Payload extends Controller
                 $this->validateCsrfToken();
 
                 // Check if posted data is editing collecting
-                if ($this->getPostValue('collecting') !== null) {
+                if ($this->getPostValue('settings') !== null) {
                     $this->setCollecting($id);
-                }
 
-                // Check if posted data is editing persistent mode
-                if ($this->getPostValue('persistent') !== null) {
-                    if ($this->model('Setting')->get('persistent') !== '1' && $this->getPostValue('persistent-mode') !== null) {
+                    $this->model('Payload')->setSingleValue($id, 'customjs', $this->getPostValue('customjs'));
+                    $this->model('Payload')->setSingleValue($id, 'customjs2', $this->getPostValue('customjs2'));
+
+                    $persistent = '2' === $this->getPostValue('method') ? 1 : 0;
+                    if($this->model('Setting')->get('persistent') !== '1' && $persistent === 1) {
                         throw new Exception('Persistent mode is globally disabled by the ezXSS admin');
                     }
-                    $this->model('Payload')->setSingleValue($id, 'persistent', ($this->getPostValue('persistent-mode') !== null) ? 1 : 0);
-                }
-
-                // Check if posted data is editing custom js
-                if ($this->getPostValue('secondary-payload') !== null) {
-                    $this->model('Payload')->setSingleValue($id, 'customjs', $this->getPostValue('customjs'));
+                    $this->model('Payload')->setSingleValue($id, 'persistent', $persistent);
                 }
 
                 // Check if posted data is editing extracting pages
@@ -109,6 +105,7 @@ class Payload extends Controller
         $this->view->renderChecked('cScreenshot', $payload['collect_screenshot'] == 1);
         $this->view->renderChecked('cPersistent', $payload['persistent'] == 1);
         $this->view->renderData('customjs', $payload['customjs']);
+        $this->view->renderData('customjs2', $payload['customjs2']);
 
         $i = 0;
 

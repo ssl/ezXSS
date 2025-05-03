@@ -100,6 +100,7 @@ class Update extends Controller
                     $sql = file_get_contents(__DIR__ . '/../sql/4.1-4.2.sql');
                     $database = Database::openConnection();
                     $database->exec($sql);
+                    $version = '4.2';
                     $this->model('Setting')->set('version', version);
                     
                     // Add indexes to database to speed up queries
@@ -112,7 +113,15 @@ class Update extends Controller
                     }
                 }
 
-                $this->model('Setting')->set('version', version);
+                // Update the database from 4.2 to 4.3
+                if ($version === '4.2') {
+                    $sql = file_get_contents(__DIR__ . '/../sql/4.2-4.3.sql');
+                    $database = Database::openConnection();
+                    $database->exec($sql);
+                    $version = '4.3';
+                    $this->model('Setting')->set('version', version);
+                }
+
                 redirect('dashboard');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());

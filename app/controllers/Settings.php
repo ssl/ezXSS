@@ -143,6 +143,7 @@ class Settings extends Controller
 
         // Render last data parts
         $this->view->renderData('customjs', $settings->get('customjs'));
+        $this->view->renderData('customjs2', $settings->get('customjs2'));
         $this->view->renderData('callbackURL', $settings->get('callback-url'));
 
         return $this->showContent();
@@ -206,6 +207,7 @@ class Settings extends Controller
         }
 
         $this->model('Setting')->set('customjs', $this->getPostValue('customjs'));
+        $this->model('Setting')->set('customjs2', $this->getPostValue('customjs2'));
 
         $persistent = $this->getPostValue('persistenton');
         $this->model('Setting')->set('persistent', $persistent !== null ? '1' : '0');
