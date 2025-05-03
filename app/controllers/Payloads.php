@@ -64,7 +64,9 @@ class Payloads extends Controller
         $this->view->renderData('noCollect', implode(',', $noCollect), true);
         $this->view->renderData('pages', implode(',', $pages), true);
         $this->view->renderDataWithLines('customjs', $payload['customjs'], true);
+        $this->view->renderDataWithLines('customjs2', $payload['customjs2'], true);
         $this->view->renderDataWithLines('globaljs', $this->model('Setting')->get('customjs'), true);
+        $this->view->renderDataWithLines('globaljs2', $this->model('Setting')->get('customjs2'), true);
         $this->view->renderDataWithLines('screenshot', $screenshot, true);
         $this->view->renderDataWithLines('persistent', $persistent ?? '', true);
 
