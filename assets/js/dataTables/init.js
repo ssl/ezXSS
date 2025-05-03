@@ -57,6 +57,19 @@ $(document).ready(function () {
             td.attr("title", td.html());
         },
         order: [[1, 'desc']],
+        dom: '<"top"lipf>rt',
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search reports...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            paginate: {
+                first: "«",
+                previous: "‹",
+                next: "›",
+                last: "»"
+            }
+        }
     });
 
     var dataTablePersistent = new DataTable('#persistent', {
@@ -101,6 +114,19 @@ $(document).ready(function () {
             },
         ],
         order: [[6, 'desc']],
+        dom: '<"top"lipf>rt',
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search sessions...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            paginate: {
+                first: "«",
+                previous: "‹",
+                next: "›",
+                last: "»"
+            }
+        }
     });
 
     if (location.toString().split('/')[4] === "persistent") {
@@ -142,6 +168,19 @@ $(document).ready(function () {
             },
         ],
         order: [[3, 'desc']],
+        dom: '<"top"lipf>rt',
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search logs...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            paginate: {
+                first: "«",
+                previous: "‹",
+                next: "›",
+                last: "»"
+            }
+        }
     });
 
     new DataTable('#users', {
@@ -176,13 +215,110 @@ $(document).ready(function () {
         order: [[0, 'asc']],
         scrollY: false,
         scrollX: false,
+        dom: '<"top"lipf>rt',
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search users...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            paginate: {
+                first: "«",
+                previous: "‹",
+                next: "›",
+                last: "»"
+            }
+        }
     });
 
     $('#simple-table').DataTable({
         columnDefs: [
             { orderable: false, targets: [0] }
         ],
-            "pageLength": 25,
+        "pageLength": 25,
         order: [[0, 'desc']],
+        dom: '<"top"lipf>rt',
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            paginate: {
+                first: "«",
+                previous: "‹",
+                next: "›",
+                last: "»"
+            }
+        }
     });
+
+    // Initialize user logs DataTable if the element exists
+    if ($('#user-logs').length) {
+        new DataTable('#user-logs', {
+            "ajax": {
+                "url": "/manage/api/userlogs/" + window.location.pathname.split('/').pop(),
+                "contentType": "application/json",
+                "type": "POST",
+                "data": function (d) {
+                    return JSON.stringify(d);
+                }
+            },
+            columns: [
+                { 
+                    data: 'description',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return '<div style="word-wrap: break-word; word-break: break-word;">' + data + '</div>';
+                        }
+                        return data;
+                    }
+                },
+                { 
+                    data: 'ip',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return '<div class="truncate" title="' + data + '">' + data + '</div>';
+                        }
+                        return data;
+                    }
+                },
+                { 
+                    data: 'date',
+                    render: function (data, type, row, meta) {
+                        if (type === 'sort') {
+                            return row.time;
+                        }
+                        return data;
+                    }
+                }
+            ],
+            columnDefs: [
+                { targets: 1, className: "truncate" }
+            ],
+            createdRow: function (row, data, dataIndex) {
+                var tds = $(row).find(".truncate");
+                tds.each(function() {
+                    $(this).attr("title", $(this).html());
+                });
+            },
+            order: [[2, 'desc']],
+            dom: '<"top"pf>rt',
+            pageLength: 10,
+            lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
+            pagingType: "simple_numbers",
+            scrollX: false,
+            autoWidth: false,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search logs...",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                paginate: {
+                    first: "«",
+                    previous: "‹",
+                    next: "›",
+                    last: "»"
+                }
+            }
+        });
+    }
 });

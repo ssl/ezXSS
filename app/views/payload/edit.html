@@ -88,33 +88,16 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Persistent mode</div>
-                        <div class="panel-body persistent-panel">
-                            <form class="form" id="persistent" method="post">
-                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-                                <div class="form-group">
-                                    <label class="checkbox-label">
-                                        <input {%checked cPersistent} class="chkbox" id="persistent-mode"
-                                            name="persistent-mode" type="checkbox">
-                                        <span class="checkbox-custom rectangular"></span>
-                                    </label>
-                                    <p class="checkbox-text">Enable persistent mode [<a
-                                            href="https://github.com/ssl/ezXSS/wiki" target=_blank>?</a>]</p>
-                                    <button name="persistent" type="submit" class="btn">Save</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Collecting</div>
+                        <div class="panel-heading">Settings</div>
                         <div class="panel-body">
                             <form class="form" id="collecting" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+
+                                <label class="control-label">Collecting</label>
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
@@ -181,22 +164,31 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button name="collecting" type="submit" class="btn">Save</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="panel panel-filled scn-payload-panel">
-                        <div class="panel-heading">Secondary Payload</div>
-                        <div class="panel-body">
-                            <form class="form" id="secondary-payload" method="post">
-                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                
                                 <div class="form-group">
-                                    <label class="control-label" for="customjs">Custom javascript</label>
-                                    <textarea class="form-control" id="customjs" name="customjs"
-                                        rows=5>{%data customjs}</textarea>
+                                    <label class="control-label" for="method">Method [<a
+                                        href="https://github.com/ssl/ezXSS/wiki" target=_blank>?</a>]</label>
+                                    <select class="form-control" id="method" name="method">
+                                        <option value="1">Classic callback</option>
+                                        <option value="2">Persistent mode</option>
+                                    </select>
                                 </div>
-                                <button name="secondary-payload" type="submit" class="btn">Save</button>
+
+                                <div class="form-group">
+                                    <label class="control-label" for="customjs">Custom javascript pre-callback</label>
+                                    <textarea class="form-control" id="customjs" name="customjs"
+                                        rows=4>{%data customjs}</textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label" for="customjs">Custom javascript post-callback</label>
+                                    <textarea class="form-control" id="customjs" name="customjs"
+                                        rows=4>{%data customjs}</textarea>
+                                </div>
+
+
+
+                                <button name="collecting" type="submit" class="btn">Save</button>
                             </form>
                         </div>
                     </div>
@@ -215,9 +207,9 @@
                                     <label class="control-label" for="path">Add new path</label>
                                     <input class="form-control" id="path" name="path" placeholder="/robots.txt">
                                 </div>
-                                <button name="extract-pages" type="submit" class="btn">Save</button>
+                                <button name="extract-pages" type="submit" class="btn">Add</button>
                             </form>
-                            <hr>
+                            <hr class="list">
                             {%if hasPages}
                             <p><b>Pages:</b></p>
                             {%foreach pages}
@@ -247,9 +239,9 @@
                                     <input class="form-control" id="blacklist-domain" name="domain"
                                         placeholder="example.com">
                                 </div>
-                                <button name="blacklist-domains" type="submit" class="btn">Save</button>
+                                <button name="blacklist-domains" type="submit" class="btn">Add</button>
                             </form>
-                            <hr>
+                            <hr class="list">
                             {%if hasBlacklist}
                             <p><b>Domains:</b></p>
                             {%foreach blacklist}
@@ -280,9 +272,9 @@
                                     <input class="form-control" id="whitelist-domain" name="domain"
                                         placeholder="example.com">
                                 </div>
-                                <button name="whitelist-domains" type="submit" class="btn">Save</button>
+                                <button name="whitelist-domains" type="submit" class="btn">Add</button>
                             </form>
-                            <hr>
+                            <hr class="list">
                             {%if hasWhitelist}
                             <p><b>Domains:</b></p>
                             {%foreach whitelist}

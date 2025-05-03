@@ -25,6 +25,27 @@ class Log_model extends Model
     }
 
     /**
+     * Get logs by user ID
+     * 
+     * @param int $userId The user ID
+     * @return array
+     */
+    public function getByUserId($userId)
+    {
+        $database = Database::openConnection();
+        $database->prepare("SELECT * FROM $this->table WHERE `user_id` = :user_id ORDER BY `time` DESC");
+        $database->bindValue(':user_id', $userId);
+        
+        if (!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        $data = $database->fetchAll();
+
+        return $data;
+    }
+
+    /**
      * Add log
      * 
      * @param int $userId The user id

@@ -126,6 +126,7 @@ class Users extends Controller
         $this->view->renderDataset('payload', $payloads);
         $this->view->renderData('username', $user['username']);
         $this->view->renderData('rankOptions', $this->rankOptions($user['rank']), true);
+        $this->view->renderData('id', $user['id']);
 
         return $this->showContent();
     }

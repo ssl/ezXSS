@@ -81,7 +81,7 @@
                     <div class="panel panel-filled">
                         <div class="panel-heading">Global payload settings</div>
                         <div class="panel-body">
-                            <p>Each payload can choose their own options, but only the onces allowed here</p>
+                            <p>Each payload has their own settings, but are only allowed the options enabled here</p>
                             <form class="form" id="collecting" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="row">
@@ -161,8 +161,15 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="control-label" for="customjs">Custom javascript</label>
-                                    <small>Add custom javascript which will be added to <i>all</i> payloads</small>
+                                    <label class="control-label" for="customjs">Custom javascript pre-callback</label>
+                                    <small>adds to <i>all</i> payloads</small>
+                                    <textarea class="form-control" name="customjs" id="customjs"
+                                        rows=5>{%data customjs}</textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label" for="customjs">Custom javascript post-callback</label>
+                                    <small>adds to <i>all</i> payloads</small>
                                     <textarea class="form-control" name="customjs" id="customjs"
                                         rows=5>{%data customjs}</textarea>
                                 </div>
@@ -172,22 +179,7 @@
                         </div>
                     </div>
 
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Kill Switch</div>
-                        <div class="panel-body">
-                            <p>Completely kills the platform. Can be reverted by visiting
-                                https://{domain[]}/?pass=...
-                            </p>
-                            <form class="form" method="post">
-                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-                                <div class="form-group">
-                                    <label class="control-label" for="password">Password to revert</label>
-                                    <input class="form-control" name="password" id="password" type="text">
-                                </div>
-                                <button name="killswitch" type="submit" class="btn">Kill</button>
-                            </form>
-                        </div>
-                    </div>
+                    
 
                 </div>
 
@@ -363,6 +355,23 @@
                                         value="{%data callbackURL}">
                                 </div>
                                 <button name="callback-alert" type="submit" class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Kill Switch</div>
+                        <div class="panel-body">
+                            <p>Completely kills the platform. Can be reverted by visiting
+                                https://{domain[]}/?pass=...
+                            </p>
+                            <form class="form" method="post">
+                                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <label class="control-label" for="password">Password to revert</label>
+                                    <input class="form-control" name="password" id="password" type="text">
+                                </div>
+                                <button name="killswitch" type="submit" class="btn">Kill</button>
                             </form>
                         </div>
                     </div>

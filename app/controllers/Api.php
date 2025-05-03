@@ -476,6 +476,25 @@ class Api extends Controller
     }
 
     /**
+     * Renders the user logs content and returns the content.
+     * 
+     * @param string $id The user id
+     * @return string
+     */
+    public function userlogs($id)
+    {
+        $this->isAdminOrExit();
+
+        $logs = $this->model('Log')->getByUserId($id);
+
+        foreach ($logs as $key => $value) {
+            $logs[$key]['date'] = date('F j, Y, g:i a', $logs[$key]['time']);
+        }
+
+        return $this->showData($logs);
+    }
+
+    /**
      * Renders the users content and returns the content.
      * 
      * @return string
