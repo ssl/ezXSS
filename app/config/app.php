@@ -1,7 +1,7 @@
 <?php
 
 // Current ezXSS version. Do not edit this
-define('version', '4.2');
+define('version', '4.3');
 
 // Defines the current host
 define('host', e($_SERVER['HTTP_HOST']));

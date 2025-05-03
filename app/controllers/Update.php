@@ -35,6 +35,8 @@ class Update extends Controller
             throw new Exception('ezXSS is already up-to-date');
         }
 
+        // Updates before 4.2 require moving data from reports and sessions tables to new tables
+        // This requires disk space and time, so we need to check if the server has enough free space
         try {
             $this->view->renderData('tablesize', 'Tables size: ' . ceil(($this->getTablesSize() * 1.1) / (1024*1024)) . ' MB');
         } catch (Exception $e) {
@@ -46,6 +48,7 @@ class Update extends Controller
         } catch (Exception $e) {
             $this->view->renderData('disksize', 'Error in retrieving free disk space. Proceed with caution');
         }
+        $this->view->renderCondition('pre42update', version_compare($version, '4.2', '<'));
 
         if ($this->isPOST()) {
             try {

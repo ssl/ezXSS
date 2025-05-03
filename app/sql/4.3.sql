@@ -363,3 +363,5 @@ ALTER TABLE sessions ADD INDEX(payload);
 ALTER TABLE sessions ADD INDEX(clientid);
 ALTER TABLE sessions ADD INDEX(origin);
 ALTER TABLE sessions_data ADD INDEX(sessionid);
+
+ALTER TABLE logs ADD INDEX(user_id);

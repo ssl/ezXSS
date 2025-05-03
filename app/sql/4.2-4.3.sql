@@ -1,4 +1,11 @@
-INSERT INTO `settings` (`id`, `setting`, `value`) VALUES
-(31, 'customjs2', '');
+--
+-- SQL for updating from 4.2 to 4.3
+--
+
+INSERT INTO `settings` (`setting`, `value`) VALUES
+('customjs2', '');
 
 ALTER TABLE `payloads` ADD `customjs2` TEXT NOT NULL DEFAULT '' AFTER `customjs`;
+
+
+ALTER TABLE logs ADD INDEX(user_id);
