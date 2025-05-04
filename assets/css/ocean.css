@@ -1,0 +1,68 @@
+.transparent{background-color:transparent!important}
+body,html{background:#0a192f!important}
+.content:before{background-color:#0a192f}
+.navigation:before{background-color:#0a192f;border-right:1px solid #64ffda}
+.nav-head{border-right:1px solid #64ffda}
+.checkbox-label input:checked~.checkbox-custom::after{border:solid #64ffda;border-width:0 2px 2px 0}
+.theme,.theme :not(img,svg),.theme body{color:#ccd6f6!important;background-color:#0a192f!important;border-color:#64ffda!important}
+.theme input,.theme input *,.theme textarea,.theme textarea *{background-color:#112240!important}
+.theme button,.theme button *{color:#64ffda!important;background-color:transparent!important}
+.theme a,.theme a *{color:#64ffda!important;background-color:transparent!important}
+.theme a:hover,.theme a:hover *{color:#8892b0!important;background-color:transparent!important}
+.theme a:active,.theme a:active *{color:#8892b0!important;background-color:transparent!important}
+
+.panel.panel-filled{background-color:#112240;border-radius:8px;box-shadow:0 2px 10px rgba(100, 255, 218, 0.1);transition:all .2s ease}
+.panel.panel-filled:hover{box-shadow:0 4px 15px rgba(100, 255, 218, 0.2)}
+.panel>.panel-heading{background-color:#112240;border-bottom:3px solid #64ffda;color:#ccd6f6}
+
+.form-control{color:#ccd6f6;background-color:#112240;border:1px solid #64ffda;border-radius:6px;transition:all .2s ease}
+.form-control:focus{border-color:#64ffda;box-shadow:0 0 0 2px rgba(100, 255, 218, 0.2);outline:none;background-color:#112240}
+select{background-color:#112240;border:1px solid #64ffda;color:#ccd6f6;border-radius:6px;transition:all .2s ease}
+select:focus{border-color:#64ffda;box-shadow:0 0 0 2px rgba(100, 255, 218, 0.2)}
+
+.btn{color:#ccd6f6;background-color:#112240;border:1px solid #64ffda;border-radius:6px;transition:all .2s ease}
+.btn:hover{color:#ccd6f6;background-color:#1d3461;border-color:#64ffda}
+.btn:focus{outline:none;box-shadow:0 0 0 2px rgba(100, 255, 218, 0.2);border-color:#64ffda}
+.btn-primary{color:#0a192f;background-color:#64ffda;border-color:#64ffda}
+.btn-primary:hover{color:#0a192f;background-color:#8892b0;border-color:#8892b0}
+
+.table>thead>tr>th{background-color:#112240;color:#ccd6f6;border-bottom:2px solid #64ffda}
+.table>tbody>tr>td{border-top:1px solid #64ffda}
+.table-striped>tbody>tr:nth-of-type(odd){background-color:#112240}
+.table-hover>tbody>tr:hover{background-color:#1d3461}
+
+.navigation{background-color:#112240}
+.ezxss-nav.nav li>a{color:#ccd6f6}
+.ezxss-nav.nav li a:focus,.ezxss-nav.nav li a:hover{color:#64ffda;background-color:#1d3461}
+.ezxss-nav.nav .nav-category{color:#64ffda}
+.ezxss-nav.nav .nav-info{background-color:#112240;border-bottom:3px solid #64ffda}
+
+.pagination>li>a{color:#ccd6f6;background-color:#112240;border:1px solid #64ffda;border-radius:6px;transition:all .2s ease}
+.pagination>li>a:focus,.pagination>li>a:hover{color:#64ffda;background-color:#1d3461;border-color:#64ffda}
+.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover{color:#0a192f;background-color:#64ffda;border-color:#64ffda}
+
+.modal-content{background-color:#0a192f;border-radius:8px;box-shadow:0 10px 30px rgba(100, 255, 218, 0.2)}
+.modal-header{background-color:#112240;border-bottom:1px solid #64ffda;border-radius:8px 8px 0 0}
+.modal-footer{background-color:#112240;border-top:1px solid #64ffda;border-radius:0 0 8px 8px}
+
+.dataTables_wrapper .top{border:2px solid #64ffda;background-color:#112240}
+.dataTables_length label,.dataTables_filter label{color:#ccd6f6}
+.dataTables_length select,.dataTables_filter input{background-color:#112240;border:1px solid #64ffda;color:#ccd6f6}
+.dataTables_length select:focus,.dataTables_filter input:focus{border-color:#64ffda;box-shadow:0 0 0 2px rgba(100, 255, 218, 0.2)}
+.dataTables_info{color:#ccd6f6}
+.dataTables_paginate .paginate_button{color:#ccd6f6}
+.dataTables_paginate .paginate_button.current{color:#0a192f;background-color:#64ffda;border-color:#64ffda}
+.dataTables_paginate .pagination li a{color:#ccd6f6;background-color:#112240;border:1px solid #64ffda}
+.dataTables_paginate .pagination li a:hover{color:#64ffda;background-color:#1d3461;border-color:#64ffda}
+.dataTables_paginate .pagination li.active a{color:#0a192f;background-color:#64ffda;border-color:#64ffda}
+
+::-webkit-scrollbar-track{background-color:#112240;border-radius:0 3px 3px 0}
+::-webkit-scrollbar{width:6px;background-color:#112240}
+::-webkit-scrollbar-thumb{background-color:#64ffda;border-radius:3px}
+
+::placeholder{color:#8892b0 !important;opacity:1}
+
+.loader{border:3px solid #112240;border-top:3px solid #64ffda;border-radius:50%;width:24px;height:24px;animation:spin 1s linear infinite}
+
+h1,h2,h3,h4,h5,h6{color:#64ffda}
+.text-accent{color:#64ffda} 

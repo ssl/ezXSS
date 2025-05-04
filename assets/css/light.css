@@ -1,0 +1,68 @@
+.transparent{background-color:transparent!important}
+body,html{background:hsl(210, 20%, 94%)!important}
+.content:before{background-color:hsl(210, 20%, 94%)}
+.navigation:before{background-color:hsl(210, 20%, 94%);border-right:1px solid hsl(210, 20%, 85%)}
+.nav-head{border-right:1px solid hsl(210, 20%, 85%)}
+.checkbox-label input:checked~.checkbox-custom::after{border:solid #3b82f6;border-width:0 2px 2px 0}
+.theme,.theme :not(img,svg),.theme body{color:hsl(220, 10%, 30%)!important;background-color:hsl(210, 20%, 94%)!important;border-color:hsl(210, 20%, 85%)!important}
+.theme input,.theme input *,.theme textarea,.theme textarea *{background-color:hsl(210, 20%, 92%)!important}
+.theme button,.theme button *{color:hsl(220, 80%, 50%)!important;background-color:transparent!important}
+.theme a,.theme a *{color:hsl(220, 80%, 50%)!important;background-color:transparent!important}
+.theme a:hover,.theme a:hover *{color:hsl(220, 80%, 40%)!important;background-color:transparent!important}
+.theme a:active,.theme a:active *{color:hsl(220, 80%, 40%)!important;background-color:transparent!important}
+
+.panel.panel-filled{background-color:hsl(210, 20%, 92%);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .2s ease}
+.panel.panel-filled:hover{box-shadow:0 4px 15px rgba(0,0,0,0.1)}
+.panel>.panel-heading{background-color:hsl(210, 20%, 88%);border-bottom:3px solid hsl(210, 20%, 85%);color:hsl(220, 10%, 30%)}
+
+.form-control{color:hsl(220, 10%, 30%);background-color:hsl(210, 20%, 92%);border:1px solid hsl(210, 20%, 85%);border-radius:6px;transition:all .2s ease}
+.form-control:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59, 130, 246, 0.2);outline:none;background-color:hsl(210, 20%, 96%)}
+select{background-color:hsl(210, 20%, 92%);border:1px solid hsl(210, 20%, 85%);color:hsl(220, 10%, 30%);border-radius:6px;transition:all .2s ease}
+select:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59, 130, 246, 0.2)}
+
+.btn{color:hsl(220, 10%, 30%);background-color:hsl(210, 20%, 92%);border:1px solid hsl(210, 20%, 85%);border-radius:6px;transition:all .2s ease}
+.btn:hover{color:hsl(220, 10%, 20%);background-color:hsl(210, 20%, 88%);border-color:hsl(210, 20%, 80%)}
+.btn:focus{outline:none;box-shadow:0 0 0 2px rgba(59, 130, 246, 0.2);border-color:#3b82f6}
+.btn-primary{color:#fff;background-color:#3b82f6;border-color:#3b82f6}
+.btn-primary:hover{color:#fff;background-color:#2563eb;border-color:#2563eb}
+
+.table>thead>tr>th{background-color:hsl(210, 20%, 88%);color:hsl(220, 10%, 30%);border-bottom:2px solid hsl(210, 20%, 85%)}
+.table>tbody>tr>td{border-top:1px solid hsl(210, 20%, 85%)}
+.table-striped>tbody>tr:nth-of-type(odd){background-color:hsl(210, 20%, 95%)}
+.table-hover>tbody>tr:hover{background-color:hsl(210, 20%, 90%)}
+
+.navigation{background-color:hsl(210, 20%, 92%)}
+.ezxss-nav.nav li>a{color:hsl(220, 10%, 30%)}
+.ezxss-nav.nav li a:focus,.ezxss-nav.nav li a:hover{color:hsl(220, 10%, 20%);background-color:hsl(210, 20%, 88%)}
+.ezxss-nav.nav .nav-category{color:hsl(220, 10%, 20%)}
+.ezxss-nav.nav .nav-info{background-color:hsl(210, 20%, 88%);border-bottom:3px solid hsl(210, 20%, 85%)}
+
+.pagination>li>a{color:hsl(220, 10%, 30%);background-color:hsl(210, 20%, 92%);border:1px solid hsl(210, 20%, 85%);border-radius:6px;transition:all .2s ease}
+.pagination>li>a:focus,.pagination>li>a:hover{color:hsl(220, 10%, 20%);background-color:hsl(210, 20%, 88%);border-color:hsl(210, 20%, 80%)}
+.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover{color:#fff;background-color:#3b82f6;border-color:#3b82f6}
+
+.modal-content{background-color:hsl(210, 20%, 94%);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.1)}
+.modal-header{background-color:hsl(210, 20%, 92%);border-bottom:1px solid hsl(210, 20%, 85%);border-radius:8px 8px 0 0}
+.modal-footer{background-color:hsl(210, 20%, 92%);border-top:1px solid hsl(210, 20%, 85%);border-radius:0 0 8px 8px}
+
+.dataTables_wrapper .top{border:2px solid hsl(210, 20%, 88%);background-color:hsl(210, 20%, 92%)}
+.dataTables_length label,.dataTables_filter label{color:hsl(220, 10%, 30%)}
+.dataTables_length select,.dataTables_filter input{background-color:hsl(210, 20%, 92%);border:1px solid hsl(210, 20%, 85%);color:hsl(220, 10%, 30%)}
+.dataTables_length select:focus,.dataTables_filter input:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59, 130, 246, 0.2)}
+.dataTables_info{color:hsl(220, 10%, 30%)}
+.dataTables_paginate .paginate_button{color:hsl(220, 10%, 30%)}
+.dataTables_paginate .paginate_button.current{color:#fff;background-color:#3b82f6;border-color:#3b82f6}
+.dataTables_paginate .pagination li a{color:hsl(220, 10%, 30%);background-color:hsl(210, 20%, 92%);border:1px solid hsl(210, 20%, 85%)}
+.dataTables_paginate .pagination li a:hover{color:hsl(220, 10%, 20%);background-color:hsl(210, 20%, 88%);border-color:hsl(210, 20%, 80%)}
+.dataTables_paginate .pagination li.active a{color:#fff;background-color:#3b82f6;border-color:#3b82f6}
+
+::-webkit-scrollbar-track{background-color:hsl(210, 20%, 92%);border-radius:0 3px 3px 0}
+::-webkit-scrollbar{width:6px;background-color:hsl(210, 20%, 88%)}
+::-webkit-scrollbar-thumb{background-color:hsl(210, 20%, 80%);border-radius:3px}
+
+::placeholder{color:hsl(220, 10%, 60%) !important;opacity:1}
+
+.loader{border:3px solid hsl(210, 20%, 88%);border-top:3px solid #3b82f6;border-radius:50%;width:24px;height:24px;animation:spin 1s linear infinite}
+
+h1,h2,h3,h4,h5,h6{color:hsl(220, 10%, 20%)}
+.text-accent{color:#3b82f6} 

@@ -262,7 +262,7 @@ th{color:#fff;}
 .modal-footer{border-color:#262d4e; background-color:#2f3457; padding:15px; border-top:0; border-radius:0 0 8px 8px;}
 .float-left{float:left;}
 .checkbox-text{padding-left:35px; padding-top:2px;}
-.loader{border:5px solid #f3f3f3; -webkit-animation:spin 1s linear infinite; animation:spin 1s linear infinite; border-top:5px solid #555; border-radius:50%; width:30px; height:30px; margin-bottom:3px;}
+.loader{border:5px solid #f3f3f3; -webkit-animation:spin 1s linear infinite; animation:spin 1s linear infinite; border-top:5px solid #555!important; border-radius:50%; width:30px; height:30px; margin-bottom:3px;}
 ::-moz-selection{color:#2c3256; background:#fff;}
 ::selection{color:#2c3256; background:#fff;}
 ::placeholder{color:#686d9375 !important; opacity:1;}
