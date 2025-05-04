@@ -1,25 +1,32 @@
 <section id="content">
-    <center>
-        <h1>Install</h1>
-        <br>
-        {message}
-        <div class="login">
-            <form class="form" id="install" method="post">
-                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-                <div class="form-group">
-                    <label class="control-label" for="username">Username</label>
-                    <input class="form-control" id="username" name="username" type="username">
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="password">Password</label>
-                    <div class="input-group">
-                        <input class="form-control" id="password" name="password" type="text">
-                        <span class="input-group-addon"><a class="generate-password pointer">Generate</a></span>
+    <div class="container-fluid full-size">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
+                <div class="panel panel-filled panel-size">
+                    <div class="panel-heading text-center">
+                        ezXSS
+                    </div>
+                    <div class="panel-body text-center">
+                        <div>{message}</div>
+                        <form class="form" id="install" method="post">
+                            <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                            <div class="form-group">
+                                <label class="control-label" for="username">Username</label>
+                                <input class="form-control" id="username" name="username" type="username">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="password">Password</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="password" name="password" type="text" autocomplete="off">
+                                    <span class="input-group-addon"><a class="generate-password" class="pointer">Generate</a></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-block">Install</button>
+                        </form>
+                        <br><p>Visit the <a href="https://github.com/ssl/ezXSS/wiki" target="_blank">wiki</a> for more information.</p>
                     </div>
                 </div>
-                <button class="btn">Install</button>
-            </form>
-        </div><br>
-        <p>Visit the <a href="https://github.com/ssl/ezXSS/wiki">wiki</a> for more information.</p>
-    </center>
+            </div>
+        </div>
+    </div>
 </section>

@@ -1,20 +1,28 @@
 <section id="content">
-    <center>
-        <h1>ezXSS</h1>
-    </center>
-    <div class="login">
-        <form class="form" id="login" method="post">
-            {message}
-            <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-            <div class="form-group">
-                <label class="control-label" for="password">Username</label>
-                <input class="form-control" id="username" name="username" type="text">
+    <div class="container-fluid full-size">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
+                <div class="panel panel-filled panel-size">
+                    <div class="panel-heading text-center">
+                        ezXSS
+                    </div>
+                    <div class="panel-body text-center">
+                        <form class="form" id="login" method="post">
+                            {message}
+                            <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                            <div class="form-group">
+                                <label class="control-label" for="password">Username</label>
+                                <input class="form-control" id="username" name="username" type="text">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="password">Password</label>
+                                <input class="form-control" id="password" name="password" type="password" autocomplete="off">
+                            </div>
+                            <button type="submit" class="btn btn-block">Login</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="control-label" for="password">Password</label>
-                <input class="form-control" id="password" name="password" type="password" autocomplete="off">
-            </div>
-            <button type="submit" class="btn">Login</button>
-        </form>
+        </div>
     </div>
 </section>

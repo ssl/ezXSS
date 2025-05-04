@@ -1,37 +1,45 @@
 <section id="content">
-    <center>
-        <h1>ezXSS</h1>
-    </center>
-    <div class="login">
-        {%if isEnabled}
-        <form class="form" id="signup" method="post">
-            {message}
-            <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-            <div class="form-group">
-                <label class="control-label" for="username">Username</label>
-                <input class="form-control" id="username" name="username" type="username">
-            </div>
-            <div class="form-group">
-                <label class="control-label" for="password">Password</label>
-                <div class="input-group">
-                    <input class="form-control" id="password" name="password" type="text" autocomplete="off">
-                    <span class="input-group-addon"><a class="generate-password"
-                            class="pointer">Generate</a></span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="control-label" for="domain">Payload domain</label>
-                <div class="input-group">
-                    <input class="form-control" id="domain" name="domain" type="text" autocomplete="off">
-                    <span class="input-group-addon span-white">.{domain[]}</span>
-                </div>
-            </div>
-            <button class="btn">Sign up</button>
-        </form>
-        {%/if}
+    <div class="container-fluid full-size">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
+                <div class="panel panel-filled panel-size">
+                    <div class="panel-heading text-center">
+                        ezXSS
+                    </div>
+                    <div class="panel-body text-center">
+                        {%if isEnabled}
+                        <form class="form" id="signup" method="post">
+                            {message}
+                            <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                            <div class="form-group">
+                                <label class="control-label" for="username">Username</label>
+                                <input class="form-control" id="username" name="username" type="username">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="password">Password</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="password" name="password" type="text" autocomplete="off">
+                                    <span class="input-group-addon"><a class="generate-password"
+                                            class="pointer">Generate</a></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="domain">Payload domain</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="domain" name="domain" type="text" autocomplete="off">
+                                    <span class="input-group-addon span-white">.{domain[]}</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-block">Sign up</button>
+                        </form>
+                        {%/if}
 
-        {%!if isEnabled}
-        <div>Sign up is disabled.</div>
-        {%/!if}
+                        {%!if isEnabled}
+                        <div>Sign up is disabled.</div>
+                        {%/!if}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>

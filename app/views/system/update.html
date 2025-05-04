@@ -1,25 +1,33 @@
 <section id="content">
-    <center>
-        <h1>Update</h1>
-        <br>
-        {message}
-        <div class="login">
-            <form class="form" id="update" method="post">
-                <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
-                <b class="transparent">Thanks for using ezXSS.</b><br><br>
-                You've updated your setup to {version[]}. Click the
-                button below to update your database.<br><br>
-                
-                {%if pre42update}
-                This update moves some big storage columns from the reports table to a new table.<br>
-                Moving data can take a while, depending on your table size. If the table size is
-                multiple gigabytes, your server might be unresponsive for some time. Do not reboot.<br><br>
-                <b>{%data tablesize}</b><br>
-                <b>{%data disksize}</b><br><br>
-                {%/if}
-                <button class="btn">Update</button>
-            </form>
-        </div><br>
-        <p>Visit the <a href="https://github.com/ssl/ezXSS/wiki">wiki</a> for more information.</p>
-    </center>
+    <div class="container-fluid full-size">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
+                <div class="panel panel-filled panel-size">
+                    <div class="panel-heading text-center">
+                        ezXSS
+                    </div>
+                    <div class="panel-body text-center">
+                        <div>{message}</div>
+                        <b class="transparent">Thanks for using ezXSS.</b><br><br>
+                        You've updated your setup to {version[]}. Click the
+                        button below to update your database.<br><br>
+                        
+                        {%if pre42update}
+                        This update moves some big storage columns from the reports table to a new table.<br>
+                        Moving data can take a while, depending on your table size. If the table size is
+                        multiple gigabytes, your server might be unresponsive for some time. Do not reboot.<br><br>
+                        <b>{%data tablesize}</b><br>
+                        <b>{%data disksize}</b><br><br>
+                        {%/if}
+                        <form class="form" id="update" method="post">
+                            <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
+                            <button class="btn btn-block">Update</button>
+                        </form><br>
+                        <div>The server might be unresponsive during the update.</div>
+                        <br><p>Visit the <a href="https://github.com/ssl/ezXSS/wiki" target="_blank">wiki</a> for more information.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

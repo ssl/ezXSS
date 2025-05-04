@@ -45,8 +45,10 @@ h2, h3{margin-top:10px;}
 .form-control[disabled]{background-color:#2b3157; opacity:1; border:#686d93 1px solid;}
 section{display:block;}
 h1{margin:.67em 0; font-size:2em; font-family:inherit; font-weight:500; line-height:1.1; color:inherit; margin-top:20px; margin-bottom:10px; font-size:36px;}
-#content{margin:0; transform:translate(-50%,-50%); margin-right:-50%; left:50%; top:50%; position:absolute;}
+#content{display: flex; align-items: center; justify-content: center; min-height: 100vh; width: 100%;}
 .login{border-radius:3px; background-color:#2b3157; padding:15px; width:400px;}
+.full-size{width:100%;}
+.panel-size{width: 100%; max-width: 500px; margin: 0 auto;}
 h1{font-weight:300;}
 h1{color:#fff;}
 h1{margin-top:10px;}
@@ -456,7 +458,7 @@ textarea.form-control:focus{background-color:#2f3457; border-color:#f6a821; box-
 .dataTables_wrapper .top{display:flex; align-items:center; justify-content:space-between; padding:10px 15px; margin-bottom:10px; border:2px solid #343a60; border-radius:4px; background-color:#2b3157;}
 .dataTables_length{display:flex; align-items:center;}
 .dataTables_length label{margin-right:8px; margin-bottom:0; color:#6e749b; font-size:13px; display:flex; align-items:center;}
-.dataTables_length select{width:auto; height:23px; padding:1px 5px; font-size:13px; background-color:#343a60; border:1px solid #64698f; color:#fff; border-radius:4px; transition:all .2s ease; margin:0 5px;}
+.dataTables_length select{width:auto; height:23px; padding:0px 0px; font-size:13px; background-color:#343a60; border:1px solid #64698f; color:#fff; border-radius:4px; transition:all .2s ease; margin:0 5px;text-align: center !important;}
 .dataTables_length select:focus{border-color:#f6a821; outline:0; box-shadow:0 0 0 2px #f6a82133;}
 .dataTables_info{color:#6e749b; font-size:13px; padding:0 10px;}
 .dataTables_filter{display:flex; align-items:center;}
@@ -635,4 +637,15 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination li > a{padding:6px 
 .dataTables_filter{justify-content:flex-start;}
 .dataTables_filter input{width:100%;}
 .dataTables_paginate{justify-content:center;}
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.panel-body.text-center,
+.panel-body.text-center form,
+.panel-body.text-center .form-group,
+.panel-body.text-center div {
+    text-align: center !important;
 }
