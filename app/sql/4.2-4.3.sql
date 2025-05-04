@@ -5,7 +5,6 @@
 INSERT INTO `settings` (`setting`, `value`) VALUES
 ('customjs2', '');
 
-ALTER TABLE `payloads` ADD `customjs2` TEXT NOT NULL DEFAULT '' AFTER `customjs`;
-
+ALTER TABLE `payloads` ADD `customjs2` TEXT AFTER `customjs`;
 
 ALTER TABLE logs ADD INDEX(user_id);
