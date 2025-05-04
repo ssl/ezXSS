@@ -66,12 +66,11 @@ $(document).ready(function () {
         pick_common($('#pick_common2').val(), 2, isAdmin)
     }
 
-    $("a[method='post']").click(function (e) {
+    $(".delete-payload").click(function (e) {
         e.preventDefault()
-        var currentUrl = window.location.href
-        request($(this).attr('href'), {}).then(function (r) {
-            window.location.href = currentUrl
-        })
+        var id = $(this).attr('data-id')
+        $(this).parent().parent().fadeOut('slow', function () { })
+        request('/manage/users/deletepayload/' + id, {}).then(function (r) {})
     })
 
     $('#method').on('change', function () {

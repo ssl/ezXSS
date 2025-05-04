@@ -476,7 +476,8 @@ textarea.form-control:focus{background-color:#2f3457; border-color:#f6a821; box-
 .dataTables_paginate .pagination li.active a{color:#fff; background-color:#f6a82133; border-color:#f6a821;}
 .dataTables_paginate .pagination li.disabled a{color:#4a4f6e; cursor:not-allowed; opacity:.5;}
 select#payloadList, select#payloadListReport, select#payloadListSession{border:0 !important;}
-.with-bar{margin-left:5px;}
+.with-bar{margin-left:15px;margin-top: -10px;display:hidden}
+.with-bar b{font-size:15px}
 .with-button{border-radius:4px; font-weight:500; letter-spacing:.3px; transition:all .2s ease; color:#5e648b; background-color:#2b3157; border:1px solid #5e648b; height:30px; line-height:1.42857143; display:inline-flex; align-items:center; justify-content:center;}
 
 @media print{

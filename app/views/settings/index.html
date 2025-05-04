@@ -362,15 +362,14 @@
                     <div class="panel panel-filled">
                         <div class="panel-heading">Kill Switch</div>
                         <div class="panel-body">
-                            <p>Completely kills the platform. Can be reverted by visiting
-                                https://{domain[]}/?pass=...
-                            </p>
+                            <p>Enter a password to completely kill the platform and longer respond to any requests.</p>
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
                                     <label class="control-label" for="password">Password to revert</label>
                                     <input class="form-control" name="password" id="password" type="text">
                                 </div>
+                                <p>Can be reverted by visiting https://{domain[]}/?pass=...</p>
                                 <button name="killswitch" type="submit" class="btn">Kill</button>
                             </form>
                         </div>

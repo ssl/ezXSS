@@ -108,8 +108,7 @@
                                         <tr>
                                             <td scope="row"><b>{payload->id}</b></td>
                                             <td>{payload->payload}</td>
-                                            <td><a method="post"
-                                                    href="/manage/users/deletepayload/{payload->id}">Delete</a></td>
+                                            <td><a class="delete-payload" href="#" data-id="{payload->id}">Delete</b></td>
                                         </tr>
                                         {%/foreach}
                                     </tbody>

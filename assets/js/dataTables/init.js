@@ -69,6 +69,12 @@ $(document).ready(function () {
                 next: "›",
                 last: "»"
             }
+        },
+        // Show with-bar only when data is present
+        drawCallback: function(settings) {
+            var api = this.api();
+            var hasData = api.data().any();
+            $('.with-bar').toggle(hasData);
         }
     });
 
@@ -126,6 +132,12 @@ $(document).ready(function () {
                 next: "›",
                 last: "»"
             }
+        },
+        // Show with-bar only when data is present
+        drawCallback: function(settings) {
+            var api = this.api();
+            var hasData = api.data().any();
+            $('.with-bar').toggle(hasData);
         }
     });
 

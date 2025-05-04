@@ -73,7 +73,6 @@ class Persistent extends Controller
 
         if (isPOST()) {
             try {
-                // Check if posted data is starting proxy
                 if (_POST('proxy') !== null) {
                     $this->validateCsrfToken();
                     $ipport = _POST('ipport');
@@ -101,28 +100,28 @@ class Persistent extends Controller
                         return jsonResponse('success', 1);
                     }
 
-                    if (_JSON('kill') !== null) {
+                    elseif (_JSON('kill') !== null) {
                         $this->model('Console')->add($clientId, $origin, 'ez_stop()');
                         return jsonResponse('success', 1);
                     }
 
-                    if (_JSON('execute') !== null) {
+                    elseif (_JSON('execute') !== null) {
                         $command = _JSON('command');
                         $this->model('Console')->add($clientId, $origin, $command);
                         return jsonResponse('success', 1);
                     }
 
-                    if (_JSON('getconsole') !== null) {
+                    elseif (_JSON('getconsole') !== null) {
                         $console = $this->model('Session')->getAllConsole($clientId, $origin);
                         return jsonResponse('console', $console);
                     }
-                }
 
+                    return jsonResponse('error', 'Invalid request');
+                }
             } catch (Exception $e) {
                 $this->view->setContentType('text/html');
                 $this->view->renderMessage($e->getMessage());
             }
-
         }
 
         // Render all rows
@@ -140,7 +139,6 @@ class Persistent extends Controller
         }
 
         return $this->showContent();
-
     }
 
     /**

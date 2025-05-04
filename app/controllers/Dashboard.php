@@ -10,7 +10,7 @@ class Dashboard extends Controller
     public function my()
     {
         $this->isLoggedInOrExit();
-        $this->view->setTitle('Account');
+        $this->view->setTitle('My Dashboard');
         $this->view->renderTemplate('dashboard/my');
 
         // Render the correct 'selected' box in the 2 rows
@@ -40,7 +40,7 @@ class Dashboard extends Controller
     public function index()
     {
         $this->isAdminOrExit();
-        $this->view->setTitle('Account');
+        $this->view->setTitle('Dashboard');
         $this->view->renderTemplate('dashboard/index');
 
         // Render the correct 'selected' box in the 2 rows

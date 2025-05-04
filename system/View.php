@@ -30,7 +30,7 @@ class View
 
         // Add CSP header to manage
         if (explode('/', path)[1] === 'manage') {
-            header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; font-src fonts.gstatic.com; script-src 'self' 'nonce-csrf'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';");
+            header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; font-src fonts.gstatic.com; script-src 'self'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';");
         }
     }
 

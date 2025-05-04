@@ -222,7 +222,7 @@ class Users extends Controller
      */
     public function deletePayload($id)
     {
-        $this->validateCsrfToken();
+        $this->isAPIRequest();
 
         // Check if payload is not default payload
         if (!+$id) {
@@ -235,7 +235,7 @@ class Users extends Controller
 
         $this->log("Deleted payload {$id}");
 
-        return json_encode([1]);
+        return jsonResponse('success', 1);
     }
 
     /**
