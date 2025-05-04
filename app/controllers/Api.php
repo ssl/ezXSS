@@ -457,15 +457,19 @@ class Api extends Controller
         $this->isAdminOrExit();
 
         $logs = $this->model('Log')->getAll();
+        $allUsers = $this->model('User')->getAllUsers();
+        
+        // Create a map of user IDs to their usernames
+        $userMap = [];
+        foreach ($allUsers as $user) {
+            $userMap[$user['id']] = $user['username'];
+        }
 
         foreach ($logs as $key => $value) {
             if ($logs[$key]['user_id'] !== 0) {
-                try {
-                    $user = $this->user($logs[$key]['user_id']);
-                    $logs[$key]['user'] = $user['username'];
-                } catch (Exception $e) {
-                    $logs[$key]['user'] = 'Deleted user';
-                }
+                $logs[$key]['user'] = isset($userMap[$logs[$key]['user_id']]) 
+                    ? $userMap[$logs[$key]['user_id']] 
+                    : 'Deleted user';
             } else {
                 $logs[$key]['user'] = 'Not logged in';
             }
@@ -506,6 +510,16 @@ class Api extends Controller
         $ranks = [0 => 'Banned', 1 => 'User', 7 => 'Admin'];
 
         $users = $this->model('User')->getAllUsers();
+        $allPayloads = $this->model('Payload')->getAll();
+        
+        // Create a map of user IDs to their payloads
+        $userPayloads = [];
+        foreach ($allPayloads as $payload) {
+            if (!isset($userPayloads[$payload['user_id']])) {
+                $userPayloads[$payload['user_id']] = [];
+            }
+            $userPayloads[$payload['user_id']][] = $payload['payload'];
+        }
 
         foreach ($users as &$user) {
             // Translate rank id to readable name
@@ -515,12 +529,13 @@ class Api extends Controller
             unset($user['secret']);
             unset($user['notepad']);
 
-            // Create list of all payloads of user
-            $payloads = $this->model('Payload')->getAllByUserId($user['id']);
             $payloadString = $user['rank'] == 'Admin' ? '*, ' : '';
-            foreach ($payloads as $payload) {
-                $payloadString .= e($payload['payload']) . ', ';
+            if (isset($userPayloads[$user['id']])) {
+                foreach ($userPayloads[$user['id']] as $payload) {
+                    $payloadString .= e($payload) . ', ';
+                }
             }
+            
             $payloadString = $payloadString === '' ? $payloadString : substr($payloadString, 0, -2);
             $payloadString = (strlen($payloadString) > 35) ? substr($payloadString, 0, 35) . '...' : $payloadString;
             $user['payloads'] = $payloadString;
