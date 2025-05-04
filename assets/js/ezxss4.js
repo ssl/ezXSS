@@ -1,23 +1,12 @@
 function request(action, data = {}) {
-    if(action.startsWith('/manage/api/')) {
-        return $.ajax({
-            type: 'post',
-            dataType: 'json',
-            contentType: 'application/json',
-            url: action,
-            data: JSON.stringify(data)
-        });
-    } else {
-        data.csrf = csrf;
-        return $.ajax({
-            type: 'post',
-            dataType: 'json',
-            url: action,
-            data: data
-        });
-    }
+    return $.ajax({
+        type: 'post',
+        dataType: 'json',
+        contentType: 'application/json',
+        url: action,
+        data: JSON.stringify(data)
+    });
 }
-
 
 $(document).ready(function () {
     $('.left-nav-toggle').click(function () {
@@ -63,8 +52,8 @@ $(document).ready(function () {
     })
 
     if (location.toString().split('/')[4] === 'dashboard') {
-        request('/manage/api/statistics', {
-            page: location.toString().split('/').pop() === 'my' ? 'my' : 'dashboard'
+        request('/manage/dashboard/statistics', {
+            page: location.pathname.split('/').pop().split('?')[0] === 'my' ? 'my' : 'dashboard'
         }).then(function (r) {
             $.each(r, function (key, value) {
                 $('#' + key).html(value)
@@ -90,7 +79,7 @@ $(document).ready(function () {
         $('#method-pick').hide()
 
         const alertId = parseInt(this.value)
-        request('/manage/api/getAlertStatus', { alertId: alertId }).then(function (
+        request('/manage/account/getAlertStatus', { alertId: alertId }).then(function (
             r
         ) {
             if (r.enabled === 1) {
@@ -119,7 +108,7 @@ $(document).ready(function () {
         $('#most_common' + row).empty()
         $('#toprow_common' + row).hide()
         $('#loading_common' + row).show()
-        request('/manage/api/getMostCommon', {
+        request('/manage/dashboard/mostCommon', {
             id: parseInt(id),
             row: row,
             admin: admin
@@ -187,13 +176,13 @@ $(document).ready(function () {
 
     $('#openGetChatId').click(function () {
         var bottoken = $('#telegram_bottoken').val()
-        request('/manage/api/getchatid', { bottoken: bottoken }).then(function (r) {
-            if (r.echo.startsWith('chatId:')) {
+        request('/manage/account/getchatid', { bottoken: bottoken }).then(function (r) {
+            if (r.chatid) {
                 $('#getChatId').modal('hide')
-                $('#chatid').val(r.echo.replace('chatId:', ''))
+                $('#chatid').val(r.chatid)
             } else {
                 $('#getChatId').modal('show')
-                $('#getChatIdBody').html(r.echo)
+                $('#getChatIdBody').html(r.error)
             }
         })
     })
@@ -279,9 +268,12 @@ $(document).ready(function () {
 
     $('.persistent-delete-selected').click(function () {
         $.each($("input[name='selected']:checked"), function () {
+            const parent = $(this).parent().parent().parent()
+            console.log(parent)
+            parent.fadeOut('slow', function () { })
             const url = $(this).attr('url')
-            request(url, { delete: '' }).then(function (r) {
-                $('#command').val('')
+            request(url, { delete: '' }).then(function (r) { 
+                parent.fadeOut('slow', function () { })
             })
         })
     })
@@ -381,7 +373,6 @@ $(document).ready(function () {
     var lastChecked
 
     $('label').on('mousedown', function (e) {
-        // Find the checkbox associated with the clicked label
         var checkbox = $('#' + $(this).attr('for'))
 
         if (!lastChecked) {
@@ -402,7 +393,6 @@ $(document).ready(function () {
 
         lastChecked = checkbox[0]
 
-        // Prevent text selection
         document.onselectstart = function () {
             return false
         }

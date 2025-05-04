@@ -50,7 +50,7 @@ class Update extends Controller
         }
         $this->view->renderCondition('pre42update', version_compare($version, '4.2', '<'));
 
-        if ($this->isPOST()) {
+        if (isPOST()) {
             try {
                 $this->validateCsrfToken();
 
@@ -94,7 +94,7 @@ class Update extends Controller
                             throw new Exception("Error in updating. Free space on disk is {$freeSpace} MB and temporary needed space for table is {$tableSize} MB. Please upgrade disk");
                         }
                     } catch (Exception $e) {
-                        if($this->getGetValue('disablechecks') !== '1') {
+                        if(_GET('disablechecks') !== '1') {
                             throw new Exception($e->getMessage() . "\r\nYou can disable this check by adding ?disablechecks=1 to the URL\r\nWARNING: If table is larger than free disk size, database can get corrupted");
                         }
                     }

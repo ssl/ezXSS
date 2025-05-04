@@ -40,18 +40,18 @@ class Payload extends Controller
             throw new Exception('You dont have permissions to this payload');
         }
 
-        if ($this->isPOST()) {
+        if (isPOST()) {
             try {
                 $this->validateCsrfToken();
 
                 // Check if posted data is editing collecting
-                if ($this->getPostValue('settings') !== null) {
+                if (_POST('settings') !== null) {
                     $this->setCollecting($id);
 
-                    $this->model('Payload')->setSingleValue($id, 'customjs', $this->getPostValue('customjs'));
-                    $this->model('Payload')->setSingleValue($id, 'customjs2', $this->getPostValue('customjs2'));
+                    $this->model('Payload')->setSingleValue($id, 'customjs', _POST('customjs'));
+                    $this->model('Payload')->setSingleValue($id, 'customjs2', _POST('customjs2'));
 
-                    $persistent = '2' === $this->getPostValue('method') ? 1 : 0;
+                    $persistent = '2' === _POST('method') ? 1 : 0;
                     if($this->model('Setting')->get('persistent') !== '1' && $persistent === 1) {
                         throw new Exception('Persistent mode is globally disabled by the ezXSS admin');
                     }
@@ -59,18 +59,18 @@ class Payload extends Controller
                 }
 
                 // Check if posted data is editing extracting pages
-                if ($this->getPostValue('extract-pages') !== null) {
-                    $this->setPages($id, $this->getPostValue('path'));
+                if (_POST('extract-pages') !== null) {
+                    $this->setPages($id, _POST('path'));
                 }
 
                 // Check if posted data is editing denylisted domains
-                if ($this->getPostValue('blacklist-domains') !== null) {
-                    $this->setList($id, $this->getPostValue('domain'), 'deny');
+                if (_POST('blacklist-domains') !== null) {
+                    $this->setList($id, _POST('domain'), 'deny');
                 }
 
                 // Check if posted data is editing allowlisted domains
-                if ($this->getPostValue('whitelist-domains') !== null) {
-                    $this->setList($id, $this->getPostValue('domain'), 'allow');
+                if (_POST('whitelist-domains') !== null) {
+                    $this->setList($id, _POST('domain'), 'allow');
                 }
 
                 $this->log("Updated payload #{$id} settings");
@@ -151,13 +151,9 @@ class Payload extends Controller
      */
     public function removeItem($id)
     {
-        // Set json content type
-        $this->view->setContentType('application/json');
+        $this->isAPIRequest();
 
         try {
-            $this->isLoggedInOrExit();
-            $this->validateCsrfToken();
-
             // Check payload permissions
             $payloadList = $this->payloadList(2);
             if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
@@ -165,8 +161,8 @@ class Payload extends Controller
             }
 
             $payload = $this->model('Payload')->getById($id);
-            $data = $this->getPostValue('data');
-            $type = $this->getPostValue('type');
+            $data = _JSON('data');
+            $type = _JSON('type');
 
             // Prevent changing anything else then the allowed items
             if (!in_array($type, ['pages', 'blacklist', 'whitelist'])) {
@@ -183,9 +179,9 @@ class Payload extends Controller
             }
             $this->model('Payload')->setSingleValue($id, $type, $newString);
 
-            return json_encode([1]);
+            return jsonResponse('success', 1);
         } catch (Exception $e) {
-            return json_encode(['error' => e($e)]);
+            return jsonResponse('error', $e);
         }
     }
 
@@ -200,7 +196,7 @@ class Payload extends Controller
         $options = ['uri', 'ip', 'referer', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'screenshot'];
 
         foreach ($options as $option) {
-            if ($this->getPostValue($option) !== null) {
+            if (_POST($option) !== null) {
                 // Enable collecting item for payload if allowed by admin settings
                 $enable = ($this->model('Setting')->get("collect_{$option}") == 1) ? 1 : 0;
                 $this->model('Payload')->setSingleValue($id, "collect_{$option}", $enable);

@@ -18,11 +18,11 @@ class Install extends Controller
             redirect('dashboard/index');
         } catch (Exception $e) {}
 
-        if ($this->isPOST()) {
+        if (isPOST()) {
             try {
                 $this->validateCsrfToken();
-                $username = $this->getPostValue('username');
-                $password = $this->getPostValue('password');
+                $username = _POST('username');
+                $password = _POST('password');
 
                 // Validate user data
                 if (preg_match('/[^A-Za-z0-9]/', $username)) {

@@ -3,7 +3,7 @@ $(document).ready(function () {
     
     new DataTable('#reports', {
         "ajax": {
-            "url": "/manage/api/reports",
+            "url": "/manage/reports/data",
             "contentType": "application/json",
             "type": "POST",
             "data": function (d) {
@@ -74,7 +74,7 @@ $(document).ready(function () {
 
     var dataTablePersistent = new DataTable('#persistent', {
         "ajax": {
-            "url": "/manage/api/sessions",
+            "url": "/manage/persistent/sessions",
             "contentType": "application/json",
             "type": "POST",
             "data": function (d) {
@@ -146,7 +146,7 @@ $(document).ready(function () {
 
     new DataTable('#logs', {
         "ajax": {
-            "url": "/manage/api/logs",
+            "url": "/manage/logs/data",
             "contentType": "application/json",
             "type": "POST",
             "data": function (d) {
@@ -185,7 +185,7 @@ $(document).ready(function () {
 
     new DataTable('#users', {
         "ajax": {
-            "url": "/manage/api/users",
+            "url": "/manage/users/data",
             "contentType": "application/json",
             "type": "POST",
             "data": function (d) {
@@ -255,10 +255,11 @@ $(document).ready(function () {
     if ($('#user-logs').length) {
         new DataTable('#user-logs', {
             "ajax": {
-                "url": "/manage/api/userlogs/" + window.location.pathname.split('/').pop(),
+                "url": "/manage/logs/users",
                 "contentType": "application/json",
                 "type": "POST",
                 "data": function (d) {
+                    d.id = window.location.pathname.split('/').filter(Boolean).pop();
                     return JSON.stringify(d);
                 }
             },

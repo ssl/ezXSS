@@ -56,6 +56,12 @@ class Router
                 if (!$reflection->isPublic()) {
                     throw new Exception('403');
                 }
+
+                // Check for request method
+                $allowedMethods = ['POST', 'GET'];
+                if (!in_array($_SERVER['REQUEST_METHOD'], $allowedMethods)) {
+                    throw new Exception('405');
+                }
             } catch (Exception $e) {
                 redirect('/manage/dashboard');
             }

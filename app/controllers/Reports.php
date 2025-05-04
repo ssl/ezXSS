@@ -55,7 +55,7 @@ class Reports extends Controller
         }
         $this->view->renderData('screenshot', $screenshot ?? '', true);
         $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
-        $this->view->renderData('browser', $this->parseUserAgent($report['user-agent']), true);
+        $this->view->renderData('browser', parseUserAgent($report['user-agent']), true);
 
         foreach ($this->rows as $value) {
             $this->view->renderData($value, $report[$value]);
@@ -81,7 +81,7 @@ class Reports extends Controller
         $screenshot = !empty($report['screenshot']) ? '<img src="data:image/png;base64,' . e($report['screenshot']) . '">' : '';
         $this->view->renderData('screenshot', $screenshot, true);
         $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
-        $this->view->renderData('browser', $this->parseUserAgent($report['user-agent']), true);
+        $this->view->renderData('browser', parseUserAgent($report['user-agent']), true);
 
         foreach ($this->rows as $value) {
             $this->view->renderData($value, $report[$value]);
@@ -123,6 +123,62 @@ class Reports extends Controller
     }
 
     /**
+     * Returns the data of all reports
+     * 
+     * @return string
+     */ 
+    public function data()
+    {
+        $this->isAPIRequest();
+
+        $id = _JSON('id');
+        $archive = _JSON('archive') === 1 ? 1 : 0;
+
+        // Check payload permissions
+        $payloadList = $this->payloadList();
+        if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
+            return jsonResponse('error', 'Something went wrong');
+        }
+
+        // Checks if requested id is 'all'
+        if (+$id === 0) {
+            if ($this->isAdmin()) {
+                // Show all reports
+                $reports = $this->model('Report')->getAllByArchive($archive);
+            } else {
+                // Show all reports of allowed payloads
+                $reports = [];
+                foreach ($payloadList as $payloadId) {
+                    if ($payloadId !== 0) {
+                        $payload = $this->model('Payload')->getById($payloadId);
+                        $payloadUri = '//' . $payload['payload'];
+                        if (strpos($payload['payload'], '/') === false) {
+                            $payloadUri .= '/%';
+                        }
+                        $reports = array_merge($reports, $this->model('Report')->getAllByPayload($payloadUri, $archive));
+                    }
+                }
+            }
+        } else {
+            // Show reports of payload
+            $payload = $this->model('Payload')->getById($id);
+
+            $payloadUri = '//' . $payload['payload'];
+            if (strpos($payload['payload'], '/') === false) {
+                $payloadUri .= '/%';
+            }
+            $reports = $this->model('Report')->getAllByPayload($payloadUri, $archive);
+        }
+
+        foreach ($reports as $key => $value) {
+            $reports[$key]['browser'] = parseUserAgent($reports[$key]['user-agent']);
+            $reports[$key]['last'] = parseTimestamp($reports[$key]['time'], 'long');
+        }
+
+        return jsonResponse('data', $reports);
+    }
+
+    /**
      * Deletes a report
      * 
      * @param string $id The report id
@@ -131,16 +187,15 @@ class Reports extends Controller
      */
     public function delete($id)
     {
-        $this->isLoggedInOrExit();
-        $this->validateCsrfToken();
+        $this->isAPIRequest();
 
         if (!$this->hasReportPermissions($id)) {
-            throw new Exception('You dont have permissions to this report');
+            return jsonResponse('error', 'You dont have permissions to this report');
         }
 
         $this->model('Report')->deleteById($id);
 
-        return json_encode(['true']);
+        return jsonResponse('success', 1);
     }
 
     /**
@@ -152,16 +207,15 @@ class Reports extends Controller
      */
     public function archive($id)
     {
-        $this->isLoggedInOrExit();
-        $this->validateCsrfToken();
+        $this->isAPIRequest();
 
         if (!$this->hasReportPermissions($id)) {
-            throw new Exception('You dont have permissions to this report');
+            return jsonResponse('error', 'You dont have permissions to this report');
         }
 
         $this->model('Report')->archiveById($id);
 
-        return json_encode(['true']);
+        return jsonResponse('success', 1);
     }
 
     /**

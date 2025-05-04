@@ -102,7 +102,7 @@ class Controller
      */
     protected function validateCsrfToken()
     {
-        $csrf = $this->getPostValue('csrf');
+        $csrf = _POST('csrf');
 
         if (!$this->session->isValidCsrfToken($csrf)) {
             if (!httpmode && !ishttps) {
@@ -150,6 +150,43 @@ class Controller
             // If session failed to validate, clear the session
             $this->session->deleteSession();
             redirect('/manage/account/login');
+        }
+    }
+
+    /**
+     * Checks and validates for API request
+     * 
+     * @throws Exception
+     * @return void
+     */
+    protected function isAPIRequest()
+    {
+        // Set content type to json
+        $this->view->setContentType('application/json');
+
+        // Validate content type
+        if (!isset($_SERVER['CONTENT_TYPE']) || strtolower($_SERVER['CONTENT_TYPE']) !== 'application/json') {
+            if ($this->session->isLoggedIn()) {
+                throw new Exception('This functionality requires a JSON request');
+            } else {
+                redirect('/manage/account/login');
+            }
+        }
+
+        // Validate request
+        if (isset($_SERVER['HTTP_ORIGIN']) && ($_SERVER['HTTP_ORIGIN'] === 'https://' . host || $_SERVER['HTTP_ORIGIN'] === 'http://' . host) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->validateSession();
+            if (!$this->session->isLoggedIn()) {
+                jsonResponse('error', 'Not logged in', 403);
+            }
+        } else {
+            jsonResponse('error', 'Bad request', 400);
+        }
+
+        // Check json body
+        $jsonBody = json_decode(file_get_contents('php://input'), true);
+        if ($jsonBody === null && json_last_error() !== JSON_ERROR_NONE) {
+            jsonResponse('error', 'Bad JSON format', 400);
         }
     }
 
@@ -205,152 +242,6 @@ class Controller
     }
 
     /**
-     * Checks if request method is POST
-     *
-     * @return boolean
-     */
-    protected function isPOST()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns post value
-     *
-     * @param string $param The param
-     * @return string|null
-     */
-    protected function getPostValue($param)
-    {
-        return isset($_POST[$param]) && is_string($_POST[$param]) ? $_POST[$param] : null;
-    }
-
-    /**
-     * Returns get value
-     *
-     * @param string $param The param
-     * @return string|null
-     */
-    protected function getGetValue($param)
-    {
-        return isset($_GET[$param]) ? $_GET[$param] : null;
-    }
-
-    /**
-     * Parses user agent and returns string with browser and OS
-     * 
-     * @param string $userAgent The user agent string
-     * @return string
-     */
-    protected function parseUserAgent($userAgent)
-    {
-        $browser = 'Unknown';
-        $os = 'Unknown';
-
-        if ($userAgent === 'Not collected') {
-            return $userAgent;
-        }
-
-        $browsers = [
-            '/MSIE/i' => 'IE',
-            '/Trident/i' => 'IE',
-            '/Edge/i' => 'Edge',
-            '/Edg/i' => 'Edge',
-            '/Firefox/i' => 'Firefox',
-            '/OPR/i' => 'Opera',
-            '/Chrome/i' => 'Chrome',
-            '/Opera/i' => 'Opera',
-            '/UCBrowser/i' => 'UC Browser',
-            '/SamsungBrowser/i' => 'SamsungBrowser',
-            '/YaBrowser/i' => 'Yandex',
-            '/Vivaldi/i' => 'Vivaldi',
-            '/Brave/i' => 'Brave',
-            '/Safari/i' => 'Safari',
-            '/PlayStation/i' => 'PlayStation'
-        ];
-
-        $oses = [
-            '/Googlebot/i' => 'Googlebot',
-            '/bingbot/i' => 'Bingbot',
-            '/MicrosoftPreview/i' => 'Bingbot',
-            '/YandexBot/i' => 'YandexBot',
-            '/Windows/i' => 'Windows',
-            '/iPhone/i' => 'iPhone',
-            '/Mac/i' => 'macOS',
-            '/Linux/i' => 'Linux',
-            '/Unix/i' => 'Unix',
-            '/Android/i' => 'Android',
-            '/iOS/i' => 'iOS',
-            '/BlackBerry/i' => 'BlackBerry',
-            '/FirefoxOS/i' => 'Firefox OS',
-            '/Windows Phone/i' => 'Windows Phone',
-            '/CrOS/i' => 'ChromeOS',
-            '/YandexBot/i' => 'YandexBot',
-            '/PlayStation/i' => 'PlayStation',
-        ];
-
-        // Get the browser
-        foreach ($browsers as $regex => $name) {
-            if (preg_match($regex, $userAgent)) {
-                $browser = $name;
-                break;
-            }
-        }
-
-        // Get the operating system
-        foreach ($oses as $regex => $name) {
-            if (preg_match($regex, $userAgent)) {
-                $os = $name;
-                break;
-            }
-        }
-
-        $browser = $os === 'Unknown' && $browser === 'Unknown' ? 'Unknown' : "{$os} with {$browser}";
-
-        return $browser;
-    }
-
-    /**
-     * Parses timestamp and returns string with last x
-     * 
-     * @param string $timestamp The timestamp
-     * @param string $syntax Syntax type
-     * @return string
-     */
-    protected function parseTimestamp($timestamp, $syntax = 'short')
-    {
-        if ($timestamp === 0) {
-            return 'never';
-        }
-
-        $elapsed = time() - $timestamp;
-
-        if ($elapsed < 60) {
-            $unit = ($elapsed == 1) ? 'second' : 'seconds';
-            return ($syntax == 'short') ? $elapsed . ' sec' : "$elapsed {$unit} ago";
-        } elseif ($elapsed < 3600) {
-            $minutes = floor($elapsed / 60);
-            $unit = ($minutes == 1) ? 'minute' : 'minutes';
-            return ($syntax == 'short') ? $minutes . ' min' : "$minutes {$unit} ago";
-        } elseif ($elapsed < 86400) {
-            $hours = floor($elapsed / 3600);
-            $unit = ($hours == 1) ? 'hour' : 'hours';
-            return ($syntax == 'short') ? $hours . ' hr' : "$hours {$unit} ago";
-        } elseif ($elapsed < 2592000) {
-            $days = floor($elapsed / 86400);
-            $unit = ($days == 1) ? 'day' : 'days';
-            return ($syntax == 'short') ? $days . ' ' . $unit : "$days {$unit} ago";
-        } else {
-            $months = floor($elapsed / 2592000);
-            $unit = ($months == 1) ? 'month' : 'months';
-            return ($syntax == 'short') ? $months . ' mon' : "$months {$unit} ago";
-        }
-    }
-
-    /**
      * Log item
      *
      * @param string $description The description
@@ -364,6 +255,12 @@ class Controller
         }
     }
 
+    /**
+     * Returns user by id
+     * 
+     * @param int $id The user id
+     * @return array
+     */
     protected function user($id = null)
     {
         $id = $id ?? $this->session->data('id');
@@ -381,7 +278,7 @@ class Controller
             $killswitch = $this->model('Setting')->get('killswitch');
 
             if (!empty($killswitch)) {
-                if ($this->getGetValue('pass') === $killswitch) {
+                if (_GET('pass') === $killswitch) {
                     $this->model('Setting')->set('killswitch', '');
                     redirect('/');
                 } else {

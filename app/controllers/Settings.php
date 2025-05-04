@@ -14,48 +14,48 @@ class Settings extends Controller
         $this->view->setTitle('Settings');
         $this->view->renderTemplate('settings/index');
 
-        if ($this->isPOST()) {
+        if (isPOST()) {
             try {
                 $this->validateCsrfToken();
 
                 // Check if posted data is changing application settings
-                if ($this->getPostValue('application') !== null) {
-                    $timezone = $this->getPostValue('timezone');
-                    $theme = $this->getPostValue('theme');
-                    $filter = $this->getPostValue('filter');
-                    $logging = $this->getPostValue('logging');
-                    $storescreenshot = $this->getPostValue('storescreenshot');
-                    $compress = $this->getPostValue('compress');
+                if (_POST('application') !== null) {
+                    $timezone = _POST('timezone');
+                    $theme = _POST('theme');
+                    $filter = _POST('filter');
+                    $logging = _POST('logging');
+                    $storescreenshot = _POST('storescreenshot');
+                    $compress = _POST('compress');
                     $this->applicationSettings($timezone, $theme, $filter, $logging, $storescreenshot, $compress);
                 }
 
                 // Check if posted data is changing global payload settings
-                if ($this->getPostValue('global-payload') !== null) {
+                if (_POST('global-payload') !== null) {
                     $this->payloadSettings();
                 }
 
                 // Check if posted data is changing global alerting settings
-                if ($this->getPostValue('global-alert') !== null) {
+                if (_POST('global-alert') !== null) {
                     $this->alertSettings();
                 }
 
                 // Check if posted data is enabling killswitch
-                if ($this->getPostValue('killswitch') !== null) {
-                    $password = $this->getPostValue('password');
+                if (_POST('killswitch') !== null) {
+                    $password = _POST('password');
                     if ($password !== '') {
                         $this->killSwitch($password);
                     }
                 }
 
                 // Check if posted data is changing alert method settings
-                if ($this->getPostValue('alert-methods') !== null) {
+                if (_POST('alert-methods') !== null) {
                     $this->alertMethods();
                 }
 
                 // Check if posted data is changing callback alert settings
-                if ($this->getPostValue('callback-alert') !== null) {
-                    $callbackOn = $this->getPostValue('callbackon');
-                    $url = $this->getPostValue('callback_url');
+                if (_POST('callback-alert') !== null) {
+                    $callbackOn = _POST('callbackon');
+                    $url = _POST('callback_url');
                     $this->callbackAlertSettings($callbackOn, $url);
                 }
             } catch (Exception $e) {
@@ -199,17 +199,17 @@ class Settings extends Controller
         $options = ['uri', 'ip', 'referer', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'screenshot'];
 
         foreach ($options as $option) {
-            if ($this->getPostValue($option) !== null) {
+            if (_POST($option) !== null) {
                 $this->model('Setting')->set("collect_{$option}", '1');
             } else {
                 $this->model('Setting')->set("collect_{$option}", '0');
             }
         }
 
-        $this->model('Setting')->set('customjs', $this->getPostValue('customjs'));
-        $this->model('Setting')->set('customjs2', $this->getPostValue('customjs2'));
+        $this->model('Setting')->set('customjs', _POST('customjs'));
+        $this->model('Setting')->set('customjs2', _POST('customjs2'));
 
-        $persistent = $this->getPostValue('persistenton');
+        $persistent = _POST('persistenton');
         $this->model('Setting')->set('persistent', $persistent !== null ? '1' : '0');
         $this->log('Updated admin payload settings');
     }
@@ -225,17 +225,17 @@ class Settings extends Controller
         $alerts = $this->model('Alert');
 
         // Update mail settings
-        $mailOn = $this->getPostValue('mailon');
-        $mail = $this->getPostValue('mail');
+        $mailOn = _POST('mailon');
+        $mail = _POST('mail');
         if (!filter_var($mail, FILTER_VALIDATE_EMAIL) && !empty($mail)) {
             throw new Exception('This is not a correct email address');
         }
         $alerts->set(0, 1, $mailOn !== null, $mail);
 
         // Update Telegram settings
-        $telegramOn = $this->getPostValue('telegramon');
-        $telegramToken = $this->getPostValue('telegram_bottoken');
-        $telegramChatID = $this->getPostValue('chatid');
+        $telegramOn = _POST('telegramon');
+        $telegramToken = _POST('telegram_bottoken');
+        $telegramChatID = _POST('chatid');
         if (!empty($telegramToken) || !empty($telegramChatID)) {
             if (!preg_match('/^[a-zA-Z0-9:_-]+$/', $telegramToken)) {
                 throw new Exception('This does not look like a valid Telegram bot token');
@@ -248,8 +248,8 @@ class Settings extends Controller
         $alerts->set(0, 2, $telegramOn !== null, $telegramToken, $telegramChatID);
 
         // Update Slack settings
-        $slackOn = $this->getPostValue('slackon');
-        $slackWebhook = $this->getPostValue('slack_webhook');
+        $slackOn = _POST('slackon');
+        $slackWebhook = _POST('slack_webhook');
         if (!empty($slackWebhook)) {
             if (!preg_match('/https:\/\/hooks\.slack\.com\/services\/([a-zA-Z0-9]+)\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)$/', $slackWebhook)) {
                 throw new Exception('This does not look like a valid Slack webhook URL');
@@ -258,8 +258,8 @@ class Settings extends Controller
         $alerts->set(0, 3, $slackOn !== null, $slackWebhook);
 
         // Update Discord settings
-        $discordOn = $this->getPostValue('discordon');
-        $discordWebhook = $this->getPostValue('discord_webhook');
+        $discordOn = _POST('discordon');
+        $discordWebhook = _POST('discord_webhook');
         if (!empty($discordWebhook)) {
             if (!preg_match('/https:\/\/(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-zA-Z0-9_-]+)$/', $discordWebhook)) {
                 throw new Exception('This does not look like a valid Discord webhook URL');
@@ -288,16 +288,16 @@ class Settings extends Controller
      */
     private function alertMethods()
     {
-        $mailOn = $this->getPostValue('mailon') !== null ? '1' : '0';
+        $mailOn = _POST('mailon') !== null ? '1' : '0';
         $this->model('Setting')->set('alert-mail', $mailOn);
 
-        $telegramOn = $this->getPostValue('telegramon') !== null ? '1' : '0';
+        $telegramOn = _POST('telegramon') !== null ? '1' : '0';
         $this->model('Setting')->set('alert-telegram', $telegramOn);
 
-        $slackOn = $this->getPostValue('slackon') !== null ? '1' : '0';
+        $slackOn = _POST('slackon') !== null ? '1' : '0';
         $this->model('Setting')->set('alert-slack', $slackOn);
 
-        $discordOn = $this->getPostValue('discordon') !== null ? '1' : '0';
+        $discordOn = _POST('discordon') !== null ? '1' : '0';
         $this->model('Setting')->set('alert-discord', $discordOn);
         $this->log('Updated admin alert method settings');
     }

@@ -428,7 +428,7 @@ class View
 
         // Check current page for reporting pages
         if ((substr($page, -2) === '*0' || substr($page, -2) === '*1') && isset($uriParts[2]) && $uriParts[2] == 'reports') {
-            if (isset($_GET['archive']) && $_GET['archive'] == '1') {
+            if (_GET('archive') == '1') {
                 if (substr($page, -2) === '*0') {
                     return 'menu-active';
                 }

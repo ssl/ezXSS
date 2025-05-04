@@ -102,7 +102,7 @@ class Payloads extends Controller
         $this->view->setContentType('text/plain');
 
         // Check method
-        if (!$this->isPOST()) {
+        if (!isPOST()) {
             return 'github.com/ssl/ezXSS';
         }
 

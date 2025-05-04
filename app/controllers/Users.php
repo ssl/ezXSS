@@ -31,13 +31,13 @@ class Users extends Controller
         $this->view->renderTemplate('users/index');
 
         // Check if request is trying to create user
-        if ($this->isPOST()) {
+        if (isPOST()) {
             try {
                 $this->validateCsrfToken();
 
-                $username = $this->getPostValue('username');
-                $password = $this->getPostValue('password');
-                $rank = intval($this->getPostValue('rank'));
+                $username = _POST('username');
+                $password = _POST('password');
+                $rank = intval(_POST('rank'));
 
                 // Validate rank type
                 if (!isset($this->ranks[$rank])) {
@@ -70,15 +70,15 @@ class Users extends Controller
         $userModel = $this->model('User');
         $user = $userModel->getById($id);
 
-        if ($this->isPOST()) {
+        if (isPOST()) {
             try {
                 $this->validateCsrfToken();
 
                 // Check if posted data is changing alerts
-                if ($this->getPostValue('edit') !== null) {
-                    $username = $this->getPostValue('username');
-                    $password = $this->getPostValue('password');
-                    $rank = intval($this->getPostValue('rank'));
+                if (_POST('edit') !== null) {
+                    $username = _POST('username');
+                    $password = _POST('password');
+                    $rank = intval(_POST('rank'));
 
                     // Check if posted data wants to change password
                     if ($password != '') {
@@ -105,8 +105,8 @@ class Users extends Controller
                 }
 
                 // Check if posted data is adding payload
-                if ($this->getPostValue('add') !== null) {
-                    $payload = $this->getPostValue('payload');
+                if (_POST('add') !== null) {
+                    $payload = _POST('payload');
 
                     // Validate payload url
                     if (strpos($payload, 'http://') === 0 || strpos($payload, 'https://') === 0 || substr($payload, 0, 1) === '/') {
@@ -147,7 +147,7 @@ class Users extends Controller
         $user = $this->user($id);
         $this->view->renderData('username', $user['username']);
 
-        if ($this->isPOST()) {
+        if (isPOST()) {
             $this->validateCsrfToken();
 
             // Prevent deleting own user
@@ -161,6 +161,56 @@ class Users extends Controller
         }
 
         return $this->showContent();
+    }
+
+    /**
+     * Renders the users content and returns the content.
+     * 
+     * @return string
+     */
+    public function data()
+    {
+        $this->isAPIRequest();
+
+        if (!$this->isAdmin()) {
+            return jsonResponse('error', 'You dont have permissions to this page');
+        }
+
+        $ranks = [0 => 'Banned', 1 => 'User', 7 => 'Admin'];
+
+        $users = $this->model('User')->getAllUsers();
+        $allPayloads = $this->model('Payload')->getAll();
+        
+        // Create a map of user IDs to their payloads
+        $userPayloads = [];
+        foreach ($allPayloads as $payload) {
+            if (!isset($userPayloads[$payload['user_id']])) {
+                $userPayloads[$payload['user_id']] = [];
+            }
+            $userPayloads[$payload['user_id']][] = $payload['payload'];
+        }
+
+        foreach ($users as &$user) {
+            // Translate rank id to readable name
+            $user['rank'] = $ranks[$user['rank']];
+
+            unset($user['password']);
+            unset($user['secret']);
+            unset($user['notepad']);
+
+            $payloadString = $user['rank'] == 'Admin' ? '*, ' : '';
+            if (isset($userPayloads[$user['id']])) {
+                foreach ($userPayloads[$user['id']] as $payload) {
+                    $payloadString .= e($payload) . ', ';
+                }
+            }
+            
+            $payloadString = $payloadString === '' ? $payloadString : substr($payloadString, 0, -2);
+            $payloadString = (strlen($payloadString) > 35) ? substr($payloadString, 0, 35) . '...' : $payloadString;
+            $user['payloads'] = $payloadString;
+        }
+
+        return jsonResponse('data', $users);
     }
 
     /**
