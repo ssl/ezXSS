@@ -151,6 +151,10 @@ $(document).ready(function () {
     $('.remove-item').click(function () {
         const data = $(this).attr('data')
         const divId = $(this).attr('divid')
+        if(divId === 'pspider') {
+            setSpider('0')
+            return
+        }
         const type =
             divId.charAt(0) === 'p'
                 ? 'pages'
@@ -172,6 +176,19 @@ $(document).ready(function () {
             $('#' + divId).fadeOut('slow', function () { })
         })
     })
+
+    $('#spider').on('change', function () {
+        const method = $(this).val()
+        setSpider(method)
+    })
+
+    function setSpider(method) {
+        const id = window.location.pathname.split('/').pop()
+        request('/manage/payload/spider/' + id, { method: method }).then(function (r) {
+            console.log(r)
+            window.location.href = window.location.href;
+        })
+    }
 
     $('#openGetChatId').click(function () {
         var bottoken = $('#telegram_bottoken').val()

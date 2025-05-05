@@ -11,6 +11,9 @@
     <div id="browser"></div>
 
     <a href="javascript:location.reload(true)">Reload page</a>
+    <a href="/">Payload URL</a>
+    <a href="/manage/payload">Manage Payload</a>
+    <a href="https://github.com/ssl/ezXSS/wiki">ezXSS Wiki</a>
 
     <!-- Color tester -->
     <hr>
@@ -38,7 +41,7 @@
     <div id="colors"></div>
 
     <script>
-        function e(i){return String(i).replace(/</g, '&lt;').replace(/>/g, '&gt;');}
+        function esc(i){return String(i).replace(/</g, '&lt;').replace(/>/g, '&gt;');}
 
         // Browser details
         try {
@@ -82,11 +85,12 @@
                     };
         
                     function logRequest(request) {
+                        console.log(request);
                         var tableBody = document.querySelector('#requests tbody');
                         var newRow = document.createElement('tr');
-                        newRow.innerHTML = '<td>' + e(request.method) + '</td>' +
-                                        '<td>' + e(request.url) + '</td>' +
-                                        '<td>' + e(request.status) + '</td>';
+                        newRow.innerHTML = '<td>' + esc(request.method) + '</td>' +
+                                        '<td>' + esc(request.url) + '</td>' +
+                                        '<td>' + esc(request.status) + '</td>';
                         tableBody.appendChild(newRow);
                         document.getElementById('table-wrap').style.display = 'block';
                     }

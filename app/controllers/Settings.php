@@ -98,6 +98,7 @@ class Settings extends Controller
         $this->view->renderData('compress1', $settings->get('compress') == 1 ? 'selected' : '');
 
         $this->view->renderChecked('persistent', $settings->get('persistent') === '1');
+        $this->view->renderChecked('spider', $settings->get('spider') === '1');
 
         // Renders data of correct selected filter
         $this->view->renderData('filter1', $filterSave == 1 && $filterAlert == 1 ? 'selected' : '');
@@ -211,6 +212,10 @@ class Settings extends Controller
 
         $persistent = _POST('persistenton');
         $this->model('Setting')->set('persistent', $persistent !== null ? '1' : '0');
+
+        $spider = _POST('spider');
+        $this->model('Setting')->set('spider', $spider !== null ? '1' : '0');
+
         $this->log('Updated admin payload settings');
     }
 

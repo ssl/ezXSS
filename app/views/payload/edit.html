@@ -169,8 +169,8 @@
                                     <label class="control-label" for="method">Method [<a
                                         href="https://github.com/ssl/ezXSS/wiki" target=_blank>?</a>]</label>
                                     <select class="form-control" id="method" name="method">
-                                        <option value="1">Classic callback</option>
-                                        <option value="2">Persistent mode</option>
+                                        <option value="1" {%data selectedMethod1}>Classic callback</option>
+                                        <option value="2" {%data selectedMethod2}>Persistent mode</option>
                                     </select>
                                 </div>
 
@@ -208,6 +208,11 @@
                                     <input class="form-control" id="path" name="path" placeholder="/robots.txt">
                                 </div>
                                 <button name="extract-pages" type="submit" class="btn">Add</button>
+                                <p style="float:right"><select id="spider" name="spider" class="form-control">
+                                    <option value="0" {%data selectedSpider0}>No auto-spidering</option>
+                                    <option value="1" {%data selectedSpider1}>Spider w/ JS Web API</option>
+                                    <option value="2" {%data selectedSpider2}>Recursive spider w/ iFrame</option>
+                                </select></p>
                             </form>
                             <hr class="list">
                             {%if hasPages}

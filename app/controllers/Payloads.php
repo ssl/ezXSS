@@ -63,6 +63,7 @@ class Payloads extends Controller
         $this->view->renderData('payload', url);
         $this->view->renderData('noCollect', implode(',', $noCollect), true);
         $this->view->renderData('pages', implode(',', $pages), true);
+        $this->view->renderData('spider', $payload['spider']);
         $this->view->renderDataWithLines('customjs', $payload['customjs'], true);
         $this->view->renderDataWithLines('customjs2', $payload['customjs2'], true);
         $this->view->renderDataWithLines('globaljs', $this->model('Setting')->get('customjs'), true);
@@ -250,8 +251,10 @@ class Payloads extends Controller
             $data->time = time();
             $data->timestamp = date('c', strtotime('now'));
 
+            $isCollected = strpos($data->referer, 'Collected page via ') !== false;
+
             // Send out alerts
-            if (($doubleReport !== false && $this->model('Setting')->get('filter-alert') == 1) || $doubleReport === false) {
+            if ((($doubleReport !== false && $this->model('Setting')->get('filter-alert') == 1) || $doubleReport === false) && !$isCollected) {
                 try {
                     $this->alert($data);
                 } catch (Exception $e) {

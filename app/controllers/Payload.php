@@ -106,11 +106,22 @@ class Payload extends Controller
         $this->view->renderChecked('cPersistent', $payload['persistent'] == 1);
         $this->view->renderData('customjs', $payload['customjs']);
         $this->view->renderData('customjs2', $payload['customjs2']);
+        $this->view->renderData('selectedMethod1', $payload['persistent'] == 0 ? 'selected' : '');
+        $this->view->renderData('selectedMethod2', $payload['persistent'] == 1 ? 'selected' : '');
+        $this->view->renderData('selectedSpider0', $payload['spider'] == 0 ? 'selected' : '');
+        $this->view->renderData('selectedSpider1', $payload['spider'] == 1 ? 'selected' : '');
+        $this->view->renderData('selectedSpider2', $payload['spider'] == 2 ? 'selected' : '');
 
         $i = 0;
 
         // Render data set of all pages of payload
         $pages = [];
+        if($payload['spider'] == 1) {
+            $pages[] = ['id' => 'spider', 'value' => '/* (first-level spidering w/ JS Web API)'];
+        } else if($payload['spider'] == 2) {
+            $pages[] = ['id' => 'spider', 'value' => '/* (recursive spidering w/ iFrame)'];
+        }
+
         foreach (explode('~', $payload['pages'] ?? '') as $val) {
             if (!empty($val)) {
                 $pages[] = ['id' => $i++, 'value' => $val];
@@ -179,10 +190,37 @@ class Payload extends Controller
             }
             $this->model('Payload')->setSingleValue($id, $type, $newString);
 
+            $this->log("Updated payload #{$id} settings");
             return jsonResponse('success', 1);
         } catch (Exception $e) {
             return jsonResponse('error', $e);
         }
+    }
+
+    /**
+     * Spiders a payload
+     * 
+     * @param string $id The payload id
+     * @return void
+     */
+    public function spider($id)
+    {
+        $this->isAPIRequest();
+
+        $method = _JSON('method');
+        $methods = ['0','1','2'];
+        
+        if (!isset($methods[$method])) {
+            jsonResponse('error', 'Invalid spidering method');
+        }
+
+        if($this->model('Setting')->get('spider') !== '1' && $method !== '0') {
+            jsonResponse('error', 'Spidering is globally disabled by the ezXSS admin');
+        }
+
+        $this->model('Payload')->setSingleValue($id, 'spider', $method);
+        $this->log("Updated payload #{$id} settings");
+        jsonResponse('success', 1);
     }
 
     /**
