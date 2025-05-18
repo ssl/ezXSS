@@ -185,7 +185,6 @@ $(document).ready(function () {
     function setSpider(method) {
         const id = window.location.pathname.split('/').pop()
         request('/manage/payload/spider/' + id, { method: method }).then(function (r) {
-            console.log(r)
             window.location.href = window.location.href;
         })
     }
@@ -263,9 +262,7 @@ $(document).ready(function () {
 
     $('.execute-selected').click(function () {
         $.each($("input[name='selected']:checked"), function () {
-            const id = $(this).val()
             const url = $(this).attr('url')
-            console.log(id)
             command = $('#command').val()
             request(url, { execute: '', command: command }).then(function (r) {
                 $('#command').val('')
@@ -285,7 +282,6 @@ $(document).ready(function () {
     $('.persistent-delete-selected').click(function () {
         $.each($("input[name='selected']:checked"), function () {
             const parent = $(this).parent().parent().parent()
-            console.log(parent)
             parent.fadeOut('slow', function () { })
             const url = $(this).attr('url')
             request(url, { delete: '' }).then(function (r) { 

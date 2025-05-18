@@ -85,7 +85,6 @@
                     };
         
                     function logRequest(request) {
-                        console.log(request);
                         var tableBody = document.querySelector('#requests tbody');
                         var newRow = document.createElement('tr');
                         newRow.innerHTML = '<td>' + esc(request.method) + '</td>' +
