@@ -18,7 +18,8 @@ class Report_model extends Model
     public function getAll()
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT `id`,`uri`,`ip`,`payload`,`archive`,`shareid` FROM $this->table ORDER BY `id` DESC LIMIT 100000");
+        $database->prepare("SELECT `id`,`uri`,`ip`,`payload`,`archive`,`shareid` FROM $this->table ORDER BY `id` DESC LIMIT :li");
+        $database->bindValue(':li', reportsLimit);
         $database->execute();
 
         $data = $database->fetchAll();
@@ -35,8 +36,9 @@ class Report_model extends Model
     public function getAllByArchive($archive)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT `id`,`uri`,`ip`,`payload`,`shareid`,`user-agent`,time FROM $this->table WHERE `archive` = :archive ORDER BY `id` DESC LIMIT 100000");
+        $database->prepare("SELECT `id`,`uri`,`ip`,`payload`,`shareid`,`user-agent`,time FROM $this->table WHERE `archive` = :archive ORDER BY `id` DESC LIMIT :li");
         $database->bindValue(':archive', $archive);
+        $database->bindValue(':li', reportsLimit);
         $database->execute();
 
         $data = $database->fetchAll();
@@ -94,7 +96,8 @@ class Report_model extends Model
     public function getAllByPayload($payload, $archive)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT `id`,`uri`,`ip`,`payload`,`shareid`,`user-agent`,time FROM $this->table WHERE `payload` LIKE :payload AND `archive` = :archive ORDER BY `id` DESC");
+        $database->prepare("SELECT `id`,`uri`,`ip`,`payload`,`shareid`,`user-agent`,time FROM $this->table WHERE `payload` LIKE :payload AND `archive` = :archive ORDER BY `id` DESC LIMIT :li");
+        $database->bindValue(':li', reportsLimit);
         $database->bindValue(':archive', $archive);
         $database->bindValue(':payload', $payload);
 

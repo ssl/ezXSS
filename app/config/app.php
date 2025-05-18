@@ -39,3 +39,6 @@ define('httpmode', $config['httpmode'] ?? '' === 'true' || $config['httpmode'] ?
 
 // Defines whenever sign up is enabled, do not enable this unless you are serving a public ezXSS installation - this allows anyone to register!
 define('signupEnabled', $config['signupEnabled'] ?? '' === 'true' || $config['signupEnabled'] ?? '' === '1' ? true : false);
+
+// Defines the limit of reports
+define('reportsLimit', intval($config['reportsLimit'] ?? 100000));
