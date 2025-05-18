@@ -43,7 +43,7 @@
                                     <tbody id="reports-list">
                                         {%foreach request}
                                         <tr>
-                                            <td><a href="/manage/persistent/request/{request->id}">{request->id}</a></td>
+                                            <td data-sort="{request->id}"><a href="/manage/persistent/request/{request->id}">{request->id}</a></td>
                                             <td><a href="/manage/persistent/session/{request->clientid}~{request->origin}">{request->clientid}</a></td>
                                             <td>{request->browser}</td>
                                             <td>{request->ip}</td>

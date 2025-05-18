@@ -35,7 +35,7 @@ class Report_model extends Model
     public function getAllByArchive($archive)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT `id`,`uri`,`ip`,`payload`,`shareid`,`user-agent`,time FROM $this->table WHERE `archive` = :archive ORDER BY `id` DESC");
+        $database->prepare("SELECT `id`,`uri`,`ip`,`payload`,`shareid`,`user-agent`,time FROM $this->table WHERE `archive` = :archive ORDER BY `id` DESC LIMIT 100000");
         $database->bindValue(':archive', $archive);
         $database->execute();
 

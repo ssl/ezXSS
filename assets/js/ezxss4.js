@@ -306,7 +306,8 @@ $(document).ready(function () {
     if (location.toString().split('/')[5] === 'session') {
         window.setInterval(function () {
             request(window.location.pathname, { getconsole: '' }).then(function (r) {
-                $('#console').val(r.console)
+                const decodedConsole = decodeHTMLEntities(r.console);
+                $('#console').val(decodedConsole);
             })
         }, 10000)
     }
@@ -428,4 +429,11 @@ function shortboost(str) {
     }
 
     return str
+}
+
+function decodeHTMLEntities(text) {
+    if (!text) return '';
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
 }

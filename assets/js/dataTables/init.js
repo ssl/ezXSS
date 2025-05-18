@@ -1,7 +1,35 @@
 $(document).ready(function () {
     $.fn.dataTable.ext.errMode = 'none';
     
+    const commonSettings = {
+        scrollX: false,
+        autoWidth: true,
+        responsive: true,
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            paginate: {
+                first: "«",
+                previous: "‹",
+                next: "›",
+                last: "»"
+            }
+        }
+    };
+
+    const truncateContent = (data, type, row, column) => {
+        if (type === 'display' && data) {
+            if (['uri', 'ip', 'payload', 'shorturi', 'description'].includes(column)) {
+                return `<div class="truncate-cell" title="${data}">${data}</div>`;
+            }
+        }
+        return data;
+    };
+
     new DataTable('#reports', {
+        ...commonSettings,
         "ajax": {
             "url": "/manage/reports/data",
             "contentType": "application/json",
@@ -14,63 +42,67 @@ $(document).ready(function () {
         },
         columns: [
             {
-                width: 110,
                 className: 'dt-body-left',
                 data: 'shareid',
                 orderable: false,
                 render: function (data, type, row) {
-                    return `<label class="reports-checkbox-label" for="chk_` + row.id + `">
-                        <input class="chkbox" type="checkbox" name="selected"
-                            value="`+ row.id + `" id="chk_` + row.id + `"
-                            report-id="`+ row.id + `">
-                        <span class="reports-checkbox-custom rectangular"></span>
-                    </label>
-                    <div class="btn-group btn-view" style="width:100px;max-width:100px;" role=group>
-                        <a href="/manage/reports/view/`+ row.id + `" class="btn pretty-border">View</a>
-                        <div class=btn-group role=group>
-                            <button type=button
-                                class="btn btn-default dropdown-toggle pretty-border"
-                                data-toggle=dropdown aria-haspopup=true aria-expanded=true>
-                                <span class=caret></span>
-                            </button>
-                            <div class=dropdown-backdrop></div>
-                            <ul class=dropdown-menu>
-                                <li><a class="share" report-id="`+ row.id + `" share-id="` + data + `" data-toggle="modal" data-target="#shareModal">Share</a></li>
-                                <li><a class="delete" report-id="`+ row.id + `">Delete</a></li>
-                                <li><a class="archive" report-id="`+ row.id + `">Archive</a></li>
-                            </ul>
+                    return `<div class="action-column">
+                        <label class="reports-checkbox-label" for="chk_` + row.id + `">
+                            <input class="chkbox" type="checkbox" name="selected"
+                                value="`+ row.id + `" id="chk_` + row.id + `"
+                                report-id="`+ row.id + `">
+                            <span class="reports-checkbox-custom rectangular"></span>
+                        </label>
+                        <div class="btn-group btn-view" role=group>
+                            <a href="/manage/reports/view/`+ row.id + `" class="btn pretty-border">View</a>
+                            <div class=btn-group role=group>
+                                <button type=button
+                                    class="btn btn-default dropdown-toggle pretty-border"
+                                    data-toggle=dropdown aria-haspopup=true aria-expanded=true>
+                                    <span class=caret></span>
+                                </button>
+                                <div class=dropdown-backdrop></div>
+                                <ul class=dropdown-menu>
+                                    <li><a class="share" report-id="`+ row.id + `" share-id="` + data + `" data-toggle="modal" data-target="#shareModal">Share</a></li>
+                                    <li><a class="delete" report-id="`+ row.id + `">Delete</a></li>
+                                    <li><a class="archive" report-id="`+ row.id + `">Archive</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>`;
                 }
             },
             { data: 'id' },
-            { data: 'uri' },
-            { data: 'ip' },
+            { 
+                data: 'uri',
+                className: 'truncate-cell',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'uri');
+                }
+            },
+            { 
+                data: 'ip',
+                className: 'truncate-cell',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'ip');
+                }
+            },
             { data: 'browser' },
-            { data: 'payload' },
+            { 
+                data: 'payload',
+                className: 'truncate-cell',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'payload');
+                }
+            },
             { data: 'last' }
         ],
         columnDefs: [{ targets: 2, className: "truncate" }],
         createdRow: function (row, data, dataIndex) {
             $(row).attr('id', data.id);
-            var td = $(row).find(".truncate");
-            td.attr("title", td.html());
         },
         order: [[1, 'desc']],
         dom: '<"top"lipf>rt',
-        language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search reports...",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ entries",
-            paginate: {
-                first: "«",
-                previous: "‹",
-                next: "›",
-                last: "»"
-            }
-        },
-        // Show with-bar only when data is present
         drawCallback: function(settings) {
             var api = this.api();
             var hasData = api.data().any();
@@ -79,6 +111,7 @@ $(document).ready(function () {
     });
 
     var dataTablePersistent = new DataTable('#persistent', {
+        ...commonSettings,
         "ajax": {
             "url": "/manage/persistent/sessions",
             "contentType": "application/json",
@@ -90,24 +123,43 @@ $(document).ready(function () {
         },
         columns: [
             {
-                width: 110,
                 className: 'dt-body-left persistent-column',
                 data: 'clientid',
                 orderable: false,
                 render: function (data, type, row) {
-                    return `<label class="reports-checkbox-label" for="chk_` + row.id + `">
-                    <input class="chkbox" type="checkbox" name="selected"
-                        value="` + row.id + `" id="chk_` + row.id + `"
-                        url="/manage/persistent/session/` + data + `~` + row.origin + `">
-                    <span class="reports-checkbox-custom rectangular" style="top:7px"></span>
-                </label>
-                <a href="/manage/persistent/session/` + data + `~` + row.origin + `">` + data + `</a>`;
+                    return `<div class="action-column">
+                        <label class="reports-checkbox-label" for="chk_` + row.id + `">
+                            <input class="chkbox" type="checkbox" name="selected"
+                                value="` + row.id + `" id="chk_` + row.id + `"
+                                url="/manage/persistent/session/` + data + `~` + row.origin + `">
+                            <span class="reports-checkbox-custom rectangular" style="top:7px"></span>
+                        </label>
+                        <a href="/manage/persistent/session/` + data + `~` + row.origin + `">` + data + `</a>
+                    </div>`;
                 }
             },
-            { data: 'browser', },
-            { data: 'ip' },
-            { data: 'shorturi' },
-            { data: 'payload' },
+            { data: 'browser' },
+            { 
+                data: 'ip',
+                className: 'truncate-cell',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'ip');
+                }
+            },
+            { 
+                data: 'shorturi',
+                className: 'truncate-cell',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'shorturi');
+                }
+            },
+            { 
+                data: 'payload',
+                className: 'truncate-cell',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'payload');
+                }
+            },
             { data: 'requests' },
             { 
                 data: 'last',
@@ -121,19 +173,6 @@ $(document).ready(function () {
         ],
         order: [[6, 'desc']],
         dom: '<"top"lipf>rt',
-        language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search sessions...",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ entries",
-            paginate: {
-                first: "«",
-                previous: "‹",
-                next: "›",
-                last: "»"
-            }
-        },
-        // Show with-bar only when data is present
         drawCallback: function(settings) {
             var api = this.api();
             var hasData = api.data().any();
@@ -157,6 +196,7 @@ $(document).ready(function () {
     }
 
     new DataTable('#logs', {
+        ...commonSettings,
         "ajax": {
             "url": "/manage/logs/data",
             "contentType": "application/json",
@@ -166,36 +206,42 @@ $(document).ready(function () {
             }
         },
         columns: [
-            { data: 'user', },
-            { data: 'description', },
-            { data: 'ip', },
+            { 
+                data: 'user',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'user');
+                }
+            },
+            { 
+                data: 'description',
+                className: 'truncate-cell',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'description');
+                }
+            },
+            { 
+                data: 'ip',
+                className: 'truncate-cell',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'ip');
+                }
+            },
             { 
                 data: 'date',
                 render: function (data, type, row, meta) {
                     if (type === 'sort') {
                         return row.time;
                     }
-                    return data;
+                    return truncateContent(data, type, row, 'date');
                 }
             },
         ],
         order: [[3, 'desc']],
         dom: '<"top"lipf>rt',
-        language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search logs...",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ entries",
-            paginate: {
-                first: "«",
-                previous: "‹",
-                next: "›",
-                last: "»"
-            }
-        }
     });
 
     new DataTable('#users', {
+        ...commonSettings,
         "ajax": {
             "url": "/manage/users/data",
             "contentType": "application/json",
@@ -205,10 +251,30 @@ $(document).ready(function () {
             }
         },
         columns: [
-            { data: 'id', },
-            { data: 'username', },
-            { data: 'rank', },
-            { data: 'payloads', },
+            { 
+                data: 'id',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'id');
+                }
+            },
+            { 
+                data: 'username',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'username');
+                }
+            },
+            { 
+                data: 'rank',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'rank');
+                }
+            },
+            { 
+                data: 'payloads',
+                render: function(data, type, row) {
+                    return truncateContent(data, type, row, 'payloads');
+                }
+            },
             { 
                 data: 'id',
                 orderable: false,
@@ -228,44 +294,21 @@ $(document).ready(function () {
         scrollY: false,
         scrollX: false,
         dom: '<"top"lipf>rt',
-        language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search users...",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ entries",
-            paginate: {
-                first: "«",
-                previous: "‹",
-                next: "›",
-                last: "»"
-            }
-        }
     });
 
     $('#simple-table').DataTable({
+        ...commonSettings,
         columnDefs: [
-            { orderable: false, targets: [0] }
+            { orderable: true, targets: [0] }
         ],
         "pageLength": 25,
         order: [[0, 'desc']],
         dom: '<"top"lipf>rt',
-        language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search...",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ entries",
-            paginate: {
-                first: "«",
-                previous: "‹",
-                next: "›",
-                last: "»"
-            }
-        }
     });
 
-    // Initialize user logs DataTable if the element exists
     if ($('#user-logs').length) {
         new DataTable('#user-logs', {
+            ...commonSettings,
             "ajax": {
                 "url": "/manage/logs/users",
                 "contentType": "application/json",
@@ -279,19 +322,13 @@ $(document).ready(function () {
                 { 
                     data: 'description',
                     render: function(data, type, row) {
-                        if (type === 'display') {
-                            return '<div style="word-wrap: break-word; word-break: break-word;">' + data + '</div>';
-                        }
-                        return data;
+                        return truncateContent(data, type, row, 'description');
                     }
                 },
                 { 
                     data: 'ip',
                     render: function(data, type, row) {
-                        if (type === 'display') {
-                            return '<div class="truncate" title="' + data + '">' + data + '</div>';
-                        }
-                        return data;
+                        return truncateContent(data, type, row, 'ip');
                     }
                 },
                 { 
@@ -300,19 +337,13 @@ $(document).ready(function () {
                         if (type === 'sort') {
                             return row.time;
                         }
-                        return data;
+                        return truncateContent(data, type, row, 'date');
                     }
                 }
             ],
             columnDefs: [
                 { targets: 1, className: "truncate" }
             ],
-            createdRow: function (row, data, dataIndex) {
-                var tds = $(row).find(".truncate");
-                tds.each(function() {
-                    $(this).attr("title", $(this).html());
-                });
-            },
             order: [[2, 'desc']],
             dom: '<"top"pf>rt',
             pageLength: 10,
@@ -320,18 +351,6 @@ $(document).ready(function () {
             pagingType: "simple_numbers",
             scrollX: false,
             autoWidth: false,
-            language: {
-                search: "_INPUT_",
-                searchPlaceholder: "Search logs...",
-                lengthMenu: "Show _MENU_ entries",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                paginate: {
-                    first: "«",
-                    previous: "‹",
-                    next: "›",
-                    last: "»"
-                }
-            }
         });
     }
 });
