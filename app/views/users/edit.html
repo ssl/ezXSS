@@ -22,7 +22,7 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Edit User</div>
+                        <div class="panel-heading">Edit user</div>
                         <div class="panel-body">
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
@@ -52,7 +52,7 @@
                     </div>
                     
                     <div class="panel panel-filled">
-                        <div class="panel-heading">User Activity Logs</div>
+                        <div class="panel-heading">User logs</div>
                         <div class="panel-body">
                             <div class="table-responsive">
                                 <table id="user-logs" class="table">
@@ -84,8 +84,8 @@
                                         platform.</small>
                                     <input class="form-control" id="payload" name="payload" type="text"
                                         placeholder="example.{domain[]}/example">
+                                    <small>When no path is given payload is valid for domain/*</small>
                                 </div>
-                                <p>When no path is given payload is valid for domain/*</p>
                                 <button type="submit" name="add" class="btn">Add</button>
                             </form>
                         </div>

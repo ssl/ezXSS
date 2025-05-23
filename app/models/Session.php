@@ -245,30 +245,6 @@ class Session_model extends Model
     }
 
     /**
-     * Set session value of single item by id
-     * 
-     * @param int $id The session id
-     * @param string $column The column name
-     * @param string $value The new value
-     * @throws Exception
-     * @return bool
-     */
-    public function setSingleValue($id, $column, $value)
-    {
-        $database = Database::openConnection();
-
-        $database->prepare("UPDATE $this->table SET `$column` = :value WHERE `id` = :id");
-        $database->bindValue(':value', $value);
-        $database->bindValue(':id', $id);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
-    }
-
-    /**
      * Set session data value of single item by id
      * 
      * @param int $id The session id

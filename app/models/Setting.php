@@ -32,7 +32,7 @@ class Setting_model extends Model
      * @throws Exception
      * @return bool
      */
-    public function set($setting, $value)
+    public function set($setting, $value, $null = null)
     {
         $database = Database::openConnection();
 

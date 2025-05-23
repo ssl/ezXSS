@@ -71,6 +71,34 @@ class Payloads extends Controller
         $this->view->renderDataWithLines('screenshot', $screenshot, true);
         $this->view->renderDataWithLines('persistent', $persistent ?? '', true);
 
+        // Load and render extensions
+        $globalExtensions = !empty($this->model('Setting')->get('extensions')) ? explode(',', $this->model('Setting')->get('extensions')) : [];
+        $payloadExtensions = !empty($payload['extensions']) ? explode(',', $payload['extensions']) : [];
+        
+        // Merge and remove duplicates
+        $allExtensionIds = array_unique(array_merge($globalExtensions, $payloadExtensions));
+        
+        $extensionCode = '';
+        foreach ($allExtensionIds as $extensionId) {
+            try {
+                $extension = $this->model('Extension')->getById($extensionId);
+                $code = $extension['code'] ?? '';
+                
+                // Remove lines that start with //
+                $lines = preg_split("/\r\n|\n|\r/", $code);
+                $filteredLines = array_filter($lines, function($line) {
+                    return !str_starts_with(trim($line), '//');
+                });
+                $code = implode("\n", $filteredLines);
+                
+                $extensionCode .= $code . "\n";
+            } catch (Exception $e) {
+                continue;
+            }
+        }
+        
+        $this->view->renderDataWithLines('extensions', $extensionCode, true);
+
         return $this->view->getContent();
     }
 
@@ -134,6 +162,10 @@ class Payloads extends Controller
         $data->origin = substr($data->origin ?? '', 0, 255);
         $data->payload = substr($data->payload ?? '', 0, 255);
         $data->useragent = substr($data->{'user-agent'} ?? '', 0, 500);
+
+        if(is_array($data->extra) || is_object($data->extra)) {
+            $data->extra = json_encode($data->extra);
+        }
 
         if(empty($data->payload)) {
             return 'github.com/ssl/ezXSS';
@@ -240,7 +272,8 @@ class Payloads extends Controller
                     $data->screenshotData ?? '',
                     json_encode($data->localstorage ?? ''),
                     json_encode($data->sessionstorage ?? ''),
-                    $data->payload
+                    $data->payload,
+                    $data->extra ?? ''
                 );
                 $data->domain = host;
             } else {
@@ -287,7 +320,7 @@ class Payloads extends Controller
             try {
                 $session = $this->model('Session')->getByClientId($data->clientid ?? '', $data->origin);
 
-                $this->model('Session')->setSingleValue($session['id'], 'time', time());
+                $this->model('Session')->set($session['id'], 'time', time());
                 $this->model('Session')->setSingleDataValue($session['id'], 'console', $data->console ?? '');
 
                 return $this->model('Console')->getNext($data->clientid ?? '', $data->origin);

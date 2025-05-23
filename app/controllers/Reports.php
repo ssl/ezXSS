@@ -7,7 +7,7 @@ class Reports extends Controller
      * 
      * @var array
      */
-    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'shareid'];
+    private $rows = ['id', 'uri', 'ip', 'referer', 'payload', 'user-agent', 'cookies', 'localstorage', 'sessionstorage', 'dom', 'origin', 'shareid', 'extra'];
 
     /**
      * Redirects to all reports
@@ -44,22 +44,7 @@ class Reports extends Controller
 
         $report = $this->model('Report')->getById($id);
 
-        // Check report permissions
-        if (!is_numeric($id) || !$this->hasReportPermissions($id)) {
-            throw new Exception('You dont have permissions to this report');
-        }
-
-        // Render all rows
-        if(!empty($report['screenshot'] ?? '')) {
-            $screenshot = strlen($report['screenshot']) === 52 ? '<img class="report-img" src="/assets/img/report-' . e($report['screenshot']) . '.png">' : '<img class="report-img" src="data:image/png;base64,' . e($report['screenshot']) . '">';
-        }
-        $this->view->renderData('screenshot', $screenshot ?? '', true);
-        $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
-        $this->view->renderData('browser', parseUserAgent($report['user-agent']), true);
-
-        foreach ($this->rows as $value) {
-            $this->view->renderData($value, $report[$value]);
-        }
+        $this->renderView($report);
 
         return $this->showContent();
     }
@@ -77,19 +62,59 @@ class Reports extends Controller
 
         $report = $this->model('Report')->getByShareId($id);
 
-        // Render all rows
-        $screenshot = !empty($report['screenshot']) ? '<img src="data:image/png;base64,' . e($report['screenshot']) . '">' : '';
-        $this->view->renderData('screenshot', $screenshot, true);
-        $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
-        $this->view->renderData('browser', parseUserAgent($report['user-agent']), true);
-
-        foreach ($this->rows as $value) {
-            $this->view->renderData($value, $report[$value]);
-        }
+        $this->renderView($report);
 
         $this->log("Visited shared report page {$id}");
 
         return $this->showContent();
+    }
+
+    /**
+     * Renders the report view
+     * 
+     * @param array $report The report data
+     * @return void
+     */
+    private function renderView($report)
+    {
+        // Render all rows
+        if(!empty($report['screenshot'] ?? '')) {
+            $screenshot = strlen($report['screenshot']) === 52 ? '<img class="report-img" src="/assets/img/report-' . e($report['screenshot']) . '.png">' : '<img class="report-img" src="data:image/png;base64,' . e($report['screenshot']) . '">';
+        }
+        $this->view->renderData('screenshot', $screenshot ?? '', true);
+        $this->view->renderCondition('hasScreenshot', !empty($screenshot));
+        $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
+        $this->view->renderData('browser', parseUserAgent($report['user-agent']), true);
+
+        // Handle extra field display logic
+        $extraData = $report['extra'] ?? '';
+        if(empty($extraData)) {
+            $this->view->renderCondition('isJsonExtra', false);
+            $this->view->renderCondition('isExtra', false);
+        } else {
+            $decodedExtra = json_decode($extraData, true);
+            
+            if(json_last_error() === JSON_ERROR_NONE && (is_array($decodedExtra) || is_object($decodedExtra))) {
+                $this->view->renderCondition('isExtra', false);
+                $this->view->renderCondition('isJsonExtra', true);
+                $extraItems = [];
+                foreach($decodedExtra as $key => $value) {
+                    if(is_array($value) || is_object($value)) {
+                        $value = json_encode($value);
+                    }
+                    $extraItems[] = ['key' => $key, 'value' => $value];
+                }
+                $this->view->renderDataset('extraItems', $extraItems);
+            } else {
+                $this->view->renderCondition('isJsonExtra', false);
+                $this->view->renderCondition('isExtra', true);
+                $this->view->renderData('extra', $extraData);
+            }
+        }
+
+        foreach ($this->rows as $value) {
+            $this->view->renderData($value, $report[$value]);
+        }
     }
 
     /**

@@ -201,7 +201,7 @@ class Users extends Controller
             $payloadString = $user['rank'] == 'Admin' ? '*, ' : '';
             if (isset($userPayloads[$user['id']])) {
                 foreach ($userPayloads[$user['id']] as $payload) {
-                    $payloadString .= e($payload) . ', ';
+                    $payloadString .= $payload . ', ';
                 }
             }
             

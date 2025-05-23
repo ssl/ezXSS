@@ -211,11 +211,11 @@ class Update extends Controller
         $reports = $this->model('Report')->getAllInvalid();
         foreach ($reports as $report) {
             // Set payload to current host
-            $this->model('Report')->setSingleValue($report['id'], 'payload', '//' . host . '/');
+            $this->model('Report')->set($report['id'], 'payload', '//' . host . '/');
 
             // Set refer to collected if collected is set
             if (strpos($report['payload'], 'Collected page via ') === 0) {
-                $this->model('Report')->setSingleValue($report['id'], 'referer', $report['payload']);
+                $this->model('Report')->set($report['id'], 'referer', $report['payload']);
             }
         }
     }

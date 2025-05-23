@@ -48,14 +48,30 @@ class Payload extends Controller
                 if (_POST('settings') !== null) {
                     $this->setCollecting($id);
 
-                    $this->model('Payload')->setSingleValue($id, 'customjs', _POST('customjs'));
-                    $this->model('Payload')->setSingleValue($id, 'customjs2', _POST('customjs2'));
+                    $this->model('Payload')->set($id, 'customjs', _POST('customjs'));
+                    $this->model('Payload')->set($id, 'customjs2', _POST('customjs2'));
+
+                    // Handle extensions
+                    $extensionsInput = _POST('extensions');
+                    $selectedExtensions = !empty($extensionsInput) ? explode(',', $extensionsInput) : [];
+                    
+                    if (!empty($selectedExtensions)) {
+                        $validExtensionIds = array_column($this->model('Extension')->getAll(), 'id');
+                        foreach ($selectedExtensions as $extensionId) {
+                            if (!in_array($extensionId, $validExtensionIds)) {
+                                throw new Exception('Invalid extension ID');
+                            }
+                        }
+                    }
+                    
+                    $extensionsValue = empty($selectedExtensions) ? '' : implode(',', $selectedExtensions);
+                    $this->model('Payload')->set($id, 'extensions', $extensionsValue);
 
                     $persistent = '2' === _POST('method') ? 1 : 0;
                     if($this->model('Setting')->get('persistent') !== '1' && $persistent === 1) {
                         throw new Exception('Persistent mode is globally disabled by the ezXSS admin');
                     }
-                    $this->model('Payload')->setSingleValue($id, 'persistent', $persistent);
+                    $this->model('Payload')->set($id, 'persistent', $persistent);
                 }
 
                 // Check if posted data is editing extracting pages
@@ -150,6 +166,21 @@ class Payload extends Controller
         $this->view->renderDataset('whitelist', $whitelist);
         $this->view->renderCondition('hasWhitelist', count($whitelist) > 0);
 
+        // Load and render extensions
+        $allExtensions = $this->model('Extension')->getAll();
+        $selectedExtensionIds = !empty($payload['extensions']) ? explode(',', $payload['extensions']) : [];
+        
+        $extensions = [];
+        foreach ($allExtensions as $extension) {
+            $extensions[] = [
+                'id' => $extension['id'],
+                'name' => $extension['name'],
+                'description' => substr($extension['description'], 0, 50) . (strlen($extension['description']) > 50 ? '...' : ''),
+                'checked' => in_array($extension['id'], $selectedExtensionIds) ? 'checked' : ''
+            ];
+        }
+        $this->view->renderDataset('extensions', $extensions);
+
         return $this->showContent();
     }
 
@@ -188,7 +219,7 @@ class Payload extends Controller
             if (strpos($payload[$type], '~' . $data . '~') !== false) {
                 $newString = str_replace('~' . $data . '~', '~', $payload[$type]);
             }
-            $this->model('Payload')->setSingleValue($id, $type, $newString);
+            $this->model('Payload')->set($id, $type, $newString);
 
             $this->log("Updated payload #{$id} settings");
             return jsonResponse('success', 1);
@@ -218,7 +249,7 @@ class Payload extends Controller
             jsonResponse('error', 'Spidering is globally disabled by the ezXSS admin');
         }
 
-        $this->model('Payload')->setSingleValue($id, 'spider', $method);
+        $this->model('Payload')->set($id, 'spider', $method);
         $this->log("Updated payload #{$id} settings");
         jsonResponse('success', 1);
     }
@@ -237,10 +268,10 @@ class Payload extends Controller
             if (_POST($option) !== null) {
                 // Enable collecting item for payload if allowed by admin settings
                 $enable = ($this->model('Setting')->get("collect_{$option}") == 1) ? 1 : 0;
-                $this->model('Payload')->setSingleValue($id, "collect_{$option}", $enable);
+                $this->model('Payload')->set($id, "collect_{$option}", $enable);
             } else {
                 // Disable item
-                $this->model('Payload')->setSingleValue($id, "collect_{$option}", 0);
+                $this->model('Payload')->set($id, "collect_{$option}", 0);
             }
         }
     }
@@ -266,7 +297,7 @@ class Payload extends Controller
         }
 
         $newString = $payload['pages'] . '~' . $path;
-        $this->model('Payload')->setSingleValue($id, 'pages', $newString);
+        $this->model('Payload')->set($id, 'pages', $newString);
     }
 
     /**
@@ -290,6 +321,6 @@ class Payload extends Controller
         $type = ($type === 'deny') ? 'blacklist' : 'whitelist';
 
         $newString = $payload[$type] . '~' . $domain;
-        $this->model('Payload')->setSingleValue($id, $type, $newString);
+        $this->model('Payload')->set($id, $type, $newString);
     }
 }

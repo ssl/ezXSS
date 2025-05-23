@@ -1,0 +1,117 @@
+<div class="wrapper">
+
+    {menu}
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Extensions</h3>
+                            <small>The extensions page allows to install and manage extensions. You can install from GitHub or create your own custom extensions.
+                            </small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            {message}
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">New extension</div>
+                        <div class="panel-body">
+                            <form method="post">
+                                <input type="hidden" name="csrf" value="{session[csrfToken]}">
+                                <div class="form-group">
+                                    <label for="method">Method</label>
+                                    <select class="form-control" id="extension-method" name="method">
+                                        <option value="github">Install from GitHub</option>
+                                        <option value="custom">Custom extension</option>
+                                    </select>
+                                </div>
+
+                                <div id="github-install-form">
+                                    <div class="form-group">
+                                        <label for="url">GitHub URL</label>
+                                        <input type="text" class="form-control" id="url" name="url" placeholder="https://github.com/ssl/ezXSS-extensions">
+                                        <small class="form-text text-muted">Enter the GitHub URL. Use a public repository URL to install all included extensions, or provide a blob/(private) Gist URL to install a single specific extension.</small>
+                                    </div>
+                                </div>
+
+                                <div id="custom-install-form" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-6" style="padding-right: 5px;">
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <label for="name">Name</label>
+                                                    <input type="text" class="form-control" id="name" name="name" value="" maxlength="35" placeholder="My first extension">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="description">Description</label>
+                                                    <input type="text" class="form-control" id="description" name="description" value="" maxlength="255" placeholder="Description of the extension">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="author">Author</label>
+                                                    <input type="text" class="form-control" id="author" name="author" value="" maxlength="50">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="version">Version</label>
+                                                    <input type="text" class="form-control" id="version" name="version" value="1.0" maxlength="10">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6" style="padding-left: 5px;">
+                                            <div class="form-group">
+                                                <label for="code">Code</label>
+                                                <small>extensions can add or modify payload functions</small>
+                                                <textarea class="form-control" id="code" name="code" rows="12" placeholder="// Your extension JavaScript code here"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn">Install</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Installed extensions</div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table id="extensions" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 8%;">Actions</th>
+                                            <th style="width: 15%;">Name</th>
+                                            <th style="width: 40%;">Description</th>
+                                            <th style="width: 15%;">Author</th>
+                                            <th style="width: 10%;">Version</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    
+                                    </tbody>
+                                </table>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="/assets/js/dataTables/jquery.dataTables.js?v={version[]}"></script>
+<script src="/assets/js/dataTables/bootstrap.dataTables.js?v={version[]}"></script>
+<script src="/assets/js/dataTables/init.js?v={version[]}"></script>

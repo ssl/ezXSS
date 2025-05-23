@@ -47,15 +47,16 @@ CREATE TABLE `payloads` (
   `collect_sessionstorage` tinyint(1) NOT NULL DEFAULT '1',
   `collect_dom` tinyint(1) NOT NULL DEFAULT '1',
   `collect_origin` tinyint(1) NOT NULL DEFAULT '1',
-  `collect_screenshot` tinyint(1) NOT NULL DEFAULT '0'
+  `collect_screenshot` tinyint(1) NOT NULL DEFAULT '0',
+  `extensions` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `payloads`
 --
 
-INSERT INTO `payloads` (`id`, `payload`, `user_id`, `pages`, `spider`, `blacklist`, `whitelist`, `customjs`, `customjs2`, `collect_uri`, `collect_ip`, `collect_referer`, `collect_user-agent`, `collect_cookies`, `collect_localstorage`, `collect_sessionstorage`, `collect_dom`, `collect_origin`, `collect_screenshot`) VALUES
-(1, 'Fallback (default)', 0, '', 0, '', '', '', '', 1, 1, 1, 1, 1, 1, 1, 1, 1, 0);
+INSERT INTO `payloads` (`id`, `payload`, `user_id`, `pages`, `spider`, `blacklist`, `whitelist`, `customjs`, `customjs2`, `collect_uri`, `collect_ip`, `collect_referer`, `collect_user-agent`, `collect_cookies`, `collect_localstorage`, `collect_sessionstorage`, `collect_dom`, `collect_origin`, `collect_screenshot`, `extensions`) VALUES
+(1, 'Fallback (default)', 0, '', 0, '', '', '', '', 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, '');
 
 -- --------------------------------------------------------
 
@@ -90,6 +91,7 @@ CREATE TABLE `reports_data` (
     `screenshot` longtext,
     `localstorage` longtext,
     `sessionstorage` longtext,
+    `extra` longtext,
     `compressed` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -113,7 +115,7 @@ INSERT INTO `settings` (`id`, `setting`, `value`) VALUES
 (1, 'filter-save', '1'),
 (2, 'filter-alert', '1'),
 (3, 'dompart', '500'),
-(4, 'timezone', 'Europe/Amsterdam'),
+(4, 'timezone', 'UTC'),
 (5, 'customjs', ''),
 (7, 'notepad', 'Welcome to ezXSS 4!'),
 (8, 'version', '4.3'),
@@ -140,7 +142,8 @@ INSERT INTO `settings` (`id`, `setting`, `value`) VALUES
 (29, 'storescreenshot', '0'),
 (30, 'compress', '0'),
 (31, 'customjs2', ''),
-(32, 'spider', '1');
+(32, 'spider', '1'),
+(33, 'extensions', '');
 
 -- --------------------------------------------------------
 

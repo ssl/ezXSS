@@ -25,30 +25,6 @@ class Payload_model extends Model
     }
 
     /**
-     * Set payload value of single item by id
-     * 
-     * @param int $id The setting id
-     * @param string $column The column name
-     * @param string $value The new value
-     * @throws Exception
-     * @return bool
-     */
-    public function setSingleValue($id, $column, $value)
-    {
-        $database = Database::openConnection();
-
-        $database->prepare("UPDATE $this->table SET `$column` = :value WHERE `id` = :id");
-        $database->bindValue(':value', $value);
-        $database->bindValue(':id', $id);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
-    }
-
-    /**
      * Get all payloads from user by user id
      * 
      * @param int $id The user id

@@ -21,6 +21,30 @@ class Model
     }
 
     /**
+     * Set value
+     * 
+     * @param int $id The id
+     * @param string $column The column
+     * @param string $value The value
+     * @throws Exception
+     * @return bool
+     */
+    public function set($id, $column, $value)
+    {
+        $database = Database::openConnection();
+
+        $database->prepare("UPDATE $this->table SET `$column` = :value WHERE `id` = :id");
+        $database->bindValue(':value', $value);
+        $database->bindValue(':id', $id);
+
+        if (!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        return true;
+    }
+
+    /**
      * Checks if row with id exists
      *
      * @param int $id The row id

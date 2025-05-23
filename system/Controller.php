@@ -45,7 +45,7 @@ class Controller
         try {
             date_default_timezone_set($this->model('Setting')->get('timezone'));
         } catch (Exception $e) {
-            date_default_timezone_set('Europe/Amsterdam');
+            date_default_timezone_set('UTC');
         }
     }
 

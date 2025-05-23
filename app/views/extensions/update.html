@@ -1,0 +1,174 @@
+<div class="wrapper">
+
+    {menu}
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Update extension</h3>
+                            <small>Check for updates and compare extension versions.</small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            {message}
+
+            {%if isCustom}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Custom extension</div>
+                        <div class="panel-body">
+                            <div class="alert alert-warning" style="margin-bottom: 0;">
+                                This is a custom extension and cannot be remotely updated. 
+                                <a href="/manage/extensions/edit/{%data id}">Edit instead.</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {%/if}
+
+            {%if updateError}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Update error</div>
+                        <div class="panel-body">
+                            <div class="alert alert-danger" style="margin-bottom: 0;">
+                                Unable to check for updates: {%data updateError}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {%/if}
+
+            {%if upToDate}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Extension up to date</div>
+                        <div class="panel-body">
+                            <div class="alert alert-success" style="margin-bottom: 0;">
+                                Extension is already latest version (version: {%data currentVersion})
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {%/if}
+
+            {%if showDiff}
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">
+                            Current version
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-condensed">
+                                <tr>
+                                    <td><strong>Name:</strong></td>
+                                    <td>{%data currentName}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Description:</strong></td>
+                                    <td>{%data currentDescription}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Version:</strong></td>
+                                    <td><b>{%data currentVersion}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Author:</strong></td>
+                                    <td>{%data currentAuthor}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">
+                            Remote version
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-condensed">
+                                <tr>
+                                    <td><strong>Name:</strong></td>
+                                    <td>{%data remoteName}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Description:</strong></td>
+                                    <td>{%data remoteDescription}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Version:</strong></td>
+                                    <td><b>{%data remoteVersion}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Author:</strong></td>
+                                    <td>{%data remoteAuthor}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Current code</div>
+                        <div class="panel-body">
+                            <textarea class="form-control" rows="20" readonly>{%data currentCode}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Remote code</div>
+                        <div class="panel-body">
+                            <textarea class="form-control" rows="20" readonly>{%data remoteCode}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">Update actions</div>
+                        <div class="panel-body">
+                            <form method="post" style="display: inline;">
+                                <input type="hidden" name="csrf" value="{session[csrfToken]}">
+                                <input type="hidden" name="action" value="accept">
+                                <button type="submit" class="btn btn-success">
+                                    Accept update
+                                </button>
+                            </form>
+                            
+                            <form method="post" style="display: inline; margin-left: 10px;">
+                                <input type="hidden" name="csrf" value="{session[csrfToken]}">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-default">
+                                    Reject update
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {%/if}
+
+        </div>
+    </section>
+</div>

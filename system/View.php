@@ -147,6 +147,19 @@ class View
     }
 
     /**
+     * Updates multiple conditions in the view template at once
+     *
+     * @param array $conditions Array of condition name => boolean value pairs
+     * @return void
+     */
+    public function renderConditions($conditions)
+    {
+        foreach ($conditions as $condition => $bool) {
+            $this->renderCondition($condition, $bool);
+        }
+    }
+
+    /**
      * Renders a checked checkbox if checked
      * 
      * @param mixed $name The checkbox name

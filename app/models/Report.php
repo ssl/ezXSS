@@ -199,10 +199,11 @@ class Report_model extends Model
      * @param string $localStorage The local storage
      * @param string $sessionStorage The session storage
      * @param string $payload The payload name
+     * @param string $extra The extra data
      * @throws Exception
      * @return string
      */
-    public function add($shareId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshot, $localStorage, $sessionStorage, $payload)
+    public function add($shareId, $cookies, $dom, $origin, $referer, $uri, $userAgent, $ip, $screenshot, $localStorage, $sessionStorage, $payload, $extra)
     {
         $database = Database::openConnection();
         $database->prepare("INSERT INTO $this->table (`shareid`, `cookies`, `origin`, `referer`, `uri`, `user-agent`, `ip`, `time`, `payload`) VALUES (:shareid, :cookies, :origin, :referer, :uri, :userAgent, :ip, :time, :payload)");
@@ -224,19 +225,21 @@ class Report_model extends Model
         // Compress data if enabled
         $compressed = false;
         if ($this->getCompressStatus() === 1) {
-            $dom = base64_encode(gzdeflate($dom, 9));
+            $dom = !empty($dom) ? base64_encode(gzdeflate($dom, 9)) : '';
             $screenshot = strlen($screenshot) === 52 || empty($screenshot) ? $screenshot : base64_encode(gzdeflate(base64_decode($screenshot), 9));
             $localStorage = $localStorage === '{}' ? '{}' : base64_encode(gzdeflate($localStorage, 9));
             $sessionStorage = $sessionStorage === '{}' ? '{}' : base64_encode(gzdeflate($sessionStorage, 9));
+            $extra = !empty($extra) ? base64_encode(gzdeflate($extra, 9)) : '';
             $compressed = true;
         }
 
-        $database->prepare("INSERT INTO $this->table_data (`reportid`, `dom`, `screenshot`, `localstorage`, `sessionstorage`, `compressed`) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage, :compressed)");
+        $database->prepare("INSERT INTO $this->table_data (`reportid`, `dom`, `screenshot`, `localstorage`, `sessionstorage`, `extra`, `compressed`) VALUES (:reportid, :dom, :screenshot, :localstorage, :sessionstorage, :extra, :compressed)");
         $database->bindValue(':reportid', $reportId);
         $database->bindValue(':dom', $dom);
         $database->bindValue(':screenshot', $screenshot);
         $database->bindValue(':localstorage', $localStorage);
         $database->bindValue(':sessionstorage', $sessionStorage);
+        $database->bindValue(':extra', $extra);
         $database->bindValue('compressed', $compressed === true ? 1 : 0);
         $database->execute();
 
@@ -279,30 +282,6 @@ class Report_model extends Model
         }
 
         return false;
-    }
-
-    /**
-     * Set report value of single item by id
-     * 
-     * @param int $id The report id
-     * @param string $column The column name
-     * @param string $value The new value
-     * @throws Exception
-     * @return bool
-     */
-    public function setSingleValue($id, $column, $value)
-    {
-        $database = Database::openConnection();
-
-        $database->prepare("UPDATE $this->table SET `$column` = :value WHERE `id` = :id");
-        $database->bindValue(':value', $value);
-        $database->bindValue(':id', $id);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
     }
 
     /**
@@ -408,7 +387,7 @@ class Report_model extends Model
     private function getReportData($id)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT `dom`,`screenshot`,`localstorage`,`sessionstorage`,`compressed` FROM $this->table_data WHERE `reportid` = :reportid LIMIT 1");
+        $database->prepare("SELECT `dom`,`screenshot`,`localstorage`,`sessionstorage`,`extra`,`compressed` FROM $this->table_data WHERE `reportid` = :reportid LIMIT 1");
         $database->bindValue(':reportid', $id);
         $database->execute();
 
@@ -418,12 +397,13 @@ class Report_model extends Model
 
         // Decompress if compressed
         if($report_data['compressed'] ?? 0 == 1) {
-            $report_data['dom'] = gzinflate(base64_decode($report_data['dom']));
+            $report_data['dom'] = !empty($report_data['dom']) ? gzinflate(base64_decode($report_data['dom'])) : '';
             $report_data['screenshot'] = strlen($report_data['screenshot']) === 52 || empty($report_data['screenshot']) ? $report_data['screenshot'] : base64_encode(gzinflate(base64_decode($report_data['screenshot']))) ?? '';
             $report_data['localstorage'] = $report_data['localstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['localstorage'])) ?? '';
             $report_data['sessionstorage'] = $report_data['sessionstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['sessionstorage'])) ?? '';
+            $report_data['extra'] = !empty($report_data['extra']) ? gzinflate(base64_decode($report_data['extra'])) : '';
         }
 
-        return $report_data ?? ['dom' => '', 'screenshot' => '', 'localstorage' => '', 'sessionstorage' => ''];
+        return $report_data ?? ['dom' => '', 'screenshot' => '', 'localstorage' => '', 'sessionstorage' => '', 'extra' => ''];
     }
 }

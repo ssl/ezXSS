@@ -147,6 +147,21 @@ class Settings extends Controller
         $this->view->renderData('customjs2', $settings->get('customjs2'));
         $this->view->renderData('callbackURL', $settings->get('callback-url'));
 
+        // Load and render extensions
+        $allExtensions = $this->model('Extension')->getAll();
+        $selectedExtensionIds = !empty($settings->get('extensions')) ? explode(',', $settings->get('extensions')) : [];
+        
+        $extensions = [];
+        foreach ($allExtensions as $extension) {
+            $extensions[] = [
+                'id' => $extension['id'],
+                'name' => $extension['name'],
+                'description' => substr($extension['description'], 0, 50) . (strlen($extension['description']) > 50 ? '...' : ''),
+                'checked' => in_array($extension['id'], $selectedExtensionIds) ? 'checked' : ''
+            ];
+        }
+        $this->view->renderDataset('extensions', $extensions);
+
         return $this->showContent();
     }
 
@@ -209,6 +224,21 @@ class Settings extends Controller
 
         $this->model('Setting')->set('customjs', _POST('customjs'));
         $this->model('Setting')->set('customjs2', _POST('customjs2'));
+
+        $extensionsInput = _POST('extensions');
+        $selectedExtensions = !empty($extensionsInput) ? explode(',', $extensionsInput) : [];
+        
+        if (!empty($selectedExtensions)) {
+            $validExtensionIds = array_column($this->model('Extension')->getAll(), 'id');
+            foreach ($selectedExtensions as $extensionId) {
+                if (!in_array($extensionId, $validExtensionIds)) {
+                    throw new Exception('Invalid extension ID');
+                }
+            }
+        }
+        
+        $extensionsValue = empty($selectedExtensions) ? '' : implode(',', $selectedExtensions);
+        $this->model('Setting')->set('extensions', $extensionsValue);
 
         $persistent = _POST('persistenton');
         $this->model('Setting')->set('persistent', $persistent !== null ? '1' : '0');

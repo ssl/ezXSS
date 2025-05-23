@@ -308,6 +308,16 @@ $(document).ready(function () {
         }, 10000)
     }
 
+    $('#extension-method').on('change', function() {
+        if ($(this).val() === 'github') {
+            $('#github-install-form').show();
+            $('#custom-install-form').hide();
+        } else {
+            $('#github-install-form').hide();
+            $('#custom-install-form').show();
+        }
+    });
+
     $('.render').click(function () {
         const byteCharacters = unescape(encodeURIComponent($('#dom').val()))
         const byteArrays = []
@@ -410,6 +420,73 @@ $(document).ready(function () {
             return false
         }
     })
+
+    initExtensionsDropdown();
+
+    // Enhanced copy button functionality for report table
+    $(document).on('click', '.copy-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const targetSelector = $(this).data('target');
+        const targetElement = $(targetSelector);
+        
+        if (targetElement.length > 0) {
+            const textToCopy = targetElement.val() || targetElement.text();
+            
+            // Modern clipboard API
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showCopyFeedback($(this), 'Copied!');
+                }).catch(() => {
+                    // Fallback for modern clipboard API failure
+                    fallbackCopy(textToCopy, $(this));
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopy(textToCopy, $(this));
+            }
+        }
+    });
+    
+    // Function to show copy feedback
+    function showCopyFeedback(button, message) {
+        const originalText = button.html();
+        const originalColor = button.css('background-color');
+        
+        button.html(message);
+        button.css('background-color', '#2ecc71');
+        
+        setTimeout(() => {
+            button.html(originalText);
+            button.css('background-color', originalColor);
+        }, 1000);
+    }
+    
+    // Fallback copy function for older browsers
+    function fallbackCopy(text, button) {
+        const tempInput = document.createElement('textarea');
+        tempInput.value = text;
+        tempInput.style.position = 'fixed';
+        tempInput.style.opacity = '0';
+        tempInput.style.left = '-9999px';
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        tempInput.setSelectionRange(0, 99999);
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showCopyFeedback(button, 'Copied!');
+            } else {
+                showCopyFeedback(button, 'Failed');
+            }
+        } catch (err) {
+            showCopyFeedback(button, 'Error');
+        } finally {
+            document.body.removeChild(tempInput);
+        }
+    }
 })
 
 function shortboost(str) {
@@ -432,4 +509,131 @@ function decodeHTMLEntities(text) {
     const textarea = document.createElement('textarea');
     textarea.innerHTML = text;
     return textarea.value;
+}
+
+function initExtensionsDropdown() {
+    const dropdown = $('.extensions-dropdown');
+    if (dropdown.length === 0) return;
+
+    const display = dropdown.find('.extensions-display');
+    const dropdownList = dropdown.find('.extensions-dropdown-list');
+    const hiddenInput = dropdown.find('#extensions-hidden');
+    const tagsContainer = dropdown.find('.extensions-tags');
+    const dropdownBtn = dropdown.find('.extensions-dropdown-btn');
+    
+    let selectedExtensions = [];
+    let isOpen = false;
+
+    function initializeFromCheckboxes() {
+        dropdown.find('input[type="checkbox"]:checked').each(function() {
+            const id = $(this).val();
+            const name = $(this).data('name');
+            const description = $(this).data('description');
+            
+            selectedExtensions.push({
+                id: id,
+                name: name,
+                description: description
+            });
+        });
+        updateDisplay();
+        updateHiddenInput();
+    }
+
+    function updateDisplay() {
+        tagsContainer.empty();
+        
+        if (selectedExtensions.length === 0) {
+            dropdownBtn.removeClass('has-selections').addClass('empty');
+            dropdownBtn.find('.dropdown-text').text('Select extensions...');
+        } else {
+            dropdownBtn.addClass('has-selections').removeClass('empty');
+            
+            selectedExtensions.forEach(function(ext) {
+                const tag = $('<div class="extension-tag"></div>');
+                const nameSpan = $('<span></span>').text(ext.name);
+                const removeSpan = $('<span class="extension-tag-remove">×</span>')
+                    .attr('data-id', ext.id)
+                    .on('click', function(e) {
+                        e.stopPropagation();
+                        removeExtension(ext.id);
+                    });
+                
+                tag.append(nameSpan).append(removeSpan);
+                tagsContainer.append(tag);
+            });
+        }
+    }
+
+    function updateHiddenInput() {
+        const ids = selectedExtensions.map(ext => ext.id);
+        hiddenInput.val(ids.join(','));
+    }
+
+    function toggleDropdown() {
+        isOpen = !isOpen;
+        if (isOpen) {
+            display.addClass('active');
+            dropdownList.show();
+        } else {
+            display.removeClass('active');
+            dropdownList.hide();
+        }
+    }
+
+    function closeDropdown() {
+        if (isOpen) {
+            isOpen = false;
+            display.removeClass('active');
+            dropdownList.hide();
+        }
+    }
+
+    function addExtension(id, name, description) {
+        if (!selectedExtensions.find(ext => ext.id === id)) {
+            selectedExtensions.push({ id, name, description });
+            updateDisplay();
+            updateHiddenInput();
+        }
+    }
+
+    function removeExtension(id) {
+        selectedExtensions = selectedExtensions.filter(ext => ext.id !== id);
+        updateDisplay();
+        updateHiddenInput();
+        
+        dropdown.find(`input[value="${id}"]`).prop('checked', false);
+    }
+
+    display.on('click', function(e) {
+        if ($(e.target).closest('.extension-tag').length === 0) {
+            e.stopPropagation();
+            toggleDropdown();
+        }
+    });
+
+    dropdown.on('change', 'input[type="checkbox"]', function() {
+        const checkbox = $(this);
+        const id = checkbox.val();
+        const name = checkbox.data('name');
+        const description = checkbox.data('description');
+        
+        if (checkbox.is(':checked')) {
+            addExtension(id, name, description);
+        } else {
+            removeExtension(id);
+        }
+    });
+
+    $(document).on('click', function(e) {
+        if (!dropdown.is(e.target) && dropdown.has(e.target).length === 0) {
+            closeDropdown();
+        }
+    });
+
+    dropdownList.on('click', function(e) {
+        e.stopPropagation();
+    });
+
+    initializeFromCheckboxes();
 }
