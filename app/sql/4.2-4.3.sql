@@ -16,3 +16,21 @@ ALTER TABLE `payloads` ADD `spider` INT NOT NULL DEFAULT '0' AFTER `pages`;
 ALTER TABLE `payloads` ADD `extensions` VARCHAR(255) DEFAULT NULL AFTER `collect_screenshot`;
 
 ALTER TABLE `reports_data` ADD `extra` LONGTEXT NULL DEFAULT NULL AFTER `sessionstorage`;
+
+
+CREATE TABLE `extensions` (
+  `id` int(11) NOT NULL,
+  `name` varchar(35) NOT NULL,
+  `description` varchar(250) NOT NULL,
+  `version` varchar(15) NOT NULL,
+  `author` varchar(50) NOT NULL,
+  `source` varchar(250) NOT NULL,
+  `code` mediumtext NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE `extensions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `source` (`source`);
+
+ALTER TABLE `extensions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;

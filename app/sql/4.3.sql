@@ -230,6 +230,22 @@ CREATE TABLE `console` (
   `executed` decimal(10,0) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `extensions`
+--
+
+CREATE TABLE `extensions` (
+  `id` int(11) NOT NULL,
+  `name` varchar(35) NOT NULL,
+  `description` varchar(250) NOT NULL,
+  `version` varchar(15) NOT NULL,
+  `author` varchar(50) NOT NULL,
+  `source` varchar(250) NOT NULL,
+  `code` mediumtext NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -295,6 +311,13 @@ ALTER TABLE `console`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `extensions`
+--
+ALTER TABLE `extensions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `source` (`source`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -350,6 +373,12 @@ COMMIT;
 -- AUTO_INCREMENT for table `console`
 --
 ALTER TABLE `console`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+COMMIT;
+--
+-- AUTO_INCREMENT for table `extensions`
+--
+ALTER TABLE `extensions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 COMMIT;
 
