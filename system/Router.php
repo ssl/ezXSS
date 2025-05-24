@@ -27,13 +27,20 @@ class Router
             $controller = empty($controller) ? 'dashboard' : $controller;
             $method = isset($parts[3]) ? $parts[3] : 'index';
             $method = empty($method) ? 'index' : $method;
+            $args = isset($parts[4]) ? [$parts[4]] : [];
 
             try {
                 // Check for nasty chars
                 if (
                     preg_match('/[^A-Za-z0-9]/', $controller) ||
-                    preg_match('/[^A-Za-z0-9]/', $method)
+                    preg_match('/[^A-Za-z0-9]/', $method) ||
+                    preg_match('/[^A-Za-z0-9._-]/', $args[0] ?? '')
                 ) {
+                    throw new Exception('403');
+                }
+
+                // Check for trigger controller
+                if ($controller === 'Trigger') {
                     throw new Exception('403');
                 }
 
@@ -65,10 +72,9 @@ class Router
             } catch (Exception $e) {
                 redirect('/manage/dashboard');
             }
-            $args = isset($parts[4]) ? [$parts[4]] : [];
         } else {
-            // Sends request to payloads to create a js payload or callback
-            $controller = 'Payloads';
+            // Sends request to trigger to create a js payload or callback
+            $controller = 'Trigger';
             $args = isset($parts[1]) && !empty($parts[1]) ? [$parts[1]] : [];
             $method = $args === [] ? 'index' : 'custom';
             $method = $args === ['callback'] ? 'callback' : $method;

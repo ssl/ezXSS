@@ -51,7 +51,7 @@ class Install extends Controller
                 // Create and login user
                 $this->model('User')->create($username, $password, 7);
                 $user = $this->model('User')->login($username, $password);
-                $this->session->createSession($user);
+                $this->session->create($user);
                 redirect('dashboard/index');
             } catch (Exception $e) {
                 $this->view->renderMessage($e->getMessage());

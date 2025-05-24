@@ -16,7 +16,6 @@ class Users extends Controller
     {
         parent::__construct();
 
-        // Validate if user is admin
         $this->isAdminOrExit();
     }
 
@@ -97,7 +96,7 @@ class Users extends Controller
                     if (!isset($this->ranks[$rank])) {
                         throw new Exception('Invalid rank');
                     }
-                    $userModel->setRank($user['id'], $rank);
+                    $userModel->set($user['id'], 'rank', $rank);
                     $this->log("Edited user {$username}");
                     if ($rank == 0) {
                         $this->log("Banned user {$username}");
@@ -141,11 +140,11 @@ class Users extends Controller
     public function delete($id)
     {
         $this->view->setTitle('Delete User');
-        $this->view->renderTemplate('users/delete');
+        $this->view->renderTemplate('system/delete');
 
         // Retrieve user by id
         $user = $this->user($id);
-        $this->view->renderData('username', $user['username']);
+        $this->view->renderData('name', $user['username']);
 
         if (isPOST()) {
             $this->validateCsrfToken();
@@ -172,13 +171,7 @@ class Users extends Controller
     {
         $this->isAPIRequest();
 
-        if (!$this->isAdmin()) {
-            return jsonResponse('error', 'You dont have permissions to this page');
-        }
-
-        $ranks = [0 => 'Banned', 1 => 'User', 7 => 'Admin'];
-
-        $users = $this->model('User')->getAllUsers();
+        $users = $this->model('User')->getAll();
         $allPayloads = $this->model('Payload')->getAll();
         
         // Create a map of user IDs to their payloads
@@ -192,7 +185,7 @@ class Users extends Controller
 
         foreach ($users as &$user) {
             // Translate rank id to readable name
-            $user['rank'] = $ranks[$user['rank']];
+            $user['rank'] = $this->ranks[$user['rank']] ?? '?';
 
             unset($user['password']);
             unset($user['secret']);

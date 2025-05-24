@@ -10,6 +10,9 @@ class Session_model extends Model
     public $table = 'sessions';
     public $table_data = 'sessions_data';
 
+    private $table_columns = ['clientid', 'cookies', 'origin', 'referer', 'payload', 'uri', 'user-agent', 'ip', 'time'];
+    private $table_data_columns = ['sessionid', 'dom', 'localstorage', 'sessionstorage', 'console', 'compressed'];
+
     /**
      * Get all sessions
      * 
@@ -24,6 +27,42 @@ class Session_model extends Model
         $data = $database->fetchAll();
 
         return $data;
+    }
+
+    /**
+     * Set session value of single item by id
+     * 
+     * @param int $id The session id
+     * @param string $column The column name
+     * @param string $value The new value
+     * @throws Exception
+     * @return bool
+     */
+    public function set($id, $column, $value)
+    {
+        if (!in_array($column, $this->table_data_columns) && !in_array($column, $this->table_columns)) {
+            throw new Exception('Invalid column name');
+        }
+
+        $table = in_array($column, $this->table_data_columns) ? $this->table_data : $this->table;
+        $where = $table === $this->table_data ? 'sessionid' : 'id';
+        
+        if ($table === $this->table_data) {
+            if ($this->getCompressStatus() === 1) {
+                $value = empty($value) ? $value : base64_encode(gzdeflate($value, 9));
+            }
+        }
+
+        $database = Database::openConnection();
+        $database->prepare("UPDATE $table SET `$column` = :value WHERE `$where` = :id");
+        $database->bindValue(':value', $value);
+        $database->bindValue(':id', $id);
+
+        if (!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        return true;
     }
 
     /**
@@ -242,33 +281,6 @@ class Session_model extends Model
         $database->execute();
 
         return $sessionId;
-    }
-
-    /**
-     * Set session data value of single item by id
-     * 
-     * @param int $id The session id
-     * @param string $column The column name
-     * @param string $value The new value
-     * @throws Exception
-     * @return bool
-     */
-    public function setSingleDataValue($id, $column, $value)
-    {
-        if ($this->getCompressStatus() === 1) {
-            $value = empty($value) ? $value : base64_encode(gzdeflate($value, 9));
-        }
-
-        $database = Database::openConnection();
-        $database->prepare("UPDATE $this->table_data SET `$column` = :value WHERE `sessionid` = :sessionid");
-        $database->bindValue(':value', $value);
-        $database->bindValue(':sessionid', $id);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
     }
 
     /**

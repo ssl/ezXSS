@@ -141,6 +141,8 @@ class Update extends Controller
      */
     public function migrateScreenshots()
     {
+        $this->isAdminOrExit();
+        
         $screenshots = glob(__DIR__ . '/../../assets/img/report-*.png');
 
         if ($screenshots === []) {
@@ -154,7 +156,7 @@ class Update extends Controller
                 $screenshotData = base64_encode(file_get_contents($screenshot));
 
                 $reportId = $this->model('Report')->getIdByScreenshot($screenshotName);
-                $this->model('Report')->setSingleDataValue($reportId, 'screenshot', $screenshotData);
+                $this->model('Report')->set($reportId, 'screenshot', $screenshotData);
 
                 unlink($screenshot);
             } catch (Exception $e) {
@@ -225,7 +227,8 @@ class Update extends Controller
      * 
      * @return int
      */
-    private function getTablesSize() {
+    private function getTablesSize() 
+    {
         $database = Database::openConnection();
         $database->prepare('SELECT SUM(data_length + index_length) AS total_size FROM information_schema.tables WHERE table_schema = "' . DB_NAME . '" AND table_name IN ("reports", "sessions")');
         $database->execute();

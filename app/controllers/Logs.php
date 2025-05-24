@@ -3,14 +3,22 @@
 class Logs extends Controller
 {
     /**
+     * Constructor that always validates if user is admin or not
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->isAdminOrExit();
+    }
+
+    /**
      * Renders the logs index and returns the content.
      *
      * @return string
      */
     public function index()
     {
-        $this->isAdminOrExit();
-
         $this->view->setTitle('Logs');
         $this->view->renderTemplate('logs/index');
 
@@ -26,12 +34,8 @@ class Logs extends Controller
     {
         $this->isAPIRequest();
 
-        if (!$this->isAdmin()) {
-            return jsonResponse('error', 'You dont have permissions to this page');
-        }
-
         $logs = $this->model('Log')->getAll();
-        $allUsers = $this->model('User')->getAllUsers();
+        $allUsers = $this->model('User')->getAll();
         
         // Create a map of user IDs to their usernames
         $userMap = [];
@@ -61,10 +65,6 @@ class Logs extends Controller
     public function users()
     {
         $this->isAPIRequest();
-
-        if (!$this->isAdmin()) {
-            return jsonResponse('error', 'You dont have permissions to this page');
-        }
 
         $id = _JSON('id');
 

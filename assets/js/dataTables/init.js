@@ -143,10 +143,10 @@ $(document).ready(function() {
                     return `
                         <div class="action-column">
                             <label class="reports-checkbox-label" for="chk_${row.id}">
-                                <input class="chkbox" type="checkbox" name="selected" value="${row.id}" id="chk_${row.id}" url="/manage/persistent/session/${esc(data)}~${esc(row.origin)}">
+                                <input class="chkbox" type="checkbox" name="selected" value="${row.id}" id="chk_${row.id}" url="/manage/persistent/session/${esc(row.link)}">
                                 <span class="reports-checkbox-custom rectangular" style="top:7px"></span>
                             </label>
-                            <a href="/manage/persistent/session/${esc(data)}~${esc(row.origin)}">${esc(data)}</a>
+                            <a href="/manage/persistent/session/${esc(row.link)}">${esc(data)}</a>
                         </div>`;
                 }
             },
@@ -175,7 +175,7 @@ $(document).ready(function() {
         }
     });
 
-    if (location.pathname.split('/')[4] === "persistent") {
+    if (location.pathname.split('/')[2] === "persistent") {
         let elapsedTime = 0;
         setInterval(function() {
             elapsedTime++;
@@ -200,13 +200,7 @@ $(document).ready(function() {
         columns: safeColumns([
             { data: 'user' },
             { data: 'description', className: 'truncate' },
-            { 
-                data: 'ip',
-                className: 'truncate',
-                render: function(data) {
-                    return esc(data) && data.length > 15 ? esc(data.substring(0, 15)) + '..' : esc(data);
-                }
-            },
+            { data: 'ip', className: 'truncate' },
             { 
                 data: 'date',
                 render: function(data, type, row) {

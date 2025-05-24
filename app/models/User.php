@@ -107,121 +107,6 @@ class User_model extends Model
     }
 
     /**
-     * Update rank
-     * 
-     * @param int $id The user id
-     * @param int $rank The new rank
-     * @throws Exception
-     * @return bool
-     */
-    public function setRank($id, $rank)
-    {
-        $database = Database::openConnection();
-
-        $database->prepare("UPDATE $this->table SET `rank` = :rank WHERE `id` = :id");
-        $database->bindValue(':id', $id);
-        $database->bindValue(':rank', $rank);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
-    }
-
-    /**
-     * Updates secret
-     * 
-     * @param int $id The user id
-     * @param string $secret The new secret
-     * @throws Exception
-     * @return bool
-     */
-    public function setSecret($id, $secret)
-    {
-        $database = Database::openConnection();
-
-        $database->prepare("UPDATE $this->table SET `secret` = :secret WHERE `id` = :id");
-        $database->bindValue(':id', $id);
-        $database->bindValue(':secret', $secret);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
-    }
-
-    /**
-     * Updates row 1
-     * 
-     * @param int $id The user id
-     * @param string $value The new value
-     * @throws Exception
-     * @return bool
-     */
-    public function setRow1($id, $value)
-    {
-        $database = Database::openConnection();
-
-        $database->prepare("UPDATE $this->table SET `row1` = :value WHERE `id` = :id");
-        $database->bindValue(':id', $id);
-        $database->bindValue(':value', $value);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
-    }
-
-    /**
-     * Updates row 2
-     * 
-     * @param int $id The user id
-     * @param string $value The new value
-     * @throws Exception
-     * @return bool
-     */
-    public function setRow2($id, $value)
-    {
-        $database = Database::openConnection();
-
-        $database->prepare("UPDATE $this->table SET `row2` = :value WHERE `id` = :id");
-        $database->bindValue(':id', $id);
-        $database->bindValue(':value', $value);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
-    }
-
-    /**
-     * Updates notepad
-     * 
-     * @param int $id The user id
-     * @param string $value The new value
-     * @throws Exception
-     * @return bool
-     */
-    public function setNotepad($id, $value)
-    {
-        $database = Database::openConnection();
-
-        $database->prepare("UPDATE $this->table SET `notepad` = :value WHERE `id` = :id");
-        $database->bindValue(':id', $id);
-        $database->bindValue(':value', $value);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
-    }
-
-    /**
      * Creates an new user
      *
      * @param string $username The username
@@ -276,7 +161,7 @@ class User_model extends Model
      *
      * @return array
      */
-    public function getAllUsers()
+    public function getAll()
     {
         $database = Database::openConnection();
         $database->getAll($this->table);

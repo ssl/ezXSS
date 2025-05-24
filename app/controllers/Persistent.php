@@ -51,19 +51,17 @@ class Persistent extends Controller
     /**
      * Renders the session view and returns the content.
      * 
-     * @param string $clientId The client id
+     * @param string $link The client link
      * @throws Exception
      * @return string
      */
-    public function session($clientId)
+    public function session($link)
     {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Online');
         $this->view->renderTemplate('persistent/session');
 
-        $clientId = explode('~', $clientId ?? '');
-        $origin = $clientId[1] ?? '';
-        $clientId = $clientId[0] ?? '';
+        [$clientId, $origin] = $this->decodelink($link);
 
         if (!$this->hasSessionPermissions($clientId, $origin)) {
             throw new Exception('You dont have permissions to this session');
@@ -125,6 +123,7 @@ class Persistent extends Controller
         }
 
         // Render all rows
+        $this->view->renderData('link', base64url_encode($clientId . '~' . $origin));
         $this->view->renderData('time', date('F j, Y, g:i a', $session['time']));
         $this->view->renderData('requests', $this->model('Session')->getRequestCount($clientId));
 
@@ -144,19 +143,17 @@ class Persistent extends Controller
     /**
      * Renders all the requests of a session.
      * 
-     * @param string $clientId The client id
+     * @param string $link The client link
      * @throws Exception
      * @return string
      */
-    public function requests($clientId)
+    public function requests($link)
     {
         $this->isLoggedInOrExit();
         $this->view->setTitle('Online');
         $this->view->renderTemplate('persistent/requests');
 
-        $clientId = explode('~', $clientId ?? '');
-        $origin = $clientId[1] ?? '';
-        $clientId = $clientId[0] ?? '';
+        [$clientId, $origin] = $this->decodelink($link);
 
         if (!$this->hasSessionPermissions($clientId, $origin)) {
             throw new Exception('You dont have permissions to this session');
@@ -168,6 +165,7 @@ class Persistent extends Controller
             $requests[$key]['browser'] = parseUserAgent($requests[$key]['user-agent']);
             $requests[$key]['last'] = parseTimestamp($requests[$key]['time'], 'long');
             $requests[$key]['shorturi'] = substr($requests[$key]['uri'], 0, 50);
+            $requests[$key]['link'] = base64url_encode($requests[$key]['clientid'] . '~' . $requests[$key]['origin']);
         }
 
         $this->view->renderCondition('hasRequests', count($requests) > 0);
@@ -202,7 +200,7 @@ class Persistent extends Controller
         foreach (array_slice($this->rows, 0, -2) as $value) {
             $this->view->renderData($value, $request[$value]);
         }
-
+        
         return $this->showContent();
     }
 
@@ -257,6 +255,7 @@ class Persistent extends Controller
             $sessions[$key]['browser'] = parseUserAgent($sessions[$key]['user-agent']);
             $sessions[$key]['last'] = parseTimestamp($sessions[$key]['time'], 'long');
             $sessions[$key]['shorturi'] = substr($sessions[$key]['uri'], 0, 50);
+            $sessions[$key]['link'] = base64url_encode($sessions[$key]['clientid'] . '~' . $sessions[$key]['origin']);
         }
 
         return jsonResponse('data', $sessions);
@@ -297,5 +296,28 @@ class Persistent extends Controller
         }
 
         return false;
+    }
+
+    /**
+     * Decodes the client path
+     * 
+     * @param string $link The client path
+     * @throws Exception
+     * @return array
+     */
+    private function decodelink($link)
+    {
+        try {
+            $link = base64url_decode($link);
+            $link = explode('~', $link);
+
+            if (count($link) !== 2) {
+                throw new Exception('Not found');
+            }
+
+            return [$link[0], $link[1]];
+        } catch (Exception $e) {
+            throw new Exception('Not found');
+        }
     }
 }

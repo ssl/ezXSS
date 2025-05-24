@@ -281,7 +281,7 @@ $(document).ready(function () {
 
     $('.persistent-delete-selected').click(function () {
         $.each($("input[name='selected']:checked"), function () {
-            const parent = $(this).parent().parent().parent()
+            const parent = $(this).parent().parent().parent().parent()
             parent.fadeOut('slow', function () { })
             const url = $(this).attr('url')
             request(url, { delete: '' }).then(function (r) { 
@@ -421,9 +421,20 @@ $(document).ready(function () {
         }
     })
 
+    if (document.getElementById("qrcode")) {
+        var secret = document.getElementById("secret").value;
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            "text": "otpauth://totp/ezXSS:ezXSS?secret=" + secret + "&issuer=ezXSS",
+            "width": 300,
+            "height": 300,
+            "colorDark": "#ffffff",
+            "colorLight": "#2c3256",
+            "correctLevel": QRCode.CorrectLevel.H
+        });
+    }
+
     initExtensionsDropdown();
 
-    // Enhanced copy button functionality for report table
     $(document).on('click', '.copy-btn', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -434,22 +445,18 @@ $(document).ready(function () {
         if (targetElement.length > 0) {
             const textToCopy = targetElement.val() || targetElement.text();
             
-            // Modern clipboard API
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
                     showCopyFeedback($(this), 'Copied!');
                 }).catch(() => {
-                    // Fallback for modern clipboard API failure
                     fallbackCopy(textToCopy, $(this));
                 });
             } else {
-                // Fallback for older browsers
                 fallbackCopy(textToCopy, $(this));
             }
         }
     });
     
-    // Function to show copy feedback
     function showCopyFeedback(button, message) {
         const originalText = button.html();
         const originalColor = button.css('background-color');

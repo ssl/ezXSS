@@ -39,7 +39,7 @@ class Account extends Controller
 
                 // Check if posted data is logout
                 if (_POST('logout') !== null) {
-                    $this->session->deleteSession();
+                    $this->session->destroy();
                     redirect('/manage/account/login');
                 }
             } catch (Exception $e) {
@@ -99,10 +99,10 @@ class Account extends Controller
                 $user = $this->model('User')->login($username, $password);
 
                 if (strlen($user['secret']) === 16) {
-                    $this->session->createTempSession($user);
+                    $this->session->createTemp($user);
                     redirect('/manage/account/mfa');
                 } else {
-                    $this->session->createSession($user);
+                    $this->session->create($user);
                     $this->log('Succesfully logged in');
 
                     if ($this->session->data('redirect') !== '') {
@@ -146,7 +146,7 @@ class Account extends Controller
                     throw new Exception('Code is incorrect');
                 }
 
-                $this->session->createSession($user);
+                $this->session->create($user);
                 $this->log('Succesfully logged in with MFA');
 
                 if ($this->session->data('redirect') !== '') {
@@ -206,7 +206,7 @@ class Account extends Controller
                 $user = $this->model('User')->create($username, $password, 1);
                 $user = $this->model('User')->login($username, $password);
                 $this->model('Payload')->add($user['id'], "{$domain}." . host);
-                $this->session->createSession($user);
+                $this->session->create($user);
                 $this->log('Succesfully created account');
 
                 redirect('manage/dashboard/index');
@@ -342,7 +342,7 @@ class Account extends Controller
             $secret = '';
         }
         $this->log('Updated MFA settings');
-        $this->model('User')->setSecret($user['id'], $secret);
+        $this->model('User')->set($user['id'], 'secret', $secret);
     }
 
     /**

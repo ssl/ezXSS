@@ -24,6 +24,18 @@ class Extension_model extends Model
         return $data;
     }
 
+    /**
+     * Update extension
+     * 
+     * @param int $id The extension id
+     * @param string $name The extension name
+     * @param string $description The extension description
+     * @param string $version The extension version
+     * @param string $author The extension author
+     * @param string $code The extension code
+     * @throws Exception
+     * @return bool
+     */
     public function update($id, $name, $description, $version, $author, $code)
     {
         $this->validate($name, $description, $version, $author);
@@ -44,6 +56,18 @@ class Extension_model extends Model
         return true;
     }
 
+    /**
+     * Add extension
+     * 
+     * @param string $name The extension name
+     * @param string $description The extension description
+     * @param string $version The extension version
+     * @param string $author The extension author
+     * @param string $source The extension source
+     * @param string $code The extension code
+     * @throws Exception
+     * @return bool
+     */
     public function add($name, $description, $version, $author, $source, $code)
     {
         $this->validate($name, $description, $version, $author);
@@ -64,6 +88,13 @@ class Extension_model extends Model
         return true;
     }
 
+    /**
+     * Get extension by source
+     * 
+     * @param string $source The extension source
+     * @throws Exception
+     * @return array
+     */
     public function getBySource($source)
     {
         $database = Database::openConnection();
@@ -77,6 +108,16 @@ class Extension_model extends Model
         return $database->fetch();
     }
 
+    /**
+     * Validate extension
+     * 
+     * @param string $name The extension name
+     * @param string $description The extension description
+     * @param string $version The extension version
+     * @param string $author The extension author
+     * @throws Exception
+     * @return void
+     */
     private function validate($name, $description, $version, $author)
     {
         if(strlen($name) < 2 || strlen($name) > 35) {

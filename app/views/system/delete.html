@@ -8,7 +8,7 @@
                     </div>
                     <div class="panel-body text-center">
                         <div>{message}</div>
-                        <p>Are you sure you want to delete extension <b>{%data name}</b>?</p>
+                        <p>Are you sure you want to delete <b>{%data name}</b>?</p>
                         <form class="form" method="post">
                             <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                             <button type="submit" class="btn btn-block">Delete</button>

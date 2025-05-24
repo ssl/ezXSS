@@ -10,6 +10,9 @@ class Report_model extends Model
     public $table = 'reports';
     public $table_data = 'reports_data';
 
+    private $table_columns = ['shareid', 'cookies', 'origin', 'referer', 'payload', 'uri', 'user-agent', 'ip', 'time', 'archive'];
+    private $table_data_columns = ['reportid', 'dom', 'screenshot', 'localstorage', 'sessionstorage', 'extra', 'compressed'];
+
     /**
      * Get all reports
      * 
@@ -25,6 +28,42 @@ class Report_model extends Model
         $data = $database->fetchAll();
 
         return $data;
+    }
+
+    /**
+     * Set report value of single item by id
+     * 
+     * @param int $id The report id
+     * @param string $column The column name
+     * @param string $value The new value
+     * @throws Exception
+     * @return bool
+     */
+    public function set($id, $column, $value)
+    {
+        if (!in_array($column, $this->table_data_columns) && !in_array($column, $this->table_columns)) {
+            throw new Exception('Invalid column name');
+        }
+
+        $table = in_array($column, $this->table_data_columns) ? $this->table_data : $this->table;
+        $where = in_array($column, $this->table_data_columns) ? 'reportid' : 'id';
+        
+        if ($table === $this->table_data) {
+            if ($this->getCompressStatus() === 1) {
+                $value = $column === 'screenshot' ? base64_encode(gzdeflate(base64_decode($value), 9)) : base64_encode(gzdeflate($value, 9));
+            }
+        }
+
+        $database = Database::openConnection();
+        $database->prepare("UPDATE $table SET `$column` = :value WHERE `$where` = :id");
+        $database->bindValue(':value', $value);
+        $database->bindValue(':id', $id);
+
+        if (!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        return true;
     }
 
     /**
@@ -282,33 +321,6 @@ class Report_model extends Model
         }
 
         return false;
-    }
-
-    /**
-     * Set report data value of single item by id
-     * 
-     * @param int $id The report id
-     * @param string $column The column name
-     * @param string $value The new value
-     * @throws Exception
-     * @return bool
-     */
-    public function setSingleDataValue($id, $column, $value)
-    {
-        if ($this->getCompressStatus() === 1) {
-            $value = $column === 'screenshot' ? base64_encode(gzdeflate(base64_decode($value), 9)) : base64_encode(gzdeflate($value, 9));
-        }
-
-        $database = Database::openConnection();
-        $database->prepare("UPDATE $this->table_data SET `$column` = :value WHERE `reportid` = :reportid");
-        $database->bindValue(':value', $value);
-        $database->bindValue(':reportid', $id);
-
-        if (!$database->execute()) {
-            throw new Exception('Something unexpected went wrong');
-        }
-
-        return true;
     }
 
     /**

@@ -24,7 +24,7 @@ class Dashboard extends Controller
         // Set and render notepad value
         if (isPOST()) {
             $this->validateCsrfToken();
-            $this->model('User')->setNotepad($user['id'], _POST('notepad'));
+            $this->model('User')->set($user['id'], 'notepad', _POST('notepad'));
             $user['notepad'] = _POST('notepad');
         }
         $this->view->renderData('notepad', $user['notepad']);
@@ -103,9 +103,9 @@ class Dashboard extends Controller
 
         // Save row/id combination of user
         if ($row === 1) {
-            $this->model('User')->setRow1($this->session->data('id'), $id);
+            $this->model('User')->set($this->session->data('id'), 'row1', $id);
         } else {
-            $this->model('User')->setRow2($this->session->data('id'), $id);
+            $this->model('User')->set($this->session->data('id'), 'row2', $id);
         }
 
         if ($admin) {

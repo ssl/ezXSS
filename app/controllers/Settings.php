@@ -2,6 +2,17 @@
 
 class Settings extends Controller
 {
+    
+    /**
+     * Constructor that always validates if user is admin or not
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->isAdminOrExit();
+    }
+
     /**
      * Renders the settings index and returns the content.
      * 
@@ -9,8 +20,6 @@ class Settings extends Controller
      */
     public function index()
     {
-        $this->isAdminOrExit();
-
         $this->view->setTitle('Settings');
         $this->view->renderTemplate('settings/index');
 

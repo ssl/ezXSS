@@ -148,7 +148,7 @@ class Controller
             }
         } catch (Exception $e) {
             // If session failed to validate, clear the session
-            $this->session->deleteSession();
+            $this->session->destroy();
             redirect('/manage/account/login');
         }
     }

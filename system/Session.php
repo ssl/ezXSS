@@ -50,7 +50,7 @@ class Session
      * @param array $user The user data
      * @return void
      */
-    public function createSession($user)
+    public function create($user)
     {
         $_SESSION['loggedIn'] = true;
         $_SESSION['temp'] = false;
@@ -90,7 +90,7 @@ class Session
      * @param array $user The user data
      * @return void
      */
-    public function createTempSession($user)
+    public function createTemp($user)
     {
         $_SESSION['loggedIn'] = false;
         $_SESSION['temp'] = true;
@@ -102,7 +102,7 @@ class Session
      *
      * @return void
      */
-    public function deleteSession()
+    public function destroy()
     {
         $_SESSION = [];
         session_unset();

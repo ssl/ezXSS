@@ -281,6 +281,10 @@ class View
      */
     public function getPayload($payload)
     {
+        if (preg_match('/[^A-Za-z0-9._-]/', $payload)) {
+            throw new Exception('403');
+        }
+
         $file = __DIR__ . "/../app/views/payloads/$payload.js";
         if (!is_file($file)) {
             throw new Exception('Payload not found');
@@ -426,7 +430,8 @@ class View
      */
     public function fileName()
     {
-        return e(ltrim(path, '/'));
+        $cleanPath = explode('?', explode('&', path)[0])[0];
+        return e(ltrim($cleanPath, '/'));
     }
 
     /**

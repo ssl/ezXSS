@@ -53,7 +53,12 @@
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
                                     <label class="control-label" for="secret">Secret code</label>
-                                    <input type="text" name="secret" id="secret" value="{%data secret}" class="form-control">
+                                    <div class="input-group">
+                                        <input type="text" name="secret" id="secret" value="{%data secret}"
+                                            class="form-control">
+                                        <span class="input-group-addon"><a data-toggle="modal" data-target="#openQRcode"
+                                                style="cursor:pointer">open QR code</a></span>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
@@ -214,6 +219,24 @@
     </section>
 </div>
 
+<div class="modal fade" id="openQRcode" role="dialog">
+    <div class="modal-dialog" style="width:430px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">&times;</button>
+                <h3 class="m-b-xs">Twofactor QR code</h3>
+                <small>Scan this code in your 2FA app</small>
+            </div>
+            <div class="modal-body">
+                <center><div id="qrcode"></div></center>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="getChatId" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content modal-content-center">
@@ -231,3 +254,5 @@
         </div>
     </div>
 </div>
+
+<script src="/assets/js/qrcode/qrcode.min.js"></script>

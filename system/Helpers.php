@@ -262,3 +262,29 @@ function parseTimestamp($timestamp, $syntax = 'short')
         return ($syntax == 'short') ? $months . ' mon' : "$months {$unit} ago";
     }
 }
+
+/**
+ * URL-safe Base64 encode
+ * 
+ * @param string $data Data to encode
+ * @return string URL-safe Base64 encoded string
+ */
+function base64url_encode($data) {
+    $encoded = base64_encode($data);
+    return str_replace(['+', '/', '='], ['-', '_', ''], $encoded);
+}
+
+/**
+ * URL-safe Base64 decode
+ * 
+ * @param string $data URL-safe Base64 encoded string
+ * @return string|bool Decoded data or false on failure
+ */
+function base64url_decode($data) {
+    $data = str_replace(['-', '_'], ['+', '/'], $data);
+    $padding = strlen($data) % 4;
+    if ($padding) {
+        $data .= str_repeat('=', 4 - $padding);
+    }
+    return base64_decode($data);
+}

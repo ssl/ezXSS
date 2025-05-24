@@ -549,6 +549,21 @@ select#payloadList, select#payloadListReport, select#payloadListSession{border:0
 .text-success{color:#2ecc71!important}
 .text-warning{color:#f39c12!important}
 .text-muted{color:#95a5a6!important}
+#user-logs .truncate{max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#user-logs .dataTables_wrapper .dataTables_filter,#user-logs .dataTables_wrapper .dataTables_info,#user-logs .dataTables_wrapper .dataTables_length,#user-logs .dataTables_wrapper .dataTables_paginate,#user-logs .dataTables_wrapper .dataTables_processing{font-size:.85em}
+#user-logs .dataTables_wrapper .dataTables_paginate .paginate_button{padding:.2em .5em}
+#user-logs table{width:100%!important;table-layout:fixed}
+#user-logs th:first-child{width:40%}
+#user-logs th:nth-child(2){width:25%}
+#user-logs th:nth-child(3){width:35%}
+#user-logs td:first-child{word-wrap:break-word;word-break:break-word}
+#user-logs td:nth-child(2){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#user-logs td:nth-child(3){white-space:nowrap}
+#user-logs .dataTables_wrapper{width:100%}
+#user-logs .dataTables_scrollBody{width:100%}
+#user-logs .panel-body{padding:15px}
+#user-logs .table-responsive{margin-bottom:0}
+
 @media (max-width:768px){
 .field-name{width:120px;padding:10px 15px}
 .field-content{padding:10px 15px}

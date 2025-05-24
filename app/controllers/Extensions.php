@@ -5,9 +5,13 @@ class Extensions extends Controller
     private const ERROR_INVALID_URL = 'Invalid GitHub URL';
     private const ERROR_INVALID_FORMAT = 'Invalid extension code';
 
+    /**
+     * Constructor that always validates if user is admin or not
+     */
     public function __construct()
     {
         parent::__construct();
+
         $this->isAdminOrExit();
     }
 
@@ -89,7 +93,7 @@ class Extensions extends Controller
     public function delete($id)
     {
         $this->view->setTitle('Delete Extension');
-        $this->view->renderTemplate('extensions/delete');
+        $this->view->renderTemplate('system/delete');
 
         $extension = $this->model('Extension')->getById($id);
         $this->view->renderData('name', $extension['name']);
@@ -383,7 +387,7 @@ class Extensions extends Controller
         $code = _POST('code');
 
         $this->model('Extension')->add($name, $description, $version, $author, 'custom', $code);
-        $this->log("Installed custom '{$name}' extension.");
+        $this->log("Installed custom extension");
     }
 
     /**
@@ -395,12 +399,12 @@ class Extensions extends Controller
 
         if (strpos($url, 'https://github.com/') === 0) {
             $installed = $this->installFromRepository($url);
-            $this->log("Installed {$installed} extension(s) from GitHub.");
-            $this->view->renderMessage("Installed {$installed} new extension(s).");
+            $this->log("Installed {$installed} extension(s) from GitHub");
+            $this->view->renderMessage("Installed {$installed} new extension(s)");
         } elseif (strpos($url, 'https://gist.github.com/') === 0) {
             $this->installFromGist($url);
-            $this->log("Installed extension from Gist.");
-            $this->view->renderMessage("Installed extension.");
+            $this->log("Installed extension from Gist");
+            $this->view->renderMessage("Installed extension");
         } else {
             throw new Exception('Invalid GitHub URL');
         }
