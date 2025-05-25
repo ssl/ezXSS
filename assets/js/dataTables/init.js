@@ -280,10 +280,22 @@ $(document).ready(function() {
             { data: 'description', className: 'truncate'},
             { data: 'author' },
             { data: 'version' },
+            { 
+                data: 'enabled',
+                orderable: false,
+                className: 'text-center extension-toggle-cell',
+                render: function(data, type, row) {
+                    const isEnabled = data == 1;
+                    const checked = isEnabled ? 'checked' : '';
+                    return `<label class="extension-toggle-label" for="ext_${row.id}">
+                                <input class="extension-toggle" type="checkbox" id="ext_${row.id}" data-id="${row.id}" ${checked}>
+                                <span class="extension-checkbox-custom rectangular"></span>
+                            </label>`;
+                }
+            }
         ]),
         order: [[0, 'asc']],
         dom: '<"top"lipf>rt',
-
     });
 
     new DataTable('#user-logs', {

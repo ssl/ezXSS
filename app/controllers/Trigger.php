@@ -82,6 +82,11 @@ class Trigger extends Controller
         foreach ($allExtensionIds as $extensionId) {
             try {
                 $extension = $this->model('Extension')->getById($extensionId);
+
+                if ($extension['enabled'] != 1) {
+                    continue;
+                }
+                
                 $code = $extension['code'] ?? '';
                 
                 // Remove lines that start with //

@@ -456,6 +456,18 @@ $(document).ready(function () {
             }
         }
     });
+
+    $(document).on('change', '.extension-toggle', function() {
+        const checkbox = $(this);
+        const extensionId = checkbox.data('id');
+        
+        $.ajax({
+            url: `/manage/extensions/toggle/${extensionId}`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({})
+        });
+    });
     
     function showCopyFeedback(button, message) {
         const originalText = button.html();

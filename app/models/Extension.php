@@ -109,6 +109,43 @@ class Extension_model extends Model
     }
 
     /**
+     * Get all enabled extensions
+     * 
+     * @return array
+     */
+    public function getAllEnabled()
+    {
+        $database = Database::openConnection();
+        $database->prepare("SELECT * FROM $this->table WHERE `enabled` = 1");
+        
+        if(!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        return $database->fetchAll();
+    }
+
+    /**
+     * Toggle extension enabled status
+     * 
+     * @param int $id The extension id
+     * @throws Exception
+     * @return bool
+     */
+    public function toggleEnabled($id)
+    {
+        $database = Database::openConnection();
+        $database->prepare("UPDATE $this->table SET `enabled` = 1 - `enabled` WHERE `id` = :id");
+        $database->bindValue(':id', $id);
+
+        if (!$database->execute()) {
+            throw new Exception('Something unexpected went wrong');
+        }
+
+        return true;
+    }
+
+    /**
      * Validate extension
      * 
      * @param string $name The extension name

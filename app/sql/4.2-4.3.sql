@@ -25,12 +25,14 @@ CREATE TABLE `extensions` (
   `version` varchar(15) NOT NULL,
   `author` varchar(50) NOT NULL,
   `source` varchar(250) NOT NULL,
-  `code` mediumtext NOT NULL
+  `code` mediumtext NOT NULL,
+  `enabled` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE `extensions`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `source` (`source`);
+  ADD KEY `source` (`source`),
+  ADD KEY `enabled` (`enabled`);
 
 ALTER TABLE `extensions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;

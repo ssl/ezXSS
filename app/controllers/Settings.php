@@ -157,7 +157,7 @@ class Settings extends Controller
         $this->view->renderData('callbackURL', $settings->get('callback-url'));
 
         // Load and render extensions
-        $allExtensions = $this->model('Extension')->getAll();
+        $allExtensions = $this->model('Extension')->getAllEnabled();
         $selectedExtensionIds = !empty($settings->get('extensions')) ? explode(',', $settings->get('extensions')) : [];
         
         $extensions = [];
@@ -238,7 +238,7 @@ class Settings extends Controller
         $selectedExtensions = !empty($extensionsInput) ? explode(',', $extensionsInput) : [];
         
         if (!empty($selectedExtensions)) {
-            $validExtensionIds = array_column($this->model('Extension')->getAll(), 'id');
+            $validExtensionIds = array_column($this->model('Extension')->getAllEnabled(), 'id');
             foreach ($selectedExtensions as $extensionId) {
                 if (!in_array($extensionId, $validExtensionIds)) {
                     throw new Exception('Invalid extension ID');

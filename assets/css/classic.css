@@ -508,7 +508,8 @@ select#payloadList, select#payloadListReport, select#payloadListSession{border:0
 .extensions-dropdown-list::-webkit-scrollbar-thumb{background-color:#64698f;border-radius:3px}
 .extensions-dropdown-btn.empty{color:#686d93}
 .extensions-dropdown-btn.has-selections{display:none}
-
+.extension-toggle{transition:all .2s ease!important;border-radius:4px!important;font-weight:500!important;letter-spacing:.3px!important;min-width:75px!important}
+.extension-toggle:disabled{opacity:.6!important;cursor:not-allowed!important}
 .report-table{background-color:transparent;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.1)}
 .report-table .table-header{background:linear-gradient(135deg,#343a60 0,#3a4067 100%);border-bottom:3px solid #f6a821}
 .report-table .table-header th{color:#fff;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:13px;padding:15px 20px;border:none}
@@ -563,6 +564,12 @@ select#payloadList, select#payloadListReport, select#payloadListSession{border:0
 #user-logs .dataTables_scrollBody{width:100%}
 #user-logs .panel-body{padding:15px}
 #user-logs .table-responsive{margin-bottom:0}
+.extension-toggle-cell{width:40px!important;padding:4px!important}
+.extension-toggle-label{display:inline-block;position:relative;margin:0;cursor:pointer;font-size:24px;line-height:24px;height:24px;width:24px}
+.extension-toggle-label input{position:absolute;opacity:0;cursor:pointer;margin:0}
+.extension-toggle-label .extension-checkbox-custom{position:absolute;top:0;left:0;height:24px;width:24px;background-color:transparent;border-radius:3px;transition:all .2s ease;border:1px solid #64698f}
+.extension-toggle-label .extension-checkbox-custom::after{position:absolute;content:"";left:6px;top:6px;height:0;width:0;border-radius:2px;border:solid #23284b;border-width:0 2px 2px 0;transform:rotate(0) scale(0);opacity:0;transition:all .2s ease}
+.extension-toggle-label input:checked~.extension-checkbox-custom::after{transform:rotate(45deg) scale(1);opacity:1;left:7px;top:3px;width:8px;height:12px;border:solid #fff;border-width:0 2px 2px 0;background-color:transparent;border-radius:0}
 
 @media (max-width:768px){
 .field-name{width:120px;padding:10px 15px}

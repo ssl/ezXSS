@@ -56,7 +56,7 @@ class Payload extends Controller
                     $selectedExtensions = !empty($extensionsInput) ? explode(',', $extensionsInput) : [];
                     
                     if (!empty($selectedExtensions)) {
-                        $validExtensionIds = array_column($this->model('Extension')->getAll(), 'id');
+                        $validExtensionIds = array_column($this->model('Extension')->getAllEnabled(), 'id');
                         foreach ($selectedExtensions as $extensionId) {
                             if (!in_array($extensionId, $validExtensionIds)) {
                                 throw new Exception('Invalid extension ID');
@@ -167,7 +167,7 @@ class Payload extends Controller
         $this->view->renderCondition('hasWhitelist', count($whitelist) > 0);
 
         // Load and render extensions
-        $allExtensions = $this->model('Extension')->getAll();
+        $allExtensions = $this->model('Extension')->getAllEnabled();
         $selectedExtensionIds = !empty($payload['extensions']) ? explode(',', $payload['extensions']) : [];
         
         $extensions = [];

@@ -127,6 +127,24 @@ class Extensions extends Controller
     }
 
     /**
+     * Toggles extension enabled status.
+     * 
+     * @param string $id The extension id
+     * @return string
+     */
+    public function toggle($id)
+    {
+        $this->isAPIRequest();
+
+        try {
+            $this->model('Extension')->toggleEnabled($id);
+            return jsonResponse('success', true);
+        } catch (Exception $e) {
+            return jsonResponse('error', $e->getMessage());
+        }
+    }
+
+    /**
      * Handles POST actions for extension updates (accept/reject)
      */
     private function handleUpdateAction($id, $extension)
