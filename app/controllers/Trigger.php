@@ -140,11 +140,18 @@ class Trigger extends Controller
             return 'github.com/ssl/ezXSS';
         }
 
-        // Decode the JSON or form data
-        $data = json_decode(file_get_contents('php://input'), false);
+        // Get the input data
+        $input = file_get_contents('php://input');
+        $data = json_decode($input, false);
 
         if (empty($data) || !is_object($data)) {
-            $data = (object)$_POST;
+            // If JSON decode failed, check if it's form-encoded data
+            if (!empty($input) && strpos($input, '=') !== false && strpos($input, '&') !== false) {
+                parse_str($input, $formData);
+                $data = (object)$formData;
+            } else {
+                $data = (object)$_POST;
+            }
             
             if (empty($data) || !is_object($data)) {
                 return 'github.com/ssl/ezXSS';
@@ -168,6 +175,7 @@ class Trigger extends Controller
         $data->payload = substr($data->payload ?? '', 0, 255);
         $data->useragent = substr($data->{'user-agent'} ?? '', 0, 500);
 
+        $data->extra = $data->extra ?? '';
         if(is_array($data->extra) || is_object($data->extra)) {
             $data->extra = json_encode($data->extra);
         }
@@ -246,7 +254,7 @@ class Trigger extends Controller
                         $data->screenshotData = time() . md5(
                             $data->uri . time() . bin2hex(openssl_random_pseudo_bytes(16))
                         ) . bin2hex(openssl_random_pseudo_bytes(5));
-                        $saveImage = fopen(__DIR__ . "/../../assets/img/report-{$data->screenshotData}.png", 'w');
+                        $saveImage = @fopen(__DIR__ . "/../../assets/img/report-{$data->screenshotData}.png", 'w');
                         if(!$saveImage) {
                             throw new Exception('Unable to save screenshots to server, check permissions');
                         }

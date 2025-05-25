@@ -3,14 +3,22 @@
 <head>
     <title>ezXSS Payload Tester</title>
     <meta charset="utf-8">
-    <style>.block{width:20px;height:20px;display:inline-block}.circle{width:20px;height:20px;display:inline-block;border-radius:10px}.title{background-color:rgb(43,49,87);color:rgb(94,100,139);padding:5px}</style>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <style>
+        .block { width: 20px; height: 20px; display: inline-block; }
+        .circle { width: 20px; height: 20px; display: inline-block; border-radius: 10px; }
+        .title { background-color: rgb(43,49,87); color: rgb(94,100,139); padding: 5px; }
+        #table-wrap { display: none; }
+        table { border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 5px; }
+    </style>
 </head>
 <body>
     <h1 class="title">ezXSS Payload Tester</h1>
     <p>This URL fires the ezXSS payload</p>
     <div id="browser"></div>
 
-    <a href="javascript:location.reload(true)">Reload page</a>
+    <a href="#" onclick="window.location.reload(true); return false;">Reload page</a>
     <a href="/">Payload URL</a>
     <a href="/manage/payload">Manage Payload</a>
     <a href="https://github.com/ssl/ezXSS/wiki">ezXSS Wiki</a>
@@ -41,28 +49,51 @@
     <div id="colors"></div>
 
     <script>
-        function esc(i){return String(i).replace(/</g, '&lt;').replace(/>/g, '&gt;');}
+        // Escape function
+        function esc(i) {
+            return String(i).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // Cross-browser event binding
+        function addEvent(element, event, handler) {
+            if (element.addEventListener) {
+                element.addEventListener(event, handler, false);
+            } else if (element.attachEvent) {
+                element.attachEvent('on' + event, handler);
+            }
+        }
 
         // Browser details
         try {
-            document.getElementById('browser').innerHTML = '<p><b>Browser: </b>'+e(navigator.appName)+' '+e(navigator.appVersion)+'</p>';
+            var browserDiv = document.getElementById('browser');
+            browserDiv.innerHTML = '<p><b>Browser: </b>' + esc(navigator.appName) + ' ' + esc(navigator.appVersion) + '</p>';
         } catch (t) {}
 
         // Random color tester
         try {
-            document.addEventListener("DOMContentLoaded", function () {
+            function initColors() {
+                var colorsDiv = document.getElementById('colors');
                 for (var i = 0; i < 10; i++) {
                     var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                    document.getElementById('colors').innerHTML += '<div class="block" style="background-color: ' + color + '"></div>';
-                };
-            });
+                    colorsDiv.innerHTML += '<div class="block" style="background-color:' + color + '"></div>';
+                }
+            }
+            if (document.readyState === 'complete') {
+                initColors();
+            } else {
+                addEvent(window, 'load', initColors);
+            }
         } catch (t) {}
 
         // Storage and cookie tester
         try {
-            sessionStorage.setItem("sessionStorageTester", Date.now());
-            localStorage.setItem("localStorageTester", Date.now());
-            document.cookie = "CookieTester=" + Date.now();
+            if (typeof sessionStorage !== 'undefined') {
+                sessionStorage.setItem('sessionStorageTester', Date.now());
+            }
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem('localStorageTester', Date.now());
+            }
+            document.cookie = 'CookieTester=' + Date.now();
         } catch (t) {}
 
         // Middle-man HTTP requests
@@ -70,48 +101,58 @@
             try {
                 if (window.XMLHttpRequest) {
                     var originalXhrOpen = XMLHttpRequest.prototype.open;
-        
+
                     XMLHttpRequest.prototype.open = function (method, url) {
                         var xhr = this;
                         var requestDetails = { method: method, url: url, status: null };
 
-                        if (xhr.addEventListener) {
-                            xhr.addEventListener('load', function () {
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState === 4) {
                                 requestDetails.status = xhr.status;
                                 logRequest(requestDetails);
-                            });
-                        }
+                            }
+                        };
+
                         return originalXhrOpen.apply(this, arguments);
                     };
-        
+
                     function logRequest(request) {
-                        var tableBody = document.querySelector('#requests tbody');
+                        var tableBody = document.getElementById('requests').getElementsByTagName('tbody')[0];
                         var newRow = document.createElement('tr');
                         newRow.innerHTML = '<td>' + esc(request.method) + '</td>' +
-                                        '<td>' + esc(request.url) + '</td>' +
-                                        '<td>' + esc(request.status) + '</td>';
+                                           '<td>' + esc(request.url) + '</td>' +
+                                           '<td>' + esc(request.status) + '</td>';
                         tableBody.appendChild(newRow);
                         document.getElementById('table-wrap').style.display = 'block';
                     }
                 }
             } catch (t) {}
         })();
+
+        // Payload status check (delayed until payload script loads)
+        function checkPayloadStatus() {
+            try {
+                var statusDiv = document.createElement('div');
+                statusDiv.innerHTML = 'ezXSS payload initialized: <b>' + (typeof ez_nW === 'function' ? 'yes' : 'no') + '</b><br>' +
+                                     'ezXSS screenshot initialized: <b>' + (typeof html2canvas === 'function' ? 'yes' : 'no') + '</b><br>' +
+                                     'ezXSS persistent initialized: <b>' + (typeof ez_persist === 'function' ? 'yes' : 'no') + '</b>';
+                document.body.appendChild(statusDiv);
+            } catch (t) {}
+        }
+
+        // Run status check after payload script loads
+        if (document.readyState === 'complete') {
+            checkPayloadStatus();
+        } else {
+            addEvent(window, 'load', checkPayloadStatus);
+        }
     </script>
 
     <!-- Load payload from main domain -->
     <script src="/"></script>
-    
-    <hr>
-    <script>
-        try {
-            document.write('ezXSS payload initialized: <b>' + (typeof ez_nW === "function" ? 'yes' : 'no') + '</b><br>');
-            document.write('ezXSS screenshot initialized: <b>' + (typeof html2canvas === "function" ? 'yes' : 'no') + '</b><br>');
-            document.write('ezXSS persistent initialized: <b>' + (typeof ez_persist === "function" ? 'yes' : 'no') + '</b>');
-        } catch (t) {}
-    </script>
 
     <!-- HTTP requests table -->
-    <div id="table-wrap" style="display:none">
+    <div id="table-wrap">
         <hr>
         <table id="requests" border="1">
             <thead>
@@ -121,9 +162,7 @@
                     <th>Status Code</th>
                 </tr>
             </thead>
-            <tbody>
-                
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
 </body>
