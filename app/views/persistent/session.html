@@ -24,38 +24,53 @@
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
                         <div class="panel-heading">Session data</div>
-                        <div class="panel-body session-panel">
-                            <table class="table report">
-                                <thead>
-                                    <tr>
-                                        <td width=150px>Client ID</td>
-                                        <td>{%data clientid}</td>
+                        <div class="panel-body">
+                            <table class="table report-table">
+                                <tbody>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>Client ID</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <code class="origin-display">{%data clientid}</code>
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>IP</td>
-                                        <td>{%data ip}</td>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>Browser</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <span class="browser-display">{%data browser}</span>
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>Browser</td>
-                                        <td>{%data browser}</td>
+                                    <tr class="report-row highlight-row">
+                                        <td class="field-name">
+                                            <strong>Payload</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <span class="badge badge-danger payload-badge">{%data payload}</span>
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>Payload</td>
-                                        <td>{%data payload}</td>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>Origin</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <code class="origin-display">{%data origin}</code>
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>Origin</td>
-                                        <td>{%data origin}</td>
+                                    <tr class="report-row timestamp-row">
+                                        <td class="field-name">
+                                            <strong>Status</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <span class="timestamp-display">
+                                                
+                                                <time class="time-formatted"><a href="/manage/persistent/requests/{%data link}" class="requests-link">{%data requests}</a> requests, last ping {%data last}</time>
+                                            </span>
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>Requests</td>
-                                        <td><a href="/manage/persistent/requests/{%data link}">{%data requests}</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Last online</td>
-                                        <td>{%data last}</td>
-                                    </tr>
-                                </thead>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -63,14 +78,14 @@
 
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Reverse proxy</div>
+                        <div class="panel-heading">Settings</div>
                         <div class="panel-body">
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <div class="form-group">
-                                    <label class="control-label" for="ipport">Proxy domain and port</label>
+                                    <label class="control-label" for="ipport">Reverse proxy</label>
                                     <input class="form-control" name="ipport" id="ipport" type="text"
-                                        placeholder="{domain[]}:30055">
+                                            placeholder="{domain[]}:30055">
                                 </div>
 
                                 <label class="checkbox-label">
@@ -81,12 +96,10 @@
 
                                 <button name="proxy" type="submit" class="btn">Start</button>
                             </form>
-                        </div>
-                    </div>
 
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">Settings</div>
-                        <div class="panel-body settings-panel">
+                            <hr style="border-top:3px solid #64698f">
+
+                            <label class="section-title" style="padding-bottom:4px">Session management</label>
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <button name="delete" type="submit" class="btn">Delete</button>
@@ -103,17 +116,19 @@
                         <div class="panel-heading">Console</div>
                         <div class="panel-body">
                             <div class="form-group">
-                                <textarea class="form-control" name="console" id="console"
-                                    rows=5>{%data console}</textarea>
+                                <label class="control-label" for="console">Output</label>
+                                <textarea class="form-control modern-textarea console-output" name="console" id="console"
+                                    rows="5" readonly>{%data console}</textarea>
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="command">Execute javascript</label>
-                                <div class="input-group">
-                                    <textarea type="text" name="command" id="command" placeholder="console.log(1);"
-                                        class="form-control"></textarea>
-                                    <span class="input-group-addon"><a name="execute" id="execute"
-                                            class="pointer">Send</a></span>
+                                <label class="control-label" for="command">Execute</label>
+                                <div class="data-container">
+                                    <textarea type="text" name="command" id="command" placeholder="console.log('Hello from ezXSS');"
+                                        class="form-control modern-textarea" rows="2"></textarea>
+                                    <button class="btn execute-btn" id="execute">
+                                        Execute
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -124,56 +139,108 @@
                     <div class="panel panel-filled">
                         <div class="panel-heading">Last request</div>
                         <div class="panel-body">
-                            <div>
-                                <table class="table report">
-                                    <thead>
-                                        <tr>
-                                            <td width=150px>URL</td>
-                                            <td>{%data uri}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>IP</td>
-                                            <td>{%data ip}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Referer</td>
-                                            <td>{%data referer}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>User Agent</td>
-                                            <td>{%data user-agent}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Cookies</td>
-                                            <td class="request-box"><textarea spellcheck=false class="form-control"
-                                                    rows="4" id="cookies">{%data cookies}</textarea>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Local Storage</td>
-                                            <td class="request-box"><textarea spellcheck=false class="form-control"
-                                                    rows="4" id="localstorage">{%data localstorage}</textarea>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Session Storage</td>
-                                            <td class="request-box"><textarea spellcheck=false class="form-control"
-                                                    rows="4" id="sessionstorage">{%data sessionstorage}</textarea>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>DOM</td>
-                                            <td class="request-box"><textarea spellcheck=false class="form-control"
-                                                    rows="12.5" id="dom">{%data dom}</textarea>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Time</td>
-                                            <td>{%data time}</td>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
+                            <table class="table report-table">
+                                <tbody>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>URL</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <code class="url-display">{%data uri}</code>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>IP</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <span class="ip-display">{%data ip}</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>Referer</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <code class="referer-display">{%data referer}</code>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>User Agent</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <small class="user-agent-display">{%data user-agent}</small>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row expandable-row">
+                                        <td class="field-name">
+                                            <strong>Cookies</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <div class="data-container">
+                                                <textarea spellcheck="false" class="form-control modern-textarea" 
+                                                          rows="4" id="cookies" readonly>{%data cookies}</textarea>
+                                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#cookies">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row expandable-row">
+                                        <td class="field-name">
+                                            <strong>Local Storage</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <div class="data-container">
+                                                <textarea spellcheck="false" class="form-control modern-textarea" 
+                                                          rows="4" id="localstorage" readonly>{%data localstorage}</textarea>
+                                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#localstorage">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row expandable-row">
+                                        <td class="field-name">
+                                            <strong>Session Storage</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <div class="data-container">
+                                                <textarea spellcheck="false" class="form-control modern-textarea" 
+                                                          rows="4" id="sessionstorage" readonly>{%data sessionstorage}</textarea>
+                                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#sessionstorage">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row expandable-row">
+                                        <td class="field-name">
+                                            <strong>DOM</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <div class="data-container">
+                                                <textarea spellcheck="false" class="form-control modern-textarea dom-textarea" 
+                                                          rows="12" id="dom" readonly>{%data dom}</textarea>
+                                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#dom">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row timestamp-row">
+                                        <td class="field-name">
+                                            <strong>Time</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <span class="timestamp-display">
+                                                <time class="time-formatted">{%data time}</time>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

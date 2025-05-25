@@ -23,63 +23,122 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="panel panel-filled">
-                        <div class="panel-heading">Request</div>
+                        <div class="panel-heading">Request Information</div>
                         <div class="panel-body">
-                            <div>
-                                <table class="table report">
-                                    <thead>
-                                        <tr>
-                                            <td width=150px>URL</td>
-                                            <td>{%data uri}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>IP</td>
-                                            <td>{%data ip}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Referer</td>
-                                            <td>{%data referer}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>User Agent</td>
-                                            <td>{%data user-agent}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Cookies</td>
-                                            <td class="request-box"><textarea spellcheck=false class="form-control"
-                                                    rows="4" id="cookies">{%data cookies}</textarea>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Local Storage</td>
-                                            <td class="request-box"><textarea spellcheck=false class="form-control"
-                                                    rows="4" id="localstorage">{%data localstorage}</textarea>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Session Storage</td>
-                                            <td class="request-box"><textarea spellcheck=false class="form-control"
-                                                    rows="4" id="sessionstorage">{%data sessionstorage}</textarea>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>DOM</td>
-                                            <td class="request-box"><textarea spellcheck=false class="form-control"
-                                                    rows="12.5" id="dom">{%data dom}</textarea>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Time</td>
-                                            <td>{%data time}</td>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
+                            <table class="table table-striped table-hover report-table">
+                                <tbody>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>Client ID</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <code class="origin-display"><a href="/manage/persistent/session/{%data link}">{%data clientid}</a></code>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>URL</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <code class="url-display">{%data uri}</code>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>IP</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <span class="ip-display">{%data ip}</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>Referer</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <code class="referer-display">{%data referer}</code>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row">
+                                        <td class="field-name">
+                                            <strong>User Agent</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <small class="user-agent-display">{%data user-agent}</small>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row expandable-row">
+                                        <td class="field-name">
+                                            <strong>Cookies</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <div class="data-container">
+                                                <textarea spellcheck="false" class="form-control modern-textarea" 
+                                                          rows="4" id="cookies" readonly>{%data cookies}</textarea>
+                                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#cookies">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row expandable-row">
+                                        <td class="field-name">
+                                            <strong>Local Storage</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <div class="data-container">
+                                                <textarea spellcheck="false" class="form-control modern-textarea" 
+                                                          rows="4" id="localstorage" readonly>{%data localstorage}</textarea>
+                                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#localstorage">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row expandable-row">
+                                        <td class="field-name">
+                                            <strong>Session Storage</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <div class="data-container">
+                                                <textarea spellcheck="false" class="form-control modern-textarea" 
+                                                          rows="4" id="sessionstorage" readonly>{%data sessionstorage}</textarea>
+                                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#sessionstorage">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row expandable-row">
+                                        <td class="field-name">
+                                            <strong>DOM</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <div class="data-container">
+                                                <textarea spellcheck="false" class="form-control modern-textarea dom-textarea" 
+                                                          rows="12" id="dom" readonly>{%data dom}</textarea>
+                                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#dom">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="report-row timestamp-row">
+                                        <td class="field-name">
+                                            <strong>Time</strong>
+                                        </td>
+                                        <td class="field-content">
+                                            <span class="timestamp-display">
+                                                <time class="time-formatted">{%data time}</time>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-</div>
-</section>
+    </section>
 </div>

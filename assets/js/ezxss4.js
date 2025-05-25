@@ -209,6 +209,9 @@ const EzXSS = {
         $('.persistent-delete-selected').on('click', this.handlePersistentBulkDelete);
         $('#execute').on('click', this.handleExecute);
 
+        // Command textarea Ctrl+Enter functionality
+        $('#command').on('keydown', this.handleCommandKeydown.bind(this));
+
         // Extension management
         $('#extension-method').on('change', this.handleExtensionMethodChange);
         $(document).on('change', '.extension-toggle', this.handleExtensionToggle);
@@ -572,6 +575,13 @@ const EzXSS = {
             .then(() => {
                 $('#command').val('');
             });
+    },
+
+    handleCommandKeydown(e) {
+        if (e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+            $('#execute').click();
+        }
     },
 
     handleExtensionMethodChange() {

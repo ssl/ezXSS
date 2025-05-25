@@ -188,7 +188,7 @@ class Persistent extends Controller
         $this->view->renderTemplate('persistent/request');
 
         $request = $this->model('Session')->getById($id);
-        $clientId = $request['clientId'] ?? '';
+        $clientId = $request['clientid'] ?? '';
         $origin = $request['origin'] ?? '';
 
         if (!$this->hasSessionPermissions($clientId, $origin)) {
@@ -200,6 +200,8 @@ class Persistent extends Controller
         foreach (array_slice($this->rows, 0, -2) as $value) {
             $this->view->renderData($value, $request[$value]);
         }
+
+        $this->view->renderData('link', base64url_encode($clientId . '~' . $origin));
         
         return $this->showContent();
     }
