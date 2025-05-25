@@ -336,6 +336,10 @@ class Trigger extends Controller
                 $this->model('Session')->set($session['id'], 'time', time());
                 $this->model('Session')->set($session['id'], 'console', $data->console ?? '');
 
+                if($session['archive'] == 1) {
+                    $this->model('Session')->archiveByClientId($data->clientid ?? '', $data->origin);
+                }
+
                 return $this->model('Console')->getNext($data->clientid ?? '', $data->origin);
             } catch (Exception $e) {
                 $tryInit = true;
