@@ -49,6 +49,9 @@
     <div id="colors"></div>
 
     <script>
+        // Global variables for request tracking
+        var requestLog = [];
+
         // Escape function
         function esc(i) {
             return String(i).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -96,51 +99,79 @@
             document.cookie = 'CookieTester=' + Date.now();
         } catch (t) {}
 
-        // Middle-man HTTP requests
-        (function () {
+        // Request logging function
+        function logRequest(request) {
+            try {
+                requestLog.push(request);
+                var tableBody = document.getElementById('requests').getElementsByTagName('tbody')[0];
+                var newRow = document.createElement('tr');
+                newRow.innerHTML = '<td>' + esc(request.method || 'UNKNOWN') + '</td>' +
+                                   '<td>' + esc(request.url || 'UNKNOWN') + '</td>' +
+                                   '<td>' + esc(request.status || 'PENDING') + '</td>';
+                tableBody.appendChild(newRow);
+                document.getElementById('table-wrap').style.display = 'block';
+            } catch (e) {
+                console.log('Error logging request:', e);
+            }
+        }
+
+        // Non-interfering XMLHttpRequest monitoring
+        (function() {
             try {
                 if (window.XMLHttpRequest) {
                     var originalXhrOpen = XMLHttpRequest.prototype.open;
+                    var originalXhrSend = XMLHttpRequest.prototype.send;
 
-                    XMLHttpRequest.prototype.open = function (method, url) {
-                        var xhr = this;
-                        var requestDetails = { method: method, url: url, status: null };
-
-                        xhr.onreadystatechange = function () {
-                            if (xhr.readyState === 4) {
-                                requestDetails.status = xhr.status;
-                                logRequest(requestDetails);
-                            }
-                        };
-
+                    XMLHttpRequest.prototype.open = function(method, url) {
+                        this._requestDetails = { method: method, url: url, status: null };
                         return originalXhrOpen.apply(this, arguments);
                     };
 
-                    function logRequest(request) {
-                        var tableBody = document.getElementById('requests').getElementsByTagName('tbody')[0];
-                        var newRow = document.createElement('tr');
-                        newRow.innerHTML = '<td>' + esc(request.method) + '</td>' +
-                                           '<td>' + esc(request.url) + '</td>' +
-                                           '<td>' + esc(request.status) + '</td>';
-                        tableBody.appendChild(newRow);
-                        document.getElementById('table-wrap').style.display = 'block';
-                    }
+                    XMLHttpRequest.prototype.send = function(data) {
+                        var xhr = this;
+                        var details = xhr._requestDetails || { method: 'UNKNOWN', url: 'UNKNOWN' };
+                        
+                        // Store original onreadystatechange to avoid overwriting payload's handler
+                        var originalOnReadyStateChange = xhr.onreadystatechange;
+                        
+                        var newOnReadyStateChange = function() {
+                            if (xhr.readyState === 4) {
+                                details.status = xhr.status;
+                                logRequest(details);
+                            }
+                            
+                            // Call original handler if it exists
+                            if (originalOnReadyStateChange) {
+                                originalOnReadyStateChange.apply(this, arguments);
+                            }
+                        };
+                        
+                        // Set our handler
+                        xhr.onreadystatechange = newOnReadyStateChange;
+                        
+                        return originalXhrSend.apply(this, arguments);
+                    };
                 }
-            } catch (t) {}
+            } catch (e) {
+                console.log('Error setting up XHR monitoring:', e);
+            }
         })();
 
         // Payload status check (delayed until payload script loads)
         function checkPayloadStatus() {
             try {
                 var statusDiv = document.createElement('div');
-                statusDiv.innerHTML = 'ezXSS payload initialized: <b>' + (typeof ez_nW === 'function' ? 'yes' : 'no') + '</b><br>' +
+                statusDiv.innerHTML = '<h3>Payload Status</h3>' +
+                                     'ezXSS payload initialized: <b>' + (typeof ez_nW === 'function' ? 'yes' : 'no') + '</b><br>' +
                                      'ezXSS screenshot initialized: <b>' + (typeof html2canvas === 'function' ? 'yes' : 'no') + '</b><br>' +
                                      'ezXSS persistent initialized: <b>' + (typeof ez_persist === 'function' ? 'yes' : 'no') + '</b>';
                 document.body.appendChild(statusDiv);
-            } catch (t) {}
+            } catch (t) {
+                console.log('Error in checkPayloadStatus:', t);
+            }
         }
 
-        // Run status check after payload script loads
+        // Initialize monitoring when page loads
         if (document.readyState === 'complete') {
             checkPayloadStatus();
         } else {
@@ -154,12 +185,13 @@
     <!-- HTTP requests table -->
     <div id="table-wrap">
         <hr>
+        <h3>Network Activity</h3>
         <table id="requests" border="1">
             <thead>
                 <tr>
                     <th>Method</th>
                     <th>URL</th>
-                    <th>Status Code</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody></tbody>
