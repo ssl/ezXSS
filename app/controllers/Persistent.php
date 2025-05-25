@@ -90,6 +90,10 @@ class Persistent extends Controller
                     $this->validateCsrfToken();
                     $this->model('Console')->add($clientId, $origin, 'ez_stop()');
                     throw new Exception('Persistent killed');
+                } elseif (_POST('archive') !== null) {
+                    $this->validateCsrfToken();
+                    $this->model('Session')->archiveByClientId($clientId, $origin);
+                    throw new Exception('Session archived');
                 } else {
                     $this->isAPIRequest();
 
@@ -106,6 +110,11 @@ class Persistent extends Controller
                     elseif (_JSON('execute') !== null) {
                         $command = _JSON('command');
                         $this->model('Console')->add($clientId, $origin, $command);
+                        return jsonResponse('success', 1);
+                    }
+
+                    elseif (_JSON('archive') !== null) {
+                        $this->model('Session')->archiveByClientId($clientId, $origin);
                         return jsonResponse('success', 1);
                     }
 
@@ -216,6 +225,7 @@ class Persistent extends Controller
         $this->isAPIRequest();
 
         $id = _JSON('id');
+        $archive = _JSON('archive') === 1 ? 1 : 0;
 
         // Check payload permissions
         $payloadList = $this->payloadList();
@@ -227,7 +237,7 @@ class Persistent extends Controller
         if (+$id === 0) {
             if ($this->isAdmin()) {
                 // Show all sessions
-                $sessions = $this->model('Session')->getAll();
+                $sessions = $this->model('Session')->getAllByArchive($archive);
             } else {
                 // Show all sessions of allowed payloads
                 $sessions = [];
@@ -238,7 +248,7 @@ class Persistent extends Controller
                         if (strpos($payload['payload'], '/') === false) {
                             $payloadUri .= '/%';
                         }
-                        $sessions = array_merge($sessions, $this->model('Session')->getAllByPayload($payloadUri));
+                        $sessions = array_merge($sessions, $this->model('Session')->getAllByPayload($payloadUri, $archive));
                     }
                 }
             }
@@ -250,7 +260,7 @@ class Persistent extends Controller
             if (strpos($payload['payload'], '/') === false) {
                 $payloadUri .= '/%';
             }
-            $sessions = $this->model('Session')->getAllByPayload($payloadUri);
+            $sessions = $this->model('Session')->getAllByPayload($payloadUri, $archive);
         }
 
         foreach ($sessions as $key => $value) {
@@ -261,6 +271,28 @@ class Persistent extends Controller
         }
 
         return jsonResponse('data', $sessions);
+    }
+
+    /**
+     * Archives a session.
+     * 
+     * @param string $link The client link
+     * @throws Exception
+     * @return string
+     */
+    public function archive($link)
+    {
+        $this->isAPIRequest();
+
+        [$clientId, $origin] = $this->decodelink($link);
+
+        if (!$this->hasSessionPermissions($clientId, $origin)) {
+            return jsonResponse('error', 'You dont have permissions to this session');
+        }
+
+        $this->model('Session')->archiveByClientId($clientId, $origin);
+
+        return jsonResponse('success', 1);
     }
 
     /**

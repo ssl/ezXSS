@@ -182,7 +182,8 @@ CREATE TABLE `sessions` (
   `time` int(11) DEFAULT NULL,
   `localstorage` longtext,
   `sessionstorage` longtext,
-  `console` longtext
+  `console` longtext,
+  `archive` int(11) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -398,6 +399,7 @@ ALTER TABLE sessions ADD INDEX(id);
 ALTER TABLE sessions ADD INDEX(payload);
 ALTER TABLE sessions ADD INDEX(clientid);
 ALTER TABLE sessions ADD INDEX(origin);
+ALTER TABLE sessions ADD INDEX(archive);
 ALTER TABLE sessions_data ADD INDEX(sessionid);
 
 ALTER TABLE logs ADD INDEX(user_id);

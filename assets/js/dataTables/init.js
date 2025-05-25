@@ -131,6 +131,7 @@ $(document).ready(function() {
             type: "POST",
             data: function(d) {
                 d.id = window.location.pathname.split('/').filter(Boolean).pop() === 'all' ? 0 : esc(window.location.pathname.split('/').filter(Boolean).pop());
+                d.archive = window.location.search.includes('archive=1') ? 1 : 0;
                 return JSON.stringify(d);
             }
         },

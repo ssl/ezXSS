@@ -36,3 +36,7 @@ ALTER TABLE `extensions`
 
 ALTER TABLE `extensions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `sessions` ADD COLUMN `archive` int(11) DEFAULT '0';
+ALTER TABLE `sessions` ADD INDEX(`archive`);

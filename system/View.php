@@ -445,7 +445,20 @@ class View
         $uriParts = explode('/', path);
 
         // Check current page for reporting pages
-        if ((substr($page, -2) === '*0' || substr($page, -2) === '*1') && isset($uriParts[2]) && $uriParts[2] == 'reports') {
+        if (($page === 'reports*0' || $page === 'reports*1') && (isset($uriParts[2]) && $uriParts[2] === 'reports')) {
+            if (_GET('archive') == '1') {
+                if (substr($page, -2) === '*0') {
+                    return 'menu-active';
+                }
+            } else {
+                if (substr($page, -2) === '*1') {
+                    return 'menu-active';
+                }
+            }
+        }
+
+        // Check current page for persistent pages
+        if (($page === 'persistent*0' || $page === 'persistent*1') && (isset($uriParts[2]) && $uriParts[2] === 'persistent')) {
             if (_GET('archive') == '1') {
                 if (substr($page, -2) === '*0') {
                     return 'menu-active';

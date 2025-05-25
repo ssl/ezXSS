@@ -207,6 +207,7 @@ const EzXSS = {
         $('.execute-selected').on('click', this.handleBulkExecute);
         $('.kill-selected').on('click', this.handleBulkKill);
         $('.persistent-delete-selected').on('click', this.handlePersistentBulkDelete);
+        $('.persistent-archive-selected').on('click', this.handlePersistentBulkArchive);
         $('#execute').on('click', this.handleExecute);
 
         // Command textarea Ctrl+Enter functionality
@@ -400,10 +401,13 @@ const EzXSS = {
     },
 
     handlePayloadListSessionChange() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const addValue = urlParams.get('archive') === '1' ? '?archive=1' : '';
+        
         if (this.value !== '0') {
-            window.location.href = `/manage/persistent/list/${this.value}`;
+            window.location.href = `/manage/persistent/list/${this.value}${addValue}`;
         } else {
-            window.location.href = '/manage/persistent/all';
+            window.location.href = `/manage/persistent/all${addValue}`;
         }
     },
 
@@ -563,7 +567,20 @@ const EzXSS = {
             parent.fadeOut('slow');
             Utils.request(url, { delete: '' })
                 .catch(() => {
-                    parent.fadeIn('slow'); // Restore on error
+                    parent.fadeIn('slow');
+                });
+        });
+    },
+
+    handlePersistentBulkArchive() {
+        $("input[name='selected']:checked").each(function() {
+            const parent = $(this).parent().parent().parent().parent();
+            const url = $(this).attr('url');
+            
+            parent.fadeOut('slow');
+            Utils.request(url, { archive: '' })
+                .catch(() => {
+                    parent.fadeIn('slow');
                 });
         });
     },
