@@ -80,8 +80,13 @@ class Persistent extends Controller
                     }
 
                     $passOrigin = _POST('passorigin') !== null ? '1' : '0';
+                    $autoReconnect = _POST('autoreconnect') !== null;
+                    
                     $this->model('Console')->add($clientId, $origin, "ez_soc('$ipport', $passOrigin)");
-                    throw new Exception("Proxy started on $ipport is accessible on http://$clientId.ezxss" . ($passOrigin === '1' ? " and http://$origin" : ''));
+                    if ($autoReconnect) {
+                        $this->model('Console')->add($clientId, $origin, "localStorage.setItem('ezProxy', '$ipport');");
+                    }
+                    throw new Exception("Proxy started on $ipport is accessible on http://$clientId.ezxss" . ($passOrigin === '1' ? " and http://$origin" : '') . ($autoReconnect ? ' (Auto reconnect enabled)' : ''));
                 } elseif (_POST('delete') !== null) {
                     $this->validateCsrfToken();
                     $this->model('Session')->deleteAll($clientId, $origin);
@@ -89,11 +94,15 @@ class Persistent extends Controller
                 } elseif (_POST('kill') !== null) {
                     $this->validateCsrfToken();
                     $this->model('Console')->add($clientId, $origin, 'ez_stop()');
-                    throw new Exception('Persistent killed');
+                    throw new Exception('Killed persistent');
                 } elseif (_POST('archive') !== null) {
                     $this->validateCsrfToken();
                     $this->model('Session')->archiveByClientId($clientId, $origin);
-                    throw new Exception('Session archived');
+                    throw new Exception('Archived session');
+                } elseif (_POST('killreconnect') !== null) {
+                    $this->validateCsrfToken();
+                    $this->model('Console')->add($clientId, $origin, "localStorage.removeItem('ezProxy');");
+                    throw new Exception('Killed auto reconnect');
                 } else {
                     $this->isAPIRequest();
 

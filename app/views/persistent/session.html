@@ -87,24 +87,38 @@
                                     <input class="form-control" name="ipport" id="ipport" type="text"
                                             placeholder="{domain[]}:30055">
                                 </div>
-
-                                <label class="checkbox-label">
-                                    <input checked class="chkbox" name="passorigin" type="checkbox">
-                                    <span class="checkbox-custom rectangular"></span>
-                                </label>
-                                <p class="checkbox-text">Pass origin requests through proxy</p>
-
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input checked class="chkbox" name="passorigin" type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Pass origin requests through proxy</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input class="chkbox" name="autoreconnect" type="checkbox">
+                                                <span class="checkbox-custom rectangular"></span>
+                                            </label>
+                                            <p class="checkbox-text">Auto reconnect to proxy</p>
+                                        </div>
+                                    </div>
+                                </div>
                                 <button name="proxy" type="submit" class="btn">Start</button>
                             </form>
 
-                            <hr style="border-top:3px solid #64698f">
+                            <hr style="border-top:2px solid #64698f">
 
-                            <label class="section-title" style="padding-bottom:4px">Session management</label>
+                            <label class="section-title">Session management</label>
                             <form class="form" method="post">
                                 <input type=hidden hidden name="csrf" value="{session[csrfToken]}">
                                 <button name="delete" type="submit" class="btn">Delete</button>
                                 <button name="archive" type="submit" class="btn">Archive</button>
                                 <button name="kill" type="submit" class="btn">Kill persistent</button>
+                                <button name="killreconnect" type="submit" class="btn">Kill reconnect</button>
                             </form>
                         </div>
                     </div>
