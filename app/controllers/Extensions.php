@@ -484,7 +484,7 @@ class Extensions extends Controller
         }
 
         if ($installed === 0) {
-            throw new Exception('No extensions installed: no valid (new) extensions found.');
+            throw new Exception('No extensions installed: no valid (new) extensions found');
         }
 
         return $installed;
@@ -498,7 +498,7 @@ class Extensions extends Controller
         $source = "gist/{$gistId}";
         
         if ($this->model('Extension')->getBySource($source)) {
-            throw new Exception('Extension already installed.');
+            throw new Exception('Extension already installed');
         }
 
         try {
@@ -639,7 +639,7 @@ class Extensions extends Controller
                 throw new Exception(self::ERROR_INVALID_URL . ' (repository might be private or not found)');
             }
             if ($httpCode === 403) {
-                throw new Exception('Access forbidden (403). You may have hit rate limits. Try again later.');
+                throw new Exception('Access forbidden (403). You may have hit rate limits. Try again later');
             }
             throw new Exception('Unable to connect to GitHub. ' . $httpCode);
         }

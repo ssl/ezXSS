@@ -33,7 +33,7 @@ class Persistent extends Controller
 
         // Check payload permissions
         $payloadList = $this->payloadList();
-        if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
+        if (!is_numeric($id) || (!in_array(+$id, $payloadList, true) && !$this->isAdmin())) {
             throw new Exception('You dont have permissions to this payload');
         }
 
@@ -42,6 +42,10 @@ class Persistent extends Controller
         foreach ($payloadList as $val) {
             $name = !$val ? 'All payloads' : $this->model('Payload')->getById($val)['payload'];
             $payloads[] = ['id' => $val, 'name' => ucfirst($name), 'selected' => $val == $id ? 'selected' : ''];
+        }
+        if(!in_array($id, $payloadList) && $this->isAdmin()) {
+            $payload = $this->model('Payload')->getById($id);
+            $payloads[] = ['id' => $id, 'name' => ucfirst($payload['payload']), 'selected' => 'selected'];
         }
         $this->view->renderDataset('payload', $payloads);
 
@@ -238,7 +242,7 @@ class Persistent extends Controller
 
         // Check payload permissions
         $payloadList = $this->payloadList();
-        if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
+        if (!is_numeric($id) || (!in_array(+$id, $payloadList, true) && !$this->isAdmin())) {
             return jsonResponse('error', 'You dont have permissions to this payload');
         }
 

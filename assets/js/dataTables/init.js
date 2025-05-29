@@ -104,8 +104,11 @@ $(document).ready(function() {
             { 
                 data: 'ip',
                 className: 'truncate',
-                render: function(data) {
-                    return esc(data) && data.length > 15 ? esc(data.substring(0, 15)) + '..' : esc(data);
+                render: function(data, type, row) {
+                    if (type === 'display' || type === 'type') {
+                        return esc(data) && data.length > 15 ? esc(data.substring(0, 15)) + '..' : esc(data);
+                    }
+                    return esc(data);
                 }
             },
             { data: 'browser' },
@@ -155,8 +158,11 @@ $(document).ready(function() {
             { 
                 data: 'ip',
                 className: 'truncate',
-                render: function(data) {
-                    return esc(data) && data.length > 15 ? esc(data.substring(0, 15)) + '..' : esc(data);
+                render: function(data, type, row) {
+                    if (type === 'display' || type === 'type') {
+                        return esc(data) && data.length > 15 ? esc(data.substring(0, 15)) + '..' : esc(data);
+                    }
+                    return esc(data);
                 }
             },
             { data: 'shorturi', className: 'truncate' },
@@ -199,7 +205,15 @@ $(document).ready(function() {
             }
         },
         columns: safeColumns([
-            { data: 'user' },
+            { 
+                data: 'user',
+                render: function(data, type, row) {
+                    if(data !== 'Not logged in') {
+                        return `<a href="/manage/users/edit/${row.user_id}">${esc(data)}</a>`;
+                    }
+                    return esc(data);
+                }
+            },
             { data: 'description', className: 'truncate' },
             { data: 'ip', className: 'truncate' },
             { 
@@ -225,23 +239,13 @@ $(document).ready(function() {
         },
         columns: safeColumns([
             { data: 'id' },
-            { data: 'username' },
+            { data: 'username',
+                render: function(data, type, row) {
+                    return `<a href="/manage/users/edit/${row.id}">${esc(data)}</a>`;
+                }
+             },
             { data: 'rank' },
-            { data: 'payloads', className: 'truncate' },
-            { 
-                data: 'id',
-                orderable: false,
-                render: function(data) {
-                    return `<a href="/manage/users/edit/${data}">Edit</a>`;
-                }
-            },
-            { 
-                data: 'id',
-                orderable: false,
-                render: function(data) {
-                    return `<a href="/manage/users/delete/${data}">Delete</a>`;
-                }
-            }
+            { data: 'payloads', className: 'truncate' }
         ]),
         order: [[0, 'asc']],
         dom: '<"top"pf>rt'
@@ -314,8 +318,12 @@ $(document).ready(function() {
             { data: 'description' },
             { 
                 data: 'ip',
-                render: function(data) {
-                    return esc(data) && data.length > 15 ? esc(data.substring(0, 15)) + '..' : esc(data);
+                className: 'truncate',
+                render: function(data, type, row) {
+                    if (type === 'display' || type === 'type') {
+                        return esc(data) && data.length > 15 ? esc(data.substring(0, 15)) + '..' : esc(data);
+                    }
+                    return esc(data);
                 }
             },
             { 

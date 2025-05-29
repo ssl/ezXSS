@@ -20,7 +20,7 @@ define('ishttps', (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_
 
 // Checks if .env file is created
 if (!file_exists(__DIR__ . '/../../.env')) {
-    throw new Exception('No config file (.env) found. Go read the documentation first.');
+    throw new Exception('No config file (.env) found. Go read the documentation first');
 }
 
 // Parse config data
@@ -28,7 +28,7 @@ $config = parse_ini_file(__DIR__ . '/../../.env');
 
 // Checks if config file is valid
 if ($config === false) {
-    throw new Exception('There is something wrong with your config file.');
+    throw new Exception('There is something wrong with your config file');
 }
 
 // Debug modus will show and report any kind of errors, do not enable this unless you are debugging something

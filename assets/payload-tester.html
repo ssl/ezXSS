@@ -54,110 +54,64 @@
 
         // Escape function
         function esc(i) {
-            return String(i).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-        }
-
-        // Cross-browser event binding
-        function addEvent(element, event, handler) {
-            if (element.addEventListener) {
-                element.addEventListener(event, handler, false);
-            } else if (element.attachEvent) {
-                element.attachEvent('on' + event, handler);
-            }
+            var str = String(i);
+            str = str.replace(/&/g, '&amp;');
+            str = str.replace(/</g, '&lt;');
+            str = str.replace(/>/g, '&gt;');
+            str = str.replace(/"/g, '&quot;');
+            str = str.replace(/'/g, '&#39;');
+            return str;
         }
 
         // Browser details
         try {
             var browserDiv = document.getElementById('browser');
-            browserDiv.innerHTML = '<p><b>Browser: </b>' + esc(navigator.appName) + ' ' + esc(navigator.appVersion) + '</p>';
+            if (browserDiv) {
+                browserDiv.innerHTML = '<p><b>Browser: </b>' + esc(navigator.appName) + ' ' + esc(navigator.appVersion) + '</p>';
+            }
         } catch (t) {}
 
         // Random color tester
         try {
             function initColors() {
                 var colorsDiv = document.getElementById('colors');
-                for (var i = 0; i < 10; i++) {
-                    var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                    colorsDiv.innerHTML += '<div class="block" style="background-color:' + color + '"></div>';
+                if (colorsDiv) {
+                    for (var i = 0; i < 10; i++) {
+                        var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                        colorsDiv.innerHTML += '<div class="block" style="background-color:' + color + '"></div>';
+                    }
                 }
             }
-            if (document.readyState === 'complete') {
-                initColors();
+            
+            if (window.onload) {
+                var oldOnload = window.onload;
+                window.onload = function() {
+                    oldOnload();
+                    initColors();
+                };
             } else {
-                addEvent(window, 'load', initColors);
+                window.onload = initColors;
             }
         } catch (t) {}
 
         // Storage and cookie tester
         try {
             if (typeof sessionStorage !== 'undefined') {
-                sessionStorage.setItem('sessionStorageTester', Date.now());
+                sessionStorage.setItem('sessionStorageTester', new Date().getTime());
             }
+        } catch (t) {}
+        
+        try {
             if (typeof localStorage !== 'undefined') {
-                localStorage.setItem('localStorageTester', Date.now());
+                localStorage.setItem('localStorageTester', new Date().getTime());
             }
-            document.cookie = 'CookieTester=' + Date.now();
+        } catch (t) {}
+        
+        try {
+            document.cookie = 'CookieTester=' + new Date().getTime();
         } catch (t) {}
 
-        // Request logging function
-        function logRequest(request) {
-            try {
-                requestLog.push(request);
-                var tableBody = document.getElementById('requests').getElementsByTagName('tbody')[0];
-                var newRow = document.createElement('tr');
-                newRow.innerHTML = '<td>' + esc(request.method || 'UNKNOWN') + '</td>' +
-                                   '<td>' + esc(request.url || 'UNKNOWN') + '</td>' +
-                                   '<td>' + esc(request.status || 'PENDING') + '</td>';
-                tableBody.appendChild(newRow);
-                document.getElementById('table-wrap').style.display = 'block';
-            } catch (e) {
-                console.log('Error logging request:', e);
-            }
-        }
-
-        // Non-interfering XMLHttpRequest monitoring
-        (function() {
-            try {
-                if (window.XMLHttpRequest) {
-                    var originalXhrOpen = XMLHttpRequest.prototype.open;
-                    var originalXhrSend = XMLHttpRequest.prototype.send;
-
-                    XMLHttpRequest.prototype.open = function(method, url) {
-                        this._requestDetails = { method: method, url: url, status: null };
-                        return originalXhrOpen.apply(this, arguments);
-                    };
-
-                    XMLHttpRequest.prototype.send = function(data) {
-                        var xhr = this;
-                        var details = xhr._requestDetails || { method: 'UNKNOWN', url: 'UNKNOWN' };
-                        
-                        // Store original onreadystatechange to avoid overwriting payload's handler
-                        var originalOnReadyStateChange = xhr.onreadystatechange;
-                        
-                        var newOnReadyStateChange = function() {
-                            if (xhr.readyState === 4) {
-                                details.status = xhr.status;
-                                logRequest(details);
-                            }
-                            
-                            // Call original handler if it exists
-                            if (originalOnReadyStateChange) {
-                                originalOnReadyStateChange.apply(this, arguments);
-                            }
-                        };
-                        
-                        // Set our handler
-                        xhr.onreadystatechange = newOnReadyStateChange;
-                        
-                        return originalXhrSend.apply(this, arguments);
-                    };
-                }
-            } catch (e) {
-                console.log('Error setting up XHR monitoring:', e);
-            }
-        })();
-
-        // Payload status check (delayed until payload script loads)
+        // Payload status check
         function checkPayloadStatus() {
             try {
                 var statusDiv = document.createElement('div');
@@ -167,35 +121,22 @@
                                      'ezXSS persistent initialized: <b>' + (typeof ez_persist === 'function' ? 'yes' : 'no') + '</b>';
                 document.body.appendChild(statusDiv);
             } catch (t) {
-                console.log('Error in checkPayloadStatus:', t);
+
             }
         }
 
-        // Initialize monitoring when page loads
-        if (document.readyState === 'complete') {
-            checkPayloadStatus();
+        if (window.onload) {
+            var oldOnload2 = window.onload;
+            window.onload = function() {
+                oldOnload2();
+                checkPayloadStatus();
+            };
         } else {
-            addEvent(window, 'load', checkPayloadStatus);
+            window.onload = checkPayloadStatus;
         }
     </script>
 
     <!-- Load payload from main domain -->
     <script src="/"></script>
-
-    <!-- HTTP requests table -->
-    <div id="table-wrap">
-        <hr>
-        <h3>Network Activity</h3>
-        <table id="requests" border="1">
-            <thead>
-                <tr>
-                    <th>Method</th>
-                    <th>URL</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
 </body>
 </html>

@@ -47,6 +47,7 @@
                                 </div>
 
                                 <button type="submit" name="edit" class="btn">Update</button>
+                                <a href="/manage/users/delete/{%data id}" class="btn btn-danger">Delete user</a>
                             </form>
                         </div>
                     </div>
@@ -55,7 +56,7 @@
                         <div class="panel-heading">User logs</div>
                         <div class="panel-body">
                             <div class="table-responsive">
-                                <table id="user-logs" class="table">
+                                <table id="user-logs" class="table table-striped">
                                     <thead>
                                         <tr>
                                             <th>Description</th>
@@ -98,17 +99,30 @@
                                 <table class="table simple">
                                     <thead>
                                         <tr>
-                                            <th style="width:10%">ID</th>
+                                            <th style="width:10%">Actions</th>
                                             <th>Payload</th>
-                                            <th style="width:10%">Delete</th>
                                         </tr>
                                     </thead>
                                     <tbody id="reports-list">
                                         {%foreach payload}
                                         <tr>
-                                            <td scope="row"><b>{payload->id}</b></td>
+                                            <td>
+                                                <div class="btn-group btn-view" role="group">
+                                                    <a href="/manage/payload/edit/{payload->id}" class="btn pretty-border">Edit</a>
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-default dropdown-toggle pretty-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <div class="dropdown-backdrop"></div>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="/manage/reports/list/{payload->id}">Reports</a></li>
+                                                            <li><a href="/manage/persistent/list/{payload->id}">Sessions</a></li>
+                                                            <li><a class="delete-payload" href="#" data-id="{payload->id}">Delete</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <td>{payload->payload}</td>
-                                            <td><a class="delete-payload" href="#" data-id="{payload->id}">Delete</b></td>
                                         </tr>
                                         {%/foreach}
                                     </tbody>

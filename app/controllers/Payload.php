@@ -36,7 +36,7 @@ class Payload extends Controller
 
         // Check payload permissions
         $payloadList = $this->payloadList(2);
-        if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
+        if (!is_numeric($id) || (!in_array(+$id, $payloadList, true) && !$this->isAdmin())) {
             throw new Exception('You dont have permissions to this payload');
         }
 
@@ -100,6 +100,10 @@ class Payload extends Controller
         foreach ($payloadList as $val) {
             $payload = $this->model('Payload')->getById($val);
             $payloads[] = ['id' => $val, 'name' => ucfirst($payload['payload']), 'selected' => $val == $id ? 'selected' : ''];
+        }
+        if(!in_array($id, $payloadList) && $this->isAdmin()) {
+            $payload = $this->model('Payload')->getById($id);
+            $payloads[] = ['id' => $id, 'name' => ucfirst($payload['payload']), 'selected' => 'selected'];
         }
         $this->view->renderDataset('payload', $payloads);
 
@@ -198,7 +202,7 @@ class Payload extends Controller
         try {
             // Check payload permissions
             $payloadList = $this->payloadList(2);
-            if (!is_numeric($id) || !in_array(+$id, $payloadList, true)) {
+            if (!is_numeric($id) || (!in_array(+$id, $payloadList, true) && !$this->isAdmin())) {
                 throw new Exception('You dont have permissions to this payload');
             }
 
@@ -237,6 +241,12 @@ class Payload extends Controller
     public function spider($id)
     {
         $this->isAPIRequest();
+
+        // Check payload permissions
+        $payloadList = $this->payloadList(2);
+        if (!is_numeric($id) || (!in_array(+$id, $payloadList, true) && !$this->isAdmin())) {
+            jsonResponse('error', 'You dont have permissions to this payload');
+        }
 
         $method = _JSON('method');
         $methods = ['0','1','2'];

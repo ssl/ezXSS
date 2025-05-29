@@ -374,7 +374,7 @@ const EzXSS = {
     handlePayloadDelete(e) {
         e.preventDefault();
         const id = $(this).attr('data-id');
-        const row = $(this).parent().parent();
+        const row = $(this).parent().parent().parent().parent().parent().parent();
         
         row.fadeOut('slow');
         Utils.request(`/manage/users/deletepayload/${id}`, {})
@@ -749,7 +749,7 @@ const EzXSS = {
         Utils.request('/manage/dashboard/mostCommon', {
             id: parseInt(id),
             row,
-            admin
+            admin: admin ? 1 : 0
         }).then((data) => {
             loadingElement.hide();
             topRowElement.show();

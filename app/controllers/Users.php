@@ -199,7 +199,7 @@ class Users extends Controller
             }
             
             $payloadString = $payloadString === '' ? $payloadString : substr($payloadString, 0, -2);
-            $payloadString = (strlen($payloadString) > 35) ? substr($payloadString, 0, 35) . '...' : $payloadString;
+            $payloadString = (strlen($payloadString) > 50) ? substr($payloadString, 0, 50) . '...' : $payloadString;
             $user['payloads'] = $payloadString;
         }
 

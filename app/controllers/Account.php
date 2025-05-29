@@ -329,7 +329,7 @@ class Account extends Controller
             }
 
             if (getAuthCode($secret) !== $code) {
-                throw new Exception('Code is incorrect.');
+                throw new Exception('Code is incorrect');
             }
         } else {
             if (strlen($secretCode) !== 16) {
