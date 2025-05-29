@@ -98,12 +98,21 @@ class Reports extends Controller
                 $this->view->renderCondition('isExtra', false);
                 $this->view->renderCondition('isJsonExtra', true);
                 $extraItems = [];
-                foreach($decodedExtra as $key => $value) {
-                    if(is_array($value) || is_object($value)) {
-                        $value = json_encode($value);
+                $processItem = function($data, $keyPrefix = '', $depth = 0) use (&$processItem, &$extraItems) {                    
+                    if (is_array($data) || is_object($data)) {
+                        if ($depth > 3) {
+                            $extraItems[] = ['key' => $keyPrefix, 'value' => json_encode($data)];
+                        } else {
+                            foreach ($data as $key => $value) {
+                                $newKey = $keyPrefix === '' ? $key : "{$keyPrefix}.{$key}";
+                                $processItem($value, $newKey, $depth + 1);
+                            }
+                        }
+                    } else {
+                        $extraItems[] = ['key' => $keyPrefix, 'value' => $data];
                     }
-                    $extraItems[] = ['key' => $key, 'value' => $value];
-                }
+                };
+                $processItem($decodedExtra);
                 $this->view->renderDataset('extraItems', $extraItems);
             } else {
                 $this->view->renderCondition('isJsonExtra', false);

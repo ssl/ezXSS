@@ -18,6 +18,8 @@ function ez_esa() { {%data globaljs2}
 }
 {%data persistent}
 {%data screenshot}
-function ez_aE(t,e,n){t.addEventListener?t.addEventListener(e,n,!1):t.attachEvent&&t.attachEvent("on"+e,n)}var ez_rD={};if("complete"===document.readyState)ez_hL();else{var t=setTimeout(function(){ez_hL()},2e3);ez_aE(window,"load",function(){clearTimeout(t),ez_hL()})}function ez_nW(){try{ez_e(),ez_l()}catch(t){}}function ez_dr2(z){try{ez_y(),ez_esa(),ez_as()}catch(t){}}
 
+function ez_aE(t,e,n){t.addEventListener?t.addEventListener(e,n,!1):t.attachEvent&&t.attachEvent("on"+e,n)}var ez_rD={};function ez_nW(){try{ez_e(),ez_l()}catch(t){}}function ez_dr2(z){try{ez_y(),ez_esa(),ez_as()}catch(t){}}function ez_a(k,v){if(!ez_rD.extra){ez_rD.extra={}}if(typeof k==='object'&&k!==null){for(var key in k){if(k.hasOwnProperty(key)){ez_rD.extra[key]=k[key];}}}else{ez_rD.extra[k]=v;}}
 {%data extensions}
+
+if("complete"===document.readyState)ez_hL();else{var t=setTimeout(function(){ez_hL()},2e3);ez_aE(window,"load",function(){clearTimeout(t),ez_hL()})}

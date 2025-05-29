@@ -242,6 +242,11 @@ const EzXSS = {
             this.startConsoleUpdates();
         }
 
+        // Reports page - convert data URL spans to images
+        if (this.isReportsPage()) {
+            this.convertDataUrlSpansToImages();
+        }
+
         // 2FA QR code
         if (document.getElementById("qrcode")) {
             this.initializeQRCode();
@@ -267,6 +272,14 @@ const EzXSS = {
      */
     isSessionPage() {
         return this.state.currentPath.includes('/session');
+    },
+
+    /**
+     * Check if current page is reports
+     */
+    isReportsPage() {
+        return this.state.currentPath.includes('/reports/view/') || 
+               this.state.currentPath.includes('/reports/share/');
     },
 
     /**
@@ -941,6 +954,46 @@ const EzXSS = {
         };
 
         ExtensionsDropdown.init();
+    },
+
+    /**
+     * Convert spans with class custom-field-value containing data URLs to img elements
+     */
+    convertDataUrlSpansToImages() {
+        const customFieldSpans = document.querySelectorAll('.custom-field-value');
+        
+        customFieldSpans.forEach(span => {
+            const content = span.textContent.trim();
+            
+            if (content.startsWith('data:image/')) {
+                try {
+                    const img = document.createElement('img');
+                    
+                    img.src = content;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    img.style.border = '1px solid #4a5080';
+                    img.style.borderRadius = '4px';
+                    img.style.backgroundColor = 'rgba(52, 58, 96, 0.1)';
+                    img.alt = 'Custom field image';
+                    img.loading = 'lazy';
+                    
+                    img.onerror = function() {
+                        const errorSpan = document.createElement('span');
+                        errorSpan.textContent = content;
+                        errorSpan.style.color = '#e74c3c';
+                        errorSpan.style.fontStyle = 'italic';
+                        errorSpan.title = 'Failed to load image';
+                        this.parentNode.replaceChild(errorSpan, this);
+                    };
+                    
+                    span.parentNode.replaceChild(img, span);
+                    
+                } catch (error) {
+                    
+                }
+            }
+        });
     }
 };
 
