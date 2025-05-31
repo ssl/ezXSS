@@ -20,7 +20,8 @@ Once an ezXSS payload is placed, the user must wait until it is triggered, at wh
 * Instant alerts via mail, Telegram, Slack, Discord or custom callback URL
 * Custom extra javascript payloads
 * Custom payload links to distinguish insert points
-* Extract additional pages, block, whitelist and other filters
+* Extract additional paths, automatic (recursive) spider, block, whitelist and more filters
+* :new: Extensions that can add or edit ezXSS payload functions (check out [ezXSS-extensions](https://github.com/ssl/ezXSS-extensions))
 * Secure your login with Two-factor (2FA)
 * The following information can be collected on a vulnerable page:
     * The URL of the page
@@ -35,7 +36,9 @@ Once an ezXSS payload is placed, the user must wait until it is triggered, at wh
     * Time of execution
     * Payload URL
     * Screenshot of the page
-    * Extract additional defined pages
+    * Extracted additional defined paths
+    * Extracted content of links from (recursive) spider
+    * Any extra custom fields (via extensions or custom JS)
 * Triggers in all browsers, starting from Chrome 1+, IE 6+, Firefox 1+, Opera 10+, Safari 4+
 * much much more, and, its just ez :-)
 
