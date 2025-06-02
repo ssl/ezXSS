@@ -228,7 +228,7 @@ class Payload extends Controller
             $this->log("Updated payload #{$id} settings");
             return jsonResponse('success', 1);
         } catch (Exception $e) {
-            return jsonResponse('error', $e);
+            return jsonResponse('error', $e->getMessage());
         }
     }
 
