@@ -18,7 +18,7 @@ class Trigger extends Controller
 
         // CORS headers
         header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Headers: origin, x-requested-with, content-type');
+        header('Access-Control-Allow-Headers: *');
         header('Access-Control-Allow-Methods: GET, POST');
 
         // Cache headers
