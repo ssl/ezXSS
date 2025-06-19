@@ -42,6 +42,11 @@ class Reports extends Controller
         $this->view->setTitle('Report');
         $this->view->renderTemplate('reports/view');
 
+        // Check report permissions
+        if (!is_numeric($id) || !$this->hasReportPermissions($id)) {
+            throw new Exception('You dont have permissions to this report');
+        }
+
         $report = $this->model('Report')->getById($id);
 
         $this->renderView($report);
