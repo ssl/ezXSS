@@ -86,8 +86,8 @@ class Reports extends Controller
         if(!empty($report['screenshot'] ?? '')) {
             $screenshot = strlen($report['screenshot']) === 52 ? '<img class="report-img" src="/assets/img/report-' . e($report['screenshot']) . '.png">' : '<img class="report-img" src="data:image/png;base64,' . e($report['screenshot']) . '">';
         }
+        $this->view->renderCondition('hasScreenshot', !empty($screenshot ?? ''));
         $this->view->renderData('screenshot', $screenshot ?? '', true);
-        $this->view->renderCondition('hasScreenshot', !empty($screenshot));
         $this->view->renderData('time', date('F j, Y, g:i a', $report['time']));
         $this->view->renderData('browser', parseUserAgent($report['user-agent']), true);
 

@@ -89,7 +89,7 @@ function jsonResponse($type, $data, $status = 200)
     }
 
     echo $response;
-    http_response_code($status);
+    @http_response_code($status);
     exit();
 }
 
