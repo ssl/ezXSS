@@ -91,14 +91,16 @@ class Alert_model extends Model
      * Gets alert by method id
      * 
      * @param int $id The method id
+     * @param int $userId The user id
      * @throws Exception
      * @return array
      */
-    public function getAllByMethodId($id)
+    public function getByMethodId($id, $userId = 0)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT * FROM $this->table WHERE `method_id` = :method_id AND `enabled` = 1 ORDER BY `id` ASC");
+        $database->prepare("SELECT * FROM $this->table WHERE `method_id` = :method_id AND `enabled` = 1 AND (`user_id` = :user_id OR `user_id` = 0) ORDER BY `id` ASC");
         $database->bindValue(':method_id', $id);
+        $database->bindValue(':user_id', $userId);
 
         if (!$database->execute()) {
             throw new Exception('Something unexpected went wrong');

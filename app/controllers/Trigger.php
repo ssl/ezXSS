@@ -387,68 +387,54 @@ class Trigger extends Controller
         }
 
         $payload = $this->getPayloadByUrl($data->payload);
+        
+        $userIdToAlert = 0;
+        try {
+            if($payload['user_id'] !== 0) {
+                $user = $this->model('User')->getById($payload['user_id']); 
+                if($user['rank'] !== 0) {
+                    $userIdToAlert = $payload['user_id'];
+                }
+            }
+        } catch (Exception $e) {}
 
         // Email alerting
         if ($this->model('Setting')->get('alert-mail') == 1) {
             // Get all enabled alerts with this method of alerting
-            $alerts = $this->model('Alert')->getAllByMethodId(1);
+            $alerts = $this->model('Alert')->getByMethodId(1, $userIdToAlert);
 
             foreach ($alerts as $alert) {
-                if ($alert['user_id'] === 0) {
-                    // Global alerting that always sends if enabled
-                    $this->mailAlert($data, $alert['value1']);
-                } elseif ($payload['user_id'] !== 0 && $alert['user_id'] === $payload['user_id']) {
-                    // Sends alert to user that owns the payload
-                    $this->mailAlert($data, $alert['value1']);
-                }
+                $this->mailAlert($data, $alert['value1']);
             }
         }
 
         // Telegram alerting
         if ($this->model('Setting')->get('alert-telegram') == 1) {
             // Get all enabled alerts with this method of alerting
-            $alerts = $this->model('Alert')->getAllByMethodId(2);
+            $alerts = $this->model('Alert')->getByMethodId(2, $userIdToAlert);
 
             foreach ($alerts as $alert) {
-                if ($alert['user_id'] === 0) {
-                    // Global alerting that always sends if enabled
-                    $this->telegramAlert($data, $alert['value1'], $alert['value2']);
-                } elseif ($payload['user_id'] !== 0 && $alert['user_id'] === $payload['user_id']) {
-                    // Sends alert to user that owns the payload
-                    $this->telegramAlert($data, $alert['value1'], $alert['value2']);
-                }
+                $this->telegramAlert($data, $alert['value1'], $alert['value2']);
             }
         }
 
         // Slack alerting
         if ($this->model('Setting')->get('alert-slack') == 1) {
             // Get all enabled alerts with this method of alerting
-            $alerts = $this->model('Alert')->getAllByMethodId(3);
+            $alerts = $this->model('Alert')->getByMethodId(3, $userIdToAlert);
 
             foreach ($alerts as $alert) {
-                if ($alert['user_id'] === 0) {
-                    // Global alerting that always sends if enabled
-                    $this->slackAlert($data, $alert['value1']);
-                } elseif ($payload['user_id'] !== 0 && $alert['user_id'] === $payload['user_id']) {
-                    // Sends alert to user that owns the payload
-                    $this->slackAlert($data, $alert['value1']);
-                }
+                $this->slackAlert($data, $alert['value1']);
             }
         }
 
         // Discord alerting
         if ($this->model('Setting')->get('alert-discord') == 1) {
             // Get all enabled alerts with this method of alerting
-            $alerts = $this->model('Alert')->getAllByMethodId(4);
+            $alerts = $this->model('Alert')->getByMethodId(4, $userIdToAlert);
 
             foreach ($alerts as $alert) {
-                if ($alert['user_id'] === 0) {
-                    // Global alerting that always sends if enabled
-                    $this->discordAlert($data, $alert['value1']);
-                } elseif ($payload['user_id'] !== 0 && $alert['user_id'] === $payload['user_id']) {
-                    // Sends alert to user that owns the payload
-                    $this->discordAlert($data, $alert['value1']);
-                }
+                $this->discordAlert($data, $alert['value1']);
             }
         }
     }

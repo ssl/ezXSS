@@ -403,3 +403,7 @@ ALTER TABLE sessions ADD INDEX(archive);
 ALTER TABLE sessions_data ADD INDEX(sessionid);
 
 ALTER TABLE logs ADD INDEX(user_id);
+
+ALTER TABLE `alerts` ADD INDEX(`user_id`);
+ALTER TABLE `alerts` ADD INDEX(`enabled`);
+ALTER TABLE `alerts` ADD INDEX(`method_id`);

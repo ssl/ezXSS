@@ -40,3 +40,7 @@ ALTER TABLE `extensions`
 
 ALTER TABLE `sessions` ADD COLUMN `archive` int(11) DEFAULT '0';
 ALTER TABLE `sessions` ADD INDEX(`archive`);
+
+ALTER TABLE `alerts` ADD INDEX(`user_id`);
+ALTER TABLE `alerts` ADD INDEX(`enabled`);
+ALTER TABLE `alerts` ADD INDEX(`method_id`);
