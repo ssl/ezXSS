@@ -33,7 +33,7 @@ class Log_model extends Model
     public function getByUserId($userId)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT * FROM $this->table WHERE `user_id` = :user_id ORDER BY `time` DESC");
+        $database->prepare("SELECT * FROM $this->table WHERE `user_id` = :user_id ORDER BY `time` ASC");
         $database->bindValue(':user_id', $userId);
         
         if (!$database->execute()) {

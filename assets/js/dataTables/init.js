@@ -5,6 +5,8 @@ $(document).ready(function() {
         scrollX: false,
         autoWidth: true,
         responsive: true,
+        pagingType: "simple_numbers",
+        dom: '<"top"lipf>rt',
         language: {
             search: "_INPUT_",
             searchPlaceholder: "Search...",
@@ -58,8 +60,11 @@ $(document).ready(function() {
         }
     };
 
+    // Reports table
     new DataTable('#reports', {
         ...commonSettings,
+        autoWidth: false,
+        responsive: false,
         ajax: {
             url: "/manage/reports/data",
             contentType: "application/json",
@@ -99,7 +104,7 @@ $(document).ready(function() {
                         </div>`;
                 }
             },
-            { data: 'id' },
+            { data: 'id', className: 'dt-id-column' },
             { data: 'uri', className: 'truncate' },
             { 
                 data: 'ip',
@@ -120,14 +125,16 @@ $(document).ready(function() {
             $(row).attr('id', data.id);
         },
         order: [[1, 'desc']],
-        dom: '<"top"lipf>rt',
         drawCallback: function() {
             $('.with-bar').toggle(this.api().data().any());
         }
     });
 
+    // Persistent table
     const dataTablePersistent = new DataTable('#persistent', {
         ...commonSettings,
+        autoWidth: false,
+        responsive: false,
         ajax: {
             url: "/manage/persistent/sessions",
             contentType: "application/json",
@@ -176,12 +183,12 @@ $(document).ready(function() {
             }
         ]),
         order: [[6, 'desc']],
-        dom: '<"top"lipf>rt',
         drawCallback: function() {
             $('.with-bar').toggle(this.api().data().any());
         }
     });
 
+    // Persistent table auto-refresh
     if (location.pathname.split('/')[2] === "persistent") {
         let elapsedTime = 0;
         setInterval(function() {
@@ -194,6 +201,7 @@ $(document).ready(function() {
         }, 120000);
     }
 
+    // Logs table
     new DataTable('#logs', {
         ...commonSettings,
         ajax: {
@@ -223,10 +231,10 @@ $(document).ready(function() {
                 }
             }
         ]),
-        order: [[3, 'desc']],
-        dom: '<"top"lipf>rt'
+        order: [[3, 'desc']]
     });
 
+    // Users table
     new DataTable('#users', {
         ...commonSettings,
         ajax: {
@@ -251,8 +259,11 @@ $(document).ready(function() {
         dom: '<"top"pf>rt'
     });
 
+    // Extensions table
     new DataTable('#extensions', {
         ...commonSettings,
+        autoWidth: false,
+        responsive: false,
         ajax: {
             url: "/manage/extensions/data",
             contentType: "application/json",
@@ -265,6 +276,7 @@ $(document).ready(function() {
             { 
                 data: 'id',
                 orderable: false,
+                className: 'dt-actions-column',
                 render: function(data, type, row) {
                     return `<div class="btn-group btn-view" role="group">
                                 <a href="/manage/extensions/edit/${row.id}" class="btn pretty-border">Edit</a>
@@ -282,13 +294,13 @@ $(document).ready(function() {
                 }
             },
             { data: 'name'},
-            { data: 'description', className: 'truncate'},
+            { data: 'description'},
             { data: 'author' },
-            { data: 'version' },
+            { data: 'version', className: 'dt-version-column' },
             { 
                 data: 'enabled',
                 orderable: false,
-                className: 'text-center extension-toggle-cell',
+                className: 'text-center extension-toggle-cell dt-toggle-column',
                 render: function(data, type, row) {
                     const isEnabled = data == 1;
                     const checked = isEnabled ? 'checked' : '';
@@ -299,10 +311,10 @@ $(document).ready(function() {
                 }
             }
         ]),
-        order: [[0, 'asc']],
-        dom: '<"top"lipf>rt',
+        order: [[0, 'asc']]
     });
 
+    // User logs table
     new DataTable('#user-logs', {
         ...commonSettings,
         ajax: {
@@ -333,23 +345,24 @@ $(document).ready(function() {
                 }
             }
         ]),
-        columnDefs: [{ targets: 1, className: "truncate" }],
+        columnDefs: [
+            { targets: 1, className: "truncate" }
+        ],
         order: [[2, 'desc']],
         dom: '<"top"pf>rt',
         pageLength: 10,
-        lengthMenu: [[5, 10, 25, 50], [5 | 10 | 25 | 50]],
+        lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
         pagingType: "simple",
         scrollX: false,
-        autoWidth: false,
-        
+        autoWidth: false
     });
 
+    // Simple table
     $('#simple-table').DataTable({
         ...commonSettings,
         columnDefs: [{ orderable: true, targets: [0] }],
         pageLength: 25,
-        order: [[0, 'desc']],
-        dom: '<"top"lipf>rt'
+        order: [[0, 'desc']]
     });
 });
 
