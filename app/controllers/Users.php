@@ -232,6 +232,38 @@ class Users extends Controller
     }
 
     /**
+     * Impersonates a user
+     * 
+     * @param string $id The user id
+     * @throws Exception
+     * @return string
+     */
+    public function impersonate($id)
+    {
+        $this->view->setTitle('Impersonate User');
+        $this->view->renderTemplate('users/impersonate');
+
+        $user = $this->model('User')->getById($id);
+
+        if($user['id'] == $this->session->data('id') || $user['rank'] == 7) {
+            throw new Exception('You cannot impersonate yourself or an other admin');
+        }
+
+        $this->view->renderData('username', $user['username']);
+
+        if (isPOST()) {
+            $this->validateCsrfToken();
+
+            $this->log("Impersonated user {$user['username']} (#{$user['id']})");
+            $this->session->clear();
+            $this->session->create($user);
+            redirect('/manage/dashboard/my');
+        }
+
+        return $this->showContent();
+    }
+
+    /**
      * Creates and returns select box of available ranks
      * 
      * @param int $default The id of the current selected payload

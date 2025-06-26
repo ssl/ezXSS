@@ -356,6 +356,7 @@ div.table-responsive>div.dataTables_wrapper>div.row>div[class^=col-]:last-child{
 .reports-checkbox-label .reports-checkbox-custom::after{position:absolute; content:""; left:12px; top:12px; height:0; width:0; border-radius:5px; border:solid #009bff; border-width:0 3px 3px 0; -webkit-transform:rotate(0) scale(0); -ms-transform:rotate(0) scale(0); transform:rotate(0) scale(0); opacity:1; transition:all .3s ease-out; -webkit-transition:all .3s ease-out; -moz-transition:all .3s ease-out; -ms-transition:all .3s ease-out; -o-transition:all .3s ease-out;}
 .reports-checkbox-label input:checked~.reports-checkbox-custom::after{-webkit-transform:rotate(45deg) scale(1); -ms-transform:rotate(45deg) scale(1); transform:rotate(45deg) scale(1); opacity:1; left:8px; top:3px; width:6px; height:12px; border:solid #23284b; border-width:0 2px 2px 0; background-color:transparent; border-radius:0;}
 .common-selectbox{margin-left:5px; height:22px; display:inline; width:100px; border:0; background-color:#343a60; border-radius:4px; padding:0 5px; color:#fff;}
+.mg-10{margin-left:10px}
 #mobile-dropdown{display:none;}
 #mobile-icon{width:35px; height:5px; background-color:#000; margin:6px 0;}
 .truncate{max-width:600px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}

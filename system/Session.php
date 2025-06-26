@@ -110,6 +110,16 @@ class Session
     }
 
     /**
+     * Clears session data
+     *
+     * @return void
+     */
+    public function clear()
+    {
+        $_SESSION = [];
+    }
+
+    /**
      * Returns session data
      *
      * @param string $param The param
