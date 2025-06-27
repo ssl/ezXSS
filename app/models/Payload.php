@@ -112,4 +112,42 @@ class Payload_model extends Model
             return false;
         }
     }
+
+    /**
+     * Check if domain conflicts with existing payloads
+     * 
+     * @param mixed $payload The payload url to check
+     * @param int $userId The user ID to check ownership for
+     * @throws Exception
+     * @return mixed
+     */
+    public function isDomainAvailable($payload, $userId)
+    {
+        $database = Database::openConnection();
+        
+        $database->getAll($this->table);
+        $payloads = $database->fetchAll();
+        
+        $payloadParts = explode('/', $payload, 2);
+        $newDomain = $payloadParts[0];
+        $newPath = isset($payloadParts[1]) ? $payloadParts[1] : '';
+        
+        foreach ($payloads as $existing) {
+            $existingParts = explode('/', $existing['payload'], 2);
+            $existingDomain = $existingParts[0];
+            $existingPath = isset($existingParts[1]) ? $existingParts[1] : '';
+            
+            if ($payload === $existing['payload'] ||
+                ($newDomain === $existingDomain && (
+                    $existing['user_id'] != $userId ||
+                    $newPath === $existingPath ||
+                    (empty($newPath) && !empty($existingPath))
+                ))
+            ) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 }

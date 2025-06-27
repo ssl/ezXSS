@@ -7,7 +7,7 @@ class Users extends Controller
      * 
      * @var array
      */
-    public $ranks = [0 => 'Banned', 1 => 'User', 7 => 'Admin'];
+    public $ranks = [0 => 'Banned', 1 => 'User', 2 => 'Pro', 7 => 'Admin'];
 
     /**
      * Constructor that always validates if user is admin or not

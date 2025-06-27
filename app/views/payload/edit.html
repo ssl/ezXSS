@@ -22,12 +22,21 @@
 
             <div class="row">
                 <div class="col-lg-12">
-                    <select class="form-control content-select" id="payloadList" name="payloadList">
-                        {%foreach payload}
-                        <option value="{payload->id}" {payload->selected}>Payload #{payload->id} | {payload->name}
-                        </option>
-                        {%/foreach}
-                    </select>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <select class="form-control content-select" id="payloadList" name="payloadList">
+                                {%foreach payload}
+                                <option value="{payload->id}" {payload->selected}>Payload #{payload->id} | {payload->name}
+                                </option>
+                                {%/foreach}
+                            </select>
+                        </div>
+                        {%if canCreatePayload}
+                        <div>
+                            <a href="/manage/payload/create" class="btn">Create New Payload</a>
+                        </div>
+                        {%/if}
+                    </div>
                     <br>
                 </div>
 

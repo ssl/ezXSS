@@ -244,7 +244,7 @@ class View
 
         $this->content = $content;
         $this->renderCondition('userIsAdmin', $this->session('rank') == 7);
-        $this->renderCondition('isLoggedIn', $this->session('rank') > 0);
+        $this->renderCondition('isLoggedIn', $this->session('rank') > 0 || $this->session('rank') == 0);
     }
 
     /**

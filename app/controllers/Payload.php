@@ -18,6 +18,8 @@ class Payload extends Controller
             redirect('/manage/payload/edit/' . $payloadList[0]);
         }
 
+        $this->view->renderCondition('canCreatePayload', $this->canCreatePayload());
+
         return $this->showContent();
     }
 
@@ -184,6 +186,7 @@ class Payload extends Controller
             ];
         }
         $this->view->renderDataset('extensions', $extensions);
+        $this->view->renderCondition('canCreatePayload', $this->canCreatePayload());
 
         return $this->showContent();
     }
@@ -332,5 +335,87 @@ class Payload extends Controller
 
         $newString = $payload[$type] . '~' . $domain;
         $this->model('Payload')->set($id, $type, $newString);
+    }
+
+    /**
+     * Renders the payload create form and handles creation
+     *
+     * @return string
+     */
+    public function create()
+    {
+        $this->isLoggedInOrExit();
+        
+        // Check if user can manage payloads
+        if (!$this->canCreatePayload()) {
+            throw new Exception('You dont have permissions to create payloads');
+        }
+
+        $this->view->setTitle('Create Payload');
+        $this->view->renderTemplate('payload/create');
+
+        if (isPOST()) {
+            try {
+                $this->validateCsrfToken();
+
+                $payload = strtolower(trim(_POST('payload') ?? ''));
+
+                if (empty($payload)) {
+                    throw new Exception('Payload domain cannot be empty');
+                }
+
+                if (preg_match('/\s/', $payload) || 
+                    preg_match('/[<>"\'\\\\\|\*\?#%&=]/', $payload) || 
+                    preg_match('/[\(\)\[\]\{\}@!]/', $payload) || 
+                    preg_match('/[\x00-\x1F\x7F]/', $payload)) {
+                    throw new Exception('Payload domain contains invalid characters');
+                }
+
+                if (strpos($payload, 'http://') === 0 || strpos($payload, 'https://') === 0) {
+                    throw new Exception('Payload needs to be in format without http://');
+                }
+
+                if (substr($payload, -1) === '/') {
+                    throw new Exception('Payload needs to be in format without trailing slash');
+                }
+
+                if (!preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]?(\.[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]?)*(\.[a-zA-Z]{2,})(\\/.*)?$/', $payload)) {
+                    throw new Exception('Payload domain is in invalid format');
+                }
+
+                if (!$this->model('Payload')->isAvailable($payload)) {
+                    throw new Exception('Payload domain is already in use');
+                }
+
+                $userId = $this->session->data('id');
+                if (!$this->model('Payload')->isDomainAvailable($payload, $userId)) {
+                    throw new Exception('Payload domain conflicts with existing payload');
+                }
+
+                // Create the payload
+                $this->model('Payload')->add($userId, $payload);
+                
+                $this->log("Created new payload {$payload}");
+                
+                // Redirect to edit the new payload
+                $newPayload = $this->model('Payload')->getByPayload($payload);
+                redirect('/manage/payload/edit/' . $newPayload['id']);
+                
+            } catch (Exception $e) {
+                $this->view->renderMessage($e->getMessage());
+            }
+        }
+
+        return $this->showContent();
+    }
+
+    /**
+     * Check if user can create payloads (rank 2 or admin)
+     *
+     * @return boolean
+     */
+    private function canCreatePayload()
+    {
+        return $this->session->data('rank') == 2 || $this->session->data('rank') == 7;
     }
 }
