@@ -46,18 +46,16 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                <code class="url-display">{request->shorturi}</code>
+                                                {request->shorturi}
                                             </td>
                                             <td>
-                                                <span class="browser-display">{request->browser}</span>
+                                                {request->browser}
                                             </td>
                                             <td>
-                                                <span class="ip-display">{request->ip}</span>
+                                                {request->ip}
                                             </td>
                                             <td data-sort="{request->time}">
-                                                <span class="timestamp-display">
-                                                    <time class="time-formatted">{request->last}</time>
-                                                </span>
+                                                <time class="time-formatted">{request->last}</time>
                                             </td>
                                         </tr>
                                         {%/foreach}
