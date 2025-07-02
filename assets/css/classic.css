@@ -731,10 +731,10 @@ div.dataTables_wrapper div.dt-paging ul.pagination li>a{padding:6px 10px;font-si
 #extensions{table-layout:fixed!important;width:100%!important;max-width:100%!important}
 #extensions .table-responsive{overflow-x:visible!important}
 #extensions td:first-child,#extensions th:first-child{width:100px!important;max-width:100px!important;text-align:center}
-#extensions td:nth-child(2),#extensions th:nth-child(2){width:auto!important;min-width:80px!important;max-width:200px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#extensions td:nth-child(2),#extensions th:nth-child(2){width:auto!important;min-width:80px!important;max-width:200px!important;white-space:nowrap;text-overflow:ellipsis}
 #extensions td:nth-child(3),#extensions th:nth-child(3){width:auto!important;min-width:150px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
-#extensions td:nth-child(4),#extensions th:nth-child(4){width:100px!important;max-width:100px!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#extensions td:nth-child(5),#extensions th:nth-child(5){width:70px!important;max-width:70px!important;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#extensions td:nth-child(4),#extensions th:nth-child(4){width:100px!important;max-width:100px!important;text-align:center;white-space:nowrap;text-overflow:ellipsis}
+#extensions td:nth-child(5),#extensions th:nth-child(5){width:70px!important;max-width:70px!important;text-align:center;text-overflow:ellipsis;white-space:nowrap}
 #extensions td:nth-child(6),#extensions th:nth-child(6){width:40px!important;max-width:40px!important;text-align:center}
 @media (max-width:768px){
 #extensions td:first-child,#extensions th:first-child{width:80px!important;max-width:80px!important}
@@ -748,13 +748,13 @@ div.dataTables_wrapper div.dt-paging ul.pagination li>a{padding:6px 10px;font-si
 }
 #reports{table-layout:fixed!important;width:100%!important;max-width:100%!important}
 #reports .table-responsive{overflow-x:auto!important}
-#reports td:first-child,#reports th:first-child{width:140px!important;min-width:140px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#reports td:nth-child(2),#reports th:nth-child(2){width:60px!important;min-width:60px!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#reports td:first-child,#reports th:first-child{width:140px!important;min-width:140px!important;white-space:nowrap;text-overflow:ellipsis}
+#reports td:nth-child(2),#reports th:nth-child(2){width:60px!important;min-width:60px!important;text-align:center;white-space:nowrap;text-overflow:ellipsis}
 #reports td:nth-child(3),#reports th:nth-child(3){width:auto!important;min-width:200px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
-#reports td:nth-child(4),#reports th:nth-child(4){width:130px!important;min-width:130px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#reports td:nth-child(5),#reports th:nth-child(5){width:150px!important;min-width:150px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#reports td:nth-child(6),#reports th:nth-child(6){width:130px!important;min-width:130px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#reports td:nth-child(7),#reports th:nth-child(7){width:140px!important;min-width:140px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#reports td:nth-child(4),#reports th:nth-child(4){width:130px!important;min-width:130px!important;white-space:nowrap;text-overflow:ellipsis}
+#reports td:nth-child(5),#reports th:nth-child(5){width:150px!important;min-width:150px!important;white-space:nowrap;text-overflow:ellipsis}
+#reports td:nth-child(6),#reports th:nth-child(6){width:130px!important;min-width:130px!important;white-space:nowrap;text-overflow:ellipsis}
+#reports td:nth-child(7),#reports th:nth-child(7){width:140px!important;min-width:140px!important;white-space:nowrap;text-overflow:ellipsis}
 #persistent{table-layout:fixed!important;width:100%!important;max-width:100%!important}
 #persistent .table-responsive{overflow-x:auto!important}
 #persistent td:first-child,#persistent th:first-child{width:200px!important;min-width:200px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
