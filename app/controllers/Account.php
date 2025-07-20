@@ -33,7 +33,7 @@ class Account extends Controller
                 // Check if posted data is changing MFA
                 if (_POST('mfa') !== null) {
                     $secret = _POST('secret') ?? '';
-                    $code = _POST('code');
+                    $code = _POST('code') ?? '';
                     $this->mfaSettings($secret, $code);
                 }
 
@@ -132,7 +132,6 @@ class Account extends Controller
 
         if ($this->session->data('temp') != true) {
             redirect('dashboard/index');
-            exit();
         }
 
         if (isPOST()) {
@@ -277,7 +276,7 @@ class Account extends Controller
         }
 
         // No recent chat found
-        return jsonResponse('error', 'Your bot token seems valid, but I cannot find a chat. Start a chat with your bot by sending /start');
+        return jsonResponse('error', 'The bot token seems valid, but no chat can be found. Start a chat with your bot by sending /start');
     }
 
 
@@ -400,6 +399,6 @@ class Account extends Controller
         }
         $alerts->set($user['id'], 4, $discordOn !== null, $discordWebhook);
 
-        $this->log('Editted personal alert settings');
+        $this->log('Updated personal alert settings');
     }
 }

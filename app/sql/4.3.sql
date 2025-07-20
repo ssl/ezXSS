@@ -138,7 +138,7 @@ INSERT INTO `settings` (`id`, `setting`, `value`) VALUES
 (25, 'alert-slack', '1'),
 (26, 'alert-discord', '1'),
 (27, 'logging', '0'),
-(28, 'persistent', '0'),
+(28, 'persistent', '1'),
 (29, 'storescreenshot', '0'),
 (30, 'compress', '0'),
 (31, 'customjs2', ''),

@@ -320,7 +320,7 @@ class View
         $content = $template;
         preg_match_all('/{{(.*?)}}/', $template, $matches);
         foreach ($matches[1] as $key => $value) {
-            if (is_object($data->{$matches[1][$key]})) {
+            if (!empty($data->{$matches[1][$key]}) && is_object($data->{$matches[1][$key]})) {
                 $data->{$matches[1][$key]} = json_encode($data->{$matches[1][$key]});
             }
             $content = str_replace(

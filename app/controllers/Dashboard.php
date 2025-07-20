@@ -24,8 +24,9 @@ class Dashboard extends Controller
         // Set and render notepad value
         if (isPOST()) {
             $this->validateCsrfToken();
-            $this->model('User')->set($user['id'], 'notepad', _POST('notepad'));
-            $user['notepad'] = _POST('notepad');
+            $notepad = _POST('notepad') ?? $user['notepad'];
+            $this->model('User')->set($user['id'], 'notepad', $notepad);
+            $user['notepad'] = $notepad;
         }
         $this->view->renderData('notepad', $user['notepad']);
 
@@ -50,13 +51,6 @@ class Dashboard extends Controller
                 $this->view->renderData("common_{$row}_{$i}", $user['row' . $row] == $i ? 'selected' : '');
             }
         }
-
-        // Set and render notepad value
-        if (isPOST()) {
-            $this->validateCsrfToken();
-            $this->model('Setting')->set('notepad', _POST('notepad'));
-        }
-        $this->view->renderData('notepad', $this->model('Setting')->get('notepad'));
 
         // Check ezXSS updates
         try {

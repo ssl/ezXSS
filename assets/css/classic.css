@@ -550,6 +550,7 @@ select#payloadList,select#payloadListReport,select#payloadListSession{border:0!i
 .text-success{color:#2ecc71!important}
 .text-warning{color:#f39c12!important}
 .text-muted{color:#95a5a6!important}
+.dt-empty{text-align: center;}
 #user-logs .truncate{max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #user-logs .dataTables_wrapper .dataTables_processing,#user-logs .dataTables_wrapper .dt-info,#user-logs .dataTables_wrapper .dt-length,#user-logs .dataTables_wrapper .dt-paging,#user-logs .dataTables_wrapper .dt-search{font-size:.85em}
 #user-logs .dataTables_wrapper .dt-paging .paginate_button{padding:.2em .5em}

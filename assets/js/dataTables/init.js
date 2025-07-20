@@ -116,7 +116,7 @@ $(document).ready(function() {
                     return esc(data);
                 }
             },
-            { data: 'browser' },
+            { data: 'browser', className: 'truncate' },
             { data: 'payload', className: 'truncate' },
             { data: 'last' }
         ]),
@@ -295,7 +295,7 @@ $(document).ready(function() {
             },
             { data: 'name'},
             { data: 'description'},
-            { data: 'author' },
+            { data: 'author', className: "truncate" },
             { data: 'version', className: 'dt-version-column' },
             { 
                 data: 'enabled',

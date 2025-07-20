@@ -50,7 +50,7 @@ class Trigger extends Controller
 
         // Create the string of pages we collect
         $pages = array_map(function ($page) {
-            return "'" . e($page) . "'";
+            return "'" . addslashes($page) . "'";
         }, array_filter(explode('~', $payload['pages'] ?? '')));
 
         $screenshot = $payload['collect_screenshot'] ? $this->view->getPayload('screenshot') : '';
@@ -164,16 +164,17 @@ class Trigger extends Controller
         // Get the user's IP address
         $data->ip = substr($data->ip ?? $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'], 0, 50);
 
-        // Remove the protocol from the origin URL
-        $data->origin = str_replace(['https://', 'http://'], '', $data->origin ?? '');
-        $data->origin = ($data->origin === '' && $data->uri !== '') ? (parse_url($data->uri ?? '')['host'] ?? '') : $data->origin;
+        // Define URL and origin
+        $data->uri = $data->uri ?? ($_SERVER['HTTP_REFERER'] ?? ($_SERVER['HTTP_ORIGIN'] ?? ''));
+        $data->origin = str_replace(['https://', 'http://'], '', $data->origin ?? ($_SERVER['HTTP_ORIGIN'] ?? ''));
+        $data->origin = ($data->origin === '' && !empty($data->uri)) ? (parse_url($data->uri ?? '')['host'] ?? '') : $data->origin;
 
-        // Truncate very long strings
+        // Define and truncate very long strings
         $data->uri = substr($data->uri ?? '', 0, 1000);
         $data->referer = substr($data->referer ?? '', 0, 1000);
         $data->origin = substr($data->origin ?? '', 0, 255);
         $data->payload = substr($data->payload ?? '', 0, 255);
-        $data->useragent = substr($data->{'user-agent'} ?? '', 0, 500);
+        $data->useragent = substr($data->{'user-agent'} ?? ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500);
 
         $data->extra = $data->extra ?? '';
         if(is_array($data->extra) || is_object($data->extra)) {

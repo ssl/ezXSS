@@ -91,8 +91,8 @@ class User_model extends Model
             throw new Exception('Invalid characters in the username. Use a-Z0-9');
         }
 
-        if (strlen($username) < 3 || strlen($username) > 25) {
-            throw new Exception('Username needs to be between 3-25 long');
+        if (strlen($username) < 2 || strlen($username) > 25) {
+            throw new Exception('Username needs to be between 2-25 long');
         }
 
         $database->prepare("UPDATE $this->table SET `username` = :username WHERE `id` = :id");
@@ -107,7 +107,7 @@ class User_model extends Model
     }
 
     /**
-     * Creates an new user
+     * Creates a new user
      *
      * @param string $username The username
      * @param string $password The password
@@ -128,8 +128,8 @@ class User_model extends Model
             throw new Exception('Invalid characters in the username. Use a-Z0-9');
         }
 
-        if (strlen($username) < 3 || strlen($username) > 25) {
-            throw new Exception('Username needs to be between 3-25 long');
+        if (strlen($username) < 2 || strlen($username) > 25) {
+            throw new Exception('Username needs to be between 2-25 long');
         }
 
         if (

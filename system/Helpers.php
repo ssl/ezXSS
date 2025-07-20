@@ -153,6 +153,19 @@ function isPOST()
 }
 
 /**
+ * Checks if request is JSON
+ *
+ * @return boolean
+ */
+function isJSON()
+{
+    if (isset($_SERVER['CONTENT_TYPE']) && strtolower($_SERVER['CONTENT_TYPE']) === 'application/json') {
+        return true;
+    }
+    return false;
+}
+
+/**
  * Parses user agent and returns string with browser and OS
  * 
  * @param string $userAgent The user agent string

@@ -75,68 +75,11 @@ class Persistent extends Controller
 
         if (isPOST()) {
             try {
-                if (_POST('proxy') !== null) {
-                    $this->validateCsrfToken();
-                    $ipport = _POST('ipport');
-
-                    if (!preg_match('/^([\w.-]+):\d+$/', $ipport)) {
-                        throw new Exception('This does not look like a valid domain/IP with port');
-                    }
-
-                    $passOrigin = _POST('passorigin') !== null ? '1' : '0';
-                    $autoReconnect = _POST('autoreconnect') !== null;
-                    
-                    $this->model('Console')->add($clientId, $origin, "ez_soc('$ipport', $passOrigin)");
-                    if ($autoReconnect) {
-                        $this->model('Console')->add($clientId, $origin, "localStorage.setItem('ezProxy', '$ipport');");
-                    }
-                    throw new Exception("Proxy started on $ipport is accessible on http://$clientId.ezxss" . ($passOrigin === '1' ? " and http://$origin" : '') . ($autoReconnect ? ' (Auto reconnect enabled)' : ''));
-                } elseif (_POST('delete') !== null) {
-                    $this->validateCsrfToken();
-                    $this->model('Session')->deleteAll($clientId, $origin);
-                    redirect('/manage/persistent/all');
-                } elseif (_POST('kill') !== null) {
-                    $this->validateCsrfToken();
-                    $this->model('Console')->add($clientId, $origin, 'ez_stop()');
-                    throw new Exception('Killed persistent');
-                } elseif (_POST('archive') !== null) {
-                    $this->validateCsrfToken();
-                    $this->model('Session')->archiveByClientId($clientId, $origin);
-                    throw new Exception('Archived session');
-                } elseif (_POST('killreconnect') !== null) {
-                    $this->validateCsrfToken();
-                    $this->model('Console')->add($clientId, $origin, "localStorage.removeItem('ezProxy');");
-                    throw new Exception('Killed auto reconnect');
+                if(isJSON()) {
+                    $this->sessionManageJSON($clientId, $origin);
                 } else {
-                    $this->isAPIRequest();
-
-                    if (_JSON('delete') !== null) {
-                        $this->model('Session')->deleteAll($clientId, $origin);
-                        return jsonResponse('success', 1);
-                    }
-
-                    elseif (_JSON('kill') !== null) {
-                        $this->model('Console')->add($clientId, $origin, 'ez_stop()');
-                        return jsonResponse('success', 1);
-                    }
-
-                    elseif (_JSON('execute') !== null) {
-                        $command = _JSON('command');
-                        $this->model('Console')->add($clientId, $origin, $command);
-                        return jsonResponse('success', 1);
-                    }
-
-                    elseif (_JSON('archive') !== null) {
-                        $this->model('Session')->archiveByClientId($clientId, $origin);
-                        return jsonResponse('success', 1);
-                    }
-
-                    elseif (_JSON('getconsole') !== null) {
-                        $console = $this->model('Session')->getAllConsole($clientId, $origin);
-                        return jsonResponse('console', $console);
-                    }
-
-                    return jsonResponse('error', 'Invalid request');
+                    $message = $this->sessionManage($clientId, $origin);
+                    $this->view->renderMessage($message);
                 }
             } catch (Exception $e) {
                 $this->view->setContentType('text/html');
@@ -160,6 +103,95 @@ class Persistent extends Controller
         }
 
         return $this->showContent();
+    }
+
+    /*
+    * Manage session by POST request
+    */
+    private function sessionManage($clientId, $origin)
+    {
+        $this->validateCsrfToken();
+
+        if (_POST('proxy') !== null) {
+            $ipport = _POST('ipport');
+
+            if (!preg_match('/^([\w.-]+):\d+$/', $ipport)) {
+                throw new Exception('This does not look like a valid domain/IP with port');
+            }
+
+            $passOrigin = _POST('passorigin') !== null ? '1' : '0';
+            $autoReconnect = _POST('autoreconnect') !== null;
+            
+            $this->model('Console')->add($clientId, $origin, "ez_soc('$ipport', $passOrigin)");
+            if ($autoReconnect) {
+                $this->model('Console')->add($clientId, $origin, "localStorage.setItem('ezProxy', '$ipport');");
+            }
+            return "Proxy started on $ipport is accessible on http://$clientId.ezxss" . 
+                    ($passOrigin === '1' ? " and http://$origin" : '') . 
+                    ($autoReconnect ? ' (Auto reconnect enabled)' : '');
+        }
+        
+        if (_POST('delete') !== null) {
+            $this->validateCsrfToken();
+            $this->model('Session')->deleteAll($clientId, $origin);
+            redirect('/manage/persistent/all');
+        }
+        
+        if (_POST('kill') !== null) {
+            $this->validateCsrfToken();
+            $this->model('Console')->add($clientId, $origin, 'ez_stop()');
+            return 'Killed persistent';
+        }
+        
+        if (_POST('archive') !== null) {
+            $this->validateCsrfToken();
+            $this->model('Session')->archiveByClientId($clientId, $origin);
+            return 'Archived session';
+        }
+        
+        if (_POST('killreconnect') !== null) {
+            $this->validateCsrfToken();
+            $this->model('Console')->add($clientId, $origin, "localStorage.removeItem('ezProxy');");
+            return 'Killed auto reconnect';
+        }
+
+        return 'Invalid request';
+    }
+
+    /*
+    * Manage session by JSON request
+    */
+    private function sessionManageJSON($clientId, $origin)
+    {
+        $this->isAPIRequest();
+
+        if (_JSON('delete') !== null) {
+            $this->model('Session')->deleteAll($clientId, $origin);
+            return jsonResponse('success', 1);
+        }
+
+        elseif (_JSON('kill') !== null) {
+            $this->model('Console')->add($clientId, $origin, 'ez_stop()');
+            return jsonResponse('success', 1);
+        }
+
+        elseif (_JSON('execute') !== null) {
+            $command = _JSON('command');
+            $this->model('Console')->add($clientId, $origin, $command);
+            return jsonResponse('success', 1);
+        }
+
+        elseif (_JSON('archive') !== null) {
+            $this->model('Session')->archiveByClientId($clientId, $origin);
+            return jsonResponse('success', 1);
+        }
+
+        elseif (_JSON('getconsole') !== null) {
+            $console = $this->model('Session')->getAllConsole($clientId, $origin);
+            return jsonResponse('console', $console);
+        }
+
+        return jsonResponse('error', 'Invalid request');
     }
 
     /**

@@ -25,14 +25,6 @@ Get a fast view below or view the whole report on https://{{domain}}/manage/repo
 ```
 {{cookies}}
 ```
-*Local Storage*
-```
-{{localstorage}}
-```
-*Session Storage*
-```
-{{sessionstorage}}
-```
 *Origin*
 ```
 {{origin}}

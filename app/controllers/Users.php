@@ -96,6 +96,9 @@ class Users extends Controller
                     if (!isset($this->ranks[$rank])) {
                         throw new Exception('Invalid rank');
                     }
+                    if($user['id'] == $this->session->data('id') && $rank !== 7) {
+                        throw new Exception('You cannot downgrade your own rank');
+                    }
                     $userModel->set($user['id'], 'rank', $rank);
                     $this->log("Edited user {$username}");
                     if ($rank == 0) {
@@ -190,6 +193,8 @@ class Users extends Controller
             unset($user['password']);
             unset($user['secret']);
             unset($user['notepad']);
+            unset($user['row1']);
+            unset($user['row2']);
 
             $payloadString = $user['rank'] == 'Admin' ? '*, ' : '';
             if (isset($userPayloads[$user['id']])) {
