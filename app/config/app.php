@@ -32,13 +32,16 @@ if ($config === false) {
 }
 
 // Debug modus will show and report any kind of errors, do not enable this unless you are debugging something
-define('debug', $config['debug'] ?? '' === 'true' || $config['debug'] ?? '' === '1' ? true : false);
+$debug = isset($config['debug']) ? $config['debug'] : '';
+define('debug', $debug === 'true' || $debug === '1' ? true : false);
 
 // Defines whenever httpmode is enabled, this allows ezXSS panel to be used without SSL
-define('httpmode', $config['httpmode'] ?? '' === 'true' || $config['httpmode'] ?? '' === '1' ? true : false);
+$httpmode = isset($config['httpmode']) ? $config['httpmode'] : '';
+define('httpmode', $httpmode === 'true' || $httpmode === '1' ? true : false);
 
 // Defines whenever sign up is enabled, do not enable this unless you are serving a public ezXSS installation - this allows anyone to register!
-define('signupEnabled', $config['signupEnabled'] ?? '' === 'true' || $config['signupEnabled'] ?? '' === '1' ? true : false);
+$signupEnabled = isset($config['signupEnabled']) ? $config['signupEnabled'] : '';
+define('signupEnabled', $signupEnabled === 'true' || $signupEnabled === '1' ? true : false);
 
 // Defines the limit of reports
-define('reportsLimit', intval($config['reportsLimit'] ?? 100000));
+define('reportsLimit', intval(isset($config['reportsLimit']) ? $config['reportsLimit'] : 100000));
