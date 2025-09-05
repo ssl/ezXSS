@@ -89,13 +89,14 @@ class Report_model extends Model
      * Get report by id
      * 
      * @param mixed $id The report id
+     * @param bool $includeLargeDOM Whether to include DOM data regardless of size
      * @throws Exception
      * @return array
      */
-    public function getById($id)
+    public function getById($id, $includeLargeDOM = false)
     {
         $report = parent::getById($id);
-        $report_data = $this->getReportData($report['id']);
+        $report_data = $this->getReportData($report['id'], $includeLargeDOM);
 
         return array_merge($report, $report_data);
     }
@@ -104,10 +105,11 @@ class Report_model extends Model
      * Get report by share id
      * 
      * @param mixed $id The share id
+     * @param bool $includeLargeDOM Whether to include DOM data regardless of size
      * @throws Exception
      * @return array
      */
-    public function getByShareId($id)
+    public function getByShareId($id, $includeLargeDOM = false)
     {
         $database = Database::openConnection();
         $database->prepare("SELECT * FROM $this->table WHERE `shareid` = :shareid LIMIT 1");
@@ -119,7 +121,7 @@ class Report_model extends Model
         }
 
         $report = $database->fetch();
-        $report_data = $this->getReportData($report['id']);
+        $report_data = $this->getReportData($report['id'], $includeLargeDOM);
 
         return array_merge($report, $report_data);
     }
@@ -394,12 +396,42 @@ class Report_model extends Model
      * Get big data from report by id
      * 
      * @param int $id The report id
+     * @param bool $includeLargeDOM Whether to include DOM data regardless of size
      * @return array
      */
-    private function getReportData($id)
+    private function getReportData($id, $includeLargeDOM = false)
     {
         $database = Database::openConnection();
-        $database->prepare("SELECT `dom`,`screenshot`,`localstorage`,`sessionstorage`,`extra`,`compressed` FROM $this->table_data WHERE `reportid` = :reportid LIMIT 1");
+        
+        // First, check DOM size if we need to conditionally exclude it
+        $domThreshold = $this->getDomThreshold();
+        $selectColumns = "`screenshot`,`localstorage`,`sessionstorage`,`extra`,`compressed`";
+        $shouldIncludeDOM = $includeLargeDOM;
+        
+        if (!$includeLargeDOM) {
+            // Check DOM size first
+            $database->prepare("SELECT LENGTH(`dom`) as dom_size, `compressed` FROM $this->table_data WHERE `reportid` = :reportid LIMIT 1");
+            $database->bindValue(':reportid', $id);
+            $database->execute();
+            
+            if ($database->countRows() === 1) {
+                $sizeData = $database->fetch();
+                $domSize = $sizeData['dom_size'];
+                
+                // If compressed, estimate uncompressed size (rough estimate: 3x compressed size)
+                if ($sizeData['compressed'] == 1) {
+                    $domSize = $domSize * 3;
+                }
+                
+                $shouldIncludeDOM = $domSize <= $domThreshold;
+            }
+        }
+        
+        if ($shouldIncludeDOM) {
+            $selectColumns = "`dom`," . $selectColumns;
+        }
+        
+        $database->prepare("SELECT $selectColumns FROM $this->table_data WHERE `reportid` = :reportid LIMIT 1");
         $database->bindValue(':reportid', $id);
         $database->execute();
 
@@ -407,15 +439,41 @@ class Report_model extends Model
             $report_data = $database->fetch();
         }
 
+        // Initialize DOM field if not included
+        if (!$shouldIncludeDOM) {
+            $report_data['dom'] = '';
+            $report_data['dom_too_large'] = true;
+        } else {
+            $report_data['dom_too_large'] = false;
+        }
+
         // Decompress if compressed
         if($report_data['compressed'] ?? 0 == 1) {
-            $report_data['dom'] = !empty($report_data['dom']) ? gzinflate(base64_decode($report_data['dom'])) : '';
+            if ($shouldIncludeDOM && !empty($report_data['dom'])) {
+                $report_data['dom'] = gzinflate(base64_decode($report_data['dom']));
+            }
             $report_data['screenshot'] = strlen($report_data['screenshot']) === 52 || empty($report_data['screenshot']) ? $report_data['screenshot'] : base64_encode(gzinflate(base64_decode($report_data['screenshot']))) ?? '';
             $report_data['localstorage'] = $report_data['localstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['localstorage'])) ?? '';
             $report_data['sessionstorage'] = $report_data['sessionstorage'] === '{}' ? '{}' : gzinflate(base64_decode($report_data['sessionstorage'])) ?? '';
             $report_data['extra'] = !empty($report_data['extra']) ? gzinflate(base64_decode($report_data['extra'])) : '';
         }
 
-        return $report_data ?? ['dom' => '', 'screenshot' => '', 'localstorage' => '', 'sessionstorage' => '', 'extra' => ''];
+        return $report_data ?? ['dom' => '', 'screenshot' => '', 'localstorage' => '', 'sessionstorage' => '', 'extra' => '', 'dom_too_large' => false];
+    }
+
+    /**
+     * Get DOM threshold setting in bytes
+     * 
+     * @return int
+     */
+    private function getDomThreshold()
+    {
+        try {
+            $settingModel = new Setting_model();
+            return intval($settingModel->get('dom_threshold'));
+        } catch (Exception $e) {
+            // Default to 2MB if setting doesn't exist
+            return 2097152; // 2 * 1024 * 1024 bytes
+        }
     }
 }
