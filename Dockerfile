@@ -14,6 +14,13 @@ RUN apt-get update && \
 
 # Configure Apache and SSL
 RUN a2enmod ssl
+
+# Create a self-signed certificate
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/ssl/private/ssl-cert-snakeoil.key \
+    -out /etc/ssl/certs/ssl-cert-snakeoil.pem \
+    -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=localhost"
+
 COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
