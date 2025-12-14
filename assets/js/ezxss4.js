@@ -642,7 +642,16 @@ const EzXSS = {
     handleDOMRender() {
         try {
             const domContent = $('#dom').val();
-            const byteCharacters = unescape(encodeURIComponent(domContent));
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(domContent, 'text/html');
+            const meta = doc.createElement('meta');
+            meta.httpEquiv = 'Content-Security-Policy';
+            meta.content = "default-src 'none'; script-src 'none'; connect-src 'none'; img-src data:; style-src 'unsafe-inline';";
+            doc.head.appendChild(meta);
+
+            const serializer = new XMLSerializer();
+            const safeContent = serializer.serializeToString(doc);
+            const byteCharacters = unescape(encodeURIComponent(safeContent));
             const byteArrays = [];
 
             for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
