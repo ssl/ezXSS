@@ -15,7 +15,7 @@ Once an ezXSS payload is placed, the user must wait until it is triggered, at wh
 
 ## Features
 * Easy to use dashboard with settings, statistics, payloads, view/share/search reports
-* :new: Persistent XSS sessions with reverse proxy aslong as the browser is active
+* Persistent XSS sessions with reverse proxy aslong as the browser is active
 * Manage unlimited users with permissions to personal payloads & their reports
 * Instant alerts via mail, Telegram, Slack, Discord or custom callback URL
 * Custom extra javascript payloads
@@ -43,7 +43,7 @@ Once an ezXSS payload is placed, the user must wait until it is triggered, at wh
 * much much more, and, its just ez :-)
 
 ## Required
-* Server or shared web hosting with PHP 7.0 or up
+* Server or shared web hosting with PHP 7.1 or up
 * Domain name (consider a short one or check out [shortboost](https://github.com/ssl/shortboost))
 * SSL Certificate to test on https websites (consider Cloudflare or Let's Encrypt for a free SSL)
 
@@ -54,22 +54,27 @@ visit the [wiki](https://github.com/ssl/ezXSS/wiki) for installation instruction
 
 
 ## Explore ezXSS hassle free
-Interested in using ezXSS but don't want to install it yet? Worry not! You can access and start using ezXSS with a free account on [ez.pe](https://ez.pe). Simply sign up and get started without any installation hassle.
+Interested in using ezXSS but don't want to install it yet? Worry not! You can access and start using ezXSS with a free account without the need of a domainname or a webserver. Simply sign up and get started without any installation hassle.
 
-Additionally, if you'd like to explore and test the tool before committing, there is a demo environment with admin account available at [demo.ezxss.com/manage](https://demo.ezxss.com/manage).
+[Create account on ezxss.com](https://ezxss.com)
 
-Please note that some features might be disabled or limited in both the free account on ez.pe and the demo environment. These limitations are in place to maintain the integrity and security of the platforms. However, you can still get a good grasp of the tool's capabilities and decide after to install it yourself.
-
-## Sponsors
+## Contribute
 Maintenance of this project is made possible by all the contributors and sponsors. 
 I've personally worked for over 8 years on this project, taking hundreds of hours from my time. Please kindly consider becoming a sponsor, so I can continue maintaining and improving ezXSS as well as creating and releasing new projects. Current sponsors and (past) sponsors/contributors with a big impact on the project:
 
 <p align="center">
-<!-- sponsors --><a href="https://github.com/GlitchSecure"><img src="https:&#x2F;&#x2F;github.com&#x2F;GlitchSecure.png" width="60px" alt="GlitchSecure" /></a>&nbsp;&nbsp;<a href="https://github.com/redprofession"><img src="https:&#x2F;&#x2F;github.com&#x2F;redprofession.png" width="60px" alt="redprofession" /></a>&nbsp;&nbsp;<!-- sponsors -->
+<!-- sponsors --><a href="https://github.com/geeknik"><img src="https:&#x2F;&#x2F;github.com&#x2F;geeknik.png" width="60px" alt="geeknik" /></a>&nbsp;&nbsp;<a href="https://github.com/GlitchSecure"><img src="https:&#x2F;&#x2F;github.com&#x2F;GlitchSecure.png" width="60px" alt="GlitchSecure" /></a>&nbsp;&nbsp;<!-- sponsors -->
 </p>
 <p align="center">
 <!--loveforever-->
 <a href="https://github.com/geeknik"><img src="https:&#x2F;&#x2F;github.com&#x2F;geeknik.png" width="40px" alt="geeknik" /></a>&nbsp;&nbsp;<a href="https://github.com/dev"><img src="https:&#x2F;&#x2F;github.com&#x2F;dev.png" width="40px" alt="dev" /></a>&nbsp;&nbsp;<a href="https://github.com/mounssif"><img src="https:&#x2F;&#x2F;github.com&#x2F;mounssif.png" width="40px" alt="mounssif" /></a>&nbsp;&nbsp;
 <!--loveforever-->
 <br><br><a href="https://github.com/sponsors/ssl">Become a sponsor</a>
+  <br>or, leave a star!<br><br>
 </p>
+
+<p align="center">
+  <img src="https://api.star-history.com/svg?repos=ssl/ezxss&type=date&legend=top-left" alt="Star History Chart">
+</p>
+
+
