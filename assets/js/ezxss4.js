@@ -248,7 +248,7 @@ const EzXSS = {
         }
 
         // 2FA QR code
-        if (document.getElementById("qrcode")) {
+        if (document.getElementById("qrcode") && document.getElementById("secret")) {
             this.initializeQRCode();
         }
     },
@@ -428,21 +428,25 @@ const EzXSS = {
         $('.method-content').hide();
         $('#method-pick').hide();
 
-        const alertId = parseInt(this.value);
-        Utils.request('/manage/account/getAlertStatus', { alertId })
-            .then((data) => {
-                if (data.enabled === 1) {
-                    $(`#method-content-${alertId}`).show();
-                } else {
-                    $('#method-disabled').show();
-                }
-            });
+        if(this.value) {
+            const alertId = parseInt(this.value);
+            Utils.request('/manage/account/getAlertStatus', { alertId })
+                .then((data) => {
+                    if (data.enabled === 1) {
+                        $(`#method-content-${alertId}`).show();
+                    } else {
+                        $('#method-disabled').show();
+                    }
+                });
+        }
     },
 
     handleCommonDataChange() {
-        const id = this.value;
-        const row = this.id === 'pick_common1' ? 1 : 2;
-        EzXSS.pickCommon(id, row, EzXSS.state.isAdmin);
+        if(this.value) {
+            const id = this.value;
+            const row = this.id === 'pick_common1' ? 1 : 2;
+            EzXSS.pickCommon(id, row, EzXSS.state.isAdmin);
+        }
     },
 
     handleItemRemoval() {
