@@ -327,7 +327,7 @@ class Payload extends Controller
         $payload = $this->model('Payload')->getById($id);
 
         // Validate domain string
-        if (!preg_match('/^(?:(?:(?!\*)[a-zA-Z\d][a-zA-Z\d\-*]{0,61})?[a-zA-Z\d]\.){0,1}(?!\d+)(?!.*\*\*)[a-zA-Z\d*]{1,63}(?:\.(?:(?:(?!\*)[a-zA-Z\d][a-zA-Z\d\-*]{0,61})?[a-zA-Z\d]\.){0,1}(?!\d+)(?!.*\*\*)[a-zA-Z\d*]{1,63})*$/', $domain)) {
+        if (!preg_match('/^(?!.*\*\*)(?:[a-zA-Z\d*](?:[a-zA-Z\d\-*]{0,61}[a-zA-Z\d*])?\.)*[a-zA-Z\d*](?:[a-zA-Z\d\-*]{0,61}[a-zA-Z\d*])?$/', $domain)) {
             throw new Exception('This does not look like a valid domain');
         }
 
