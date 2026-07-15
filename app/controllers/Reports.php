@@ -129,6 +129,10 @@ class Reports extends Controller
         foreach ($this->rows as $value) {
             $this->view->renderData($value, $report[$value]);
         }
+
+        // Render DOM size information
+        $this->view->renderCondition('domTooLarge', $report['dom_too_large'] ?? false);
+        $this->view->renderData('reportId', $report['id']);
     }
 
     /**
@@ -295,5 +299,41 @@ class Reports extends Controller
         }
 
         return false;
+    }
+
+    /**
+     * Downloads DOM content for a report
+     * 
+     * @param string $id The report id
+     * @throws Exception
+     * @return void
+     */
+    public function downloaddom($id)
+    {
+        $this->isLoggedInOrExit();
+
+        // Check report permissions
+        if (!is_numeric($id) || !$this->hasReportPermissions($id)) {
+            throw new Exception('You dont have permissions to this report');
+        }
+
+        // Get report with DOM data included regardless of size
+        $report = $this->model('Report')->getById($id, true);
+
+        if (empty($report['dom'])) {
+            throw new Exception('No DOM content available for this report');
+        }
+
+        // Set headers for download with attachment content type to prevent XSS
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="report-' . $id . '-dom.html"');
+        header('Content-Length: ' . strlen($report['dom']));
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        // Output DOM content
+        echo $report['dom'];
+        exit;
     }
 }

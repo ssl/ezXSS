@@ -35,7 +35,8 @@ class Settings extends Controller
                     $logging = _POST('logging');
                     $storescreenshot = _POST('storescreenshot');
                     $compress = _POST('compress');
-                    $this->applicationSettings($timezone, $theme, $filter, $logging, $storescreenshot, $compress);
+                    $domThreshold = _POST('dom_threshold');
+                    $this->applicationSettings($timezone, $theme, $filter, $logging, $storescreenshot, $compress, $domThreshold);
                 }
 
                 // Check if posted data is changing global payload settings
@@ -105,6 +106,16 @@ class Settings extends Controller
 
         $this->view->renderData('compress0', $settings->get('compress') == 0 ? 'selected' : '');
         $this->view->renderData('compress1', $settings->get('compress') == 1 ? 'selected' : '');
+
+        // Render DOM threshold value (convert bytes to MB for display)
+        try {
+            $domThresholdBytes = $settings->get('dom_threshold');
+            $domThresholdMB = $domThresholdBytes / (1024 * 1024);
+        } catch (Exception $e) {
+            // Default to 2MB if setting doesn't exist yet
+            $domThresholdMB = 2;
+        }
+        $this->view->renderData('domThreshold', $domThresholdMB);
 
         $this->view->renderChecked('persistent', $settings->get('persistent') === '1');
         $this->view->renderChecked('spider', $settings->get('spider') === '1');
@@ -183,10 +194,11 @@ class Settings extends Controller
      * @param string $logging Enable logging
      * @param string $storescreenshot Method of screenshot storage
      * @param string $compress Enable compressing
+     * @param string $domThreshold DOM size threshold in bytes
      * @throws Exception
      * @return void
      */
-    private function applicationSettings($timezone, $theme, $filter, $logging, $storescreenshot, $compress)
+    private function applicationSettings($timezone, $theme, $filter, $logging, $storescreenshot, $compress, $domThreshold)
     {
         // Validate timezone
         if (!in_array($timezone, timezone_identifiers_list(), true)) {
@@ -203,6 +215,12 @@ class Settings extends Controller
         $filterSave = ($filter == 1 || $filter == 2) ? 1 : 0;
         $filterAlert = ($filter == 1 || $filter == 3) ? 1 : 0;
 
+        // Validate DOM threshold (must be a positive integer, convert MB to bytes)
+        if (!is_numeric($domThreshold) || $domThreshold < 0) {
+            throw new Exception('DOM threshold must be a positive number');
+        }
+        $domThresholdBytes = intval($domThreshold * 1024 * 1024); // Convert MB to bytes
+
         // Save settings
         $this->model('Setting')->set('filter-save', $filterSave);
         $this->model('Setting')->set('filter-alert', $filterAlert);
@@ -211,6 +229,7 @@ class Settings extends Controller
         $this->model('Setting')->set('logging', $logging === '1' ? '1' : '0');
         $this->model('Setting')->set('storescreenshot', $storescreenshot === '1' ? '1' : '0');
         $this->model('Setting')->set('compress', $compress === '1' ? '1' : '0');
+        $this->model('Setting')->set('dom_threshold', $domThresholdBytes);
         $this->log('Updated admin application settings');
     }
 
