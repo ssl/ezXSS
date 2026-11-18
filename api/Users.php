@@ -396,6 +396,9 @@ class UsersController extends Controller
             $role = (string) $body['role'];
             $this->validateRole($role);
             $this->assertCanAssignRole($role);
+            if ($target['role'] === 'admin' && $role !== 'admin' && User::countAdmins() <= 1) {
+                throw new HttpException(409, 'You cannot demote the last admin');
+            }
             $changes['role'] = $role;
         }
 

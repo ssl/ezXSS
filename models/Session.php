@@ -40,9 +40,13 @@ class Session extends Model
         $type = isset($data->type) ? (string) $data->type : '';
         $clientId = isset($data->clientid) ? (string) $data->clientid : '';
         $origin = isset($data->origin) ? (string) $data->origin : '';
+        $payload = isset($data->payload) ? self::normalizePayloadIdentifier((string) $data->payload) : null;
+        if ($payload === '') {
+            $payload = null;
+        }
 
         if ($type === 'heartbeat') {
-            $session = self::findLatest($clientId, $origin);
+            $session = self::findLatest($clientId, $origin, $payload);
 
             if (!$session) {
                 return '';
@@ -51,14 +55,14 @@ class Session extends Model
             self::query()->where('id', (int) $session['id'])->update(array('updated_at' => time()));
 
             if ((int) $session['archive'] === 1) {
-                self::toggleArchive($clientId, $origin);
+                self::toggleArchive($clientId, $origin, $payload);
             }
 
             return Console::hasPending($clientId, $origin) ? '1' : '0';
         }
 
         if ($type === 'ping') {
-            $session = self::findLatest($clientId, $origin);
+            $session = self::findLatest($clientId, $origin, $payload);
 
             if (!$session) {
                 if ($clientId !== '') {
@@ -70,7 +74,7 @@ class Session extends Model
             self::updatePing((int) $session['id'], isset($data->console) ? (string) $data->console : '');
 
             if ((int) $session['archive'] === 1) {
-                self::toggleArchive($clientId, $origin);
+                self::toggleArchive($clientId, $origin, $payload);
             }
 
             return Console::getNext($clientId, $origin);
@@ -155,13 +159,13 @@ class Session extends Model
      * @param string $clientId
      * @param string $origin
      */
-    public static function findLatest($clientId, $origin)
+    public static function findLatest($clientId, $origin, $payload = null)
     {
-        $row = self::query()
+        $q = self::query()
             ->where('client_id', substr((string) $clientId, 0, self::LIMIT_CLIENT))
-            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN))
-            ->orderBy('id', 'DESC')
-            ->first();
+            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN));
+        self::scopePayload($q, $payload);
+        $row = $q->orderBy('id', 'DESC')->first();
 
         return $row ?: null;
     }
@@ -196,19 +200,20 @@ class Session extends Model
      * @param string $origin
      * @return int|null
      */
-    public static function toggleArchive($clientId, $origin)
+    public static function toggleArchive($clientId, $origin, $payload = null)
     {
-        $latest = self::findLatest($clientId, $origin);
+        $latest = self::findLatest($clientId, $origin, $payload);
         if (!$latest) {
             return null;
         }
 
         $new = ((int) $latest['archive'] === 0) ? 1 : 0;
 
-        self::query()
+        $q = self::query()
             ->where('client_id', substr((string) $clientId, 0, self::LIMIT_CLIENT))
-            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN))
-            ->update(array('archive' => $new));
+            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN));
+        self::scopePayload($q, $payload);
+        $q->update(array('archive' => $new));
 
         return $new;
     }
@@ -220,14 +225,15 @@ class Session extends Model
      * @param string $origin
      * @param string $flag
      */
-    public static function setArchiveGroup($clientId, $origin, $flag)
+    public static function setArchiveGroup($clientId, $origin, $flag, $payload = null)
     {
         $flag = ((int) $flag === 1) ? 1 : 0;
 
-        self::query()
+        $q = self::query()
             ->where('client_id', substr((string) $clientId, 0, self::LIMIT_CLIENT))
-            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN))
-            ->update(array('archive' => $flag));
+            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN));
+        self::scopePayload($q, $payload);
+        $q->update(array('archive' => $flag));
 
         return $flag;
     }
@@ -249,7 +255,7 @@ class Session extends Model
         $allParams = array_merge($params, $built['recency']['params']);
 
         $groupSql = 'SELECT MAX(id) AS max_id, COUNT(*) AS requests FROM `sessions`'
-            . $whereSql . ' GROUP BY `client_id`, `origin`';
+            . $whereSql . ' GROUP BY `client_id`, `origin`, ' . self::PAYLOAD_IDENTIFIER_SQL;
 
         $countSql = 'SELECT COUNT(*) FROM (' . $groupSql . ') grp'
             . ' INNER JOIN `sessions` s ON s.id = grp.max_id'
@@ -362,7 +368,7 @@ class Session extends Model
         $built = self::buildGroupWhere($opts);
 
         $groupSql = 'SELECT MAX(id) AS max_id FROM `sessions`'
-            . $built['where'] . ' GROUP BY `client_id`, `origin`';
+            . $built['where'] . ' GROUP BY `client_id`, `origin`, ' . self::PAYLOAD_IDENTIFIER_SQL;
 
         $sql = 'SELECT COUNT(*) FROM (' . $groupSql . ') grp'
             . ' INNER JOIN `sessions` s ON s.id = grp.max_id'
@@ -385,7 +391,7 @@ class Session extends Model
         $built = self::buildGroupWhere($opts);
 
         $groupSql = 'SELECT MAX(id) AS max_id FROM `sessions`'
-            . $built['where'] . ' GROUP BY `client_id`, `origin`';
+            . $built['where'] . ' GROUP BY `client_id`, `origin`, ' . self::PAYLOAD_IDENTIFIER_SQL;
 
         $limit = isset($opts['limit']) ? max(1, (int) $opts['limit']) : 200;
 
@@ -409,7 +415,16 @@ class Session extends Model
     /**
      * SQL expression reducing a stored payload to its identifier.
      */
-    const PAYLOAD_IDENTIFIER_SQL = "TRIM(TRAILING '/' FROM SUBSTRING_INDEX(`payload`, '?', 1))";
+    const PAYLOAD_IDENTIFIER_SQL = "TRIM(TRAILING '/' FROM SUBSTRING_INDEX(COALESCE(`payload`, ''), '?', 1))";
+
+    private static function scopePayload($q, $payload)
+    {
+        if ($payload === null) {
+            return $q;
+        }
+        $q->whereRaw(self::PAYLOAD_IDENTIFIER_SQL . " = ?", array($payload));
+        return $q;
+    }
 
     public static function normalizePayloadIdentifier($raw)
     {
@@ -464,14 +479,14 @@ class Session extends Model
      * @param string $clientId
      * @param string $origin
      */
-    public static function requestsFor($clientId, $origin)
+    public static function requestsFor($clientId, $origin, $payload = null)
     {
-        return self::query()
+        $q = self::query()
             ->select(implode(', ', self::SUMMARY_COLUMNS))
             ->where('client_id', substr((string) $clientId, 0, self::LIMIT_CLIENT))
-            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN))
-            ->orderBy('id', 'DESC')
-            ->get();
+            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN));
+        self::scopePayload($q, $payload);
+        return $q->orderBy('id', 'DESC')->get();
     }
 
     /**
@@ -482,11 +497,12 @@ class Session extends Model
      * @param array $opts
      * @return array
      */
-    public static function requestsPage($clientId, $origin, array $opts = array())
+    public static function requestsPage($clientId, $origin, array $opts = array(), $payload = null)
     {
         $q = self::query()
             ->where('client_id', substr((string) $clientId, 0, self::LIMIT_CLIENT))
             ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN));
+        self::scopePayload($q, $payload);
 
         $search = isset($opts['search']) ? trim((string) $opts['search']) : '';
         if ($search !== '') {
@@ -517,12 +533,13 @@ class Session extends Model
      * @param string $clientId
      * @param string $origin
      */
-    public static function requestCount($clientId, $origin)
+    public static function requestCount($clientId, $origin, $payload = null)
     {
-        return (int) self::query()
+        $q = self::query()
             ->where('client_id', substr((string) $clientId, 0, self::LIMIT_CLIENT))
-            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN))
-            ->count();
+            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN));
+        self::scopePayload($q, $payload);
+        return (int) $q->count();
     }
 
     /**
@@ -560,10 +577,10 @@ class Session extends Model
      * @param string $clientId
      * @param string $origin
      */
-    public static function consoleOutput($clientId, $origin)
+    public static function consoleOutput($clientId, $origin, $payload = null)
     {
         $console = '';
-        foreach (self::requestsFor($clientId, $origin) as $row) {
+        foreach (self::requestsFor($clientId, $origin, $payload) as $row) {
             $data = self::dataFor((int) $row['id']);
             $console .= $data['console'];
         }
@@ -577,22 +594,25 @@ class Session extends Model
      * @param string $origin
      * @return int
      */
-    public static function deleteGroup($clientId, $origin)
+    public static function deleteGroup($clientId, $origin, $payload = null)
     {
         $clientId = substr((string) $clientId, 0, self::LIMIT_CLIENT);
         $origin = substr((string) $origin, 0, self::LIMIT_ORIGIN);
 
-        $rows = self::query()
+        $q = self::query()
             ->select('id')
             ->where('client_id', $clientId)
-            ->where('origin', $origin)
-            ->get();
+            ->where('origin', $origin);
+        self::scopePayload($q, $payload);
+        $rows = $q->get();
 
         foreach ($rows as $row) {
             self::query()->from(self::TABLE_DATA)->where('session_id', (int) $row['id'])->delete();
         }
 
-        self::query()->where('client_id', $clientId)->where('origin', $origin)->delete();
+        $dq = self::query()->where('client_id', $clientId)->where('origin', $origin);
+        self::scopePayload($dq, $payload);
+        $dq->delete();
         Console::deleteFor($clientId, $origin);
 
         return count($rows);

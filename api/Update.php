@@ -91,7 +91,8 @@ class UpdateController extends Controller
         try {
             $summary = Upgrader::run();
         } catch (Exception $e) {
-            throw new HttpException(500, 'Upgrade failed: ' . $e->getMessage());
+            Log::event('update', 0, 'Upgrade failed: ' . $e->getMessage(), USER_IP);
+            throw new HttpException(500, 'Upgrade failed.');
         }
 
         AppState::clearCache();
@@ -110,6 +111,16 @@ class UpdateController extends Controller
      */
     private function runStandardUpdate()
     {
+        $status = $this->statusPayload();
+        if (!$status['needs_update']) {
+            return $this->respond(array(
+                'upgraded' => false,
+                'migrated' => array(),
+                'version'  => $status['code_version'],
+                'message'  => 'Already up to date.',
+            ), array(), 200);
+        }
+
         try {
             $allowed = Security::rateLimit('update:ip:' . USER_IP, self::UPGRADE_MAX, self::UPGRADE_WINDOW);
         } catch (Throwable $e) {
@@ -125,7 +136,8 @@ class UpdateController extends Controller
             $version = (string) Config::get('VERSION', '5.0');
             Setting::put('version', $version);
         } catch (Exception $e) {
-            throw new HttpException(500, 'Update failed: ' . $e->getMessage());
+            Log::event('update', 0, 'Update failed: ' . $e->getMessage(), USER_IP);
+            throw new HttpException(500, 'Update failed.');
         }
 
         AppState::clearCache();

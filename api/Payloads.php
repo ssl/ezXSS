@@ -239,7 +239,11 @@ class PayloadsController extends Controller
             if ($slash !== false) {
                 $idHost = substr($idHost, 0, $slash);
             }
-            if (in_array($idHost, Security::realPanelHosts(), true)) {
+            $blocked = Security::realPanelHosts();
+            if (defined('HOST') && HOST !== '' && !in_array(HOST, $blocked, true)) {
+                $blocked[] = HOST;
+            }
+            if (in_array($idHost, $blocked, true)) {
                 throw new HttpException(403, 'Only an administrator can create a payload on the panel domain');
             }
         }

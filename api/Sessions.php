@@ -208,7 +208,7 @@ class SessionsController extends Controller
         $group = $this->resolveGroup($id);
         $this->accessForGroup($group['payload'], 'view');
 
-        $latest = Session::findLatest($group['client_id'], $group['origin']);
+        $latest = Session::findLatest($group['client_id'], $group['origin'], $group['payload']);
         if (!$latest) {
             throw new HttpException(404, 'Session not found');
         }
@@ -228,11 +228,11 @@ class SessionsController extends Controller
             'archive'        => (int) $latest['archive'],
             'created_at'     => isset($latest['created_at']) ? (int) $latest['created_at'] : null,
             'last'           => isset($latest['updated_at']) ? (int) $latest['updated_at'] : null,
-            'requests'       => Session::requestCount($group['client_id'], $group['origin']),
+            'requests'       => Session::requestCount($group['client_id'], $group['origin'], $group['payload']),
             'dom'            => $data['dom'],
             'localstorage'   => $data['localstorage'],
             'sessionstorage' => $data['sessionstorage'],
-            'console'        => Session::consoleOutput($group['client_id'], $group['origin']),
+            'console'        => Session::consoleOutput($group['client_id'], $group['origin'], $group['payload']),
         );
     }
 
@@ -258,7 +258,7 @@ class SessionsController extends Controller
             'limit'  => $perPage,
             'offset' => $offset,
             'search' => $search,
-        ));
+        ), $group['payload']);
 
         $out = array();
         foreach ($result['rows'] as $row) {
@@ -327,7 +327,7 @@ class SessionsController extends Controller
         $group = $this->resolveGroup($id);
         $this->accessForGroup($group['payload'], 'edit');
 
-        $flag = Session::toggleArchive($group['client_id'], $group['origin']);
+        $flag = Session::toggleArchive($group['client_id'], $group['origin'], $group['payload']);
         return array('id' => $id, 'archive' => (int) $flag);
     }
 
@@ -344,7 +344,7 @@ class SessionsController extends Controller
         $group = $this->resolveGroup($id);
         $this->accessForGroup($group['payload'], 'edit');
 
-        $removed = Session::deleteGroup($group['client_id'], $group['origin']);
+        $removed = Session::deleteGroup($group['client_id'], $group['origin'], $group['payload']);
         return array('deleted' => true, 'id' => $id, 'removed' => $removed);
     }
 
@@ -391,9 +391,9 @@ class SessionsController extends Controller
             }
 
             if ($action === 'delete') {
-                Session::deleteGroup($group['client_id'], $group['origin']);
+                Session::deleteGroup($group['client_id'], $group['origin'], $group['payload']);
             } else {
-                Session::setArchiveGroup($group['client_id'], $group['origin'], $action === 'archive' ? 1 : 0);
+                Session::setArchiveGroup($group['client_id'], $group['origin'], $action === 'archive' ? 1 : 0, $group['payload']);
             }
             $applied++;
         }
