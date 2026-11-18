@@ -2,7 +2,6 @@
 import argparse
 import asyncio
 import base64
-import gzip
 import hashlib
 import hmac
 import json
@@ -26,21 +25,20 @@ For additional information and support, please visit the ezXSS wiki on GitHub at
 """
 
 BANNER = """
-                              ████     █████  █████████      █████████      
-                              ██████ ███████ ████   █████  █████   █████  
-  ███████████  ██████████████   ██████████   ████          █████            
+                              ████     █████  █████████      █████████
+                              ██████ ███████ ████   █████  █████   █████
+  ███████████  ██████████████   ██████████   ████          █████
  ████     ████       ██████       ██████      ██████████     ██████████     ezProxy v3.0
  █████████████     ██████       ██████████            ████           ████   github.com/ssl/ezXSS
- ████            ███████      ██████ ███████ ████     ████ █████     ████   
+ ████            ███████      ██████ ███████ ████     ████ █████     ████
    ██████████  ██████████████ ████     █████  ███████████    ██████████     made with <3
 """
 
 WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
 MAX_MESSAGE_SIZE = 10 * 1024 * 1024
+MAX_REQUEST_HEADER_SIZE = 64 * 1024
 REQUEST_TIMEOUT = 30
-MAX_RETRIES = 3
-COMPRESSION_THRESHOLD = 1024
 HANDSHAKE_TIMEOUT = 15
 
 logger = logging.getLogger("ezproxy")
@@ -48,6 +46,7 @@ logger = logging.getLogger("ezproxy")
 connected_clients = {}
 passed_origins = {}
 pending_requests = {}
+pending_by_client = {}
 
 
 class WebSocketError(Exception):
@@ -116,6 +115,9 @@ class WebSocketConnection:
         masked = (b1 & 0x80) != 0
         length = b1 & 0x7F
 
+        if (opcode & 0x08) and (not fin or length > 125):
+            raise WebSocketError("invalid control frame")
+
         if length == 126:
             length = struct.unpack("!H", await self._read_exact(2))[0]
         elif length == 127:
@@ -124,10 +126,13 @@ class WebSocketConnection:
         if length > MAX_MESSAGE_SIZE:
             raise WebSocketError("frame exceeds MAX_MESSAGE_SIZE")
 
-        mask = await self._read_exact(4) if masked else None
+        if not masked:
+            raise WebSocketError("received unmasked frame from client")
+
+        mask = await self._read_exact(4)
         data = await self._read_exact(length) if length else b""
 
-        if masked and data:
+        if data:
             data = bytes(b ^ mask[i % 4] for i, b in enumerate(data))
 
         return fin, opcode, data
@@ -208,7 +213,9 @@ class WebSocketConnection:
 async def handle_websocket(reader, writer, cfg=None):
     ws = WebSocketConnection(reader, writer)
     client_id = None
-    relay_secret = getattr(cfg, "relay_secret", "") or "" if cfg is not None else ""
+    relay_secret = ""
+    if cfg is not None:
+        relay_secret = getattr(cfg, "relay_secret", "") or ""
     try:
         await asyncio.wait_for(ws.handshake(), timeout=HANDSHAKE_TIMEOUT)
     except Exception as exc:
@@ -254,7 +261,7 @@ async def handle_websocket(reader, writer, cfg=None):
                 print("\n[!] Client connected with client ID: %s" % client_id)
                 print("[!] Origin: %s" % data.get("origin", "unknown"))
 
-                if data.get("pass") in (True, "1", 1, "true"):
+                if str(data.get("pass", "")).lower() in ("true", "1", "yes", "on"):
                     origin = data.get("origin")
                     if origin:
                         held = passed_origins.get(origin)
@@ -296,7 +303,7 @@ async def handle_websocket(reader, writer, cfg=None):
 
 
 def _purge_pending(client_id):
-    for req_id in [r for r in pending_requests if r.startswith("%s_" % client_id)]:
+    for req_id in pending_by_client.pop(client_id, set()):
         pending_requests.pop(req_id, None)
 
 
@@ -304,16 +311,62 @@ def _basic_auth_token(username, password):
     return base64.b64encode(("%s:%s" % (username, password)).encode("utf-8")).decode("utf-8")
 
 
+def _is_textual(content_type):
+    ct = str(content_type or "").lower()
+    if not ct:
+        return True
+    if ct.startswith("text/"):
+        return True
+    return any(token in ct for token in
+               ("html", "json", "javascript", "ecmascript", "xml", "css", "svg"))
+
+
+async def _read_request_head(reader):
+    buf = bytearray()
+    while True:
+        crlf = buf.find(b"\r\n\r\n")
+        lf = buf.find(b"\n\n")
+        if crlf != -1 and (lf == -1 or crlf <= lf):
+            return bytes(buf[:crlf]), bytes(buf[crlf + 4:])
+        if lf != -1:
+            return bytes(buf[:lf]), bytes(buf[lf + 2:])
+        if len(buf) > MAX_REQUEST_HEADER_SIZE:
+            raise WebSocketError("request headers exceed MAX_REQUEST_HEADER_SIZE")
+        chunk = await reader.read(4096)
+        if not chunk:
+            return None, b""
+        buf += chunk
+
+
+def _parse_content_length(head_lines):
+    for line in head_lines[1:]:
+        if ":" not in line:
+            continue
+        name, value = line.split(":", 1)
+        if name.strip().lower() == "content-length":
+            try:
+                return int(value.strip())
+            except ValueError:
+                return None
+    return None
+
+
 async def handle_proxy(reader, writer, cfg):
     try:
-        raw = await asyncio.wait_for(reader.read(32768), timeout=HANDSHAKE_TIMEOUT)
-        request = "".join((line + "\n") for line in raw.decode("ISO-8859-1").splitlines())
-        if "\n\n" in request:
-            request_head, request_body = request.split("\n\n", 1)
-        else:
-            request_head, request_body = request, ""
-        head_lines = request_head.splitlines()
-        if not head_lines:
+        try:
+            request_head, leftover = await asyncio.wait_for(
+                _read_request_head(reader), timeout=HANDSHAKE_TIMEOUT
+            )
+        except asyncio.TimeoutError:
+            return
+        except WebSocketError:
+            logger.warning("Request headers exceed the read buffer limit")
+            return
+        if request_head is None:
+            return
+
+        head_lines = request_head.decode("ISO-8859-1").splitlines()
+        if not head_lines or not head_lines[0]:
             return
 
         parts = head_lines[0].split(" ")
@@ -321,9 +374,29 @@ async def handle_proxy(reader, writer, cfg):
             return
         request_method, request_uri = parts[0], parts[1]
 
+        content_length = _parse_content_length(head_lines)
+        if content_length is not None and (content_length < 0 or content_length > MAX_MESSAGE_SIZE):
+            logger.warning("Rejecting request with invalid Content-Length %s", content_length)
+            return
+
+        if content_length is None:
+            request_body = leftover
+        elif content_length <= len(leftover):
+            request_body = leftover[:content_length]
+        else:
+            try:
+                request_body = leftover + await asyncio.wait_for(
+                    reader.readexactly(content_length - len(leftover)), timeout=REQUEST_TIMEOUT
+                )
+            except asyncio.IncompleteReadError as exc:
+                request_body = leftover + exc.partial
+            except asyncio.TimeoutError:
+                logger.warning("Timed out reading request body (%s bytes expected)", content_length)
+                return
+
         parsed = urlsplit(request_uri)
         domain = parsed.netloc
-        status_code, content_type = 200, "text/html; charset=utf-8"
+        content_type = "text/html; charset=utf-8"
         response_headers = {}
         response_body = b"You can not browse the internet while on the ezXSS proxy."
 
@@ -347,37 +420,40 @@ async def handle_proxy(reader, writer, cfg):
             do_proxy = True
 
         if do_proxy and client_id:
-            full_uri = parsed.path + (("?" + parsed.query) if parsed.query else "")
+            full_uri = (parsed.path or "/") + (("?" + parsed.query) if parsed.query else "")
             logger.info("Browser request: %s %s (client: %s)", request_method, full_uri, client_id)
 
             if client_id in connected_clients:
                 request_id = "%s_%s" % (client_id, uuid.uuid4().hex)
                 queue = asyncio.Queue()
                 pending_requests[request_id] = queue
+                pending_by_client.setdefault(client_id, set()).add(request_id)
                 client_response = None
                 received = False
                 try:
                     await connected_clients[client_id].send(json.dumps({
                         "method": request_method,
                         "request_uri": full_uri,
-                        "postData": request_body,
+                        "postData": request_body.decode("ISO-8859-1"),
                         "request_id": request_id,
                     }))
-                    await asyncio.sleep(0.1)
 
-                    for attempt in range(MAX_RETRIES):
+                    loop = asyncio.get_running_loop()
+                    deadline = loop.time() + REQUEST_TIMEOUT
+                    while not received:
+                        remaining = deadline - loop.time()
+                        if remaining <= 0:
+                            break
                         try:
-                            msg = await asyncio.wait_for(queue.get(), timeout=REQUEST_TIMEOUT)
+                            msg = await asyncio.wait_for(queue.get(), timeout=remaining)
                         except asyncio.TimeoutError:
-                            logger.warning("Attempt %s/%s: timeout for %s", attempt + 1, MAX_RETRIES, full_uri)
-                            continue
+                            break
 
                         data = json.loads(msg)
                         if "body" not in data:
                             logger.warning("Response missing body for %s", full_uri)
                             continue
 
-                        status_code = data.get("statusCode", 200)
                         body_data = data["body"]
                         try:
                             if data.get("compressed", False):
@@ -394,41 +470,49 @@ async def handle_proxy(reader, writer, cfg):
                             if "content-type" in response_headers:
                                 content_type = response_headers["content-type"]
                         received = True
-                        logger.info("Response received for %s (%s bytes, status %s)", full_uri, len(client_response), status_code)
-                        break
+                        logger.info(
+                            "Response received for %s (%s bytes, upstream status %s)",
+                            full_uri, len(client_response), data.get("statusCode", 200),
+                        )
+
+                    if not received:
+                        logger.warning("Timeout waiting for response to %s", full_uri)
                 finally:
                     pending_requests.pop(request_id, None)
+                    reqs = pending_by_client.get(client_id)
+                    if reqs is not None:
+                        reqs.discard(request_id)
+                        if not reqs:
+                            pending_by_client.pop(client_id, None)
 
                 if received and client_response is not None:
                     response_body = client_response
                 else:
-                    response_body = ("No response received for %s after %s attempts" % (full_uri, MAX_RETRIES)).encode("utf-8")
-                    status_code = 504
+                    response_body = ("No response received for %s within %s seconds" % (full_uri, REQUEST_TIMEOUT)).encode("utf-8")
             else:
                 response_body = ('No connected client found with client ID "%s"' % client_id).encode("utf-8")
-                status_code = 502
 
-        if isinstance(response_body, bytes):
+        if not isinstance(response_body, bytes):
+            response_body = str(response_body).encode("utf-8")
+
+        if _is_textual(content_type):
             response_body = response_body.replace(b"https://", b"http://")
-        else:
-            response_body = str(response_body).replace("https://", "http://").encode("utf-8")
-
-        try:
-            status_code = int(status_code)
-        except (TypeError, ValueError):
-            status_code = 200
-        if not 100 <= status_code <= 599:
-            status_code = 200
 
         def _no_crlf(v):
             return str(v).replace("\r", "").replace("\n", "")
 
-        head = ["HTTP/1.1 %s OK" % status_code]
+        hop_by_hop = (
+            "content-length", "content-encoding", "transfer-encoding",
+            "connection", "keep-alive", "proxy-authenticate",
+            "proxy-authorization", "te", "trailer", "upgrade",
+        )
+        head = ["HTTP/1.1 200 OK"]
         for name, value in response_headers.items():
-            if str(name).lower() in ("content-length", "content-encoding"):
+            if str(name).lower() in hop_by_hop:
                 continue
             head.append("%s: %s" % (_no_crlf(name), _no_crlf(value)))
         head.append("Content-Length: %s" % len(response_body))
+        head.append("Connection: close")
         if not any(h.lower().startswith("content-type:") for h in head[1:]):
             head.append("Content-Type: %s" % _no_crlf(content_type))
 
@@ -443,19 +527,6 @@ async def handle_proxy(reader, writer, cfg):
             await writer.wait_closed()
         except Exception:
             pass
-
-
-def compress_response(data):
-    if isinstance(data, str):
-        data = data.encode("utf-8")
-    if len(data) > COMPRESSION_THRESHOLD:
-        try:
-            compressed = gzip.compress(data)
-            if len(compressed) < len(data):
-                return base64.b64encode(compressed).decode("utf-8"), True
-        except Exception as exc:
-            logger.warning("Failed to compress response: %s", exc)
-    return base64.b64encode(data).decode("utf-8"), False
 
 
 def decompress_response(data, is_compressed):
@@ -516,7 +587,7 @@ def cmd_kill(cfg):
 
 
 async def run_serve(cfg):
-    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     try:
         ssl_context.load_cert_chain(cfg.cert, keyfile=cfg.key)
     except Exception as exc:
@@ -551,6 +622,16 @@ def _env_bool(name):
     return _env(name) in ("1", "true", "True", "yes", "on")
 
 
+def _env_int(name, default):
+    value = _env(name)
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        raise SystemExit("%s must be an integer (got %r)" % (name, value))
+
+
 def build_parser():
     parser = argparse.ArgumentParser(description="ezXSS 5.0 persistent reverse proxy (stdlib-only).")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -558,8 +639,8 @@ def build_parser():
     serve = sub.add_parser("serve", help="Run the WebSocket relay + HTTP proxy servers.")
     serve.add_argument("--host", default=_env("prHost", "127.0.0.1"),
                        help="Bind address. Defaults to loopback; set 0.0.0.0 (or prHost) to expose it.")
-    serve.add_argument("--ws-port", type=int, default=int(_env("prWebPort", "8443")))
-    serve.add_argument("--proxy-port", type=int, default=int(_env("prProxyPort", "8080")))
+    serve.add_argument("--ws-port", type=int, default=_env_int("prWebPort", 8443))
+    serve.add_argument("--proxy-port", type=int, default=_env_int("prProxyPort", 8080))
     serve.add_argument("--cert", default=_env("prCertFile"), help="TLS certificate (PEM).")
     serve.add_argument("--key", default=_env("prKeyFile"), help="TLS private key (PEM).")
     serve.add_argument("--hostname", default=_env("prHostname", _env("prHost", "localhost")),
