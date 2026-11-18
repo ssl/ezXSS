@@ -1,31 +1,56 @@
-version: '3.7'
-
 services:
-  ezxssdb:
-    image: mysql:latest
+  db:
+    image: mariadb:11
     restart: always
     environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_DATABASE=${dbName}
-      - MYSQL_USER=${dbUser}
-      - MYSQL_PASSWORD=${dbPassword}
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: "${DB_NAME:-ezxss}"
+      MARIADB_USER: "${DB_USER:-ezxss}"
+      MARIADB_PASSWORD: "${DB_PASS:-ezxss}"
     volumes:
-      - "./ezxssdb:/var/lib/mysql"
-  ezxss:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
     build:
       context: .
       dockerfile: ./Dockerfile
-      args:
-        - USE_MAIL_ALERTS=${useMailAlerts}
-    ports:
-      - "${dockerHttpPort:-80}:80"
-      - "${dockerHttpsPort:-443}:443"
-    volumes:
-      - .:/var/www/html
     restart: always
     depends_on:
-      - ezxssdb
+      db:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
     environment:
-      - INSTALL_CERTIFICATE=${autoInstallCertificate}
-      - DOMAIN=${domain}
-      - HTTPMODE=${httpmode}
+      DB_HOST: "db"
+      DB_PORT: "3306"
+      DB_NAME: "${DB_NAME:-ezxss}"
+      DB_USER: "${DB_USER:-ezxss}"
+      DB_PASS: "${DB_PASS:-ezxss}"
+      DB_CHARSET: "utf8mb4"
+
+      VERSION: "${VERSION:-5.0.0}"
+      DOMAIN: "${DOMAIN:-localhost}"
+      TIMEZONE: "${TIMEZONE:-UTC}"
+      DEBUG: "${DEBUG:-false}"
+
+      IP_LOCK: "${IP_LOCK:-false}"
+      ALLOWED_IPS: "${ALLOWED_IPS:-}"
+      SESSION_TTL: "${SESSION_TTL:-604800}"
+      PANEL_DOMAINS: "${PANEL_DOMAINS:-}"
+      TRUST_PROXY: "${TRUST_PROXY:-false}"
+
+      INSTALL_CERTIFICATE: "${INSTALL_CERTIFICATE:-false}"
+    volumes:
+      - report_img:/var/www/html/assets/img
+      - letsencrypt:/etc/letsencrypt
+
+volumes:
+  db_data:
+  report_img:
+  letsencrypt:

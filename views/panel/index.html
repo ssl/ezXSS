@@ -1,0 +1,706 @@
+
+<div class="boot-splash" id="boot-splash" aria-hidden="true">
+  <svg class="boot-splash__logo" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><use href="#ezlogo"/></svg>
+</div>
+
+<div class="auth" id="auth" hidden>
+  <div class="auth__card">
+    <div class="auth__brand">
+      <svg class="brand__bug" viewBox="6.14 6.14 31 31" aria-hidden="true" focusable="false"><use href="#ezbug" x="6.14" y="6.14"/></svg>
+      <span class="brand__word"><span class="brand__ez">ez</span><span class="brand__xss">XSS</span><span class="brand__v">5</span></span>
+    </div>
+
+    <div class="auth__step is-active" data-step="login">
+      <h1 class="auth__title">Sign in</h1>
+      <p class="auth__sub">Manage payloads, reports and sessions.</p>
+      <form id="login-form">
+        <div class="auth__field">
+          <label class="field-label" for="username">Username</label>
+          <input class="input" id="username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false">
+        </div>
+        <div class="auth__field">
+          <label class="field-label" for="password">Password</label>
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password">
+        </div>
+        <p class="auth__error" id="login-error" role="alert" hidden></p>
+        <button class="btn btn--primary btn--block" type="submit">Continue</button>
+      </form>
+      <p class="auth__sub auth__signup" id="auth-signup" {{authSignupHidden}}>New here? <a class="link" href="/manage/register">Create an account</a></p>
+    </div>
+
+    <div class="auth__step" data-step="twofa">
+      <h1 class="auth__title">Two-factor code</h1>
+      <p class="auth__sub">Enter the 6-digit code from your authenticator app.</p>
+      <form id="twofa-form">
+        <div class="code-input">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+        </div>
+        <p class="auth__error" id="twofa-error" role="alert" hidden></p>
+        <button class="btn btn--primary btn--block" type="submit">Verify &amp; sign in</button>
+        <button class="btn btn--ghost btn--block" type="button" id="twofa-back" style="margin-top:8px">Back</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="app" hidden>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="#" data-screen="dashboard" aria-label="ezXSS 5 - dashboard">
+        <svg class="brand__bug" viewBox="6.14 6.14 31 31" aria-hidden="true" focusable="false"><g fill="currentColor" shape-rendering="crispEdges"><rect x="8.11" y="18.72" width="1.97" height="1.97"/><rect x="10.04" y="18.72" width="1.97" height="1.97"/><rect x="10.04" y="30.29" width="1.97" height="1.97"/><rect x="10.04" y="32.22" width="1.97" height="1.97"/><rect x="11.97" y="18.72" width="1.97" height="1.97"/><rect x="11.97" y="20.65" width="1.97" height="1.97"/><rect x="11.97" y="22.58" width="1.97" height="1.97"/><rect x="11.97" y="24.51" width="1.97" height="1.97"/><rect x="11.97" y="26.44" width="1.97" height="1.97"/><rect x="11.97" y="28.36" width="1.97" height="1.97"/><rect x="11.97" y="30.29" width="1.97" height="1.97"/><rect x="13.9" y="14.86" width="1.97" height="1.97"/><rect x="13.9" y="20.65" width="1.97" height="1.97"/><rect x="13.9" y="22.58" width="1.97" height="1.97"/><rect x="13.9" y="24.51" width="1.97" height="1.97"/><rect x="13.9" y="26.44" width="1.97" height="1.97"/><rect x="13.9" y="28.36" width="1.97" height="1.97"/><rect x="15.83" y="14.86" width="1.97" height="1.97"/><rect x="15.83" y="18.72" width="1.97" height="1.97"/><rect x="15.83" y="20.65" width="1.97" height="1.97"/><rect x="15.83" y="22.58" width="1.97" height="1.97"/><rect x="15.83" y="24.51" width="1.97" height="1.97"/><rect x="15.83" y="26.44" width="1.97" height="1.97"/><rect x="15.83" y="28.36" width="1.97" height="1.97"/><rect x="17.76" y="14.86" width="1.97" height="1.97"/><rect x="17.76" y="16.79" width="1.97" height="1.97"/><rect x="17.76" y="18.72" width="1.97" height="1.97"/><rect x="17.76" y="20.65" width="1.97" height="1.97"/><rect x="17.76" y="22.58" width="1.97" height="1.97"/><rect x="17.76" y="24.51" width="1.97" height="1.97"/><rect x="17.76" y="26.44" width="1.97" height="1.97"/><rect x="17.76" y="28.36" width="1.97" height="1.97"/><rect x="19.69" y="16.79" width="1.97" height="1.97"/><rect x="19.69" y="18.72" width="1.97" height="1.97"/><rect x="19.69" y="20.65" width="1.97" height="1.97"/><rect x="19.69" y="22.58" width="1.97" height="1.97"/><rect x="19.69" y="24.51" width="1.97" height="1.97"/><rect x="19.69" y="26.44" width="1.97" height="1.97"/><rect x="19.69" y="28.36" width="1.97" height="1.97"/><rect x="21.61" y="16.79" width="1.97" height="1.97"/><rect x="21.61" y="18.72" width="1.97" height="1.97"/><rect x="21.61" y="20.65" width="1.97" height="1.97"/><rect x="21.61" y="22.58" width="1.97" height="1.97"/><rect x="21.61" y="24.51" width="1.97" height="1.97"/><rect x="21.61" y="26.44" width="1.97" height="1.97"/><rect x="21.61" y="28.36" width="1.97" height="1.97"/><rect x="21.61" y="30.29" width="1.97" height="1.97"/><rect x="23.54" y="9.08" width="1.97" height="1.97"/><rect x="23.54" y="11.01" width="1.97" height="1.97"/><rect x="23.54" y="12.94" width="1.97" height="1.97"/><rect x="23.54" y="14.86" width="1.97" height="1.97"/><rect x="23.54" y="16.79" width="1.97" height="1.97"/><rect x="23.54" y="18.72" width="1.97" height="1.97"/><rect x="23.54" y="20.65" width="1.97" height="1.97"/><rect x="23.54" y="22.58" width="1.97" height="1.97"/><rect x="23.54" y="24.51" width="1.97" height="1.97"/><rect x="23.54" y="26.44" width="1.97" height="1.97"/><rect x="23.54" y="30.29" width="1.97" height="1.97"/><rect x="23.54" y="32.22" width="1.97" height="1.97"/><rect x="25.47" y="11.01" width="1.97" height="1.97"/><rect x="25.47" y="12.94" width="1.97" height="1.97"/><rect x="25.47" y="16.79" width="1.97" height="1.97"/><rect x="25.47" y="18.72" width="1.97" height="1.97"/><rect x="25.47" y="20.65" width="1.97" height="1.97"/><rect x="25.47" y="22.58" width="1.97" height="1.97"/><rect x="25.47" y="24.51" width="1.97" height="1.97"/><rect x="27.4" y="18.72" width="1.97" height="1.97"/><rect x="27.4" y="24.51" width="1.97" height="1.97"/><rect x="27.4" y="26.44" width="1.97" height="1.97"/><rect x="27.4" y="28.36" width="1.97" height="1.97"/><rect x="29.33" y="18.72" width="1.97" height="1.97"/><rect x="29.33" y="28.36" width="1.97" height="1.97"/><rect x="31.26" y="16.79" width="1.97" height="1.97"/><rect x="31.26" y="18.72" width="1.97" height="1.97"/><rect x="31.26" y="20.65" width="1.97" height="1.97"/><rect x="33.19" y="16.79" width="1.97" height="1.97"/><rect x="33.19" y="18.72" width="1.97" height="1.97"/></g></svg>
+        <span class="brand__word"><span class="brand__ez">ez</span><span class="brand__xss">XSS</span><span class="brand__v">5</span></span>
+      </a>
+
+      <div class="topbar__right">
+        <div class="topsearch" id="topsearch">
+          <input class="topsearch__input" id="topsearch-input" type="search" aria-label="Search reports and sessions" placeholder="Search reports and sessions&hellip;">
+          <button class="iconbtn topsearch__btn" id="searchtoggle" type="button" aria-label="Search" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="account" id="account">
+          <button class="account__btn" id="accounttoggle" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">
+            <span class="avatar">AD</span>
+            <svg class="account__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <div class="menu" role="menu" aria-label="Account">
+            <div class="menu__id">
+              <span class="avatar avatar--lg">AD</span>
+              <div><div class="menu__name">admin</div><div class="menu__role">Administrator</div></div>
+            </div>
+            <div class="menu__sep" data-admin-sep></div>
+            <div class="menu__label" data-admin-label>Admin</div>
+            <a class="menu__link" role="menuitem" href="#" data-screen="settings">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Settings</a>
+            <a class="menu__link" role="menuitem" href="#" data-screen="users">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 6.5a3 3 0 0 1 0 5.8M18 18.8a5 5 0 0 1 2.8 1.2" stroke-linecap="round"/></svg>
+              Users</a>
+            <div class="menu__sep"></div>
+            <div class="menu__label" data-personal-label>Personal</div>
+            <a class="menu__link" role="menuitem" href="#" data-screen="account">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" stroke-linecap="round"/></svg>
+              Account</a>
+            <a class="menu__link" role="menuitem" href="#" data-screen="docs">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m7 10 2.5 2L7 14M12.5 14.5H16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              API docs</a>
+            <a class="menu__link" role="menuitem" href="#" data-notepad-open>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 13h5M8 17h8" stroke-linecap="round"/><path d="m14 4 3 3-7 7H7v-3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Notepad</a>
+            <a class="menu__link" role="menuitem" href="https://github.com/ssl/ezXSS/wiki" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13M4 19a2 2 0 0 0 2 2h12M4 19a2 2 0 0 1 2-2h12v4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 8h4" stroke-linecap="round"/></svg>
+              Wiki</a>
+            <div class="menu__sep"></div>
+            <button class="menu__link menu__link--danger" role="menuitem" data-logout>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 12h10M17 9l3 3-3 3M4 12h3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Log out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <section class="screen is-active" id="screen-dashboard">
+      <div class="pagehead">
+        <h1 class="pagetitle">Overview</h1>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+
+      <aside class="version-card" id="version-card" data-version-root hidden aria-label="Version status">
+        <div class="card__head">
+          <h2 class="card__title">Version status</h2>
+          <button class="iconbtn iconbtn--sm" id="version-card-dismiss" type="button" aria-label="Hide version card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="version-card__lines">
+          <div class="version-line"><span class="version-line__label">Current</span><span class="version-line__value mono" data-version-current>&hellip;</span></div>
+          <div class="version-line" data-version-latest-field hidden><span class="version-line__label">Latest</span><span class="version-line__value mono" data-version-latest></span></div>
+        </div>
+        <p class="field-hint version-card__status" data-version-status>Checking for updates&hellip;</p>
+        <pre class="mono version-changelog" data-version-changelog hidden></pre>
+        <a class="btn btn--ghost btn--block btn--sm" data-version-releases href="https://github.com/ssl/ezXSS/releases" target="_blank" rel="noopener noreferrer" style="margin-top:var(--space-sm)">View releases on GitHub</a>
+      </aside>
+
+      <div class="dash-stats">
+        <div class="card statcard">
+          <div class="card__head">
+            <h2 class="card__title">Reports</h2>
+            <span class="deltapill deltapill--good" data-delta="reports_week" hidden></span>
+          </div>
+          <div class="statnums">
+            <div class="statnum">
+              <div class="statfig"><span data-stat="reports">&ndash;</span></div>
+              <span class="statsub">Total reports</span>
+            </div>
+            <div class="statnum">
+              <div class="statfig"><span data-stat="report_domains">&ndash;</span></div>
+              <span class="statsub">Domains</span>
+            </div>
+          </div>
+          <div class="statfoot">
+            <div class="ministat"><span class="ministat__k">last</span><span class="ministat__value" data-stat="last_report">&ndash;</span></div>
+            <div class="ministat"><span class="ministat__k">pages</span><span class="ministat__value" data-stat="collected_pages">&ndash;</span></div>
+          </div>
+        </div>
+
+        <div class="card statcard">
+          <div class="card__head">
+            <h2 class="card__title">Sessions</h2>
+            <span class="deltapill deltapill--good" data-delta="session_clients_week" hidden></span>
+          </div>
+          <div class="statnums">
+            <div class="statnum">
+              <div class="statfig"><span data-stat="session_clients">&ndash;</span></div>
+              <span class="statsub">Clients</span>
+            </div>
+            <div class="statnum">
+              <div class="statfig"><span data-stat="session_requests">&ndash;</span></div>
+              <span class="statsub">Requests</span>
+            </div>
+          </div>
+          <div class="statfoot">
+            <div class="ministat"><span class="ministat__k">domains</span><span class="ministat__value" data-stat="session_domains">&ndash;</span></div>
+            <div class="ministat"><span class="ministat__k"><span class="live"><span class="dot"></span></span> last</span><span class="ministat__value" data-stat="last_client">&ndash;</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-lists">
+        <div class="card listcard">
+          <div class="card__head">
+            <h2 class="card__title">Most common</h2>
+            <select class="miniselect" data-common="1" aria-label="Most common - field">
+              <option value="origins" selected>Origins</option>
+              <option value="ips">IPs</option>
+              <option value="cookies">Cookies</option>
+              <option value="browsers">Browsers</option>
+              <option value="payloads">Payloads</option>
+            </select>
+          </div>
+          <div class="lrows" data-common-list="1"></div>
+        </div>
+
+        <div class="card listcard">
+          <div class="card__head">
+            <h2 class="card__title">Most common</h2>
+            <select class="miniselect" data-common="2" aria-label="Most common - field">
+              <option value="origins">Origins</option>
+              <option value="ips">IPs</option>
+              <option value="cookies">Cookies</option>
+              <option value="browsers" selected>Browsers</option>
+              <option value="payloads">Payloads</option>
+            </select>
+          </div>
+          <div class="lrows" data-common-list="2"></div>
+        </div>
+
+        <div class="card listcard">
+          <div class="card__head">
+            <h2 class="card__title">Most common</h2>
+            <select class="miniselect" data-common="3" aria-label="Most common - field">
+              <option value="origins">Origins</option>
+              <option value="ips">IPs</option>
+              <option value="cookies">Cookies</option>
+              <option value="browsers">Browsers</option>
+              <option value="payloads" selected>Payloads</option>
+            </select>
+          </div>
+          <div class="lrows" data-common-list="3"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-reports">
+      <div class="pagehead">
+        <h1 class="pagetitle">Reports</h1>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+
+      <div data-reports-root></div>
+    </section>
+
+    <section class="screen" id="screen-report">
+      <div class="pagehead">
+        <div class="pagehead__title">
+          <a class="iconbtn pagehead__back" href="#" data-screen="reports" aria-label="Back to reports">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 6-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <h1 class="pagetitle" data-report-title>Report</h1>
+        </div>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+
+      <div data-report-root></div>
+    </section>
+
+    <section class="screen" id="screen-payloads" data-autosave>
+      <div class="pagehead">
+        <h1 class="pagetitle">Payloads</h1>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+
+      <div data-payloads-root></div>
+    </section>
+
+    <section class="screen" id="screen-sessions">
+      <div class="pagehead">
+        <h1 class="pagetitle">Sessions</h1>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+
+      <div class="sess-controls">
+        <div class="sess-controls__filters">
+          <div class="segmented" role="group" aria-label="Session filter" data-sess-seg>
+            <button type="button" data-archive="0" aria-pressed="true">Active</button>
+            <button type="button" data-archive="1" aria-pressed="false">Archived</button>
+          </div>
+          <select class="input" id="sess-payload" aria-label="Filter by payload">
+            <option value="">All payloads</option>
+          </select>
+          <input class="input" id="sess-search" type="search" placeholder="Search sessions&#8230;" aria-label="Search sessions (origin, IP, user-agent)">
+        </div>
+        <div class="sess-controls__select">
+          <div class="sess-scope" id="sess-scope">
+            <button class="btn sess-scope__toggle" type="button" id="sess-scope-toggle" aria-haspopup="true" aria-expanded="false">
+              <span>Select more</span>
+              <svg class="sess-scope__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="menu sess-scope__menu" id="sess-scope-menu" role="menu"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="withbar sess-bulkbar" hidden id="sess-withbar">
+        <button class="btn btn--sm btn--ghost sess-withbar__clear" type="button" id="sess-withbar-clear">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="14" height="14"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+          Clear
+        </button>
+        <span class="withbar__label" id="sess-withbar-label">0 selected:</span>
+        <span class="withbar__actions" id="sess-withbar-actions"></span>
+      </div>
+
+      <div class="notice notice--warn catchall-note" id="sess-catchall-note" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 9v4m0 3h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>These sessions are coupled to no payload. Create a payload for these domains to organise them, or delete the ones you don&rsquo;t need.</span>
+      </div>
+
+      <div class="console-layout">
+        <div class="sess-listcol">
+          <div class="card sess-leftcard" style="padding:var(--space-sm)">
+            <div class="session-list" id="sess-list">
+              <div class="ezload" role="status" aria-label="Loading&hellip;"><svg class="ezload__logo" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><use href="#ezlogo"/></svg></div>
+            </div>
+          </div>
+          <div class="pagination" id="sess-pager"></div>
+        </div>
+
+        <div class="card" id="sess-detail">
+          <div class="card__head sess-head">
+            <div class="sess-head__main">
+              <h2 class="card__title mono" id="sess-title" title="No session selected">No session selected</h2>
+              <div class="sess-meta" id="sess-sub">
+                <span class="field-hint">Pick a session from the list to view its console.</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="sess-requests-wrap" hidden style="margin-bottom:var(--space-md)">
+            <div class="card__head" style="margin-bottom:var(--space-sm)">
+              <h3 class="card__title" style="font-size:var(--text-sm)">Requests</h3>
+              <span class="tag tag--muted" id="sess-requests-count"></span>
+            </div>
+            <div class="reqlist" id="sess-requests"></div>
+          </div>
+
+          <div class="console" id="console-out">
+            <div class="console__line"><span class="out faint">Select a session to stream its console output.</span></div>
+          </div>
+
+          <form class="console-input" id="console-form" hidden>
+            <span class="prompt">&raquo;</span>
+            <input class="input mono" id="console-cmd" type="text" placeholder="JS to eval in the target session&hellip;" autocomplete="off">
+            <button class="iconbtn console-input__ml" id="console-multiline" type="button" aria-pressed="false" aria-label="Multiline input (Ctrl/Cmd+Enter to send)" title="Multiline - Ctrl/Cmd+Enter to send">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h11M4 18h16" stroke-linecap="round"/></svg>
+            </button>
+            <button class="btn btn--primary" type="submit">Send</button>
+          </form>
+          <p class="field-hint" id="sess-foot">Commands are queued and delivered to the client on its next ping.</p>
+
+          <div class="screenbar__actions" id="sess-actions" hidden>
+            <button class="btn btn--sm" type="button" id="sess-proxy">Proxy</button>
+            <button class="btn btn--sm" type="button" id="sess-killreconnect" hidden>Kill reconnect</button>
+            <button class="btn btn--sm" type="button" id="sess-archive">Archive</button>
+            <button class="btn btn--sm" type="button" id="sess-kill" style="margin-left:auto">Kill</button>
+            <button class="btn btn--sm" type="button" id="sess-delete">Delete</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-session-requests">
+      <div class="pagehead">
+        <div class="pagehead__title">
+          <a class="iconbtn pagehead__back" id="sr-back" href="#" data-screen="sessions" aria-label="Back to session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 6-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <h1 class="pagetitle">Requests</h1>
+        </div>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+
+      <div class="card" style="padding:var(--space-md)">
+        <div class="sr-toolbar">
+          <input class="input" id="sr-search" type="search" placeholder="Search by URL, IP, user agent, origin or referer&hellip;" autocomplete="off" spellcheck="false">
+          <span class="tag tag--muted" id="sr-count"></span>
+        </div>
+        <div class="reqlist" id="sr-list" style="margin-top:var(--space-md)"></div>
+        <div class="pagination" id="sr-pager"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-users">
+      <div class="pagehead">
+        <h1 class="pagetitle">Users</h1>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+
+      <div data-users-panel="users"></div>
+    </section>
+
+    <section class="screen" id="screen-settings" data-autosave>
+      <div class="pagehead">
+        <h1 class="pagetitle">Settings</h1>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+
+      <div class="tabs" data-tabs role="tablist" aria-label="Settings sections">
+        <button role="tab" aria-selected="true" data-tab="set-app">System</button>
+        <button role="tab" aria-selected="false" data-tab="set-payload">Payload policy</button>
+        <button role="tab" aria-selected="false" data-tab="set-alerts">Alerts</button>
+        <button role="tab" aria-selected="false" data-tab="set-ext">Extensions</button>
+        <button role="tab" aria-selected="false" data-tab="set-logs" hidden>Logs</button>
+      </div>
+
+      <div data-tabpanel="set-app" class="tabpanel is-active" data-endpoint="/settings/update"></div>
+      <div data-tabpanel="set-payload" class="tabpanel" data-endpoint="/settings/update"></div>
+      <div data-tabpanel="set-alerts" class="tabpanel" data-endpoint="/alerts/settings"></div>
+      <div data-tabpanel="set-ext" class="tabpanel"></div>
+      <div data-tabpanel="set-logs" class="tabpanel"></div>
+    </section>
+
+    <section class="screen" id="screen-account">
+      <div class="pagehead">
+        <h1 class="pagetitle">Account</h1>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+
+      <div class="acctgrid">
+        <div class="card">
+          <div class="card__head"><h2 class="card__title">Profile</h2><span class="tag tag--muted" id="acc-role-tag">-</span></div>
+          <div class="field">
+            <label class="field-label" for="acc-github">Avatar</label>
+            <div class="acct-avatar__row">
+              <span class="avatar avatar--xl" id="acc-avatar-preview">AD</span>
+              <input class="input" id="acc-github" placeholder="GitHub username" autocapitalize="none" spellcheck="false" autocomplete="off">
+            </div>
+            <p class="field-hint" style="margin-top:var(--space-xs)">Uses your public GitHub avatar. Leave blank for initials.</p>
+            <p class="field-hint" id="acc-github-msg" hidden></p>
+          </div>
+          <div class="field" style="margin-top:var(--space-md)">
+            <label class="field-label" for="acc-username">Username</label>
+            <input class="input" id="acc-username" value="" disabled>
+            <p class="field-hint" style="margin-top:var(--space-xs)">Your username can&rsquo;t be changed.</p>
+          </div>
+          <div class="acct-spacer"></div>
+          <div class="field">
+            <label class="field-label">Panel theme</label>
+            <div class="themeswitch" role="group" aria-label="Theme" id="acc-theme"></div>
+            <p class="field-hint" style="margin-top:var(--space-xs)">Applies to this browser only.</p>
+          </div>
+        </div>
+
+        <div class="card seccard">
+          <div class="card__head"><h2 class="card__title">Security</h2></div>
+          <div class="sectabs" data-tabs role="tablist" aria-label="Security">
+            <button type="button" role="tab" aria-selected="true" data-tab="sec-password">Password</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="sec-twofa">Two-factor</button>
+          </div>
+
+          <div class="sectabs-body">
+            <div data-tabpanel="sec-password" class="tabpanel is-active">
+              <form id="account-password-form">
+                <div class="field">
+                  <label class="field-label" for="acc-current">Current password</label>
+                  <input class="input" id="acc-current" type="password" autocomplete="current-password">
+                </div>
+                <div class="field" style="margin-top:var(--space-sm)">
+                  <label class="field-label" for="acc-new">New password</label>
+                  <input class="input" id="acc-new" type="password" autocomplete="new-password">
+                </div>
+                <div class="field" style="margin-top:var(--space-sm)">
+                  <label class="field-label" for="acc-confirm">Confirm new password</label>
+                  <input class="input" id="acc-confirm" type="password" autocomplete="new-password">
+                </div>
+                <p class="field-hint" id="acc-pw-msg" hidden></p>
+                <button class="btn btn--primary btn--block" type="submit" style="margin-top:var(--space-md)">Change password</button>
+              </form>
+            </div>
+
+            <div data-tabpanel="sec-twofa" class="tabpanel">
+              <div id="acc-2fa-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--wide" data-autosave data-endpoint="/alerts">
+          <div class="card__head">
+            <h2 class="card__title">Alert destinations</h2>
+            <span class="tag tag--muted">your channels</span>
+          </div>
+          <div id="acc-alerts-body">
+            <div class="ezload" role="status" aria-label="Loading&hellip;"><svg class="ezload__logo" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><use href="#ezlogo"/></svg></div>
+          </div>
+        </div>
+
+        <div class="card card--wide" id="acc-keys-card" hidden>
+          <div class="card__head">
+            <h2 class="card__title">API keys</h2>
+            <span class="tag tag--muted">bearer tokens</span>
+          </div>
+          <div id="acc-keys-body">
+            <div class="ezload" role="status" aria-label="Loading&hellip;"><svg class="ezload__logo" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><use href="#ezlogo"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-search">
+      <div class="pagehead">
+        <h1 class="pagetitle">Search</h1>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+      <div data-search-root></div>
+    </section>
+
+    <section class="screen" id="screen-docs">
+      <div class="pagehead">
+        <h1 class="pagetitle">API docs</h1>
+        <nav class="topnav" data-topnav aria-label="Primary"></nav>
+      </div>
+      <p class="field-hint" style="margin-bottom:var(--space-lg)">The ezXSS 5.0 HTTP API &middot; served under <span class="mono">/api</span> &middot; JSON envelope &middot; bearer-token auth.</p>
+      <div data-docs-root></div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-scrim" id="share-modal">
+  <div class="modal modal--wide" role="dialog" aria-modal="true" aria-labelledby="share-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="share-title">Share report</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="share-modal-body"></div>
+    <div class="modal__foot" id="share-modal-foot"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="smtp-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="smtp-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="smtp-title">SMTP settings</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="smtp-modal-body"></div>
+    <div class="modal__foot" id="smtp-modal-foot"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="proxy-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="proxy-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="proxy-title">Reverse proxy</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="proxy-modal-body"></div>
+    <div class="modal__foot" id="proxy-modal-foot"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="sess-eval-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sess-eval-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="sess-eval-title">Queue JS to selected sessions</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="sess-eval-body"></div>
+    <div class="modal__foot" id="sess-eval-foot"></div>
+  </div>
+</div>
+
+<div class="modal-scrim drawer-scrim" id="request-drawer">
+  <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="request-title">
+    <div class="drawer__head">
+      <h2 class="drawer__title" id="request-title">Request detail</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="drawer__body" id="request-drawer-body"></div>
+    <div class="drawer__foot" id="request-drawer-foot"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="key-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="key-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="key-title">New API key</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="key-modal-body"></div>
+    <div class="modal__foot" id="key-modal-foot"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="user-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="user-modal-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="user-modal-title">User</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="user-modal-body"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="role-defaults-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="role-defaults-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="role-defaults-title">Default permissions</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="role-defaults-body"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="payload-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="payload-modal-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="payload-modal-title">Create payload</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="payload-modal-body"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="csp-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="csp-modal-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="csp-modal-title">Auto-pick vector from CSP</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="csp-modal-body"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="payload-share-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="payload-share-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="payload-share-title">Manage access</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="payload-share-body"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="ext-edit-modal">
+  <div class="modal modal--wide" role="dialog" aria-modal="true" aria-labelledby="ext-edit-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="ext-edit-title">Edit extension</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="ext-edit-body"></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="killswitch-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="kill-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="kill-title">Arm kill switch</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <div class="notice notice--accent" style="margin-bottom:var(--space-md)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 8v5m0 3h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg>
+        <span>This takes payloads, callbacks <b>and this panel</b> dark immediately. The platform returns 404 to every request until you visit any URL with <span class="mono">?pass=&lt;password&gt;</span> to clear it.</span>
+      </div>
+      <div class="field">
+        <label class="field-label" for="kill-password">Kill switch password</label>
+        <input class="input" id="kill-password" type="password" autocomplete="off" placeholder="Choose an unlock password">
+      </div>
+      <p class="field-hint" id="kill-msg" hidden></p>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn--ghost" data-close-modal>Cancel</button>
+      <button class="btn btn--danger" id="kill-arm-btn" type="button">Arm kill switch</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-scrim--top" id="confirm-modal">
+  <div class="modal modal--sm" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="confirm-title">Confirm</h2>
+      <button class="iconbtn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal__body"><p id="confirm-message" class="field-hint" style="font-size:var(--text-sm)"></p></div>
+    <div class="modal__foot">
+      <button class="btn btn--ghost" type="button" id="confirm-cancel">Cancel</button>
+      <button class="btn btn--primary" type="button" id="confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="savetoast" id="savetoast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="m5 13 4 4 10-10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Saved
+</div>
+
+<div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
