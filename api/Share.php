@@ -137,8 +137,6 @@ class ShareController extends Controller
      */
     private function ensureOwnerOrAdmin($table, $id)
     {
-        $actor = Auth::user();
-
         if (!in_array($table, self::$shareable, true)) {
             throw new HttpException(404, 'Unknown or non-shareable resource');
         }
@@ -154,23 +152,23 @@ class ShareController extends Controller
             throw new HttpException(404, 'Resource not found');
         }
 
-        $actorId = (int) $actor['id'];
+        $actorId = Auth::id();
         $ownerUid = isset($row['user_id']) ? (int) $row['user_id'] : 0;
 
         if ($table === 'payloads') {
-            if (Permissions::can($actor, 'payload.viewall')) {
+            if (Auth::can('payload.viewall')) {
                 return $row;
             }
-            if (Permissions::can($actor, 'payload.share') && $actorId > 0 && $actorId === $ownerUid) {
+            if (Auth::can('payload.share') && $actorId > 0 && $actorId === $ownerUid) {
                 return $row;
             }
             throw new HttpException(403, 'You do not have permission to manage this resource');
         }
 
-        if (Permissions::can($actor, 'report.viewall')) {
+        if (Auth::can('report.viewall')) {
             return $row;
         }
-        if (Permissions::can($actor, 'report.share') && $actorId > 0 && $actorId === $ownerUid) {
+        if (Auth::can('report.share') && $actorId > 0 && $actorId === $ownerUid) {
             return $row;
         }
 

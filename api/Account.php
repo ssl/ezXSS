@@ -32,9 +32,7 @@ class AccountController extends Controller
      */
     public function doGetNotepad()
     {
-        $actor = Auth::user();
-
-        return array('notepad' => $actor['notepad']);
+        return array('notepad' => Auth::user()['notepad']);
     }
 
     /**
@@ -45,10 +43,9 @@ class AccountController extends Controller
      */
     public function doSaveNotepad($body)
     {
-        $actor = Auth::user();
         $notepad = $this->validateNotepad($body);
 
-        User::update((int) $actor['id'], array('notepad' => $notepad));
+        User::update(Auth::id(), array('notepad' => $notepad));
         return array('notepad' => $notepad);
     }
 

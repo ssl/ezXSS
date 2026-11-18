@@ -117,8 +117,6 @@ class SessionsController extends Controller
      */
     public function doList()
     {
-        $actor = Auth::user();
-
         $perPage = $this->intParam('per_page', 25, 1, 200);
         $page = $this->intParam('page', 1, 1, PHP_INT_MAX);
         $offset = ($page - 1) * $perPage;
@@ -130,7 +128,7 @@ class SessionsController extends Controller
         $clientId = queryParam('client_id', '');
         $search = queryParam('search', '');
 
-        $viewAll = Permissions::can($actor, 'session.viewall');
+        $viewAll = Auth::can('session.viewall');
         $catchall = $viewAll && $payloadStr === Payload::CATCHALL_FILTER;
 
         $opts = array(
@@ -146,7 +144,7 @@ class SessionsController extends Controller
         );
 
         if (!$viewAll) {
-            $opts['identifiers'] = Payload::accessibleIdentifiers((int) $actor['id']);
+            $opts['identifiers'] = Payload::accessibleIdentifiers(Auth::id());
         }
 
         $result = Session::listGroups($opts);
@@ -170,8 +168,6 @@ class SessionsController extends Controller
      */
     public function doCount()
     {
-        $actor = Auth::user();
-
         $archiveRaw = queryParam('archive', '0');
         $archive = ($archiveRaw === '1') ? 1 : 0;
         $payload = queryParam('payload', '');
@@ -179,7 +175,7 @@ class SessionsController extends Controller
         $clientId = queryParam('client_id', '');
         $search = queryParam('search', '');
 
-        $viewAll = Permissions::can($actor, 'session.viewall');
+        $viewAll = Auth::can('session.viewall');
         $catchall = $viewAll && $payloadStr === Payload::CATCHALL_FILTER;
 
         $opts = array(
@@ -193,7 +189,7 @@ class SessionsController extends Controller
         );
 
         if (!$viewAll) {
-            $opts['identifiers'] = Payload::accessibleIdentifiers((int) $actor['id']);
+            $opts['identifiers'] = Payload::accessibleIdentifiers(Auth::id());
         }
 
         return array('count' => Session::countGroups($opts));
@@ -424,16 +420,15 @@ class SessionsController extends Controller
      */
     public function resolveScopeIds($scope)
     {
-        $actor = Auth::user();
         $opts = $this->validScope($scope);
 
-        if (Permissions::can($actor, 'session.viewall')) {
+        if (Auth::can('session.viewall')) {
             if (isset($opts['payload']) && $opts['payload'] === Payload::CATCHALL_FILTER) {
                 $opts['catchall'] = true;
                 $opts['payload'] = '';
             }
         } else {
-            $opts['identifiers'] = Payload::accessibleIdentifiers((int) $actor['id']);
+            $opts['identifiers'] = Payload::accessibleIdentifiers(Auth::id());
         }
 
         $matched = Session::countGroups($opts);
@@ -502,11 +497,9 @@ class SessionsController extends Controller
      */
     public function doPayloads()
     {
-        $actor = Auth::user();
-
         $opts = array();
-        if (!Permissions::can($actor, 'session.viewall')) {
-            $opts['identifiers'] = Payload::accessibleIdentifiers((int) $actor['id']);
+        if (!Auth::can('session.viewall')) {
+            $opts['identifiers'] = Payload::accessibleIdentifiers(Auth::id());
         }
         return Session::distinctPayloads($opts);
     }
@@ -539,9 +532,7 @@ class SessionsController extends Controller
      */
     public function accessForGroup($payloadIdentifier, $type)
     {
-        $actor = Auth::user();
-
-        if (Permissions::can($actor, 'session.viewall')) {
+        if (Auth::can('session.viewall')) {
             return;
         }
 
@@ -551,7 +542,7 @@ class SessionsController extends Controller
             throw new HttpException(403, 'Forbidden');
         }
 
-        Payload::ensureAccess((int) $actor['id'], (int) $payload['id'], $type, 'payloads');
+        Payload::ensureAccess(Auth::id(), (int) $payload['id'], $type, 'payloads');
     }
 
     /**

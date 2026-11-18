@@ -121,7 +121,7 @@ class ReportsController extends Controller
     {
         $this->begin();
 
-        if (!Permissions::can(Auth::user(), 'report.viewall')) {
+        if (!Auth::can('report.viewall')) {
             throw new HttpException(403, 'You do not have permission to do that');
         }
 
@@ -139,8 +139,6 @@ class ReportsController extends Controller
      */
     public function doList()
     {
-        $actor = Auth::user();
-
         $perPage = $this->intParam('per_page', 25, 1, 200);
         $page = $this->intParam('page', 1, 1, PHP_INT_MAX);
         $offset = ($page - 1) * $perPage;
@@ -150,7 +148,7 @@ class ReportsController extends Controller
         $payload = queryParam('payload', '');
         $payloadStr = is_string($payload) ? trim($payload) : '';
 
-        $viewAll = Permissions::can($actor, 'report.viewall');
+        $viewAll = Auth::can('report.viewall');
 
         $catchall = $viewAll && $payloadStr === Payload::CATCHALL_FILTER;
 
@@ -166,7 +164,7 @@ class ReportsController extends Controller
         if ($viewAll) {
             $opts['cacheTotal'] = true;
         } else {
-            $opts['ids'] = Report::accessibleIds((int) $actor['id']);
+            $opts['ids'] = Report::accessibleIds(Auth::id());
         }
 
         $result = Report::listFor($opts);
@@ -243,14 +241,12 @@ class ReportsController extends Controller
      */
     public function doArchive($id)
     {
-        $actor = Auth::user();
-
         $this->cap('report.view');
         $this->ensureReport($id);
         $this->access($id, 'edit');
 
         $flag = Report::toggleArchive($id);
-        Log::event('reports', (int) $actor['id'], ($flag ? 'Archived' : 'Unarchived') . ' report #' . $id, USER_IP);
+        Log::event('reports', Auth::id(), ($flag ? 'Archived' : 'Unarchived') . ' report #' . $id, USER_IP);
         return array('id' => $id, 'archive' => $flag);
     }
 
@@ -262,14 +258,12 @@ class ReportsController extends Controller
      */
     public function doDelete($id)
     {
-        $actor = Auth::user();
-
         $this->cap('report.view');
         $this->ensureReport($id);
         $this->access($id, 'edit');
 
         Report::deleteFull($id);
-        Log::event('reports', (int) $actor['id'], 'Deleted report #' . $id, USER_IP);
+        Log::event('reports', Auth::id(), 'Deleted report #' . $id, USER_IP);
         return array('deleted' => true, 'id' => $id);
     }
 
@@ -282,8 +276,6 @@ class ReportsController extends Controller
      */
     public function doCreateShare($id, $body)
     {
-        $actor = Auth::user();
-
         $this->cap('report.share');
         $this->ensureReport($id);
         $this->access($id, 'edit');
@@ -334,7 +326,7 @@ class ReportsController extends Controller
         $share = ReportShare::createShare($id, $columns, false, $expiresTs);
         $share['url'] = $this->publicShareUrl($share['slug']);
 
-        Log::event('reports', (int) $actor['id'], 'Shared report #' . $id, USER_IP);
+        Log::event('reports', Auth::id(), 'Shared report #' . $id, USER_IP);
         return $share;
     }
 
@@ -362,8 +354,6 @@ class ReportsController extends Controller
      */
     public function doRevokeShare($shareId)
     {
-        $actor = Auth::user();
-
         $share = ReportShare::find($shareId);
         if (!$share) {
             throw new HttpException(404, 'Share not found');
@@ -374,12 +364,12 @@ class ReportsController extends Controller
 
         if (Report::find($reportId)) {
             $this->access($reportId, 'edit');
-        } elseif (!Permissions::can($actor, 'report.viewall')) {
+        } elseif (!Auth::can('report.viewall')) {
             throw new HttpException(403, 'Forbidden');
         }
 
         ReportShare::delete($shareId);
-        Log::event('reports', (int) $actor['id'], 'Revoked a share of report #' . $reportId, USER_IP);
+        Log::event('reports', Auth::id(), 'Revoked a share of report #' . $reportId, USER_IP);
         return array('deleted' => true, 'id' => $shareId);
     }
 
@@ -406,12 +396,10 @@ class ReportsController extends Controller
      */
     private function access($id, $type)
     {
-        $actor = Auth::user();
-
-        if (Permissions::can($actor, 'report.viewall')) {
+        if (Auth::can('report.viewall')) {
             return;
         }
-        Report::ensureAccess((int) $actor['id'], $id, $type, 'reports');
+        Report::ensureAccess(Auth::id(), $id, $type, 'reports');
     }
 
     /**

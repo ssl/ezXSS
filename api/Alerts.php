@@ -47,11 +47,10 @@ class AlertsController extends Controller
     public function settings()
     {
         $this->begin();
-        $actor = Auth::user();
 
         if (isPOST()) {
             $data = $this->doSaveGlobal($this->input());
-            Log::event('settings', (int) $actor['id'], 'Updated global alert settings', USER_IP);
+            Log::event('settings', Auth::id(), 'Updated global alert settings', USER_IP);
             return $this->respond($data);
         }
         return $this->respond($this->doReadGlobal());
@@ -82,8 +81,7 @@ class AlertsController extends Controller
      */
     public function doReadOwn()
     {
-        $actor = Auth::user();
-        $own = $this->readFor((int) $actor['id']);
+        $own = $this->readFor(Auth::id());
 
         $own['mail']['method_enabled'] = Setting::enabled('alert-mail');
         $own['telegram']['method_enabled'] = Setting::enabled('alert-telegram');
@@ -99,9 +97,7 @@ class AlertsController extends Controller
      */
     public function doSaveOwn(array $body)
     {
-        $actor = Auth::user();
-
-        return $this->readFor((int) $actor['id']);
+        return $this->readFor(Auth::id());
     }
 
     /**
@@ -155,8 +151,6 @@ class AlertsController extends Controller
      */
     public function doTest()
     {
-        $actor = Auth::user();
-
         $sent = array();
         $report = Alert::sampleReport();
         $methods = array(
@@ -170,7 +164,7 @@ class AlertsController extends Controller
             if (!Setting::enabled($masterSetting)) {
                 continue;
             }
-            foreach (AlertConfig::ownRecipientsFor($methodId, (int) $actor['id']) as $row) {
+            foreach (AlertConfig::ownRecipientsFor($methodId, Auth::id()) as $row) {
                 Alert::sendOne($methodId, $row, $report);
                 $sent[] = AlertConfig::methodName($methodId);
             }

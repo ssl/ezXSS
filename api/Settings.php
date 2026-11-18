@@ -26,10 +26,9 @@ class SettingsController extends Controller
     public function update()
     {
         $this->begin();
-        $actor = Auth::user();
 
         $result = $this->doUpdate($this->input());
-        Log::event('settings', (int) $actor['id'], 'Updated settings', USER_IP);
+        Log::event('settings', Auth::id(), 'Updated settings', USER_IP);
         return $this->respond($result);
     }
 

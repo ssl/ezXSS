@@ -232,8 +232,6 @@ class ConsoleController extends Controller
      */
     public function doBulk($body)
     {
-        $actor = Auth::user();
-
         $action = isset($body['action']) ? (string) $body['action'] : '';
         if (!in_array($action, array('execute', 'kill', 'killreconnect'), true)) {
             throw new HttpException(422, 'Invalid bulk action');
@@ -257,7 +255,7 @@ class ConsoleController extends Controller
             $ids = $this->validBulkIds($body['ids']);
         } elseif ($hasScope) {
             $mode = 'scope';
-            $resolved = $this->sessions->resolveScopeIds($actor, $body['scope']);
+            $resolved = $this->sessions->resolveScopeIds($body['scope']);
             $ids = $resolved['ids'];
             $matched = $resolved['matched'];
         } else {
@@ -305,11 +303,9 @@ class ConsoleController extends Controller
      */
     private function gate($id, $type)
     {
-        $actor = Auth::user();
-
         $id = $this->validId($id, 'session');
         $group = $this->sessions->resolveGroup($id);
-        $this->sessions->accessForGroup($actor, $group['payload'], $type);
+        $this->sessions->accessForGroup($group['payload'], $type);
         return $group;
     }
 }

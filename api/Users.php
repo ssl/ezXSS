@@ -16,11 +16,10 @@ class UsersController extends Controller
     public function index()
     {
         $this->begin();
-        $actor = Auth::user();
 
         if (isPOST()) {
             $data = $this->doCreate($this->input());
-            Log::event('users', (int) $actor['id'], 'Created user ' . (isset($data['username']) ? $data['username'] : '#' . (isset($data['id']) ? $data['id'] : '?')), USER_IP);
+            Log::event('users', Auth::id(), 'Created user ' . (isset($data['username']) ? $data['username'] : '#' . (isset($data['id']) ? $data['id'] : '?')), USER_IP);
             return $this->respond($data, array(), 201);
         }
 
@@ -47,14 +46,13 @@ class UsersController extends Controller
     public function update($id)
     {
         $this->begin();
-        $actor = Auth::user();
 
         $body = $this->input();
         $data = $this->doUpdate($id, $body);
 
         if (array_key_exists('banned', $body)) {
             $banned = isset($data['banned']) ? ((int) $data['banned'] === 1) : $this->asBool($body['banned']);
-            Log::event('users', (int) $actor['id'], ($banned ? 'Banned' : 'Unbanned') . ' user #' . (int) $id, USER_IP);
+            Log::event('users', Auth::id(), ($banned ? 'Banned' : 'Unbanned') . ' user #' . (int) $id, USER_IP);
         }
         $this->respond($data);
     }
@@ -101,8 +99,6 @@ class UsersController extends Controller
      */
     public function doUpsertRole($name, array $body)
     {
-        $actor = Auth::user();
-
         $granted = $this->grantedFromBody($body);
 
         if ($name === null) {
@@ -114,7 +110,7 @@ class UsersController extends Controller
                 throw new HttpException(409, 'A role with that name already exists');
             }
             Role::upsert($newName, $granted);
-            Log::event('users', (int) $actor['id'], 'Created role ' . $newName, USER_IP);
+            Log::event('users', Auth::id(), 'Created role ' . $newName, USER_IP);
             return $newName;
         }
 
@@ -125,7 +121,7 @@ class UsersController extends Controller
             throw new HttpException(404, 'Role not found');
         }
         Role::upsert($name, $granted);
-        Log::event('users', (int) $actor['id'], 'Edited role ' . $name, USER_IP);
+        Log::event('users', Auth::id(), 'Edited role ' . $name, USER_IP);
         return $name;
     }
 
@@ -151,8 +147,6 @@ class UsersController extends Controller
 
     private function deleteRole($name)
     {
-        $actor = Auth::user();
-
         if ($name === 'admin' || $name === Role::BASE) {
             throw new HttpException(422, 'This role cannot be deleted');
         }
@@ -164,7 +158,7 @@ class UsersController extends Controller
 
         User::query()->where('role', $name)->update(array('role' => Role::BASE));
         Role::remove($name);
-        Log::event('users', (int) $actor['id'], 'Deleted role ' . $name . ' (users reassigned to ' . Role::BASE . ')', USER_IP);
+        Log::event('users', Auth::id(), 'Deleted role ' . $name . ' (users reassigned to ' . Role::BASE . ')', USER_IP);
     }
 
     /**
@@ -191,8 +185,6 @@ class UsersController extends Controller
      */
     private function grantedFromBody(array $body)
     {
-        $actor = Auth::user();
-
         $caps = isset($body['permissions']) && is_array($body['permissions']) ? $body['permissions'] : array();
         $granted = array();
         foreach ($caps as $cap => $on) {
@@ -202,7 +194,7 @@ class UsersController extends Controller
         }
         $granted = Permissions::sanitizeGranted($granted);
 
-        $own = Permissions::effective($actor);
+        $own = Permissions::effective(Auth::user());
         $allowed = array();
         foreach ($granted as $cap) {
             if (!empty($own[$cap])) {
@@ -222,10 +214,9 @@ class UsersController extends Controller
     public function delete($id)
     {
         $this->begin();
-        $actor = Auth::user();
 
         $data = $this->doDelete($id);
-        Log::event('users', (int) $actor['id'], 'Deleted user #' . (isset($data['id']) ? $data['id'] : $id), USER_IP);
+        Log::event('users', Auth::id(), 'Deleted user #' . (isset($data['id']) ? $data['id'] : $id), USER_IP);
         $this->respond($data);
     }
 
@@ -333,11 +324,10 @@ class UsersController extends Controller
      */
     public function doGet($id)
     {
-        $actor = Auth::user();
+        $id = (int) $id;
+        $isSelf = Auth::id() === $id;
 
-        $isSelf = (int) $actor['id'] === $id;
-
-        if (!$isSelf && !Permissions::can($actor, 'user.manage')) {
+        if (!$isSelf && !Auth::can('user.manage')) {
             throw new HttpException(403, 'You do not have permission to do that');
         }
 
@@ -361,9 +351,10 @@ class UsersController extends Controller
     public function doUpdate($id, $body)
     {
         $actor = Auth::user();
+        $id = (int) $id;
 
-        $isSelf = (int) $actor['id'] === $id;
-        $canManage = Permissions::can($actor, 'user.manage');
+        $isSelf = Auth::id() === $id;
+        $canManage = Auth::can('user.manage');
 
         if (!$canManage && !$isSelf) {
             throw new HttpException(403, 'You do not have permission to do that');
@@ -496,7 +487,7 @@ class UsersController extends Controller
 
         $id = $this->validId($id, 'user');
 
-        if ((int) $actor['id'] === $id) {
+        if (Auth::id() === $id) {
             throw new HttpException(409, 'You cannot delete your own account');
         }
 
@@ -512,7 +503,7 @@ class UsersController extends Controller
             throw new HttpException(409, 'You cannot delete the last admin');
         }
 
-        Payload::query()->from('payloads')->where('user_id', $id)->update(array('user_id' => (int) $actor['id']));
+        Payload::query()->from('payloads')->where('user_id', $id)->update(array('user_id' => Auth::id()));
 
         Token::revokeAllForUser($id);
         User::purgeAccessFor($id);
@@ -530,7 +521,7 @@ class UsersController extends Controller
     private function assertCanAssignRole($role)
     {
         foreach (Permissions::roleCaps($role) as $cap => $on) {
-            if ($on && !Permissions::can(Auth::user(), $cap)) {
+            if ($on && !Auth::can($cap)) {
                 throw new HttpException(403, 'You can only assign a role whose capabilities you hold yourself');
             }
         }
@@ -546,7 +537,7 @@ class UsersController extends Controller
     {
         $clean = Permissions::sanitizeOverrides($raw);
         foreach ($clean as $cap => $val) {
-            if ($val && !Permissions::can(Auth::user(), $cap)) {
+            if ($val && !Auth::can($cap)) {
                 throw new HttpException(403, 'You can only grant capabilities you hold yourself');
             }
         }

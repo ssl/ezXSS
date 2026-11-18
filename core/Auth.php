@@ -70,6 +70,22 @@ class Auth
     }
 
     /**
+     * @return int|null
+     */
+    public static function id()
+    {
+        return self::$user ? (int) self::$user['id'] : null;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function can($capability)
+    {
+        return Permissions::can(self::$user, $capability);
+    }
+
+    /**
      * The current token row (null when not authenticated).
      */
     public static function token()

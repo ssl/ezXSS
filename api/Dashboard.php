@@ -47,9 +47,7 @@ class DashboardController extends Controller
      */
     public function doStats()
     {
-        $actor = Auth::user();
-
-        if (Permissions::can($actor, 'report.viewall')) {
+        if (Auth::can('report.viewall')) {
             return Cache::remember(Report::CACHE_DASHBOARD_GLOBAL, function () {
                 return array_merge(
                     Report::dashboardStats(array()),
@@ -58,9 +56,9 @@ class DashboardController extends Controller
             }, Report::CACHE_TTL);
         }
 
-        $reportIds = Report::accessibleIds((int) $actor['id']);
-        $identifiers = Payload::accessibleIdentifiers((int) $actor['id']);
-        $key = 'dashboard:stats:v' . Report::dashboardVersion() . ':' . (int) $actor['id'];
+        $reportIds = Report::accessibleIds(Auth::id());
+        $identifiers = Payload::accessibleIdentifiers(Auth::id());
+        $key = 'dashboard:stats:v' . Report::dashboardVersion() . ':' . Auth::id();
 
         return Cache::remember($key, function () use ($reportIds, $identifiers) {
             return array_merge(
@@ -78,21 +76,19 @@ class DashboardController extends Controller
      */
     public function doCommon($field)
     {
-        $actor = Auth::user();
-
         $field = strtolower(trim((string) $field));
         if (!in_array($field, Report::COMMON_FIELDS, true)) {
             throw new HttpException(422, 'Unknown most-common field');
         }
 
-        if (Permissions::can($actor, 'report.viewall')) {
+        if (Auth::can('report.viewall')) {
             return Cache::remember(Report::CACHE_COMMON_PREFIX . 'v' . Report::dashboardVersion() . ':' . $field, function () use ($field) {
                 return $this->computeCommon($field, Report::commonData(array()));
             }, Report::CACHE_TTL);
         }
 
-        $reportIds = Report::accessibleIds((int) $actor['id']);
-        $key = Report::CACHE_COMMON_PREFIX . 'v' . Report::dashboardVersion() . ':' . $field . ':' . (int) $actor['id'];
+        $reportIds = Report::accessibleIds(Auth::id());
+        $key = Report::CACHE_COMMON_PREFIX . 'v' . Report::dashboardVersion() . ':' . $field . ':' . Auth::id();
 
         return Cache::remember($key, function () use ($field, $reportIds) {
             return $this->computeCommon($field, Report::commonData(array('ids' => $reportIds)));

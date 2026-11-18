@@ -14,11 +14,10 @@ class PayloadsController extends Controller
     public function index()
     {
         $this->begin();
-        $actor = Auth::user();
 
         if (isPOST()) {
             $data = $this->doCreate($this->input());
-            Log::event('payloads', (int) $actor['id'], 'Created payload ' . (isset($data['identifier']) ? $data['identifier'] : '#' . (isset($data['id']) ? $data['id'] : '?')), USER_IP);
+            Log::event('payloads', Auth::id(), 'Created payload ' . (isset($data['identifier']) ? $data['identifier'] : '#' . (isset($data['id']) ? $data['id'] : '?')), USER_IP);
             return $this->respond($data, array(), 201);
         }
 
@@ -57,10 +56,9 @@ class PayloadsController extends Controller
     public function delete($id)
     {
         $this->begin();
-        $actor = Auth::user();
 
         $data = $this->doDelete($id);
-        Log::event('payloads', (int) $actor['id'], 'Deleted payload #' . (isset($data['id']) ? $data['id'] : $id), USER_IP);
+        Log::event('payloads', Auth::id(), 'Deleted payload #' . (isset($data['id']) ? $data['id'] : $id), USER_IP);
         $this->respond($data);
     }
 
@@ -122,10 +120,9 @@ class PayloadsController extends Controller
     public function reassign($id)
     {
         $this->begin();
-        $actor = Auth::user();
 
         $data = $this->doReassign($id, $this->input());
-        Log::event('payloads', (int) $actor['id'], 'Reassigned payload #' . $id . ' to user #' . $data['user_id'], USER_IP);
+        Log::event('payloads', Auth::id(), 'Reassigned payload #' . $id . ' to user #' . $data['user_id'], USER_IP);
         $this->respond($data);
     }
 
@@ -136,10 +133,9 @@ class PayloadsController extends Controller
          */
     public function doList()
     {
-        $actor = Auth::user();
         $all = queryParam('all', null) !== null;
 
-        if (Permissions::can($actor, 'payload.viewall')) {
+        if (Auth::can('payload.viewall')) {
 
             $userId = null;
             $rawUser = queryParam('user', null);
@@ -175,7 +171,7 @@ class PayloadsController extends Controller
             );
         }
 
-        $scoped = array_values(Payload::listWithAccess((int) $actor['id'], 'payloads'));
+        $scoped = array_values(Payload::listWithAccess(Auth::id(), 'payloads'));
 
         usort($scoped, function ($a, $b) {
             return (int) $a['id'] - (int) $b['id'];
@@ -268,14 +264,12 @@ class PayloadsController extends Controller
      */
     private function resolveOwner($body)
     {
-        $actor = Auth::user();
-
-        if (!Permissions::can($actor, 'payload.viewall')) {
-            return (int) $actor['id'];
+        if (!Auth::can('payload.viewall')) {
+            return Auth::id();
         }
 
         if (!isset($body['user']) || $body['user'] === '' || $body['user'] === null) {
-            return (int) $actor['id'];
+            return Auth::id();
         }
 
         $rawUser = $body['user'];
@@ -673,11 +667,9 @@ class PayloadsController extends Controller
      */
     private function access($id, $type)
     {
-        $actor = Auth::user();
-
-        if (Permissions::can($actor, 'payload.viewall')) {
+        if (Auth::can('payload.viewall')) {
             return;
         }
-        Payload::ensureAccess((int) $actor['id'], $id, $type, 'payloads');
+        Payload::ensureAccess(Auth::id(), $id, $type, 'payloads');
     }
 }
