@@ -68,6 +68,7 @@ class InstallController extends Controller
         'collect_dom'          => '1',
         'collect_screenshot'   => '0',
         'collect_csp'          => '1',
+        'seeded_session_caps'  => '1',
     );
 
     /**
@@ -105,6 +106,10 @@ class InstallController extends Controller
             throw new HttpException(409, 'ezXSS is already installed.');
         }
 
+        if (Upgrader::isLegacy()) {
+            throw new HttpException(409, 'A legacy database was detected. Run the updater first.');
+        }
+
         $body = $this->input();
         $username = isset($body['username']) && is_string($body['username']) ? trim($body['username']) : '';
         $password = isset($body['password']) && is_string($body['password']) ? $body['password'] : '';
@@ -119,7 +124,8 @@ class InstallController extends Controller
         try {
             $data = $this->runInstall($username, $password);
         } catch (Exception $e) {
-            throw new HttpException(409, $e->getMessage());
+            Log::event('install', 0, 'Install failed: ' . $e->getMessage(), USER_IP);
+            throw new HttpException(409, 'Installation failed.');
         }
 
         return $this->respond($data, array(), 201);
