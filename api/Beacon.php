@@ -34,10 +34,10 @@ class BeaconController
             'manifest' => array('application/manifest+json; charset=utf-8', '{}', 200, 'manifest-src'),
             'media'    => array('video/mp4', '', 200, 'media-src'),
             'ping'     => array('text/plain; charset=utf-8', '', 204, 'connect-src'),
-            'report'   => array('application/reports+json; charset=utf-8', '{}', 200, 'report-to'),
+            'report'   => array('application/reports+json; charset=utf-8', '{}', 200, ''),
             'frame'    => array('text/html; charset=utf-8', '', 200, 'frame-src'),
             'object'   => array('text/html; charset=utf-8', '', 200, 'object-src'),
-            'prefetch' => array('text/plain; charset=utf-8', '', 200, 'prefetch'),
+            'prefetch' => array('text/plain; charset=utf-8', '', 200, ''),
         );
     }
 
