@@ -14,7 +14,7 @@ class BeaconController
     /**
      * 1x1 transparent PNG (hardcoded bytes), base64-encoded.
      */
-    const PNG_1X1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const PNG_1X1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mNgAAIAAAUAAen63NgAAAAASUVORK5CYII=';
 
     /**
      * The beacon channel table: type => [content-type, body, status, directive].
