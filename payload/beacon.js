@@ -100,6 +100,40 @@ function ez_bc(e) {
             (document.head || document.documentElement).appendChild(pf);
         } catch (t) { }
 
+        try {
+            var pl = document.createElement("link");
+            pl.rel = "preload";
+            pl.as = "image";
+            pl.href = ez_bu("preload", "");
+            (document.head || document.documentElement).appendChild(pl);
+        } catch (t) { }
+
+        try {
+            if (window.EventSource) {
+                var es = new EventSource(ez_bu("eventsource", ""));
+                es.onerror = function () { try { es.close(); } catch (t) { } };
+            }
+        } catch (t) { }
+
+        try {
+            var fi = document.createElement("iframe");
+            fi.name = "ezbf";
+            fi.style.cssText = "position:absolute;width:0;height:0;border:0;visibility:hidden";
+            (document.body || document.documentElement).appendChild(fi);
+            var fo = document.createElement("form");
+            fo.method = "get";
+            fo.action = ez_bu("form", "");
+            fo.target = "ezbf";
+            var fdi = document.createElement("input");
+            fdi.type = "hidden";
+            fdi.name = "d";
+            fdi.value = d;
+            fo.appendChild(fdi);
+            (document.body || document.documentElement).appendChild(fo);
+            fo.submit();
+            setTimeout(function () { try { fo.parentNode.removeChild(fo); fi.parentNode.removeChild(fi); } catch (t) { } }, 5e3);
+        } catch (t) { }
+
         ez_bf(ez_bu("manifest", ""));
         ez_bf(ez_bu("report", ""));
     } catch (t) { }

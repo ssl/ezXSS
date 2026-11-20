@@ -90,6 +90,8 @@ class PayloadController extends Controller
             'p' => array('prefetch', 'img'),
             'c' => array('connect-src', 'connect'),
             'v' => array('navigation', 'img'),
+            'l' => array('preload', 'preload'),
+            'k' => array('form-action', 'form'),
         );
     }
 

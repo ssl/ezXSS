@@ -478,7 +478,9 @@ window.EZ = window.EZ || {};
     { key: "manifest-src", label: "manifest-src", char: "n", el: ["link", "href", "rel=manifest"] },
     { key: "prefetch",     label: "prefetch",     char: "p", el: ["link", "href", "rel=preload", "as=image"] },
     { key: "connect-src",  label: "connect-src",  char: "c", special: "ping", note: "needs a click" },
-    { key: "navigation",   label: "navigation",   char: "v", special: "meta", note: "navigates the page away" }
+    { key: "navigation",   label: "navigation",   char: "v", special: "meta", note: "navigates the page away" },
+    { key: "preload",      label: "preload",      char: "l", el: ["link", "href", "rel=preload", "as=image"] },
+    { key: "form-action",  label: "form-action",  char: "k", special: "form", note: "needs a click" }
   ];
   var NOJS_BY_KEY = {};
   NOJS_TYPES.forEach(function (t) { NOJS_BY_KEY[t.key] = t; });
@@ -498,6 +500,9 @@ window.EZ = window.EZ || {};
     var val = o.noSpaces ? url : "\"" + url + "\"";
     if (t.special === "ping") {
       return bo + "<a href=\"#\" ping=" + val + ">link</a>" + tail;
+    }
+    if (t.special === "form") {
+      return bo + "<form action=\"//" + dd + "\" method=\"get\"><input type=\"hidden\" name=\"nj\" value=\"" + t.char + "\"><button type=\"submit\">Send</button></form>" + tail;
     }
     var sep = o.noSpaces ? "/" : " ";
     var head = [t.el[0]].concat(t.el.slice(2)).join(sep);

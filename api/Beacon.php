@@ -38,6 +38,9 @@ class BeaconController
             'frame'    => array('text/html; charset=utf-8', '', 200, 'frame-src'),
             'object'   => array('text/html; charset=utf-8', '', 200, 'object-src'),
             'prefetch' => array('text/plain; charset=utf-8', '', 200, ''),
+            'form'     => array('text/plain; charset=utf-8', '', 204, 'form-action'),
+            'eventsource' => array('text/event-stream; charset=utf-8', '', 204, 'connect-src'),
+            'preload'  => array('text/plain; charset=utf-8', '', 200, ''),
         );
     }
 
