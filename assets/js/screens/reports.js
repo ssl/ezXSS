@@ -523,6 +523,26 @@ window.EZ = window.EZ || {};
       "</div></div>";
   }
 
+  var SEC_FETCH_FIELDS = [
+    { key: "site", label: "Site", header: "Sec-Fetch-Site" },
+    { key: "mode", label: "Mode", header: "Sec-Fetch-Mode" },
+    { key: "dest", label: "Destination", header: "Sec-Fetch-Dest" },
+    { key: "user", label: "User gesture", header: "Sec-Fetch-User" }
+  ];
+  function secFetchRow(rep) {
+    var sf = (rep.meta && rep.meta.sec_fetch) || {};
+    var tags = SEC_FETCH_FIELDS.filter(function (f) {
+      return sf[f.key] !== undefined && sf[f.key] !== null && String(sf[f.key]) !== "";
+    }).map(function (f) {
+      var raw = String(sf[f.key]);
+      var shown = f.key === "user" && raw === "?1" ? "yes" : raw;
+      return '<span class="tag" title="' + util.escapeHtml(f.header + ": " + raw) + '">' +
+        util.escapeHtml(f.label) + ' <span class="mono">' + util.escapeHtml(shown) + "</span></span>";
+    });
+    if (!tags.length) { return ""; }
+    return dataRow("Request metadata", '<span class="tagrow">' + tags.join("") + "</span>");
+  }
+
   function cspRows(rep) {
     var meta = rep.meta;
     var csp = meta && meta.csp;
@@ -591,6 +611,7 @@ window.EZ = window.EZ || {};
     rows += domRow(rep);
     rows += renderData(rep.extra);
     rows += cspRows(rep);
+    rows += secFetchRow(rep);
     rows += infoRow("Captured", "r-captured", util.escapeHtml(fmtDateTime(rep.created_at)), { suffix: util.escapeHtml(EZ.format.fmtAgo(rep.created_at)) });
 
     var card =
