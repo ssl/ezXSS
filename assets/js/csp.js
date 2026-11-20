@@ -186,24 +186,37 @@ window.EZ = window.EZ || {};
     if (!dirs["form-action"]) {
       out.push({ level: "info", dir: "form-action", text: "Not set (no default-src fallback). A form can post to any host." });
     }
-    if (dirs["require-trusted-types-for"]) {
-      var tt = dirs["trusted-types"] || null;
-      var names = tt ? lower(tt).filter(function (t) { return t.charAt(0) !== "'" && t !== "*"; }) : [];
-      var ttText = "Enforced. script.src strings, eval, encoded vectors and the Inline loader throw; Image, SVG and details (import()) still load.";
-      if (tt && has(tt, "'none'")) {
-        ttText += " trusted-types 'none' blocks every policy, so the Trusted Types vector fails too.";
-      } else if (names.length && names.indexOf("ez") === -1 && !has(tt, "*")) {
-        ttText += " Allowed policy names: " + names.join(", ") + ". Rename the Trusted Types vector's policy to one of them.";
-      } else {
-        ttText += " The Trusted Types vector can create its policy.";
-      }
-      out.push({ level: "info", dir: "trusted-types", text: ttText });
-    }
+    var ttFinding = trustedTypesFinding(dirs, false);
+    if (ttFinding) { out.push(ttFinding); }
     var reports = (dirs["report-uri"] || []).concat(dirs["report-to"] || []);
     if (reports.length) {
       out.push({ level: "info", dir: "reporting", text: "Violations are reported to " + reports.join(", ") + ". Blocked attempts are visible to the site owner." });
     }
     return out;
+  }
+
+  function trustedTypesFinding(dirs, reportOnly) {
+    if (!dirs["require-trusted-types-for"]) { return null; }
+    var tt = dirs["trusted-types"] || null;
+    var names = tt ? lower(tt).filter(function (t) { return t.charAt(0) !== "'" && t !== "*"; }) : [];
+    var lead = reportOnly ? "Report-only. If enforced: " : "Enforced. ";
+    var ttText = lead + "script.src strings, eval, encoded vectors and the Inline loader throw; Image, SVG and details (import()) still load.";
+    if (tt && has(tt, "'none'")) {
+      ttText += " trusted-types 'none' blocks every policy, so the Trusted Types vector fails too.";
+    } else if (names.length && names.indexOf("ez") === -1 && !has(tt, "*")) {
+      ttText += " Allowed policy names: " + names.join(", ") + ". Rename the Trusted Types vector's policy to one of them.";
+    } else {
+      ttText += " The Trusted Types vector can create its policy.";
+    }
+    return { level: "info", dir: "trusted-types", text: ttText };
+  }
+  function reportOnlyTrustedTypes(policies, out) {
+    var seen = {};
+    policies.forEach(function (p) {
+      if (!p.reportOnly) { return; }
+      var f = trustedTypesFinding(p.dirs, true);
+      if (f && !seen[f.text]) { seen[f.text] = true; out.push(f); }
+    });
   }
 
   function analyze(text, host) {
@@ -220,6 +233,7 @@ window.EZ = window.EZ || {};
       res.open = NOJS_ORDER.concat(["navigation"]);
       res.best = res.open[0];
       res.findings.push({ level: "info", dir: "report-only", text: "Report-only: violations are logged, nothing is blocked." });
+      reportOnlyTrustedTypes(policies, res.findings);
       return res;
     }
     var external = true, inline = true, okWhy = "", blockWhy = "";
@@ -251,6 +265,7 @@ window.EZ = window.EZ || {};
     if (policies.length > enforced.length) {
       res.findings.push({ level: "info", dir: "report-only", text: "A report-only policy is also present. It only logs." });
     }
+    reportOnlyTrustedTypes(policies, res.findings);
     var rank = { high: 0, med: 1, info: 2 };
     res.findings.sort(function (a, b) { return rank[a.level] - rank[b.level]; });
     return res;
