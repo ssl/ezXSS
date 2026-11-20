@@ -1,0 +1,26 @@
+
+<div class="auth" id="auth">
+  <div class="auth__card">
+    <div class="auth__brand">
+      <svg class="brand__bug" viewBox="6.14 6.14 31 31" aria-hidden="true" focusable="false"><use href="#ezbug" x="6.14" y="6.14"/></svg>
+      <span class="brand__word"><span class="brand__ez">ez</span><span class="brand__xss">XSS</span><span class="brand__v">5</span></span>
+    </div>
+
+    <div class="auth__step is-active" data-step="configure">
+      <h1 class="auth__title">Database not configured</h1>
+      <p class="auth__sub">ezXSS can&rsquo;t reach its database yet. Set the connection details in <span class="mono">.env</span> on the server, then reload this page.</p>
+
+      <div class="auth__field">
+        <label class="field-label">Required <span class="mono">.env</span> keys</label>
+        <pre class="mono" style="margin:0;padding:var(--space-md);background:var(--color-surface-3);border-radius:var(--radius-sm);font-size:var(--text-sm);line-height:var(--leading-snug);overflow:auto;white-space:pre">DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=ezxss
+DB_USER=ezxss
+DB_PASS=your-password</pre>
+      </div>
+
+      <a class="btn btn--primary btn--block" href="/manage" style="margin-top:var(--space-lg)">Retry connection</a>
+    </div>
+  </div>
+</div>
+

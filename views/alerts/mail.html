@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ezXSS</title>
+    <style media="screen">
+        .mail {
+            background-color: #1a1730;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            color: #9893a8;
+            padding: 5px;
+            border-radius: 5px;
+            padding-left: 25px;
+            padding-right: 25px
+        }
+
+        .h {
+            color: #f5f4f7;
+            font-size: 24px;
+            margin-bottom: 2px
+        }
+
+        small {
+            font-size: 85%
+        }
+
+        hr {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border: 0;
+            border-top: 1px solid #332f52
+        }
+
+        .panel {
+            background-color: #252243;
+            box-shadow: none;
+            color: #9893a8;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            border: 1px solid transparent
+        }
+
+        .panel-heading {
+            background-color: #2e2b4f;
+            border-bottom: #332f52 3px solid;
+            color: #f5f4f7;
+            padding: 10px 15px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px
+        }
+
+        .panel-body {
+            padding-top: 10px;
+            padding: 5px 15px 15px 15px
+        }
+
+        table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 20px;
+            background-color: transparent;
+            border-spacing: 0;
+            border-collapse: collapse
+        }
+
+        tr {
+            display: table-row
+        }
+
+        th {
+            border-top: 0;
+            border-color: #413e5c;
+            border-bottom: none;
+            padding: 8px;
+            vertical-align: middle;
+            color: #f5f4f7;
+            width: 150px;
+            text-align: left
+        }
+
+        td {
+            border-color: #413e5c;
+            border-top: 1px solid #413e5c;
+            padding: 8px;
+            vertical-align: middle;
+            line-height: 1.42857143;
+            word-wrap: break-word;
+            max-width: 800px
+        }
+
+        a {
+            color: #c4c1ce !important
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mail">
+        <div class="view-header">
+            <div class="header-title">
+                <h3 class="h">XSS Report #{{id}}</h3>
+                <small>Get a fast view below or view the whole report on
+                    <a href="https://{{domain}}/manage/reports/{{id}}">https://{{domain}}/manage/reports/{{id}}</a></small>
+            </div>
+        </div>
+        <hr>
+        <div class="panel">
+            <div class="panel-heading">View report</div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="color: #9893a8;">URL</td>
+                            <td style="color: #9893a8;">{{uri}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">IP</td>
+                            <td style="color: #9893a8;">{{ip}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">Referer</td>
+                            <td style="color: #9893a8;">{{referer}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">Payload</td>
+                            <td style="color: #9893a8;">{{payload}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">User Agent</td>
+                            <td style="color: #9893a8;">{{user-agent}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">Cookies</td>
+                            <td><textarea spellcheck="false"
+                                style="width: 100%;color: #9893a8;height: 100px;background-color: transparent;border-color: #413e5c;resize:vertical">{{cookies}}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">Local Storage</td>
+                            <td><textarea spellcheck="false"
+                                    style="width: 100%;color: #9893a8;height: 100px;background-color: transparent;border-color: #413e5c;resize:vertical">{{localstorage}}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">Session Storage</td>
+                            <td><textarea spellcheck="false"
+                                    style="width: 100%;color: #9893a8;height: 100px;background-color: transparent;border-color: #413e5c;resize:vertical">{{sessionstorage}}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">DOM</td>
+                            <td><textarea spellcheck="false"
+                                    style="width: 100%;color: #9893a8;height: 100px;background-color: transparent;border-color: #413e5c;resize:vertical">{{dom}}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">Origin</td>
+                            <td style="color: #9893a8;">{{origin}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">Time</td>
+                            <td style="color: #9893a8;">{{timestamp}}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #9893a8;">Screenshot</td>
+                            <td>{{screenshot}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

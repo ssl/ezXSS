@@ -1,0 +1,53 @@
+
+<div class="auth" id="auth">
+  <div class="auth__card">
+    <div class="auth__brand">
+      <svg class="brand__bug" viewBox="6.14 6.14 31 31" aria-hidden="true" focusable="false"><use href="#ezbug" x="6.14" y="6.14"/></svg>
+      <span class="brand__word"><span class="brand__ez">ez</span><span class="brand__xss">XSS</span><span class="brand__v">5</span></span>
+    </div>
+
+    <div class="auth__step is-active" data-step="update">
+      <h1 class="auth__title">Update ezXSS</h1>
+      <p class="auth__sub" id="update-sub">Your database is behind this build. Apply the update to continue to the panel.</p>
+
+      <div class="auth__field">
+        <label class="field-label">Version</label>
+        <p class="mono" id="update-versions" style="margin:0">&hellip;</p>
+      </div>
+
+      <div class="auth__field" id="update-legacy" hidden>
+        <label class="field-label">Legacy database detected</label>
+        <p class="field-hint">A one-time upgrade to the 5.0 schema will run. Your existing data is carried over, and it&rsquo;s safe to re-run.</p>
+      </div>
+
+      <div class="auth__field" id="update-pending-wrap" hidden>
+        <label class="field-label">Pending migrations</label>
+        <pre class="mono" id="update-pending" style="margin:0;padding:var(--space-md);background:var(--color-surface-3);border-radius:var(--radius-sm);font-size:var(--text-sm);line-height:var(--leading-snug);overflow:auto;white-space:pre"></pre>
+      </div>
+
+      <div class="auth__field">
+        <p class="auth__error" id="update-warning" role="alert" style="display:block">
+          <b>Back up your database first.</b> This change is hard to reverse. Make a full database backup before you continue.
+        </p>
+      </div>
+
+      <form id="update-form" novalidate>
+        <label class="auth__field" style="display:flex;align-items:flex-start;gap:var(--space-sm);cursor:pointer">
+          <input type="checkbox" id="update-confirm" style="margin-top:3px">
+          <span class="field-hint" style="margin:0">I have backed up my database and I understand this update modifies it.</span>
+        </label>
+        <p class="auth__error" id="update-error" role="alert" hidden></p>
+        <p class="field-hint" id="update-busy" role="status" aria-live="polite" hidden style="align-items:center;gap:var(--space-sm);margin:0 0 var(--space-md)">
+          <span class="spinner" aria-hidden="true"></span>
+          <span id="update-busy-text">Upgrading&hellip; this can take a while on large databases - do not close this tab.</span>
+        </p>
+        <button class="btn btn--primary btn--block" type="submit" id="update-submit" disabled>
+          <span class="spinner" id="update-submit-spinner" aria-hidden="true" hidden></span>
+          <span id="update-submit-label">Run update</span>
+        </button>
+      </form>
+      <p class="auth__foot">ezXSS 5.0 &middot; self-hosted</p>
+    </div>
+  </div>
+</div>
+
