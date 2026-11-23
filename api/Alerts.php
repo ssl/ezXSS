@@ -97,6 +97,7 @@ class AlertsController extends Controller
      */
     public function doSaveOwn(array $body)
     {
+        $this->validateAndStore(Auth::id(), $body);
         return $this->readFor(Auth::id());
     }
 
