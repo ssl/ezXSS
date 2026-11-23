@@ -50,7 +50,7 @@
         { "m": "POST", "p": "/api/users/update/{id}", "a": "Cap: user.manage (user.roles for permissions), or self", "params": "{ role?, permissions?, password?, current_password? }", "d": "Manager: change role/username, reset password, or ban - only for a user whose capabilities are a subset of yours; changing permissions needs user.roles. Self: change own password (requires current_password); cannot change own role/caps." },
         { "m": "DELETE", "p": "/api/users/delete/{id}", "a": "Cap: user.manage", "params": "path: id", "d": "Delete a user (revokes their tokens + sharing rows). Refuses deleting yourself or the last admin." },
         { "m": "GET", "p": "/api/users/roles", "a": "Cap: user.roles", "params": "-", "d": "List all roles and their capability sets." },
-        { "m": "POST", "p": "/api/users/roles/{name?}", "a": "Cap: user.roles", "params": "{ name?, capabilities }", "d": "Create a role (name in body) or update an existing one (name in path). Can only grant capabilities the caller holds." },
+        { "m": "POST", "p": "/api/users/roles/{name?}", "a": "Cap: user.roles", "params": "{ name?, permissions }", "d": "Create a role (name in body) or update an existing one (name in path). permissions is a map of capability to boolean. Can only grant capabilities the caller holds." },
         { "m": "DELETE", "p": "/api/users/roles/{name}", "a": "Cap: user.roles", "params": "path: name", "d": "Delete a custom role. Built-in roles (admin, user) cannot be deleted." }
       ]
     },
