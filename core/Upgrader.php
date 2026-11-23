@@ -36,7 +36,7 @@ class Upgrader
     }
 
     /**
-     * Whether the instance needs an update: a legacy schema, a stored.
+     * Whether the instance needs an update: a legacy schema, or a stored version below 5.0.
      *
      * @param bool $legacy
      * @return bool
@@ -102,12 +102,234 @@ class Upgrader
     }
 
     /**
-     * Run the idempotent in-place upgrade and return a summary.
+     * Columns the 5.0 transforms need that a given 4.x release did not yet have,
+     * with the type and default that release would have used. Derived from the
+     * 4.0 to 4.3 install files; no indexes or keys. `spider` on payloads arrived
+     * in 4.3, `archive` on sessions arrived in 4.3, and 4.0 had no sessions table
+     * at all (the 5.0 schema creates it fresh, so no bridge column is needed there).
      *
+     * @return array
+     */
+    private static function legacyShape()
+    {
+        return array(
+            '4.0' => array(
+                'payloads' => array('spider' => 'INT NOT NULL DEFAULT 0'),
+            ),
+            '4.1' => array(
+                'payloads' => array('spider' => 'INT NOT NULL DEFAULT 0'),
+                'sessions' => array('archive' => 'INT DEFAULT 0'),
+            ),
+            '4.2' => array(
+                'payloads' => array('spider' => 'INT NOT NULL DEFAULT 0'),
+                'sessions' => array('archive' => 'INT DEFAULT 0'),
+            ),
+            '4.3' => array(),
+        );
+    }
+
+    /**
+     * Identify the source release from the columns actually present, not from the
+     * stored version (the 4.1 install never bumped it). Runs before the schema is
+     * applied, so the legacy tables and their distinctive columns are still intact.
+     *
+     * @return string
+     */
+    private static function detectLegacyVersion()
+    {
+        if (self::columnExists('payloads', 'spider') || self::columnExists('payloads', 'customjs2')) {
+            return '4.3';
+        }
+        if (self::columnExists('payloads', 'persistent')) {
+            return self::tableExists('sessions_data') ? '4.2' : '4.1';
+        }
+        return '4.0';
+    }
+
+    /**
+     * Bridge the source shape up to what the transforms expect: add the columns
+     * the detected release lacked, each with that release's default. A column that
+     * is already present is left untouched, so the step is safe to repeat.
+     *
+     * @param object $db
+     * @param string $version
+     */
+    private static function ensureLegacyShape($db, $version)
+    {
+        $shape = self::legacyShape();
+        if (!isset($shape[$version])) {
+            return;
+        }
+        foreach ($shape[$version] as $table => $columns) {
+            if (!self::tableExists($table)) {
+                continue;
+            }
+            foreach ($columns as $column => $definition) {
+                if (!self::columnExists($table, $column)) {
+                    $db->exec("ALTER TABLE `{$table}` ADD COLUMN `{$column}` {$definition}");
+                }
+            }
+        }
+    }
+
+    /**
+     * The inline blob columns each source table would move into its *_data table.
+     *
+     * @return array
+     */
+    private static function inlineBlobColumns()
+    {
+        return array(
+            'reports'  => array('table' => 'reports_data', 'columns' => array('dom', 'screenshot', 'localstorage', 'sessionstorage')),
+            'sessions' => array('table' => 'sessions_data', 'columns' => array('dom', 'localstorage', 'sessionstorage', 'console')),
+        );
+    }
+
+    /**
+     * Whether a table has no rows. A table that does not exist counts as empty.
+     *
+     * @param string $table
+     * @return bool
+     */
+    private static function tableIsEmpty($table)
+    {
+        if (!self::tableExists($table)) {
+            return true;
+        }
+        return !(bool) Database::getInstance()->query("SELECT EXISTS(SELECT 1 FROM `{$table}` LIMIT 1)")->fetchColumn();
+    }
+
+    /**
+     * Whether a source table still holds big data inline that must be moved into its *_data table: the
+     * inline `dom` column is present and the table has rows, and the target has not received the data
+     * yet (absent or empty). Retry-safe and re-run-safe: after the move the inline columns are gone, and
+     * an already-split 4.2/4.3 source has a non-empty target, so both read as "no move" on a re-run.
+     *
+     * @param string $table
+     * @param string $dataTable
+     * @return bool
+     */
+    private static function willMoveInline($table, $dataTable)
+    {
+        return self::tableExists($table)
+            && self::columnExists($table, 'dom')
+            && !self::tableIsEmpty($table)
+            && self::tableIsEmpty($dataTable);
+    }
+
+    /**
+     * Bytes of inline blob data a pre-split (4.0/4.1) source would copy into the
+     * *_data tables: the LENGTH of each inline column that is still on `reports`
+     * and `sessions` and really will be copied. Zero when the source is already
+     * split (4.2/4.3), so the caller can tell there is nothing to copy.
+     *
+     * @return float
+     */
+    private static function inlineDataBytes()
+    {
+        $db = Database::getInstance();
+        $total = 0.0;
+        foreach (self::inlineBlobColumns() as $table => $spec) {
+            if (!self::willMoveInline($table, $spec['table'])) {
+                continue;
+            }
+            $parts = array();
+            foreach ($spec['columns'] as $column) {
+                if (self::columnExists($table, $column)) {
+                    $parts[] = "COALESCE(LENGTH(`{$column}`), 0)";
+                }
+            }
+            if (!$parts) {
+                continue;
+            }
+            $total += (float) $db->query(
+                "SELECT COALESCE(SUM(" . implode(' + ', $parts) . "), 0) FROM `{$table}`"
+            )->fetchColumn();
+        }
+        return $total;
+    }
+
+    /**
+     * Refuse the inline-data move when the bytes being copied would not fit on
+     * disk, unless ?disablechecks=1 is given. The estimate is the size of the
+     * inline blob columns being copied (times 1.2 for overhead), not the whole
+     * database, and the check is skipped entirely for an already-split source
+     * because then no copy is made.
+     *
+     * @throws Exception
+     */
+    private static function assertLegacyDiskSpace()
+    {
+        if (queryParam('disablechecks') === '1') {
+            return;
+        }
+        $bytes = self::inlineDataBytes();
+        if ($bytes <= 0) {
+            return;
+        }
+        $needed = $bytes * 1.2;
+        $free = (float) disk_free_space('/');
+        if ($free > 0 && $needed > $free) {
+            throw new Exception(sprintf(
+                'Not enough free disk space to move the inline report/session data: need about %d MB, have %d MB.',
+                ceil($needed / 1048576),
+                ceil($free / 1048576)
+            ));
+        }
+    }
+
+    /**
+     * Move a pre-split (4.0/4.1) source's inline blob columns into its 5.0 *_data table, then drop the
+     * inline columns. The copy runs only when the data is not already in the target (willMoveInline),
+     * so it is safe to repeat and safe after a failed-then-retried run; the inline data is uncompressed,
+     * so `compressed` is 0. On an already-split 4.2/4.3 source nothing is copied and only the vestigial
+     * inline columns are dropped.
+     *
+     * @param object $db
+     * @param string $table
+     * @param string $dataTable
+     * @param string $idColumn
+     * @param array  $columns
+     */
+    private static function moveInlineBlobs($db, $table, $dataTable, $idColumn, $columns)
+    {
+        if (!self::tableExists($table) || !self::tableExists($dataTable)) {
+            return;
+        }
+        if (!self::columnExists($table, 'dom')) {
+            return;
+        }
+        $present = array();
+        foreach ($columns as $column) {
+            if (self::columnExists($table, $column)) {
+                $present[] = $column;
+            }
+        }
+        if (!$present) {
+            return;
+        }
+        if (self::willMoveInline($table, $dataTable) && self::columnExists($dataTable, $idColumn)) {
+            $cols = '`' . implode('`, `', $present) . '`';
+            $db->exec(
+                "INSERT INTO `{$dataTable}` (`{$idColumn}`, {$cols}, `compressed`)
+                 SELECT `id`, {$cols}, 0 FROM `{$table}`"
+            );
+        }
+        foreach ($present as $column) {
+            $db->exec("ALTER TABLE `{$table}` DROP COLUMN `{$column}`");
+        }
+    }
+
+    /**
+     * Run the idempotent in-place upgrade and return a summary. Triggered by the manual updater
+     * (POST /api/update). 3.x and lower are refused; a 4.x database is migrated to 5.0.
+     *
+     * @throws Exception
      * @return array
      */
     public static function run()
     {
+        @set_time_limit(0);
         $db = Database::getInstance();
 
         if (self::isUpgraded()) {
@@ -119,7 +341,22 @@ class Upgrader
             );
         }
 
+        $legacy = self::isLegacy();
+        $legacyVersion = null;
+        if ($legacy) {
+            $stored = self::rawSetting('version');
+            if ($stored === null || strpos($stored, '4.') !== 0) {
+                throw new Exception('Upgrading to 5.0 is only supported from 4.x, found: ' . ($stored === null ? 'no version' : $stored));
+            }
+            $legacyVersion = self::detectLegacyVersion();
+            self::assertLegacyDiskSpace();
+        }
+
         $migrated = Migrator::run();
+
+        if ($legacy) {
+            self::ensureLegacyShape($db, $legacyVersion);
+        }
 
         self::transformReports($db);
         self::transformReportsData($db);
@@ -152,7 +389,9 @@ class Upgrader
     }
 
     /**
-     * reports (big): user-agent -> useragent, time -> created_at, drop shareid
+     * Bring the reports table to the 5.0 shape: rename user-agent to useragent and time to created_at,
+     * drop shareid, add meta, and move any inline blob data into reports_data.
+     *
      * @param object $db
      */
     private static function transformReports($db)
@@ -160,6 +399,13 @@ class Upgrader
         if (!self::tableExists('reports')) {
             return;
         }
+        self::moveInlineBlobs(
+            $db,
+            'reports',
+            'reports_data',
+            'report_id',
+            array('dom', 'screenshot', 'localstorage', 'sessionstorage')
+        );
         if (self::columnExists('reports', 'user-agent') && !self::columnExists('reports', 'useragent')) {
             $db->exec("ALTER TABLE `reports` CHANGE `user-agent` `useragent` VARCHAR(500) DEFAULT NULL");
         }
@@ -178,7 +424,8 @@ class Upgrader
     }
 
     /**
-     * reports_data (big): reportid -> report_id as a metadata-only rename (the
+     * Bring the reports_data table to the 5.0 shape: rename reportid to report_id and add its index.
+     *
      * @param object $db
      */
     private static function transformReportsData($db)
@@ -198,7 +445,9 @@ class Upgrader
     }
 
     /**
-     * sessions (big): clientid -> client_id, time -> created_at, user-agent ->
+     * Bring the sessions table to the 5.0 shape: rename clientid, time and user-agent, add updated_at,
+     * and move any inline blob data into sessions_data.
+     *
      * @param object $db
      */
     private static function transformSessions($db)
@@ -223,11 +472,13 @@ class Upgrader
             $db->exec("UPDATE `sessions` SET `updated_at` = `created_at` WHERE `updated_at` IS NULL");
         }
 
-        foreach (array('dom', 'localstorage', 'sessionstorage', 'console') as $dead) {
-            if (self::columnExists('sessions', $dead)) {
-                $db->exec("ALTER TABLE `sessions` DROP COLUMN `{$dead}`");
-            }
-        }
+        self::moveInlineBlobs(
+            $db,
+            'sessions',
+            'sessions_data',
+            'session_id',
+            array('dom', 'localstorage', 'sessionstorage', 'console')
+        );
 
         if (self::columnExists('sessions', 'payload')) {
             $distinct = $db->query("SELECT DISTINCT `payload` FROM `sessions`")->fetchAll(PDO::FETCH_COLUMN);
@@ -249,7 +500,8 @@ class Upgrader
     }
 
     /**
-     * sessions_data (big): sessionid -> session_id as a metadata-only rename
+     * Bring the sessions_data table to the 5.0 shape: rename sessionid to session_id and add its index.
+     *
      * @param object $db
      */
     private static function transformSessionsData($db)
