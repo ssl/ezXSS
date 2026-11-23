@@ -33,6 +33,6 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 COPY . /var/www/html
 
-RUN chmod 777 /var/www/html/assets/img
+RUN chown www-data:www-data /var/www/html/assets/img && chmod 755 /var/www/html/assets/img
 
 ENTRYPOINT ["docker-entrypoint.sh"]
