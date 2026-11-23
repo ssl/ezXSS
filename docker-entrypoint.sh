@@ -70,6 +70,11 @@ wait_for_db() {
     echo "Database is accepting connections."
 }
 
+use_letsencrypt_cert() {
+    sed -i "s|SSLCertificateFile .*|SSLCertificateFile /etc/letsencrypt/live/${DOMAIN}/fullchain.pem|g" /etc/apache2/sites-available/default-ssl.conf
+    sed -i "s|SSLCertificateKeyFile .*|SSLCertificateKeyFile /etc/letsencrypt/live/${DOMAIN}/privkey.pem|g" /etc/apache2/sites-available/default-ssl.conf
+}
+
 obtain_certificate() {
     if [ "${INSTALL_CERTIFICATE:-false}" = "true" ]; then
         if [ ! -e "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
@@ -83,8 +88,7 @@ obtain_certificate() {
                 --webroot --webroot-path="${APP_DIR}" -d "${DOMAIN}" \
                 && [ -e "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
                 echo "Certificate obtained. Updating Apache SSL configuration..."
-                sed -i "s|SSLCertificateFile .*|SSLCertificateFile /etc/letsencrypt/live/${DOMAIN}/fullchain.pem|g" /etc/apache2/sites-available/default-ssl.conf
-                sed -i "s|SSLCertificateKeyFile .*|SSLCertificateKeyFile /etc/letsencrypt/live/${DOMAIN}/privkey.pem|g" /etc/apache2/sites-available/default-ssl.conf
+                use_letsencrypt_cert
                 apache2ctl graceful || { echo "Failed to reload Apache"; exit 1; }
             else
                 echo "Certbot failed to obtain the certificate — continuing with the self-signed cert."
@@ -93,6 +97,7 @@ obtain_certificate() {
             sleep 2
         else
             echo "SSL certificate already exists for ${DOMAIN}. Skipping acquisition."
+            use_letsencrypt_cert
         fi
     else
         echo "SSL certificate acquisition not requested (serving the self-signed cert)."
