@@ -47,7 +47,13 @@ class DashboardController extends Controller
      */
     public function doStats()
     {
-        if (Auth::can('report.viewall')) {
+        if (!Auth::can('report.view') && !Auth::can('session.view')) {
+            $this->cap('report.view');
+        }
+        $reportAll = Auth::can('report.viewall');
+        $sessionAll = Auth::can('session.viewall');
+
+        if ($reportAll && $sessionAll) {
             return Cache::remember(Report::CACHE_DASHBOARD_GLOBAL, function () {
                 return array_merge(
                     Report::dashboardStats(array()),
@@ -56,14 +62,19 @@ class DashboardController extends Controller
             }, Report::CACHE_TTL);
         }
 
-        $reportIds = Report::accessibleIds(Auth::id());
-        $identifiers = Payload::accessibleIdentifiers(Auth::id());
-        $key = 'dashboard:stats:v' . Report::dashboardVersion() . ':' . Auth::id();
+        $reportOpts = $reportAll ? array() : array(
+            'ids' => Auth::can('report.view') ? Report::accessibleIds(Auth::id()) : array(),
+        );
+        $sessionOpts = $sessionAll ? array() : array(
+            'identifiers' => Auth::can('session.view') ? Payload::accessibleIdentifiers(Auth::id()) : array(),
+        );
+        $key = 'dashboard:stats:v' . Report::dashboardVersion() . ':' . Auth::id()
+            . ':' . ($reportAll ? 'R' : 'r') . ($sessionAll ? 'S' : 's');
 
-        return Cache::remember($key, function () use ($reportIds, $identifiers) {
+        return Cache::remember($key, function () use ($reportOpts, $sessionOpts) {
             return array_merge(
-                Report::dashboardStats(array('ids' => $reportIds)),
-                Session::dashboardStats(array('identifiers' => $identifiers))
+                Report::dashboardStats($reportOpts),
+                Session::dashboardStats($sessionOpts)
             );
         }, Report::CACHE_TTL);
     }
@@ -76,6 +87,7 @@ class DashboardController extends Controller
      */
     public function doCommon($field)
     {
+        $this->cap('report.view');
         $field = strtolower(trim((string) $field));
         if (!in_array($field, Report::COMMON_FIELDS, true)) {
             throw new HttpException(422, 'Unknown most-common field');
