@@ -24,7 +24,7 @@ class ReportsController extends Controller
      */
     public function get($id)
     {
-        $this->begin();
+        $this->begin('GET');
         $this->respond($this->doGet($id));
     }
 
@@ -35,7 +35,7 @@ class ReportsController extends Controller
      */
     public function dom($id)
     {
-        $this->begin();
+        $this->begin('GET');
 
         $id = $this->validId($id, 'report');
         $this->cap('report.view');
@@ -119,7 +119,7 @@ class ReportsController extends Controller
      */
     public function stats()
     {
-        $this->begin();
+        $this->begin('GET');
 
         if (!Auth::can('report.viewall')) {
             throw new HttpException(403, 'You do not have permission to do that');
@@ -139,6 +139,7 @@ class ReportsController extends Controller
      */
     public function doList()
     {
+        $this->cap('report.view');
         $perPage = $this->intParam('per_page', 25, 1, 200);
         $page = $this->intParam('page', 1, 1, PHP_INT_MAX);
         $offset = ($page - 1) * $perPage;

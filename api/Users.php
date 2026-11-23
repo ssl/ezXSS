@@ -15,7 +15,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $this->begin();
+        $this->begin(array('GET', 'POST'));
 
         if (isPOST()) {
             $data = $this->doCreate($this->input());
@@ -34,7 +34,7 @@ class UsersController extends Controller
      */
     public function get($id)
     {
-        $this->begin();
+        $this->begin('GET');
         $this->respond($this->doGet($id));
     }
 
@@ -45,7 +45,7 @@ class UsersController extends Controller
      */
     public function update($id)
     {
-        $this->begin();
+        $this->begin('POST');
 
         $body = $this->input();
         $data = $this->doUpdate($id, $body);
@@ -213,7 +213,7 @@ class UsersController extends Controller
      */
     public function delete($id)
     {
-        $this->begin();
+        $this->begin('DELETE');
 
         $data = $this->doDelete($id);
         Log::event('users', Auth::id(), 'Deleted user #' . (isset($data['id']) ? $data['id'] : $id), USER_IP);

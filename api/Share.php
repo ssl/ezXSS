@@ -19,7 +19,7 @@ class ShareController extends Controller
      */
     public function get($table, $id)
     {
-        $this->begin();
+        $this->begin('GET');
 
         $this->ensureOwnerOrAdmin($table, $id);
         $this->respond($this->state($table, (int) $id));

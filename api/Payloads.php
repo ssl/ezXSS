@@ -13,7 +13,7 @@ class PayloadsController extends Controller
          */
     public function index()
     {
-        $this->begin();
+        $this->begin(array('GET', 'POST'));
 
         if (isPOST()) {
             $data = $this->doCreate($this->input());
@@ -32,7 +32,7 @@ class PayloadsController extends Controller
      */
     public function get($id)
     {
-        $this->begin();
+        $this->begin('GET');
         $this->respond($this->doGet($id));
     }
 
@@ -55,7 +55,7 @@ class PayloadsController extends Controller
      */
     public function delete($id)
     {
-        $this->begin();
+        $this->begin('DELETE');
 
         $data = $this->doDelete($id);
         Log::event('payloads', Auth::id(), 'Deleted payload #' . (isset($data['id']) ? $data['id'] : $id), USER_IP);
@@ -119,7 +119,7 @@ class PayloadsController extends Controller
      */
     public function reassign($id)
     {
-        $this->begin();
+        $this->begin('POST');
 
         $data = $this->doReassign($id, $this->input());
         Log::event('payloads', Auth::id(), 'Reassigned payload #' . $id . ' to user #' . $data['user_id'], USER_IP);

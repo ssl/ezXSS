@@ -29,7 +29,7 @@ class SessionsController extends Controller
      */
     public function get($id)
     {
-        $this->begin();
+        $this->begin('GET');
         $this->respond($this->doGet($id));
     }
 
@@ -40,7 +40,7 @@ class SessionsController extends Controller
      */
     public function requests($id)
     {
-        $this->begin();
+        $this->begin('GET');
         $result = $this->doRequests($id);
         $this->respond($result['data'], array('pagination' => $result['pagination']));
     }
@@ -52,7 +52,7 @@ class SessionsController extends Controller
      */
     public function request($requestId)
     {
-        $this->begin();
+        $this->begin('GET');
         $this->respond($this->doRequest($requestId));
     }
 
@@ -117,6 +117,7 @@ class SessionsController extends Controller
      */
     public function doList()
     {
+        $this->cap('session.view');
         $perPage = $this->intParam('per_page', 25, 1, 200);
         $page = $this->intParam('page', 1, 1, PHP_INT_MAX);
         $offset = ($page - 1) * $perPage;
@@ -168,6 +169,7 @@ class SessionsController extends Controller
      */
     public function doCount()
     {
+        $this->cap('session.view');
         $archiveRaw = queryParam('archive', '0');
         $archive = ($archiveRaw === '1') ? 1 : 0;
         $payload = queryParam('payload', '');
@@ -497,6 +499,7 @@ class SessionsController extends Controller
      */
     public function doPayloads()
     {
+        $this->cap('session.view');
         $opts = array();
         if (!Auth::can('session.viewall')) {
             $opts['identifiers'] = Payload::accessibleIdentifiers(Auth::id());

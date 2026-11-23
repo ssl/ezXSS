@@ -25,7 +25,7 @@ class SettingsController extends Controller
      */
     public function update()
     {
-        $this->begin();
+        $this->begin('POST');
 
         $result = $this->doUpdate($this->input());
         Log::event('settings', Auth::id(), 'Updated settings', USER_IP);
