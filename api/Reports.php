@@ -403,7 +403,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * Build the public share URL for a slug: {proto}://{domain}/s/{slug}.
+     * Build the public share URL for a slug without scheme: {domain}/s/{slug}.
      *
      * @param string $slug
      */
@@ -413,10 +413,7 @@ class ReportsController extends Controller
         if ($domain === '') {
             $domain = defined('HOST') ? HOST : 'localhost';
         }
-        $https = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off')
-            || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
-        $proto = $https ? 'https' : 'http';
-        return $proto . '://' . $domain . '/s/' . $slug;
+        return $domain . '/s/' . $slug;
     }
 
     /**

@@ -758,7 +758,7 @@ window.EZ = window.EZ || {};
   }
 
   function publicUrl(share) {
-    if (share && share.url) { return share.url; }
+    if (share && share.url) { return /^https?:\/\//.test(share.url) ? share.url : location.protocol + "//" + share.url; }
     var slug = share && share.slug;
     return slug ? (location.origin + "/s/" + slug) : "";
   }
