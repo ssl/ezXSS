@@ -210,12 +210,9 @@ class WebSocketConnection:
             pass
 
 
-async def handle_websocket(reader, writer, cfg=None):
+async def handle_websocket(reader, writer):
     ws = WebSocketConnection(reader, writer)
     client_id = None
-    relay_secret = ""
-    if cfg is not None:
-        relay_secret = getattr(cfg, "relay_secret", "") or ""
     try:
         await asyncio.wait_for(ws.handshake(), timeout=HANDSHAKE_TIMEOUT)
     except Exception as exc:
@@ -240,12 +237,6 @@ async def handle_websocket(reader, writer, cfg=None):
                 continue
 
             if client_id is None:
-                if relay_secret:
-                    presented = str(data.get("secret") or "")
-                    if not hmac.compare_digest(presented, relay_secret):
-                        logger.warning("Relay handshake rejected: missing/invalid secret")
-                        break
-
                 client_id = (data.get("clientid") or "").lower()
                 if not client_id:
                     logger.error("No client ID provided in initial message")
@@ -594,7 +585,7 @@ async def run_serve(cfg):
         raise SystemExit("Error while loading SSL cert: %s" % exc)
 
     ws_server = await asyncio.start_server(
-        lambda r, w: handle_websocket(r, w, cfg), cfg.host, cfg.ws_port, ssl=ssl_context
+        lambda r, w: handle_websocket(r, w), cfg.host, cfg.ws_port, ssl=ssl_context
     )
     proxy_server = await asyncio.start_server(lambda r, w: handle_proxy(r, w, cfg), cfg.host, cfg.proxy_port)
 
@@ -649,10 +640,6 @@ def build_parser():
                        help="Require HTTP Basic auth on the proxy port.")
     serve.add_argument("--user", dest="username", default=_env("prUser", ""))
     serve.add_argument("--password", default=_env("prPassword", ""))
-    serve.add_argument("--relay-secret", dest="relay_secret", default=_env("prRelaySecret", ""),
-                       help="Shared secret the relay client must send in its WebSocket handshake. "
-                            "Strongly recommended whenever the ws-port is reachable beyond localhost. "
-                            "Set the matching value in the ezXSS panel (proxy_relay_secret). Empty = disabled (legacy).")
     serve.add_argument("--log-level", default=_env("prLogLevel", "WARNING"))
 
     for name, help_text in (("connect", "Enqueue a proxy-connect (ez_soc) command via the ezXSS API."),
