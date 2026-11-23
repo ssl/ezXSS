@@ -128,8 +128,7 @@
     var id = cid();
     return '<div class="data-image-wrap">' +
         '<figure class="data-image">' +
-          '<img src="' + esc(v) + '" alt="Collected image" loading="lazy" ' +
-            'onerror="this.style.display=\'none\';this.parentNode.nextElementSibling.hidden=false">' +
+          '<img src="' + esc(v) + '" alt="Collected image" loading="lazy" data-img-fallback>' +
         "</figure>" +
         '<code class="mono data-image__raw" id="' + id + '" hidden>' + esc(v) + "</code>" +
         copyBtn(id) +
@@ -293,6 +292,14 @@
       })
       .catch(function () { fail("Could not load this share. Please try again later."); });
   }
+
+  document.addEventListener("error", function (e) {
+    var img = e.target;
+    if (!img || img.tagName !== "IMG" || !img.hasAttribute("data-img-fallback")) { return; }
+    img.style.display = "none";
+    var raw = img.parentNode && img.parentNode.nextElementSibling;
+    if (raw) { raw.hidden = false; }
+  }, true);
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start);

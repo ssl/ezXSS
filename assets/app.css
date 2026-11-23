@@ -1296,6 +1296,15 @@ select.input { appearance: none; background-image: none; padding-right: var(--sp
   .inputrow:has(.inputrow__or) > .btn:first-child { flex: 1 1 100%; }
   .inputrow:has(.inputrow__or) > .inputrow__or { flex: 1 1 100%; text-align: center; padding: var(--space-2xs) 0; }
 }
+@media (max-width: 600px) {
+  :root { --control-h: 40px; }
+  .topnav__link { min-width: var(--control-h); min-height: var(--control-h); padding: 0; justify-content: center; }
+  .segmented, .themeswitch { height: calc(var(--control-h) + 2px); }
+  .xselect--mini .xselect__btn { min-height: var(--control-h); }
+  .switch { min-height: var(--control-h); }
+  .tabs { flex-wrap: wrap; overflow-x: visible; }
+  .tabs button { min-height: var(--control-h); padding-block: 0; }
+}
 @media (max-width: 520px) {
   .menu { width: min(252px, 82vw); }
 }

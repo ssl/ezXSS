@@ -436,8 +436,7 @@ window.EZ = window.EZ || {};
     var id = dataCopyId();
     return '<div class="data-image-wrap">' +
         '<figure class="data-image">' +
-          '<img src="' + util.escapeHtml(v) + '" alt="Collected image" loading="lazy" ' +
-            'onerror="this.style.display=\'none\';this.parentNode.nextElementSibling.hidden=false">' +
+          '<img src="' + util.escapeHtml(v) + '" alt="Collected image" loading="lazy" data-img-fallback>' +
         "</figure>" +
         '<code class="mono data-image__raw" id="' + id + '" hidden>' + util.escapeHtml(v) + "</code>" +
         EZ.ui.copyBtn("#" + id) +

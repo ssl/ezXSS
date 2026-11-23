@@ -2,6 +2,14 @@ window.EZ = window.EZ || {};
 (function (EZ) {
   "use strict";
 
+  document.addEventListener("error", function (e) {
+    var img = e.target;
+    if (!img || img.tagName !== "IMG" || !img.hasAttribute("data-img-fallback")) { return; }
+    img.style.display = "none";
+    var raw = img.parentNode && img.parentNode.nextElementSibling;
+    if (raw) { raw.hidden = false; }
+  }, true);
+
   var dom = EZ.dom, util = EZ.util;
   var root = document.documentElement;
 
