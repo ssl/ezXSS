@@ -303,6 +303,7 @@ class ConsoleController extends Controller
      */
     private function gate($id, $type)
     {
+        $this->cap($type === 'edit' ? 'session.interact' : 'session.view');
         $id = $this->validId($id, 'session');
         $group = $this->sessions->resolveGroup($id);
         $this->sessions->accessForGroup($group['payload'], $type);
