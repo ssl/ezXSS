@@ -166,9 +166,9 @@ class Auth
      */
     public static function login($username, $password, $code = null, $ip = '0.0.0.0')
     {
-        self::rateLimitLogin($ip, $username);
-
         $username = is_string($username) ? trim($username) : '';
+
+        self::rateLimitLogin($ip, $username);
         $password = is_string($password) ? $password : '';
 
         $user = ($username !== '') ? User::findByUsername($username) : null;
