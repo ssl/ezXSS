@@ -486,6 +486,7 @@ class UsersController extends Controller
      */
     public function doDelete($id)
     {
+        $this->cap('user.manage');
         $actor = Auth::user();
 
         $id = $this->validId($id, 'user');
