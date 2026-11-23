@@ -75,6 +75,10 @@ use_letsencrypt_cert() {
     sed -i "s|SSLCertificateKeyFile .*|SSLCertificateKeyFile /etc/letsencrypt/live/${DOMAIN}/privkey.pem|g" /etc/apache2/sites-available/default-ssl.conf
 }
 
+start_cert_renewal() {
+    ( while sleep 43200; do certbot renew --quiet --deploy-hook "apache2ctl graceful" || true; done ) &
+}
+
 obtain_certificate() {
     if [ "${INSTALL_CERTIFICATE:-false}" = "true" ]; then
         if [ ! -e "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
@@ -99,6 +103,7 @@ obtain_certificate() {
             echo "SSL certificate already exists for ${DOMAIN}. Skipping acquisition."
             use_letsencrypt_cert
         fi
+        start_cert_renewal
     else
         echo "SSL certificate acquisition not requested (serving the self-signed cert)."
     fi
