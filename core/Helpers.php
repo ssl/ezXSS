@@ -149,3 +149,40 @@ function userAgentLabel($userAgent)
     }
     return $parts['os'] . ' with ' . $parts['browser'];
 }
+
+/**
+ * Make a string valid UTF-8 by replacing bad byte sequences. Headers and raw fields can carry anything.
+ *
+ * @param mixed $value
+ * @return string
+ */
+function utf8Clean($value)
+{
+    $value = (string) $value;
+    if ($value === '' || preg_match('//u', $value) === 1) {
+        return $value;
+    }
+    if (function_exists('mb_scrub')) {
+        return mb_scrub($value, 'UTF-8');
+    }
+    return (string) iconv('UTF-8', 'UTF-8//IGNORE', $value);
+}
+
+/**
+ * Cut a string to at most $bytes bytes without splitting a multibyte character.
+ *
+ * @param string $value
+ * @param int $bytes
+ * @return string
+ */
+function utf8Cut($value, $bytes)
+{
+    $value = (string) $value;
+    if (strlen($value) <= $bytes) {
+        return $value;
+    }
+    while ($bytes > 0 && (ord($value[$bytes]) & 0xC0) === 0x80) {
+        $bytes--;
+    }
+    return substr($value, 0, $bytes);
+}

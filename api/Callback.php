@@ -128,8 +128,12 @@ class CallbackController extends Controller
      */
     public function readBody()
     {
-        $input = file_get_contents('php://input');
-        $data = json_decode((string) $input, false);
+        $input = self::decodeBodyEncoding((string) file_get_contents('php://input'));
+        $input = (string) preg_replace('/^\xEF\xBB\xBF/', '', $input);
+        $data = json_decode($input, false);
+        if (!is_object($data)) {
+            $data = json_decode(self::fixLoneSurrogates($input), false);
+        }
 
         if (empty($data) || !is_object($data)) {
             if (!empty($input) && strpos($input, '=') !== false && strpos($input, '&') !== false) {
@@ -144,6 +148,41 @@ class CallbackController extends Controller
         }
 
         return $data;
+    }
+
+    /**
+     * Undo a Content-Encoding on the request body. Only gzip is handled; anything else is passed through.
+     *
+     * @param string $input
+     * @return string
+     */
+    private static function decodeBodyEncoding($input)
+    {
+        $encoding = isset($_SERVER['HTTP_CONTENT_ENCODING']) ? strtolower(trim($_SERVER['HTTP_CONTENT_ENCODING'])) : '';
+        if ($encoding === 'gzip' && function_exists('gzdecode')) {
+            $decoded = @gzdecode($input, 67108864);
+            if ($decoded !== false) {
+                return $decoded;
+            }
+        }
+        return $input;
+    }
+
+    /**
+     * Replace unpaired UTF-16 surrogate escapes (a lone \ud83d) with U+FFFD, so the JSON can be decoded.
+     *
+     * @param string $json
+     * @return string
+     */
+    private static function fixLoneSurrogates($json)
+    {
+        return (string) preg_replace_callback(
+            '/\\\\u[dD][89abAB][0-9a-fA-F]{2}(?:\\\\u[dD][c-fC-F][0-9a-fA-F]{2})?|\\\\u[dD][c-fC-F][0-9a-fA-F]{2}/',
+            function ($m) {
+                return strlen($m[0]) === 12 ? $m[0] : '\\uFFFD';
+            },
+            $json
+        );
     }
 
     /**
@@ -347,7 +386,7 @@ class CallbackController extends Controller
         $ip = isset($data->ip) && $data->ip !== ''
             ? $data->ip
             : (isset($server['REMOTE_ADDR']) ? $server['REMOTE_ADDR'] : '');
-        $data->ip = substr((string) $ip, 0, self::LIMIT_IP);
+        $data->ip = utf8Cut(utf8Clean($ip), self::LIMIT_IP);
 
         if (!isset($data->uri) || $data->uri === '') {
             $data->uri = isset($server['HTTP_REFERER']) ? $server['HTTP_REFERER']
@@ -361,14 +400,14 @@ class CallbackController extends Controller
             $origin = isset($parsed['host']) ? $parsed['host'] : '';
         }
 
-        $data->uri = substr((string) $data->uri, 0, self::LIMIT_URI);
-        $data->referer = substr((string) (isset($data->referer) ? $data->referer : ''), 0, self::LIMIT_REFERER);
-        $data->origin = substr((string) $origin, 0, self::LIMIT_ORIGIN);
-        $data->payload = substr((string) (isset($data->payload) ? $data->payload : ''), 0, self::LIMIT_PAYLOAD);
+        $data->uri = utf8Cut(utf8Clean($data->uri), self::LIMIT_URI);
+        $data->referer = utf8Cut(utf8Clean(isset($data->referer) ? $data->referer : ''), self::LIMIT_REFERER);
+        $data->origin = utf8Cut(utf8Clean($origin), self::LIMIT_ORIGIN);
+        $data->payload = utf8Cut(utf8Clean(isset($data->payload) ? $data->payload : ''), self::LIMIT_PAYLOAD);
 
         $ua = isset($data->{'user-agent'}) ? $data->{'user-agent'}
             : (isset($server['HTTP_USER_AGENT']) ? $server['HTTP_USER_AGENT'] : '');
-        $data->useragent = substr((string) $ua, 0, self::LIMIT_USERAGENT);
+        $data->useragent = utf8Cut(utf8Clean($ua), self::LIMIT_USERAGENT);
 
         $extra = isset($data->extra) ? $data->extra : '';
         if (is_array($extra) || is_object($extra)) {

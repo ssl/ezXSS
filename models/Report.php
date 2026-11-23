@@ -81,17 +81,33 @@ class Report extends Model
     public static function add(array $fields)
     {
         $payload   = isset($fields['payload']) ? (string) $fields['payload'] : '';
-        $uri       = isset($fields['uri']) ? (string) $fields['uri'] : '';
-        $ip        = isset($fields['ip']) ? (string) $fields['ip'] : '';
-        $referer   = isset($fields['referer']) ? (string) $fields['referer'] : '';
-        $useragent = isset($fields['useragent']) ? (string) $fields['useragent'] : '';
-        $cookies   = isset($fields['cookies']) ? (string) $fields['cookies'] : '';
-        $origin    = isset($fields['origin']) ? (string) $fields['origin'] : '';
+        $uri       = utf8Clean(isset($fields['uri']) ? $fields['uri'] : '');
+        $ip        = utf8Clean(isset($fields['ip']) ? $fields['ip'] : '');
+        $referer   = utf8Clean(isset($fields['referer']) ? $fields['referer'] : '');
+        $useragent = utf8Clean(isset($fields['useragent']) ? $fields['useragent'] : '');
+        $cookies   = utf8Clean(isset($fields['cookies']) ? $fields['cookies'] : '');
+        $origin    = utf8Clean(isset($fields['origin']) ? $fields['origin'] : '');
         $createdAt = isset($fields['created_at']) ? (int) $fields['created_at'] : time();
 
         $meta = (isset($fields['meta']) && (is_array($fields['meta']) || is_object($fields['meta'])))
-            ? json_encode($fields['meta'])
+            ? json_encode($fields['meta'], defined('JSON_INVALID_UTF8_SUBSTITUTE') ? JSON_INVALID_UTF8_SUBSTITUTE : 0)
             : null;
+
+        $dom            = utf8Clean(isset($fields['dom']) ? $fields['dom'] : '');
+        $screenshot     = utf8Clean(isset($fields['screenshot']) ? $fields['screenshot'] : '');
+        $localStorage   = utf8Clean(isset($fields['localstorage']) ? $fields['localstorage'] : '');
+        $sessionStorage = utf8Clean(isset($fields['sessionstorage']) ? $fields['sessionstorage'] : '');
+        $extra          = utf8Clean(isset($fields['extra']) ? $fields['extra'] : '');
+
+        $compressed = 0;
+        if (Compression::enabled()) {
+            $dom = Compression::pack($dom);
+            $screenshot = Compression::packScreenshot($screenshot);
+            $localStorage = Compression::packJson($localStorage);
+            $sessionStorage = Compression::packJson($sessionStorage);
+            $extra = Compression::pack($extra);
+            $compressed = 1;
+        }
 
         $reportId = (int) self::query()->insert(array(
             'payload'     => $payload,
@@ -106,31 +122,21 @@ class Report extends Model
             'created_at'  => $createdAt,
         ));
 
-        $dom            = isset($fields['dom']) ? (string) $fields['dom'] : '';
-        $screenshot     = isset($fields['screenshot']) ? (string) $fields['screenshot'] : '';
-        $localStorage   = isset($fields['localstorage']) ? (string) $fields['localstorage'] : '';
-        $sessionStorage = isset($fields['sessionstorage']) ? (string) $fields['sessionstorage'] : '';
-        $extra          = isset($fields['extra']) ? (string) $fields['extra'] : '';
-
-        $compressed = 0;
-        if (Compression::enabled()) {
-            $dom = Compression::pack($dom);
-            $screenshot = Compression::packScreenshot($screenshot);
-            $localStorage = Compression::packJson($localStorage);
-            $sessionStorage = Compression::packJson($sessionStorage);
-            $extra = Compression::pack($extra);
-            $compressed = 1;
+        // Best-effort blob: keep the light report row even if the data row cannot be written (for
+        // example a DOM over max_allowed_packet). A partial report beats losing it.
+        try {
+            self::query()->from(self::TABLE_DATA)->insert(array(
+                'report_id'      => $reportId,
+                'dom'            => $dom,
+                'screenshot'     => $screenshot,
+                'localstorage'   => $localStorage,
+                'sessionstorage' => $sessionStorage,
+                'extra'          => $extra,
+                'compressed'     => $compressed,
+            ));
+        } catch (Throwable $e) {
+            error_log('ezXSS: report ' . $reportId . ' stored without its data row: ' . $e->getMessage());
         }
-
-        self::query()->from(self::TABLE_DATA)->insert(array(
-            'report_id'      => $reportId,
-            'dom'            => $dom,
-            'screenshot'     => $screenshot,
-            'localstorage'   => $localStorage,
-            'sessionstorage' => $sessionStorage,
-            'extra'          => $extra,
-            'compressed'     => $compressed,
-        ));
 
         self::invalidateCaches();
 
@@ -239,7 +245,7 @@ class Report extends Model
             }
         }
         $meta['dom_size'] = (int) $size;
-        self::query()->where('id', (int) $reportId)->update(array('meta' => json_encode($meta)));
+        self::query()->where('id', (int) $reportId)->update(array('meta' => json_encode($meta, defined('JSON_INVALID_UTF8_SUBSTITUTE') ? JSON_INVALID_UTF8_SUBSTITUTE : 0)));
     }
 
     /**
@@ -856,7 +862,7 @@ class Report extends Model
             $meta['sec_fetch'] = $patch['sec_fetch'];
         }
 
-        self::query()->where('id', $id)->update(array('meta' => json_encode($meta)));
+        self::query()->where('id', $id)->update(array('meta' => json_encode($meta, defined('JSON_INVALID_UTF8_SUBSTITUTE') ? JSON_INVALID_UTF8_SUBSTITUTE : 0)));
     }
 
     /**
