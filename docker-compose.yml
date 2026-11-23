@@ -1,41 +1,44 @@
 services:
-  db:
-    image: mariadb:11
+  ezxssdb:
+    image: "${DB_IMAGE:-mysql:9.7.4}"
     restart: always
+    stop_grace_period: 2m
     environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
-      MARIADB_DATABASE: "${DB_NAME:-ezxss}"
-      MARIADB_USER: "${DB_USER:-ezxss}"
-      MARIADB_PASSWORD: "${DB_PASS:-ezxss}"
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: "${DB_NAME:-${dbName:-ezxss}}"
+      MYSQL_USER: "${DB_USER:-${dbUser:-ezxss}}"
+      MYSQL_PASSWORD: "${DB_PASS:-${dbPassword:-ezxss}}"
     volumes:
-      - db_data:/var/lib/mysql
+      - ./ezxssdb:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 --silent"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 60
+      start_period: 30s
 
-  app:
+  ezxss:
+    image: "ezxss:${VERSION:-5.0}"
     build:
       context: .
       dockerfile: ./Dockerfile
     restart: always
     depends_on:
-      db:
+      ezxssdb:
         condition: service_healthy
     ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
+      - "${HTTP_PORT:-${dockerHttpPort:-80}}:80"
+      - "${HTTPS_PORT:-${dockerHttpsPort:-443}}:443"
     environment:
-      DB_HOST: "db"
+      DB_HOST: "ezxssdb"
       DB_PORT: "3306"
-      DB_NAME: "${DB_NAME:-ezxss}"
-      DB_USER: "${DB_USER:-ezxss}"
-      DB_PASS: "${DB_PASS:-ezxss}"
+      DB_NAME: "${DB_NAME:-${dbName:-ezxss}}"
+      DB_USER: "${DB_USER:-${dbUser:-ezxss}}"
+      DB_PASS: "${DB_PASS:-${dbPassword:-ezxss}}"
       DB_CHARSET: "utf8mb4"
 
       VERSION: "${VERSION:-5.0}"
-      DOMAIN: "${DOMAIN:-localhost}"
+      DOMAIN: "${DOMAIN:-${domain:-localhost}}"
       TIMEZONE: "${TIMEZONE:-UTC}"
       DEBUG: "${DEBUG:-false}"
 
@@ -45,12 +48,10 @@ services:
       PANEL_DOMAINS: "${PANEL_DOMAINS:-}"
       TRUST_PROXY: "${TRUST_PROXY:-false}"
 
-      INSTALL_CERTIFICATE: "${INSTALL_CERTIFICATE:-false}"
+      INSTALL_CERTIFICATE: "${INSTALL_CERTIFICATE:-${autoInstallCertificate:-false}}"
     volumes:
-      - report_img:/var/www/html/assets/img
+      - ./assets/img:/var/www/html/assets/img
       - letsencrypt:/etc/letsencrypt
 
 volumes:
-  db_data:
-  report_img:
   letsencrypt:

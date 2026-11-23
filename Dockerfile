@@ -15,6 +15,7 @@ RUN { \
       echo "upload_max_filesize=150M"; \
       echo "post_max_size=150M"; \
       echo "memory_limit=256M"; \
+      echo "expose_php=Off"; \
     } > /usr/local/etc/php/conf.d/ezxss.ini
 
 RUN apt-get update && \

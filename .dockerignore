@@ -10,3 +10,4 @@ nginx-rewrite.conf
 .idea/
 .DS_Store
 __pycache__/
+ezxssdb/
