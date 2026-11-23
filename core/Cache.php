@@ -2,6 +2,12 @@
 class Cache
 {
     /**
+     * Seconds a row may go without a write before the sweep drops it. Every caller treats a missing
+     * row as a miss.
+     */
+    const RETENTION = 604800;
+
+    /**
      * Get a cached value or run the callback when missing/expired.
      *
      * @param string $name
@@ -39,7 +45,9 @@ class Cache
             timestamp = VALUES(timestamp)
         ");
 
-        return $stmt->execute(array($name, json_encode($value), time()));
+        $ok = $stmt->execute(array($name, json_encode($value), time()));
+        self::sweep();
+        return $ok;
     }
 
     /**
@@ -57,6 +65,7 @@ class Cache
             ON DUPLICATE KEY UPDATE value = value + 1, timestamp = VALUES(timestamp)
         ");
         $stmt->execute(array($name, time()));
+        self::sweep();
 
         $read = $db->prepare("SELECT value FROM cache WHERE name = ?");
         $read->execute(array($name));
@@ -88,5 +97,22 @@ class Cache
     {
         $stmt = Database::getInstance()->prepare("DELETE FROM cache WHERE name = ?");
         return $stmt->execute(array($name));
+    }
+
+    /**
+     * Drop rows that nobody has written for RETENTION seconds. Runs on about one write in 200, and a
+     * failure here never fails the write that triggered it. The dashboard version counter is kept:
+     * it only changes when reports change, so an old value is still the right one.
+     */
+    private static function sweep()
+    {
+        if (mt_rand(1, 200) !== 1) {
+            return;
+        }
+        try {
+            $stmt = Database::getInstance()->prepare("DELETE FROM cache WHERE timestamp < ? AND name <> ?");
+            $stmt->execute(array(time() - self::RETENTION, Report::CACHE_DASHBOARD_VERSION));
+        } catch (Throwable $e) {
+        }
     }
 }
