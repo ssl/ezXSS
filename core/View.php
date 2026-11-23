@@ -93,7 +93,8 @@ class View
     }
 
     /**
-     * Newest mtime across /assets, used to cache-bust the panel asset URLs.
+     * Newest mtime across the js and css files in /assets, used to cache-bust the panel asset URLs.
+     * Images, such as report screenshots, are skipped.
      */
     private static function assetVersion()
     {
@@ -102,10 +103,18 @@ class View
         if (is_dir($dir)) {
             try {
                 $it = new RecursiveIteratorIterator(
-                    new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
+                    new RecursiveCallbackFilterIterator(
+                        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+                        function ($current) {
+                            if ($current->isDir()) {
+                                return $current->getFilename() !== 'img';
+                            }
+                            return preg_match('/\.(js|css)$/i', $current->getFilename()) === 1;
+                        }
+                    )
                 );
                 foreach ($it as $f) {
-                    if ($f->isFile() && $f->getMTime() > $max) {
+                    if ($f->getMTime() > $max) {
                         $max = $f->getMTime();
                     }
                 }
