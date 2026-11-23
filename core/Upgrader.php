@@ -302,9 +302,9 @@ class Upgrader
         $rows = $db->query("SELECT * FROM `payloads`")->fetchAll(PDO::FETCH_ASSOC);
 
         $insPage = $db->prepare("INSERT INTO `payload_pages` (`payload_id`, `path`) VALUES (?, ?)");
-        $delPages = $db->prepare("DELETE FROM `payload_pages` WHERE `payload_id` = ?");
+        $pageCount = $db->prepare("SELECT COUNT(*) FROM `payload_pages` WHERE `payload_id` = ?");
         $insFilter = $db->prepare("INSERT INTO `payload_filters` (`payload_id`, `domain`, `type`) VALUES (?, ?, ?)");
-        $delFilters = $db->prepare("DELETE FROM `payload_filters` WHERE `payload_id` = ?");
+        $filterCount = $db->prepare("SELECT COUNT(*) FROM `payload_filters` WHERE `payload_id` = ?");
         $insCollect = $db->prepare(
             "INSERT IGNORE INTO `payload_collect`
                 (`payload_id`, `collect_uri`, `collect_ip`, `collect_referer`, `collect_useragent`,
@@ -315,17 +315,22 @@ class Upgrader
 
         foreach ($rows as $r) {
             $id = (int) $r['id'];
+            $db->beginTransaction();
 
-            $delPages->execute(array($id));
-            foreach (self::splitTilde(isset($r['pages']) ? $r['pages'] : '') as $path) {
-                $insPage->execute(array($id, $path));
+            $pageCount->execute(array($id));
+            if ((int) $pageCount->fetchColumn() === 0) {
+                foreach (self::splitTilde(isset($r['pages']) ? $r['pages'] : '') as $path) {
+                    $insPage->execute(array($id, $path));
+                }
             }
-            $delFilters->execute(array($id));
-            foreach (self::splitTilde(isset($r['blacklist']) ? $r['blacklist'] : '') as $domain) {
-                $insFilter->execute(array($id, $domain, 'deny'));
-            }
-            foreach (self::splitTilde(isset($r['whitelist']) ? $r['whitelist'] : '') as $domain) {
-                $insFilter->execute(array($id, $domain, 'allow'));
+            $filterCount->execute(array($id));
+            if ((int) $filterCount->fetchColumn() === 0) {
+                foreach (self::splitTilde(isset($r['blacklist']) ? $r['blacklist'] : '') as $domain) {
+                    $insFilter->execute(array($id, $domain, 'deny'));
+                }
+                foreach (self::splitTilde(isset($r['whitelist']) ? $r['whitelist'] : '') as $domain) {
+                    $insFilter->execute(array($id, $domain, 'allow'));
+                }
             }
 
             if ($hasCollect) {
@@ -342,6 +347,7 @@ class Upgrader
                     self::flag($r, 'collect_screenshot', 0),
                 ));
             }
+            $db->commit();
         }
 
         $fallbackId = (int) $db->query("SELECT `id` FROM `payloads` WHERE `identifier` = 'Fallback (default)' LIMIT 1")->fetchColumn();
