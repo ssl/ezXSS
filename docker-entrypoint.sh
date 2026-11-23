@@ -67,7 +67,6 @@ wait_for_db() {
         fi
         sleep 2
     done
-    exec 3>&- 2>/dev/null || true
     echo "Database is accepting connections."
 }
 
