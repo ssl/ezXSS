@@ -4,6 +4,7 @@
 });
 
 var ez_we, ez_las = "", ez_ind = null, ez_exi = !1, ez_q_pr = {}, ez_q_rq = [], ez_q_p = !1;
+var ez_cid_fb = "";
 
 function ez_hb() {
     try {
@@ -38,8 +39,9 @@ function ez_eva(input) {
 function eze_ini() {
     ra_hL();
     ez_s();
+    var sent = ez_rD.type;
     ez_cb(ez_rD, function (r) {
-        try { ra_adopt(r); } catch (e) { }
+        if ("init" === sent) try { ra_adopt(r); } catch (e) { }
         ez_stp();
         try {
             var p = localStorage.getItem("ezProxy");
@@ -127,8 +129,8 @@ if (!console.ez) {
     for (var i = 0; i < logTypes.length; i++) ra_wc(logTypes[i], logTypes[i].toUpperCase());
 }
 
-function ra_client() {
-    var t = "", o = "ezXSS", e;
+function ra_read(o) {
+    var t = "", e;
     try {
         e = "localStorage" in window && null !== window.localStorage;
     } catch (p) {
@@ -145,10 +147,8 @@ function ra_client() {
     return t;
 }
 
-function ra_adopt(id) {
-    if ("string" != typeof id || !/^[A-Za-z0-9]{8,64}$/.test(id)) return;
-    if ("" !== ra_client()) return;
-    var o = "ezXSS", e;
+function ra_store(o, id) {
+    var e;
     try {
         e = "localStorage" in window && null !== window.localStorage;
     } catch (p) {
@@ -163,7 +163,23 @@ function ra_adopt(id) {
             l.indexOf("GMT") >= 0 && (l = l.replace("GMT", ""));
             document.cookie = o + "=" + id + ";expires=" + l + ";path=/";
         }
-    } catch (t) { }
+    } catch (t) { ez_cid_fb = id; }
+}
+
+function ra_client() {
+    if (ez_cid_fb) return ez_cid_fb;
+    var o = "ezXSS_{{clientKey}}", t = ra_read(o);
+    if (!t) {
+        t = ra_read("ezXSS");
+        if (t) ra_store(o, t);
+    }
+    return t;
+}
+
+function ra_adopt(id) {
+    if ("string" != typeof id || !/^[A-Za-z0-9]{8,64}$/.test(id)) return;
+    if (id === ra_client()) return;
+    ra_store("ezXSS_{{clientKey}}", id);
 }
 
 function ra_hL() {

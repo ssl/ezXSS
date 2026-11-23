@@ -28,6 +28,22 @@ class Setting extends Model
     }
 
     /**
+     * A short, stable per-install id that namespaces the client-id storage key in the payload, so
+     * two ezXSS installs hitting one origin never overwrite each other's id. Made once, then stored.
+     *
+     * @return string
+     */
+    public static function clientKey()
+    {
+        $key = (string) self::get('client_key', '');
+        if (!preg_match('/^[a-f0-9]{8,32}$/', $key)) {
+            $key = bin2hex(random_bytes(4));
+            self::put('client_key', $key);
+        }
+        return $key;
+    }
+
+    /**
      * Upsert a single setting in one statement (unique index on `setting`).
      *
      * @param string $setting

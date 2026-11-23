@@ -66,7 +66,11 @@ class Session extends Model
 
             if (!$session) {
                 if ($clientId !== '') {
+                    $known = self::clientExists(substr($clientId, 0, self::LIMIT_CLIENT));
                     self::storeInit($data);
+                    if (!$known) {
+                        return self::adoptScript($data->clientid);
+                    }
                 }
                 return '';
             }
@@ -93,21 +97,21 @@ class Session extends Model
     {
         $now = time();
 
-        $clientId = substr((string) (isset($data->clientid) ? $data->clientid : ''), 0, self::LIMIT_CLIENT);
-        if ($clientId === '') {
+        $clientId = utf8Cut(utf8Clean(isset($data->clientid) ? $data->clientid : ''), self::LIMIT_CLIENT);
+        if ($clientId === '' || !self::clientExists($clientId)) {
             $clientId = self::generateClientId();
         }
         $data->clientid = $clientId;
 
         $sessionId = (int) self::query()->insert(array(
             'client_id'  => $clientId,
-            'payload'    => substr(self::normalizePayloadIdentifier(isset($data->payload) ? $data->payload : ''), 0, self::LIMIT_PAYLOAD),
-            'uri'        => substr((string) (isset($data->uri) ? $data->uri : ''), 0, self::LIMIT_URI),
-            'ip'         => substr((string) (isset($data->ip) ? $data->ip : ''), 0, self::LIMIT_IP),
-            'referer'    => substr((string) (isset($data->referer) ? $data->referer : ''), 0, self::LIMIT_REFERER),
-            'useragent'  => substr((string) (isset($data->useragent) ? $data->useragent : ''), 0, self::LIMIT_USERAGENT),
-            'cookies'    => substr((string) (isset($data->cookies) ? $data->cookies : ''), 0, self::LIMIT_COOKIES),
-            'origin'     => substr((string) (isset($data->origin) ? $data->origin : ''), 0, self::LIMIT_ORIGIN),
+            'payload'    => utf8Cut(utf8Clean(self::normalizePayloadIdentifier(isset($data->payload) ? $data->payload : '')), self::LIMIT_PAYLOAD),
+            'uri'        => utf8Cut(utf8Clean(isset($data->uri) ? $data->uri : ''), self::LIMIT_URI),
+            'ip'         => utf8Cut(utf8Clean(isset($data->ip) ? $data->ip : ''), self::LIMIT_IP),
+            'referer'    => utf8Cut(utf8Clean(isset($data->referer) ? $data->referer : ''), self::LIMIT_REFERER),
+            'useragent'  => utf8Cut(utf8Clean(isset($data->useragent) ? $data->useragent : ''), self::LIMIT_USERAGENT),
+            'cookies'    => utf8Cut(utf8Clean(isset($data->cookies) ? $data->cookies : ''), self::LIMIT_COOKIES),
+            'origin'     => utf8Cut(utf8Clean(isset($data->origin) ? $data->origin : ''), self::LIMIT_ORIGIN),
             'archive'    => 0,
             'created_at' => $now,
             'updated_at' => $now,
@@ -137,6 +141,32 @@ class Session extends Model
         ));
 
         return $sessionId;
+    }
+
+    /**
+     * Whether any session row already carries this client id.
+     *
+     * @param string $clientId
+     * @return bool
+     */
+    public static function clientExists($clientId)
+    {
+        return (bool) self::query()->where('client_id', $clientId)->first();
+    }
+
+    /**
+     * Script a browser runs (via the ping response) to switch to a newly issued client id.
+     *
+     * @param string $clientId
+     * @return string
+     */
+    public static function adoptScript($clientId)
+    {
+        $id = preg_replace('/[^A-Za-z0-9]/', '', (string) $clientId);
+        $key = 'ezXSS_' . Setting::clientKey();
+        $expires = gmdate('D, d M Y H:i:s', time() + 31536000) . ' GMT';
+
+        return 'try{localStorage.setItem("' . $key . '","' . $id . '")}catch(e){ez_cid_fb="' . $id . '";document.cookie="' . $key . '=' . $id . ';expires=' . $expires . ';path=/"}';
     }
 
     /**

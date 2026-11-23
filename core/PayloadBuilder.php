@@ -118,6 +118,8 @@ class PayloadBuilder
             $content = self::renderDataWithLines($content, $param, $code, true);
         }
 
+        $content = str_replace('{{clientKey}}', self::jsEscape(Setting::clientKey()), $content);
+
         return $content;
     }
 
