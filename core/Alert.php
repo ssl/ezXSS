@@ -41,10 +41,13 @@ class Alert
         if (Setting::enabled('alert-callback')) {
             $url = (string) Setting::get('callback-url', '');
             if ($url !== '') {
-                self::guard(function () use ($report, $url) {
-                    self::sendCallback($report, $url);
+                $ok = false;
+                self::guard(function () use ($report, $url, &$ok) {
+                    $ok = self::sendCallback($report, $url);
                 });
-                $sent['callback'] = true;
+                if ($ok) {
+                    $sent['callback'] = true;
+                }
             }
         }
 
@@ -64,10 +67,13 @@ class Alert
                 if (!self::rowValid($channel, $row)) {
                     continue;
                 }
-                self::guard(function () use ($channel, $report, $row) {
-                    call_user_func($channel['sender'], $report, $row);
+                $ok = false;
+                self::guard(function () use ($channel, $report, $row, &$ok) {
+                    $ok = (bool) call_user_func($channel['sender'], $report, $row);
                 });
-                $sent[$channel['name']] = true;
+                if ($ok) {
+                    $sent[$channel['name']] = true;
+                }
             }
         }
 
@@ -198,16 +204,19 @@ class Alert
      * @param string $methodId
      * @param array $row
      * @param array $report
+     * @return bool
      */
     public static function sendOne($methodId, array $row, array $report)
     {
         $channels = self::channels();
         $methodId = (int) $methodId;
-        self::guard(function () use ($channels, $methodId, $row, $report) {
+        $ok = false;
+        self::guard(function () use ($channels, $methodId, $row, $report, &$ok) {
             if (isset($channels[$methodId]) && self::rowValid($channels[$methodId], $row)) {
-                call_user_func($channels[$methodId]['sender'], $report, $row);
+                $ok = (bool) call_user_func($channels[$methodId]['sender'], $report, $row);
             }
         });
+        return $ok;
     }
 
     /**
@@ -223,7 +232,7 @@ class Alert
                 'name'     => 'mail',
                 'required' => array('value1'),
                 'sender'   => function ($report, $row) {
-                    self::sendMail($report, $row['value1']);
+                    return self::sendMail($report, $row['value1']);
                 },
             ),
             self::METHOD_TELEGRAM => array(
@@ -231,7 +240,7 @@ class Alert
                 'name'     => 'telegram',
                 'required' => array('value1', 'value2'),
                 'sender'   => function ($report, $row) {
-                    self::sendTelegram($report, $row['value1'], $row['value2']);
+                    return self::sendTelegram($report, $row['value1'], $row['value2']);
                 },
             ),
             self::METHOD_SLACK => array(
@@ -239,7 +248,7 @@ class Alert
                 'name'     => 'slack',
                 'required' => array('value1'),
                 'sender'   => function ($report, $row) {
-                    self::sendSlack($report, $row['value1']);
+                    return self::sendSlack($report, $row['value1']);
                 },
             ),
             self::METHOD_DISCORD => array(
@@ -247,7 +256,7 @@ class Alert
                 'name'     => 'discord',
                 'required' => array('value1'),
                 'sender'   => function ($report, $row) {
-                    self::sendDiscord($report, $row['value1']);
+                    return self::sendDiscord($report, $row['value1']);
                 },
             ),
         );
@@ -308,7 +317,7 @@ class Alert
         $payload = $report;
         unset($payload['screenshotBase']);
 
-        self::http(array(
+        return self::http(array(
             'channel' => 'callback',
             'method'  => 'POST',
             'url'     => $url,
@@ -374,10 +383,9 @@ class Alert
         $fullHeaders = implode("\n", $headers);
 
         if (self::$mailTransport !== null) {
-            call_user_func(self::$mailTransport, $email, $subject, $fullBody, $fullHeaders);
-            return;
+            return call_user_func(self::$mailTransport, $email, $subject, $fullBody, $fullHeaders) !== false;
         }
-        Mailer::send($email, $subject, $fullBody, $fullHeaders);
+        return (bool) Mailer::send($email, $subject, $fullBody, $fullHeaders);
     }
 
     /**
@@ -393,7 +401,7 @@ class Alert
             return self::markdownFenceSafe($v);
         });
 
-        self::http(array(
+        $ok = self::http(array(
             'channel' => 'telegram',
             'method'  => 'POST',
             'url'     => "https://api.telegram.org/bot{$bottoken}/sendMessage",
@@ -403,7 +411,7 @@ class Alert
         ));
 
         if (!empty($report['screenshotBase'])) {
-            self::http(array(
+            $photoOk = self::http(array(
                 'channel'   => 'telegram-photo',
                 'method'    => 'POST',
                 'url'       => "https://api.telegram.org/bot{$bottoken}/sendPhoto",
@@ -415,7 +423,10 @@ class Alert
                 'headers'   => array('Content-type: multipart/form-data'),
                 'curl'      => array(CURLOPT_PROTOCOLS => CURLPROTO_HTTPS),
             ));
+            $ok = $ok && $photoOk;
         }
+
+        return $ok;
     }
 
     /**
@@ -430,7 +441,7 @@ class Alert
             return self::markdownFenceSafe($v);
         });
 
-        self::http(array(
+        return self::http(array(
             'channel' => 'slack',
             'method'  => 'POST',
             'url'     => $webhookUrl,
@@ -481,19 +492,19 @@ class Alert
             $request['fields'] = array('payload_json' => $message);
         }
 
-        self::http($request);
+        return self::http($request);
     }
 
     /**
      * Dispatch an HTTP request through the transport seam or curl.
      *
      * @param array $request
+     * @return bool
      */
     private static function http(array $request)
     {
         if (self::$httpTransport !== null) {
-            call_user_func(self::$httpTransport, $request);
-            return;
+            return call_user_func(self::$httpTransport, $request) !== false;
         }
 
         $ch = curl_init($request['url']);
@@ -520,8 +531,14 @@ class Alert
             curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
         }
 
-        curl_exec($ch);
+        $body = curl_exec($ch);
+        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+        $ok = $body !== false && $code >= 200 && $code < 300;
+        if (!$ok) {
+            Log::event('alerts', 0, 'Alert delivery failed via ' . $request['channel'] . ' (HTTP ' . $code . ')', USER_IP);
+        }
+        return $ok;
     }
 
     /**
@@ -557,7 +574,10 @@ class Alert
         try {
             $fn();
         } catch (Throwable $e) {
-
+            try {
+                Log::event('alerts', 0, 'Alert delivery error: ' . get_class($e), USER_IP);
+            } catch (Throwable $logError) {
+            }
         }
     }
 }

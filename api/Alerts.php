@@ -153,6 +153,7 @@ class AlertsController extends Controller
     public function doTest()
     {
         $sent = array();
+        $failed = array();
         $report = Alert::sampleReport();
         $methods = array(
             Alert::METHOD_MAIL     => 'alert-mail',
@@ -166,16 +167,28 @@ class AlertsController extends Controller
                 continue;
             }
             foreach (AlertConfig::ownRecipientsFor($methodId, Auth::id()) as $row) {
-                Alert::sendOne($methodId, $row, $report);
-                $sent[] = AlertConfig::methodName($methodId);
+                if (Alert::sendOne($methodId, $row, $report)) {
+                    $sent[] = AlertConfig::methodName($methodId);
+                } else {
+                    $failed[] = AlertConfig::methodName($methodId);
+                }
             }
         }
 
+        $sent = array_values(array_unique($sent));
+        $failed = array_values(array_unique($failed));
+        if (empty($sent) && empty($failed)) {
+            $message = 'No enabled destinations to test. Enable a method and configure a destination first.';
+        } elseif (!empty($failed)) {
+            $message = 'Test alert failed for: ' . implode(', ', $failed) . '.';
+        } else {
+            $message = 'Test alert dispatched to your enabled destinations.';
+        }
+
         return array(
-            'sent'    => array_values(array_unique($sent)),
-            'message' => empty($sent)
-                ? 'No enabled destinations to test. Enable a method and configure a destination first.'
-                : 'Test alert dispatched to your enabled destinations.',
+            'sent'    => $sent,
+            'failed'  => $failed,
+            'message' => $message,
         );
     }
 

@@ -127,7 +127,7 @@ window.EZ = window.EZ || {};
     btn.disabled = true;
     EZ.api.post("/alerts/test", {}).then(function (res) {
       var d = res.data || {};
-      EZ.ui.toast(d.message || "Test alert dispatched.", (d.sent && d.sent.length) ? "success" : "info");
+      EZ.ui.toast(d.message || "Test alert dispatched.", (d.failed && d.failed.length) ? "error" : ((d.sent && d.sent.length) ? "success" : "info"));
     }).catch(function () {  })
       .then(function () { btn.disabled = false; });
   }
