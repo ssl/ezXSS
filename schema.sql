@@ -130,7 +130,6 @@ CREATE TABLE IF NOT EXISTS `report_shares` (
     `slug`            VARCHAR(32) NOT NULL,
     `report_id`       INT UNSIGNED NOT NULL,
     `allowed_columns` JSON DEFAULT NULL,
-    `obfuscate_ip`    TINYINT(1) NOT NULL DEFAULT 0,
     `expires_at`      DATETIME DEFAULT NULL,
     `created_at`      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),

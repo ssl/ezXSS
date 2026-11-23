@@ -975,29 +975,4 @@ class Report extends Model
 
         return false;
     }
-
-    /**
-     * Mask an IP: IPv4 keeps the first octet (203.0.113.9 -> 203.0.0.0), IPv6.
-     *
-     * @param string $ip
-     * @return string
-     */
-    public static function obfuscateIp($ip)
-    {
-        $ip = (string) $ip;
-        if ($ip === '') {
-            return '';
-        }
-        if (strpos($ip, ':') !== false) {
-
-            $first = explode(':', $ip, 2);
-            $head = $first[0] !== '' ? $first[0] : '0';
-            return $head . '::';
-        }
-        if (strpos($ip, '.') !== false) {
-            $parts = explode('.', $ip);
-            return $parts[0] . '.0.0.0';
-        }
-        return '0.0.0.0';
-    }
 }

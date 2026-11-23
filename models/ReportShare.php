@@ -15,11 +15,10 @@ class ReportShare extends Model
      *
      * @param int $reportId
      * @param array $columns
-     * @param bool $obfuscateIp
      * @param int $expiresTs
      * @return array
      */
-    public static function createShare($reportId, array $columns, $obfuscateIp, $expiresTs = null)
+    public static function createShare($reportId, array $columns, $expiresTs = null)
     {
         $slug = self::mintSlug();
         $expiresAt = ($expiresTs !== null) ? gmdate('Y-m-d H:i:s', (int) $expiresTs) : null;
@@ -28,7 +27,6 @@ class ReportShare extends Model
             'slug'            => $slug,
             'report_id'       => (int) $reportId,
             'allowed_columns' => json_encode(array_values($columns)),
-            'obfuscate_ip'    => $obfuscateIp ? 1 : 0,
             'expires_at'      => $expiresAt,
         ));
 
@@ -36,7 +34,6 @@ class ReportShare extends Model
             'slug'            => $slug,
             'report_id'       => (int) $reportId,
             'allowed_columns' => array_values($columns),
-            'obfuscate_ip'    => $obfuscateIp ? 1 : 0,
             'expires_at'      => $expiresAt,
         );
     }
@@ -154,7 +151,6 @@ class ReportShare extends Model
             'slug'            => $row['slug'],
             'report_id'       => (int) $row['report_id'],
             'allowed_columns' => self::columnsOf($row),
-            'obfuscate_ip'    => (int) $row['obfuscate_ip'],
             'expires_at'      => $row['expires_at'],
             'created_at'      => isset($row['created_at']) ? $row['created_at'] : null,
         );

@@ -36,9 +36,7 @@ class SharedController extends Controller
         }
 
         $allowed = ReportShare::columnsOf($share);
-        $obfuscate = (int) $share['obfuscate_ip'] === 1;
-
-        $out = self::buildProjection($allowed, $values, $obfuscate, $slug);
+        $out = self::buildProjection($allowed, $values, $slug);
 
         $this->respond(array(
             'columns' => array_keys($out),
@@ -51,9 +49,8 @@ class SharedController extends Controller
      *
      * @param array $allowed
      * @param array $values
-     * @param bool $obfuscate
      */
-    public static function buildProjection(array $allowed, array $values, $obfuscate, $slug = null)
+    public static function buildProjection(array $allowed, array $values, $slug = null)
     {
         $out = array();
         $extraAll = false;
@@ -78,9 +75,7 @@ class SharedController extends Controller
 
             $value = $values[$col];
 
-            if ($col === 'ip' && $obfuscate) {
-                $value = Report::obfuscateIp((string) $value);
-            } elseif ($col === 'screenshot') {
+            if ($col === 'screenshot') {
                 if ($slug !== null && Compression::isStoredScreenshotFile((string) $value)) {
                     $value = array('type' => 'file', 'url' => '/s/' . $slug . '.png');
                 } else {

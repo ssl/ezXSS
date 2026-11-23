@@ -323,8 +323,7 @@ class ReportsController extends Controller
 
         $expiresTs = $this->parseExpiry(isset($body['expires_at']) ? $body['expires_at'] : null);
 
-        $obfuscate = !empty($body['obfuscate_ip']);
-        $share = ReportShare::createShare($id, $columns, $obfuscate, $expiresTs);
+        $share = ReportShare::createShare($id, $columns, $expiresTs);
         $share['url'] = $this->publicShareUrl($share['slug']);
 
         Log::event('reports', Auth::id(), 'Shared report #' . $id, USER_IP);
