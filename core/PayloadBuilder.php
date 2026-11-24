@@ -87,7 +87,7 @@ class PayloadBuilder
         }
 
         $persistentCode = $persistent ? self::load('persist') : '';
-        $screenshotCode = (isset($collect['screenshot']) && $collect['screenshot']) ? self::load('screenshot') : '';
+        $screenshotCode = (isset($collect['screenshot']) && $collect['screenshot'] && self::uaSupportsScreenshot()) ? self::load('screenshot') : '';
 
         $beaconCode = $beacon ? self::load('beacon') : '';
 
@@ -152,6 +152,23 @@ class PayloadBuilder
             $content = str_replace('{{' . $key . '}}', self::jsEscape($value), $content);
         }
         return $content;
+    }
+
+    /**
+     * Whether the browser can run the html2canvas screenshot bundle (false for IE 8 and older).
+     *
+     * @return bool
+     */
+    private static function uaSupportsScreenshot()
+    {
+        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? (string) $_SERVER['HTTP_USER_AGENT'] : '';
+        if ($ua === '') {
+            return true;
+        }
+        if (preg_match('/MSIE [1-8]\.0/', $ua) && !preg_match('#Trident/[5-9]#', $ua)) {
+            return false;
+        }
+        return true;
     }
 
     /**
