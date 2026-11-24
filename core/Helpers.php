@@ -186,3 +186,15 @@ function utf8Cut($value, $bytes)
     }
     return substr($value, 0, $bytes);
 }
+
+/**
+ * Make a string valid UTF-8 and cut it to at most $bytes bytes.
+ *
+ * @param mixed $value
+ * @param int $bytes
+ * @return string
+ */
+function utf8CleanCut($value, $bytes)
+{
+    return utf8Cut(utf8Clean($value), $bytes);
+}

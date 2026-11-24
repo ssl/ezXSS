@@ -80,13 +80,13 @@ class Report extends Model
      */
     public static function add(array $fields)
     {
-        $payload   = isset($fields['payload']) ? (string) $fields['payload'] : '';
-        $uri       = utf8Clean(isset($fields['uri']) ? $fields['uri'] : '');
-        $ip        = utf8Clean(isset($fields['ip']) ? $fields['ip'] : '');
-        $referer   = utf8Clean(isset($fields['referer']) ? $fields['referer'] : '');
-        $useragent = utf8Clean(isset($fields['useragent']) ? $fields['useragent'] : '');
-        $cookies   = utf8Clean(isset($fields['cookies']) ? $fields['cookies'] : '');
-        $origin    = utf8Clean(isset($fields['origin']) ? $fields['origin'] : '');
+        $payload   = (string) ($fields['payload'] ?? '');
+        $uri       = utf8Clean($fields['uri'] ?? '');
+        $ip        = utf8Clean($fields['ip'] ?? '');
+        $referer   = utf8Clean($fields['referer'] ?? '');
+        $useragent = utf8Clean($fields['useragent'] ?? '');
+        $cookies   = utf8Clean($fields['cookies'] ?? '');
+        $origin    = utf8Clean($fields['origin'] ?? '');
         $createdAt = isset($fields['created_at']) ? (int) $fields['created_at'] : time();
 
         $meta = (isset($fields['meta']) && (is_array($fields['meta']) || is_object($fields['meta'])))
@@ -97,11 +97,11 @@ class Report extends Model
             $meta = null;
         }
 
-        $dom            = utf8Clean(isset($fields['dom']) ? $fields['dom'] : '');
-        $screenshot     = utf8Clean(isset($fields['screenshot']) ? $fields['screenshot'] : '');
-        $localStorage   = utf8Clean(isset($fields['localstorage']) ? $fields['localstorage'] : '');
-        $sessionStorage = utf8Clean(isset($fields['sessionstorage']) ? $fields['sessionstorage'] : '');
-        $extra          = utf8Clean(isset($fields['extra']) ? $fields['extra'] : '');
+        $dom            = utf8Clean($fields['dom'] ?? '');
+        $screenshot     = utf8Clean($fields['screenshot'] ?? '');
+        $localStorage   = utf8Clean($fields['localstorage'] ?? '');
+        $sessionStorage = utf8Clean($fields['sessionstorage'] ?? '');
+        $extra          = utf8Clean($fields['extra'] ?? '');
 
         $compressed = 0;
         if (Compression::enabled()) {

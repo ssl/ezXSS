@@ -97,7 +97,7 @@ class Session extends Model
     {
         $now = time();
 
-        $clientId = utf8Cut(utf8Clean(isset($data->clientid) ? $data->clientid : ''), self::LIMIT_CLIENT);
+        $clientId = utf8CleanCut($data->clientid ?? '', self::LIMIT_CLIENT);
         if ($clientId === '' || !self::clientExists($clientId)) {
             $clientId = self::generateClientId();
         }
@@ -105,22 +105,22 @@ class Session extends Model
 
         $sessionId = (int) self::query()->insert(array(
             'client_id'  => $clientId,
-            'payload'    => utf8Cut(utf8Clean(self::normalizePayloadIdentifier(isset($data->payload) ? $data->payload : '')), self::LIMIT_PAYLOAD),
-            'uri'        => utf8Cut(utf8Clean(isset($data->uri) ? $data->uri : ''), self::LIMIT_URI),
-            'ip'         => utf8Cut(utf8Clean(isset($data->ip) ? $data->ip : ''), self::LIMIT_IP),
-            'referer'    => utf8Cut(utf8Clean(isset($data->referer) ? $data->referer : ''), self::LIMIT_REFERER),
-            'useragent'  => utf8Cut(utf8Clean(isset($data->useragent) ? $data->useragent : ''), self::LIMIT_USERAGENT),
-            'cookies'    => utf8Cut(utf8Clean(isset($data->cookies) ? $data->cookies : ''), self::LIMIT_COOKIES),
-            'origin'     => utf8Cut(utf8Clean(isset($data->origin) ? $data->origin : ''), self::LIMIT_ORIGIN),
+            'payload'    => utf8CleanCut(self::normalizePayloadIdentifier($data->payload ?? ''), self::LIMIT_PAYLOAD),
+            'uri'        => utf8CleanCut($data->uri ?? '', self::LIMIT_URI),
+            'ip'         => utf8CleanCut($data->ip ?? '', self::LIMIT_IP),
+            'referer'    => utf8CleanCut($data->referer ?? '', self::LIMIT_REFERER),
+            'useragent'  => utf8CleanCut($data->useragent ?? '', self::LIMIT_USERAGENT),
+            'cookies'    => utf8CleanCut($data->cookies ?? '', self::LIMIT_COOKIES),
+            'origin'     => utf8CleanCut($data->origin ?? '', self::LIMIT_ORIGIN),
             'archive'    => 0,
             'created_at' => $now,
             'updated_at' => $now,
         ));
 
-        $dom = (string) (isset($data->dom) ? $data->dom : '');
-        $localStorage = json_encode(isset($data->localstorage) ? $data->localstorage : '');
-        $sessionStorage = json_encode(isset($data->sessionstorage) ? $data->sessionstorage : '');
-        $console = (string) (isset($data->console) ? $data->console : '');
+        $dom = utf8Clean($data->dom ?? '');
+        $localStorage = json_encode($data->localstorage ?? '');
+        $sessionStorage = json_encode($data->sessionstorage ?? '');
+        $console = utf8Clean($data->console ?? '');
 
         $compressed = 0;
         if (Compression::enabled()) {
@@ -212,8 +212,9 @@ class Session extends Model
 
         self::query()->where('id', $sessionId)->update(array('updated_at' => time()));
 
+        $console = utf8Clean($console);
         $enabled = Compression::enabled();
-        $stored = $enabled ? Compression::pack($console) : (string) $console;
+        $stored = $enabled ? Compression::pack($console) : $console;
 
         self::query()->from(self::TABLE_DATA)
             ->where('session_id', $sessionId)

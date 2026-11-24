@@ -150,7 +150,7 @@ class BeaconController
         );
         foreach ($limits as $key => $max) {
             if (isset($obj[$key]) && is_string($obj[$key]) && $obj[$key] !== '') {
-                $out[$key] = utf8Cut(utf8Clean($obj[$key]), $max);
+                $out[$key] = utf8CleanCut($obj[$key], $max);
             }
         }
         return empty($out) ? null : $out;

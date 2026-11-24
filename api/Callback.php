@@ -386,7 +386,7 @@ class CallbackController extends Controller
         $ip = isset($data->ip) && $data->ip !== ''
             ? $data->ip
             : (isset($server['REMOTE_ADDR']) ? $server['REMOTE_ADDR'] : '');
-        $data->ip = utf8Cut(utf8Clean($ip), self::LIMIT_IP);
+        $data->ip = utf8CleanCut($ip, self::LIMIT_IP);
 
         if (!isset($data->uri) || $data->uri === '') {
             $data->uri = isset($server['HTTP_REFERER']) ? $server['HTTP_REFERER']
@@ -400,14 +400,14 @@ class CallbackController extends Controller
             $origin = isset($parsed['host']) ? $parsed['host'] : '';
         }
 
-        $data->uri = utf8Cut(utf8Clean($data->uri), self::LIMIT_URI);
-        $data->referer = utf8Cut(utf8Clean(isset($data->referer) ? $data->referer : ''), self::LIMIT_REFERER);
-        $data->origin = utf8Cut(utf8Clean($origin), self::LIMIT_ORIGIN);
-        $data->payload = utf8Cut(utf8Clean(isset($data->payload) ? $data->payload : ''), self::LIMIT_PAYLOAD);
+        $data->uri = utf8CleanCut($data->uri, self::LIMIT_URI);
+        $data->referer = utf8CleanCut($data->referer ?? '', self::LIMIT_REFERER);
+        $data->origin = utf8CleanCut($origin, self::LIMIT_ORIGIN);
+        $data->payload = utf8CleanCut($data->payload ?? '', self::LIMIT_PAYLOAD);
 
         $ua = isset($data->{'user-agent'}) ? $data->{'user-agent'}
             : (isset($server['HTTP_USER_AGENT']) ? $server['HTTP_USER_AGENT'] : '');
-        $data->useragent = utf8Cut(utf8Clean($ua), self::LIMIT_USERAGENT);
+        $data->useragent = utf8CleanCut($ua, self::LIMIT_USERAGENT);
 
         $extra = isset($data->extra) ? $data->extra : '';
         if (is_array($extra) || is_object($extra)) {
