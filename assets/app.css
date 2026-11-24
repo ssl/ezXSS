@@ -412,7 +412,7 @@ html.is-booting .auth, html.is-booting .app { display: none !important; }
 .themeswitch button + button { border-left: 1px solid var(--color-border); }
 .themeswitch button:hover { color: var(--color-text); background: var(--color-surface-2); }
 .themeswitch button[aria-pressed="true"] { background: var(--color-accent); color: var(--color-text-on-accent); }
-.main { flex: 1; width: 100%; max-width: 1220px; margin: 0 auto; padding: var(--space-xl) var(--space-2xl) var(--space-3xl); }
+.main { flex: 1; width: 100%; max-width: 1220px; margin: 0 auto; padding: 0 var(--space-2xl) var(--space-3xl); }
 .screen { display: none; animation: screenfade var(--dur-slow) var(--ease-out); }
 .screen.is-active { display: block; }
 @keyframes screenfade { from { opacity: 0; } to { opacity: 1; } }
