@@ -502,7 +502,7 @@ window.EZ = window.EZ || {};
       return bo + "<a href=\"#\" ping=" + val + ">link</a>" + tail;
     }
     if (t.special === "form") {
-      return bo + "<form action=\"//" + dd + "\" method=\"get\"><input type=\"hidden\" name=\"nj\" value=\"" + t.char + "\"><button type=\"submit\">Send</button></form>" + tail;
+      return bo + "<form action=\"//" + dd + (dd.indexOf("/") === -1 ? "/" : "") + "*" + t.char + "\" method=\"get\"><button type=\"submit\">Send</button></form>" + tail;
     }
     var sep = o.noSpaces ? "/" : " ";
     var head = [t.el[0]].concat(t.el.slice(2)).join(sep);
