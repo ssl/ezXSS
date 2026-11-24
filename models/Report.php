@@ -92,6 +92,10 @@ class Report extends Model
         $meta = (isset($fields['meta']) && (is_array($fields['meta']) || is_object($fields['meta'])))
             ? json_encode($fields['meta'], defined('JSON_INVALID_UTF8_SUBSTITUTE') ? JSON_INVALID_UTF8_SUBSTITUTE : 0)
             : null;
+        // meta is nullable: fall back to NULL on a failed encode so the light row still inserts.
+        if ($meta === false) {
+            $meta = null;
+        }
 
         $dom            = utf8Clean(isset($fields['dom']) ? $fields['dom'] : '');
         $screenshot     = utf8Clean(isset($fields['screenshot']) ? $fields['screenshot'] : '');
