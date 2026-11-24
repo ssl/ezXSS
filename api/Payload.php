@@ -18,9 +18,13 @@ class PayloadController extends Controller
             exit;
         }
 
-        if (isset($_GET['nj'])) {
-            $this->serveNojsProbe();
-            exit;
+        if (substr(URI, -2, 1) === '*') {
+            $map = self::nojsMap();
+            $njCode = substr(URI, -1);
+            if (isset($map[$njCode])) {
+                $this->serveNojsProbe($njCode);
+                exit;
+            }
         }
 
         $this->sendHeaders();
@@ -96,12 +100,11 @@ class PayloadController extends Controller
     }
 
     /**
-     * Serve a no-JS CSP probe (/{payload}?nj=<char>). The payload.
+     * Serve a no-JS CSP probe (/{payload}*<char>). The payload.
      */
-    private function serveNojsProbe()
+    private function serveNojsProbe($code)
     {
         $map = self::nojsMap();
-        $code = (string) queryParam('nj');
         $entry = isset($map[$code]) ? $map[$code] : $map['i'];
 
         $identifier = HOST . (URI === '' ? '' : '/' . URI);

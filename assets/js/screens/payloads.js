@@ -488,7 +488,7 @@ window.EZ = window.EZ || {};
   function buildNojsSnippet(key, o, d) {
     var t = NOJS_BY_KEY[key] || NOJS_TYPES[0];
     var dd = o.shortboost ? shortboostDomain(d) : d;
-    var url = "//" + dd + "?nj=" + t.char;
+    var url = "//" + dd + (dd.indexOf("/") === -1 ? "/" : "") + "*" + t.char;
     var bo = o.breakout ? "\">" : "";
     var tail = (o.breakout && o.openTag) ? "<x=\"" : "";
     if (t.special === "font") {
