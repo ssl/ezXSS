@@ -22,6 +22,7 @@ Once an ezXSS payload is placed, the user must wait until it is triggered, at wh
 * Custom extra javascript payloads
 * Custom payload links to distinguish insert points
 * Extract additional paths, automatic (recursive) spider, block, whitelist and more filters
+* No-JS CSP beacons that still catch a blocked hit and reveal which CSP directives are allowed
 * Extensions that can add or edit ezXSS payload functions (check out [ezXSS-extensions](https://github.com/ssl/ezXSS-extensions))
 * Secure your login with Two-factor (2FA)
 * Every function behind a JSON API
