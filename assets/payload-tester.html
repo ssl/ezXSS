@@ -22,7 +22,7 @@
     <h1 class="title">ezXSS Payload Tester</h1>
 
     <a href="#" onclick="window.location.reload(true); return false;">Reload page</a>
-    <a href="#" onclick="window.location.href = location.pathname; return false;">Payload URL</a>
+    <a href="#" onclick="window.location.href = location.pathname.replace(/\*test$/, ''); return false;">Payload URL</a>
     <a href="/manage/payloads">Manage payloads</a>
 
     <p>This page fires the ezXSS payload for its own path.</p>
@@ -72,7 +72,7 @@
             try { localStorage.setItem("localStorageTester", Date.now()); } catch (t) {}
             try { document.cookie = "CookieTester=" + Date.now(); } catch (t) {}
 
-            var payloadUrl = (location.protocol + "//" + location.host + location.pathname)
+            var payloadUrl = (location.protocol + "//" + location.host + location.pathname.replace(/\*test$/, ""))
                 .replace(/["'<>\\]/g, "");
             var s = document.createElement("script");
             s.src = payloadUrl;

@@ -13,7 +13,7 @@ class PayloadController extends Controller
     {
         Security::corsOpen();
 
-        if (isset($_GET['_eztest'])) {
+        if (URI !== '' && substr(URI, -5) === '*test') {
             $this->serveTester();
             exit;
         }
@@ -53,7 +53,7 @@ class PayloadController extends Controller
     }
 
     /**
-     * Serve the payload-tester HTML page (reached via /{payload}?_eztest). The page.
+     * Serve the payload-tester HTML page (reached via /{payload}*test). The page.
      */
     private function serveTester()
     {

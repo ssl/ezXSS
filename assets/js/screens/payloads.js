@@ -517,7 +517,7 @@ window.EZ = window.EZ || {};
 
   function copyCard(p) {
     var d = p.identifier;
-    var testerUrl = "//" + d + "?_eztest";
+    var testerUrl = "//" + d + (d.indexOf("/") === -1 ? "/" : "") + "*test";
     var jsBtns = PB_TYPES.map(function (t, i) {
       return '<button type="button" data-pb-type="' + t.key + '" data-pb-mode="js" aria-pressed="' + (i === 0 ? "true" : "false") + '">' + t.label + "</button>";
     }).join("");
