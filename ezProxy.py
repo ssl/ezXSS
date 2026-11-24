@@ -4,6 +4,7 @@ import asyncio
 import base64
 import hashlib
 import hmac
+import http.client
 import json
 import logging
 import os
@@ -28,7 +29,7 @@ BANNER = """
                               ████     █████  █████████      █████████
                               ██████ ███████ ████   █████  █████   █████
   ███████████  ██████████████   ██████████   ████          █████
- ████     ████       ██████       ██████      ██████████     ██████████     ezProxy v3.0
+ ████     ████       ██████       ██████      ██████████     ██████████     ezProxy v5.0
  █████████████     ██████       ██████████            ████           ████   github.com/ssl/ezXSS
  ████            ███████      ██████ ███████ ████     ████ █████     ████
    ██████████  ██████████████ ████     █████  ███████████    ██████████     made with <3
@@ -47,6 +48,13 @@ connected_clients = {}
 passed_origins = {}
 pending_requests = {}
 pending_by_client = {}
+
+
+def _logsafe(value, limit=100):
+    """Strip control characters from an untrusted value before it is printed or logged."""
+    text = str(value)
+    cleaned = "".join(ch for ch in text if ch >= " " and ch != "\x7f")
+    return cleaned[:limit]
 
 
 class WebSocketError(Exception):
@@ -249,8 +257,8 @@ async def handle_websocket(reader, writer):
                     _purge_pending(client_id)
 
                 connected_clients[client_id] = ws
-                print("\n[!] Client connected with client ID: %s" % client_id)
-                print("[!] Origin: %s" % data.get("origin", "unknown"))
+                print("\n[!] Client connected with client ID: %s" % _logsafe(client_id))
+                print("[!] Origin: %s" % _logsafe(data.get("origin", "unknown")))
 
                 if str(data.get("pass", "")).lower() in ("true", "1", "yes", "on"):
                     origin = data.get("origin")
@@ -258,14 +266,14 @@ async def handle_websocket(reader, writer):
                         held = passed_origins.get(origin)
                         if held and held != client_id and held in connected_clients:
                             logger.warning(
-                                "Refusing to remap live origin %s (held by %s)", origin, held
+                                "Refusing to remap live origin %s (held by %s)", _logsafe(origin), _logsafe(held)
                             )
-                            print("[>] Accessible on http://%s.ezxss" % client_id)
+                            print("[>] Accessible on http://%s.ezxss" % _logsafe(client_id))
                         else:
-                            print("[>] Accessible on http://%s.ezxss and http://%s" % (client_id, origin))
+                            print("[>] Accessible on http://%s.ezxss and http://%s" % (_logsafe(client_id), _logsafe(origin)))
                             passed_origins[origin] = client_id
                 else:
-                    print("[>] Accessible on http://%s.ezxss" % client_id)
+                    print("[>] Accessible on http://%s.ezxss" % _logsafe(client_id))
             else:
                 if "body" in data:
                     if client_id not in connected_clients:
@@ -389,6 +397,7 @@ async def handle_proxy(reader, writer, cfg):
         domain = parsed.netloc
         content_type = "text/html; charset=utf-8"
         response_headers = {}
+        status_code = 200
         response_body = b"You can not browse the internet while on the ezXSS proxy."
 
         if cfg.use_login:
@@ -460,6 +469,12 @@ async def handle_proxy(reader, writer, cfg):
                             response_headers = data["headers"]
                             if "content-type" in response_headers:
                                 content_type = response_headers["content-type"]
+                        try:
+                            status_code = int(data.get("statusCode", 200) or 200)
+                        except (TypeError, ValueError):
+                            status_code = 200
+                        if status_code < 100 or status_code > 599:
+                            status_code = 200
                         received = True
                         logger.info(
                             "Response received for %s (%s bytes, upstream status %s)",
@@ -479,8 +494,10 @@ async def handle_proxy(reader, writer, cfg):
                 if received and client_response is not None:
                     response_body = client_response
                 else:
+                    status_code = 504
                     response_body = ("No response received for %s within %s seconds" % (full_uri, REQUEST_TIMEOUT)).encode("utf-8")
             else:
+                status_code = 502
                 response_body = ('No connected client found with client ID "%s"' % client_id).encode("utf-8")
 
         if not isinstance(response_body, bytes):
@@ -497,7 +514,8 @@ async def handle_proxy(reader, writer, cfg):
             "connection", "keep-alive", "proxy-authenticate",
             "proxy-authorization", "te", "trailer", "upgrade",
         )
-        head = ["HTTP/1.1 200 OK"]
+        reason = http.client.responses.get(status_code, "")
+        head = ["HTTP/1.1 %d %s" % (status_code, reason)]
         for name, value in response_headers.items():
             if str(name).lower() in hop_by_hop:
                 continue
