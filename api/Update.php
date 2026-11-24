@@ -105,7 +105,7 @@ class UpdateController extends Controller
     }
 
     /**
-     * Standard 5.0 update: apply pending migrations + bump the stored version. Like.
+     * Standard 5.0 update: apply pending migrations + bump the stored version.
      *
      * @throws HttpException
      */

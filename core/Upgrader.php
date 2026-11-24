@@ -2,9 +2,14 @@
 class Upgrader
 {
     /**
-     * The migrations-table marker that makes a completed upgrade a no-op.
+     * migrations-table id for the one-time legacy-to-5.0 migration; its presence makes it a no-op.
      */
-    const MARKER = 'upgrade_4.3_to_5.0';
+    const MARKER = 'upgrade_to_5.0';
+
+    /**
+     * Pre-release name of MARKER, still recognised so an already-upgraded install is not re-run.
+     */
+    const MARKER_LEGACY = 'upgrade_4.3_to_5.0';
 
     /**
      * Legacy numeric rank that maps to the 5.0 admin role (all others -> user).
@@ -26,7 +31,10 @@ class Upgrader
                 return true;
             }
             $version = self::rawSetting('version');
-            if ($version !== null && strpos((string) $version, '4') === 0) {
+            if ($version !== null && preg_match('/^[1234]\./', (string) $version)) {
+                return true;
+            }
+            if (self::tableExists('reports') && !self::tableExists('payloads')) {
                 return true;
             }
         } catch (Throwable $e) {
@@ -93,8 +101,8 @@ class Upgrader
     {
         try {
             $db = Database::getInstance();
-            $stmt = $db->prepare("SELECT COUNT(*) FROM `migrations` WHERE `filename` = ?");
-            $stmt->execute(array(self::MARKER));
+            $stmt = $db->prepare("SELECT COUNT(*) FROM `migrations` WHERE `filename` IN (?, ?)");
+            $stmt->execute(array(self::MARKER, self::MARKER_LEGACY));
             return (int) $stmt->fetchColumn() > 0;
         } catch (Throwable $e) {
             return false;
@@ -144,6 +152,64 @@ class Upgrader
             return self::tableExists('sessions_data') ? '4.2' : '4.1';
         }
         return '4.0';
+    }
+
+    /**
+     * Normalise a pre-4.0 reports/settings to InnoDB/utf8mb4, add payload/archive, dedupe settings.
+     *
+     * @param object $db
+     */
+    private static function prepareLegacyPreV4($db)
+    {
+        foreach (array('reports', 'settings') as $table) {
+            if (!self::tableExists($table)) {
+                continue;
+            }
+            $db->exec("ALTER TABLE `{$table}` ENGINE=InnoDB");
+            // Pre-4.0 stored UTF-8 in latin1 columns; relabel via binary so CONVERT won't mojibake it.
+            $db->exec("ALTER TABLE `{$table}` CONVERT TO CHARACTER SET binary");
+            $db->exec("ALTER TABLE `{$table}` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        }
+        if (self::tableExists('reports')) {
+            if (!self::columnExists('reports', 'payload')) {
+                $db->exec("ALTER TABLE `reports` ADD COLUMN `payload` VARCHAR(255) DEFAULT NULL");
+            }
+            if (!self::columnExists('reports', 'archive')) {
+                $db->exec("ALTER TABLE `reports` ADD COLUMN `archive` TINYINT(1) NOT NULL DEFAULT 0");
+            }
+        }
+        if (self::tableExists('settings')) {
+            if (self::columnExists('settings', 'value')) {
+                $db->exec("ALTER TABLE `settings` MODIFY `value` TEXT NOT NULL");
+            }
+            $db->exec(
+                "DELETE `s1` FROM `settings` `s1`
+                 INNER JOIN `settings` `s2`
+                 ON `s1`.`setting` = `s2`.`setting` AND `s1`.`id` > `s2`.`id`"
+            );
+        }
+    }
+
+    /**
+     * Create the single admin from a pre-4.0 install's password/username settings, then drop them.
+     *
+     * @param object $db
+     */
+    private static function createLegacyAdmin($db)
+    {
+        if ((int) $db->query("SELECT COUNT(*) FROM `users`")->fetchColumn() > 0) {
+            return;
+        }
+        $password = self::rawSetting('password');
+        if ($password === null || $password === '') {
+            return;
+        }
+        $username = self::rawSetting('username');
+        $username = ($username !== null && trim($username) !== '') ? substr(trim($username), 0, 25) : 'admin';
+
+        $stmt = $db->prepare("INSERT INTO `users` (`username`, `password`, `role`) VALUES (?, ?, 'admin')");
+        $stmt->execute(array($username, $password));
+        $db->exec("DELETE FROM `settings` WHERE `setting` IN ('password', 'username')");
     }
 
     /**
@@ -321,8 +387,7 @@ class Upgrader
     }
 
     /**
-     * Run the idempotent in-place upgrade and return a summary. Triggered by the manual updater
-     * (POST /api/update). 3.x and lower are refused; a 4.x database is migrated to 5.0.
+     * Run the idempotent in-place upgrade of any 1.x-4.x database to 5.0 (manual /api/update).
      *
      * @throws Exception
      * @return array
@@ -343,13 +408,15 @@ class Upgrader
 
         $legacy = self::isLegacy();
         $legacyVersion = null;
+        $preV4 = false;
         if ($legacy) {
-            $stored = self::rawSetting('version');
-            if ($stored === null || strpos($stored, '4.') !== 0) {
-                throw new Exception('Upgrading to 5.0 is only supported from 4.x, found: ' . ($stored === null ? 'no version' : $stored));
-            }
+            // Pre-4.0 (1.x-3.x): no payloads table yet, so only reports and settings survive.
+            $preV4 = !self::tableExists('payloads');
             $legacyVersion = self::detectLegacyVersion();
             self::assertLegacyDiskSpace();
+            if ($preV4) {
+                self::prepareLegacyPreV4($db);
+            }
         }
 
         $migrated = Migrator::run();
@@ -369,6 +436,10 @@ class Upgrader
         self::transformExtensions($db);
         self::transformAlerts($db);
         self::transformSettings($db);
+
+        if ($preV4) {
+            self::createLegacyAdmin($db);
+        }
 
         $ins = $db->prepare("INSERT IGNORE INTO `settings` (`setting`, `value`) VALUES (?, ?)");
         foreach (InstallController::defaultSettings() as $setting => $value) {
@@ -520,7 +591,8 @@ class Upgrader
     }
 
     /**
-     * payloads (tiny): payload -> identifier; add the 5.0-only columns; a PHP
+     * payloads: payload -> identifier, add 5.0 columns, split pages/filters/collect, drop fallback.
+     *
      * @param object $db
      */
     private static function transformPayloads($db)
@@ -631,7 +703,8 @@ class Upgrader
     }
 
     /**
-     * users (tiny): add the 5.0-only columns; widen password; map rank -> role;
+     * users: add 5.0 columns, widen password, map rank -> role, ban rank 0, drop legacy columns.
+     *
      * @param object $db
      */
     private static function transformUsers($db)
@@ -726,7 +799,8 @@ class Upgrader
     }
 
     /**
-     * extensions: no column change (legacy 4.3 has no `fields`); normalize the
+     * extensions: normalize the enabled flag and ensure the lookup indexes.
+     *
      * @param object $db
      */
     private static function transformExtensions($db)
@@ -760,7 +834,8 @@ class Upgrader
     }
 
     /**
-     * settings: remap collect_user-agent -> collect_useragent, widen the setting
+     * settings: remap collect_user-agent, widen the setting column, add the unique key.
+     *
      * @param object $db
      */
     private static function transformSettings($db)
