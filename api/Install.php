@@ -23,7 +23,7 @@ class InstallController extends Controller
         'duplicate_columns'    => 'cookies,origin,referer,uri,useragent,dom,ip',
         'dom_threshold'        => '2097152',
 
-        'callback_max_body_kb' => '8192',
+        'callback_max_body_kb' => '51200',
 
         'log_logins'           => '0',
         'log_reports'          => '0',

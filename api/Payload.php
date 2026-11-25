@@ -185,7 +185,7 @@ class PayloadController extends Controller
             'persistent' => false,
             'beacon'     => Setting::enabled('beacon_fallback'),
             'extensions' => $this->mergedExtensions(array()),
-            'max_body_kb' => (int) Setting::get('callback_max_body_kb', '8192'),
+            'max_body_kb' => (int) Setting::get('callback_max_body_kb', '51200'),
         );
     }
 
@@ -247,7 +247,7 @@ class PayloadController extends Controller
             'persistent' => $persistent,
             'beacon'     => $beacon,
             'extensions' => $this->mergedExtensions($row, $owner),
-            'max_body_kb' => (int) Setting::get('callback_max_body_kb', '8192'),
+            'max_body_kb' => (int) Setting::get('callback_max_body_kb', '51200'),
         );
     }
 

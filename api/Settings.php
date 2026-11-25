@@ -67,7 +67,7 @@ class SettingsController extends Controller
                 'collect'           => $collect,
                 'duplicate_columns' => Report::duplicateColumns(),
                 'dom_threshold'     => (int) Report::domThreshold(),
-                'callback_max_body_kb' => (int) Setting::get('callback_max_body_kb', '8192'),
+                'callback_max_body_kb' => (int) Setting::get('callback_max_body_kb', '51200'),
                 'dompart'           => (int) Setting::get('dompart', '0'),
                 'persistent'        => Setting::enabled('persistent'),
                 'spider'            => Setting::enabled('spider'),
@@ -99,8 +99,6 @@ class SettingsController extends Controller
             'available' => array(
                 'timezones' => timezone_identifiers_list(),
                 'themes'    => $this->availableThemes(),
-
-                'php_post_max_bytes' => $this->phpPostMaxBytes(),
             ),
         );
     }
@@ -283,26 +281,6 @@ class SettingsController extends Controller
             'message'     => 'ezXSS is now killed. The platform returns 404 to every request until unlocked.',
             'unlock_hint' => 'Visit any URL with ?pass=<your password> to clear the kill switch and resume serving.',
         );
-    }
-
-    /**
-     * PHP's post_max_size in bytes (0 = unlimited). Parses the ini shorthand.
-     *
-     * @return int
-     */
-    private function phpPostMaxBytes()
-    {
-        $raw = trim((string) ini_get('post_max_size'));
-        if ($raw === '') {
-            return 0;
-        }
-        $num = (int) $raw;
-        switch (strtolower(substr($raw, -1))) {
-            case 'g': $num *= 1024 * 1024 * 1024; break;
-            case 'm': $num *= 1024 * 1024; break;
-            case 'k': $num *= 1024; break;
-        }
-        return $num > 0 ? $num : 0;
     }
 
     /**

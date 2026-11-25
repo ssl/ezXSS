@@ -58,15 +58,7 @@ window.EZ = window.EZ || {};
       '<div class="formrow__field">' + fieldHTML + "</div></div>";
   }
 
-  function humanSize(bytes) {
-    bytes = Number(bytes) || 0;
-    if (bytes <= 0) { return "unlimited"; }
-    if (bytes >= 1048576) { return (Math.round(bytes / 1048576 * 10) / 10) + " MB"; }
-    if (bytes >= 1024) { return Math.round(bytes / 1024) + " KB"; }
-    return bytes + " B";
-  }
-
-  function renderApp(s, themes, phpMax) {
+  function renderApp(s, themes) {
     var p = tp("set-app");
     if (!p) { return; }
     var tz = s.timezone || "UTC";
@@ -130,7 +122,7 @@ window.EZ = window.EZ || {};
             '<option value="base64"' + (storeScreenshot === "base64" ? " selected" : "") + ">Store in database</option></select>") +
         formrow("Inline-DOM size limit", "DOMs larger than this are fetched on demand instead of shown inline (0 = always inline).",
           '<input class="input mono" type="number" min="0" data-field="dom_threshold" style="max-width:200px" value="' + util.escapeHtml(String(s.dom_threshold != null ? s.dom_threshold : 0)) + '">') +
-        formrow("Max callback size (KB)", "Reports larger than this split their DOM/screenshot into separate requests so a proxy body limit (e.g. Cloudflare) isn't hit (0 = never split). This server (PHP <code>post_max_size</code>) accepts up to <strong>" + humanSize(phpMax) + "</strong> per request.",
+        formrow("Max callback size (KB)", "Reports larger than this split their DOM/screenshot into separate requests so a request body limit isn't hit (0 = never split). Set it to whatever your server or proxy allows.",
           '<input class="input mono" type="number" min="0" data-field="callback_max_body_kb" style="max-width:200px" value="' + util.escapeHtml(String(s.callback_max_body_kb != null ? s.callback_max_body_kb : 0)) + '">', true) +
       "</div>";
 
@@ -666,7 +658,7 @@ window.EZ = window.EZ || {};
         window.__ezTimezones = (data.available && data.available.timezones) || [];
         var themes = (data.available && data.available.themes) || [];
         var s = data.settings || {};
-        renderApp(s, themes, (data.available && data.available.php_post_max_bytes) || 0);
+        renderApp(s, themes);
         renderPayload(s);
         if (EZ.alerts) { EZ.alerts.renderGlobal(tp("set-alerts"), { dompart: s.dompart }); }
         renderExtensions();
