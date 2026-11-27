@@ -1,0 +1,40 @@
+
+<div class="auth" id="auth">
+  <div class="auth__card">
+    <div class="auth__brand">
+      <svg class="brand__bug" viewBox="6.14 6.14 31 31" aria-hidden="true" focusable="false"><use href="#ezbug" x="6.14" y="6.14"/></svg>
+      <span class="brand__word"><span class="brand__ez">ez</span><span class="brand__xss">XSS</span><span class="brand__v">5</span></span>
+    </div>
+
+    <div class="auth__step is-active" data-step="register">
+      <h1 class="auth__title">Create an account</h1>
+      <p class="auth__sub">Sign up for access to this ezXSS instance.</p>
+      <form id="register-form" novalidate>
+        <div class="auth__field">
+          <label class="field-label" for="username">Username</label>
+          <input class="input" id="username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false">
+          <p class="field-hint">2&ndash;25 characters, letters and numbers only.</p>
+        </div>
+        <div class="auth__field">
+          <label class="field-label" for="password">Password</label>
+          <input class="input" id="password" name="password" type="password" autocomplete="new-password">
+          <p class="field-hint">At least 12 characters.</p>
+        </div>
+        <div class="auth__field">
+          <label class="field-label" for="password2">Confirm password</label>
+          <input class="input" id="password2" name="password2" type="password" autocomplete="new-password">
+        </div>
+        <div class="auth__field" id="code-field" {{codeFieldHidden}}>
+          <label class="field-label" for="code">Signup code</label>
+          <input class="input" id="code" name="code" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
+          <p class="field-hint">This instance requires a signup code to register.</p>
+        </div>
+        <p class="auth__error" id="register-error" role="alert" hidden></p>
+        <p class="auth__sub" id="register-success" role="status" hidden></p>
+        <button class="btn btn--primary btn--block" type="submit" id="register-submit">Create account</button>
+      </form>
+      <p class="auth__foot">Already have an account? <a href="/manage">Sign in</a></p>
+    </div>
+  </div>
+</div>
+

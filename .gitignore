@@ -4,3 +4,4 @@ ezxssdb/
 .vscode/
 /assets/img/report-*
 .DS_Store
+__pycache__/

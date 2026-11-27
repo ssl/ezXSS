@@ -5,3 +5,9 @@ Dockerfile
 docker-compose.yml
 readme.md
 nginx-rewrite.conf
+.env
+.vscode/
+.idea/
+.DS_Store
+__pycache__/
+ezxssdb/

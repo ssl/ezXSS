@@ -1,142 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>ezXSS Payload Tester</title>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        try { sessionStorage.clear(); } catch (e) {}
+    </script>
     <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .title { background-color: rgb(43,49,87); color: rgb(94,100,139); padding: 5px; }
+        a { margin-right: 10px; }
         .block { width: 20px; height: 20px; display: inline-block; }
         .circle { width: 20px; height: 20px; display: inline-block; border-radius: 10px; }
-        .title { background-color: rgb(43,49,87); color: rgb(94,100,139); padding: 5px; }
-        #table-wrap { display: none; }
-        table { border-collapse: collapse; }
-        th, td { border: 1px solid black; padding: 5px; }
+        table { border-collapse: collapse; } th, td { border: 1px solid #000; padding: 5px; }
+        #status { margin-top: 16px; }
+        #status h3 { margin: 0 0 4px; }
     </style>
 </head>
 <body>
     <h1 class="title">ezXSS Payload Tester</h1>
-    <p>This URL fires the ezXSS payload</p>
-    <div id="browser"></div>
 
     <a href="#" onclick="window.location.reload(true); return false;">Reload page</a>
-    <a href="/">Payload URL</a>
-    <a href="/manage/payload">Manage Payload</a>
-    <a href="https://github.com/ssl/ezXSS/wiki">ezXSS Wiki</a>
+    <a href="#" onclick="window.location.href = location.pathname.replace(/\*test$/, ''); return false;">Payload URL</a>
+    <a href="/manage/payloads">Manage payloads</a>
 
-    <!-- Color tester -->
+    <p>This page fires the ezXSS payload for its own path.</p>
+    <div id="browser"></div>
     <hr>
-    <div class="block" style="background-color:red"></div>
-    <div class="block" style="background-color:green"></div>
-    <div class="block" style="background-color:blue"></div>
-    <div class="block" style="background-color:yellow"></div>
-    <div class="block" style="background-color:orange"></div>
-    <div class="circle" style="background-color:red"></div>
-    <div class="circle" style="background-color:green"></div>
-    <div class="circle" style="background-color:blue"></div>
-    <div class="circle" style="background-color:yellow"></div>
-    <div class="circle" style="background-color:orange"></div><br>
-    <div class="block" style="background-color:black"></div>
-    <div class="block" style="background-color:white"></div>
-    <div class="block" style="background-color:purple"></div>
-    <div class="block" style="background-color:pink"></div>
-    <div class="block" style="background-color:gray"></div>
-    <div class="circle" style="background-color:black"></div>
-    <div class="circle" style="background-color:white"></div>
-    <div class="circle" style="background-color:purple"></div>
-    <div class="circle" style="background-color:pink"></div>
-    <div class="circle" style="background-color:gray"></div>
-    <p>github.com/ssl/ezXSS</p>
+    <div id="swatches"></div>
+    <div id="circles"></div>
     <div id="colors"></div>
+    <div id="status"></div>
 
     <script>
-        // Global variables for request tracking
-        var requestLog = [];
+        (function () {
+            function esc(i){ return String(i).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-        // Escape function
-        function esc(i) {
-            var str = String(i);
-            str = str.replace(/&/g, '&amp;');
-            str = str.replace(/</g, '&lt;');
-            str = str.replace(/>/g, '&gt;');
-            str = str.replace(/"/g, '&quot;');
-            str = str.replace(/'/g, '&#39;');
-            return str;
-        }
+            try { document.getElementById("browser").innerHTML =
+                "<p><b>Browser: </b>" + esc(navigator.appName) + " " + esc(navigator.appVersion) + "</p>"; } catch (t) {}
 
-        // Browser details
-        try {
-            var browserDiv = document.getElementById('browser');
-            if (browserDiv) {
-                browserDiv.innerHTML = '<p><b>Browser: </b>' + esc(navigator.appName) + ' ' + esc(navigator.appVersion) + '</p>';
-            }
-        } catch (t) {}
-
-        // Random color tester
-        try {
-            function initColors() {
-                var colorsDiv = document.getElementById('colors');
-                if (colorsDiv) {
-                    for (var i = 0; i < 10; i++) {
-                        var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                        colorsDiv.innerHTML += '<div class="block" style="background-color:' + color + '"></div>';
-                    }
-                }
-            }
-            
-            if (window.onload) {
-                var oldOnload = window.onload;
-                window.onload = function() {
-                    oldOnload();
-                    initColors();
-                };
-            } else {
-                window.onload = initColors;
-            }
-        } catch (t) {}
-
-        // Storage and cookie tester
-        try {
-            if (typeof sessionStorage !== 'undefined') {
-                sessionStorage.setItem('sessionStorageTester', new Date().getTime());
-            }
-        } catch (t) {}
-        
-        try {
-            if (typeof localStorage !== 'undefined') {
-                localStorage.setItem('localStorageTester', new Date().getTime());
-            }
-        } catch (t) {}
-        
-        try {
-            document.cookie = 'CookieTester=' + new Date().getTime();
-        } catch (t) {}
-
-        // Payload status check
-        function checkPayloadStatus() {
             try {
-                var statusDiv = document.createElement('div');
-                statusDiv.innerHTML = '<h3>Payload Status</h3>' +
-                                     'ezXSS payload initialized: <b>' + (typeof ez_nW === 'function' ? 'yes' : 'no') + '</b><br>' +
-                                     'ezXSS screenshot initialized: <b>' + (typeof html2canvas === 'function' ? 'yes' : 'no') + '</b><br>' +
-                                     'ezXSS persistent initialized: <b>' + (typeof ez_persist === 'function' ? 'yes' : 'no') + '</b>';
-                document.body.appendChild(statusDiv);
-            } catch (t) {
+                var palette = ["red","green","blue","yellow","orange","black","white","purple","pink","gray"];
+                var squares = "", circles = "";
+                palette.forEach(function (c) {
+                    squares += '<div class="block" style="background-color:' + c + '"></div>';
+                    circles += '<div class="circle" style="background-color:' + c + '"></div>';
+                });
+                document.getElementById("swatches").innerHTML = squares;
+                document.getElementById("circles").innerHTML = circles;
+                var cd = document.getElementById("colors"), rnd = "";
+                for (var i = 0; i < 10; i++) {
+                    rnd += '<div class="block" style="background-color:#' +
+                        Math.floor(Math.random() * 16777215).toString(16) + '"></div>';
+                }
+                cd.innerHTML = rnd;
+            } catch (t) {}
 
+            function renderStatus() {
+                var s = document.getElementById("status");
+                if (!s) { return; }
+                s.innerHTML =
+                    "<h3>Payload Status</h3>" +
+                    "ezXSS payload initialized: <b>" + (typeof ez_nW === "function" ? "yes" : "no") + "</b><br>" +
+                    "ezXSS screenshot initialized: <b>" + (typeof html2canvas === "function" ? "yes" : "no") + "</b><br>" +
+                    "ezXSS persistent initialized: <b>" + (typeof ez_persist === "function" ? "yes" : "no") + "</b>";
             }
-        }
+            renderStatus();
 
-        if (window.onload) {
-            var oldOnload2 = window.onload;
-            window.onload = function() {
-                oldOnload2();
-                checkPayloadStatus();
-            };
-        } else {
-            window.onload = checkPayloadStatus;
-        }
+            try { sessionStorage.setItem("sessionStorageTester", Date.now()); } catch (t) {}
+            try { localStorage.setItem("localStorageTester", Date.now()); } catch (t) {}
+            try { document.cookie = "CookieTester=" + Date.now(); } catch (t) {}
+
+            var payloadUrl = (location.protocol + "//" + location.host + location.pathname.replace(/\*test$/, ""))
+                .replace(/["'<>\\]/g, "");
+            var s = document.createElement("script");
+            s.src = payloadUrl;
+            s.onload = renderStatus;
+            s.onerror = renderStatus;
+            document.body.appendChild(s);
+
+            var ticks = 0;
+            var iv = setInterval(function () {
+                renderStatus();
+                if (++ticks >= 20) { clearInterval(iv); }
+            }, 200);
+        })();
     </script>
-
-    <!-- Load payload from main domain -->
-    <script src="/"></script>
 </body>
 </html>

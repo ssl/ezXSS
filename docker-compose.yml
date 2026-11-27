@@ -1,31 +1,57 @@
-version: '3.7'
-
 services:
   ezxssdb:
-    image: mysql:latest
+    image: "${DB_IMAGE:-mysql:9.7.4}"
     restart: always
+    stop_grace_period: 2m
     environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_DATABASE=${dbName}
-      - MYSQL_USER=${dbUser}
-      - MYSQL_PASSWORD=${dbPassword}
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: "${DB_NAME:-${dbName:-ezxss}}"
+      MYSQL_USER: "${DB_USER:-${dbUser:-ezxss}}"
+      MYSQL_PASSWORD: "${DB_PASS:-${dbPassword:-ezxss}}"
     volumes:
-      - "./ezxssdb:/var/lib/mysql"
+      - ./ezxssdb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+
   ezxss:
+    image: "ezxss:${VERSION:-5.0}"
     build:
       context: .
       dockerfile: ./Dockerfile
-      args:
-        - USE_MAIL_ALERTS=${useMailAlerts}
-    ports:
-      - "${dockerHttpPort:-80}:80"
-      - "${dockerHttpsPort:-443}:443"
-    volumes:
-      - .:/var/www/html
     restart: always
     depends_on:
-      - ezxssdb
+      ezxssdb:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-${dockerHttpPort:-80}}:80"
+      - "${HTTPS_PORT:-${dockerHttpsPort:-443}}:443"
     environment:
-      - INSTALL_CERTIFICATE=${autoInstallCertificate}
-      - DOMAIN=${domain}
-      - HTTPMODE=${httpmode}
+      DB_HOST: "ezxssdb"
+      DB_PORT: "3306"
+      DB_NAME: "${DB_NAME:-${dbName:-ezxss}}"
+      DB_USER: "${DB_USER:-${dbUser:-ezxss}}"
+      DB_PASS: "${DB_PASS:-${dbPassword:-ezxss}}"
+      DB_CHARSET: "utf8mb4"
+
+      VERSION: "${VERSION:-5.0}"
+      DOMAIN: "${DOMAIN:-${domain:-localhost}}"
+      TIMEZONE: "${TIMEZONE:-UTC}"
+      DEBUG: "${DEBUG:-false}"
+
+      IP_LOCK: "${IP_LOCK:-false}"
+      ALLOWED_IPS: "${ALLOWED_IPS:-}"
+      SESSION_TTL: "${SESSION_TTL:-604800}"
+      PANEL_DOMAINS: "${PANEL_DOMAINS:-}"
+      TRUST_PROXY: "${TRUST_PROXY:-false}"
+
+      INSTALL_CERTIFICATE: "${INSTALL_CERTIFICATE:-${autoInstallCertificate:-false}}"
+    volumes:
+      - ./assets/img:/var/www/html/assets/img
+      - letsencrypt:/etc/letsencrypt
+
+volumes:
+  letsencrypt:

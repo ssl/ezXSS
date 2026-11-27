@@ -1,0 +1,195 @@
+{
+  "intro": [
+    {
+      "title": "Base URL",
+      "html": "<p class=\"field-hint\">Every JSON endpoint is served under <span class=\"mono\">/api</span> (for example <span class=\"mono\">/api/ping</span>). The panel, the payload, the callback collector and the public share/beacon endpoints live OUTSIDE <span class=\"mono\">/api</span> and are documented in the Public surface section below.</p>"
+    },
+    {
+      "title": "Response envelope",
+      "html": "<p class=\"field-hint\">Every <span class=\"mono\">/api</span> response is the same JSON envelope. <code>success</code> is a boolean, <code>data</code> carries the payload (or <code>null</code> on error), <code>error</code> is a human-readable message (or <code>null</code> on success) and <code>meta</code> is an object that carries pagination for list endpoints.</p><pre class=\"docs-pre mono\">{\n  \"success\": true,\n  \"data\": { },\n  \"error\": null,\n  \"meta\": { \"pagination\": { \"total\": 0, \"page\": 1, \"per_page\": 25, \"pages\": 0 } }\n}</pre><p class=\"field-hint\">On failure the HTTP status matches the error (401 unauthenticated, 403 forbidden, 404 not found, 405 wrong method, 409 conflict, 422 validation, 429 rate-limited, 503 database unavailable).</p>"
+    },
+    {
+      "title": "Authentication",
+      "html": "<p class=\"field-hint\">Authenticated endpoints expect a bearer token in the <span class=\"mono\">Authorization: Bearer &lt;token&gt;</span> header. Two token types, both validated by the same middleware:</p><ul class=\"docs-list field-hint\"><li><b>Session tokens</b> - issued by <span class=\"mono\">POST /api/auth/login</span>. Default lifetime 7 days (<span class=\"mono\">SESSION_TTL</span>). The panel stores it in <span class=\"mono\">sessionStorage</span>.</li><li><b>API keys</b> - long-lived (or TTL-bounded) tokens for use outside the panel, managed under <span class=\"mono\">/api/apikeys</span>. The raw key is shown once at creation and never again.</li></ul><p class=\"field-hint\">Tokens are hashed at rest (SHA-256); the password hash and the 2FA secret are never returned by any endpoint. If an account has TOTP 2FA enabled, login returns a one-time <code>challenge</code> instead of a token and is completed via <span class=\"mono\">POST /api/auth/twofa</span> (see Session &amp; 2FA).</p>"
+    },
+    {
+      "title": "Capabilities, CORS & rate limiting",
+      "html": "<p class=\"field-hint\">Each endpoint requires specific <b>capabilities</b>, resolved from the user's <b>role</b> (admin, user, or custom) plus optional per-user overrides. The <span class=\"mono\">Cap:</span> column in the tables below shows which. Owners always have full control over their own resources; <span class=\"mono\">*.viewall</span> holders and admins bypass scoping. Advanced payload behaviours (persistent, spider, beacon, custom JS, pages, filters, extensions) need both the global switch in Settings and the owner's <span class=\"mono\">payload.behaviour</span> capability.</p><p class=\"field-hint\">CORS: panel/API endpoints answer only for the configured panel origin(s); the public surface (payload, callback, shared, beacon) is open. Rate limiting applies to login and registration (HTTP 429).</p>"
+    }
+  ],
+  "groups": [
+    {
+      "title": "Session & 2FA",
+      "note": "Login is open; the rest answer CORS for the panel origin.",
+      "rows": [
+        { "m": "POST", "p": "/api/auth/login", "a": "None", "params": "{ username, password, code? }", "d": "Verify credentials. Returns a session token, or { twofa_required, challenge, expires_in } when 2FA is on and no code was supplied. Rate-limited per IP and per username." },
+        { "m": "POST", "p": "/api/auth/twofa", "a": "None (challenge)", "params": "{ challenge, code }", "d": "Complete a pending 2FA login challenge and receive the session token. Rate-limited per challenge and per IP." },
+        { "m": "POST", "p": "/api/auth/logout", "a": "Bearer", "params": "-", "d": "Revoke the current bearer token." },
+        { "m": "POST", "p": "/api/auth/enable2fa", "a": "Bearer", "params": "step 1: -  ·  step 2: { secret, code }", "d": "Two-step TOTP enable. Step 1 (no body) returns { secret, otpauth_uri }; step 2 confirms a code against that secret and persists it." },
+        { "m": "POST", "p": "/api/auth/disable2fa", "a": "Bearer", "params": "{ code? , password? }", "d": "Disable 2FA. Requires a valid current TOTP code OR the account password." }
+      ]
+    },
+    {
+      "title": "Account & API keys",
+      "note": "User rows are always returned through the safe-field filter. API key management requires the apikey.manage capability.",
+      "rows": [
+        { "m": "GET", "p": "/api/me", "a": "Bearer", "params": "-", "d": "The current user (safe fields), the token type used, and the effective capability map." },
+        { "m": "GET/POST", "p": "/api/account/notepad", "a": "Bearer", "params": "POST: { notepad }", "d": "GET reads the user's notepad text; POST saves it." },
+        { "m": "GET", "p": "/api/apikeys", "a": "Cap: apikey.manage", "params": "-", "d": "List the current user's API keys (id/name/last_used/created only - never the raw key or hash)." },
+        { "m": "POST", "p": "/api/apikeys", "a": "Cap: apikey.manage", "params": "{ name, ttl? }", "d": "Create a named API key. Returns the raw token ONCE (201). ttl is optional expiry in seconds (0/absent = no expiry)." },
+        { "m": "DELETE", "p": "/api/apikeys/delete/{id}", "a": "Cap: apikey.manage", "params": "path: id", "d": "Revoke one of the current user's API keys." }
+      ]
+    },
+    {
+      "title": "Users & Roles",
+      "note": "User management requires user.manage; creating/editing roles and setting per-user permission overrides require user.roles. You can only grant capabilities you hold, and only manage a user whose capabilities are a subset of your own. Self-service cannot change the caller's own role/capabilities.",
+      "rows": [
+        { "m": "GET", "p": "/api/users", "a": "Cap: user.manage", "params": "-", "d": "List all users (safe fields)." },
+        { "m": "POST", "p": "/api/users", "a": "Cap: user.manage", "params": "{ username, password, role?, permissions? }", "d": "Create a user (201). role = any existing role (admin, user, or a custom role). Reuses the installer username/password rules." },
+        { "m": "GET", "p": "/api/users/get/{id}", "a": "Cap: user.manage, or self", "params": "path: id", "d": "One user (safe fields) plus the effective capability map." },
+        { "m": "POST", "p": "/api/users/update/{id}", "a": "Cap: user.manage (user.roles for permissions), or self", "params": "{ role?, permissions?, password?, current_password? }", "d": "Manager: change role/username, reset password, or ban - only for a user whose capabilities are a subset of yours; changing permissions needs user.roles. Self: change own password (requires current_password); cannot change own role/caps." },
+        { "m": "DELETE", "p": "/api/users/delete/{id}", "a": "Cap: user.manage", "params": "path: id", "d": "Delete a user (revokes their tokens + sharing rows). Refuses deleting yourself or the last admin." },
+        { "m": "GET", "p": "/api/users/roles", "a": "Cap: user.roles", "params": "-", "d": "List all roles and their capability sets." },
+        { "m": "POST", "p": "/api/users/roles/{name?}", "a": "Cap: user.roles", "params": "{ name?, permissions }", "d": "Create a role (name in body) or update an existing one (name in path). permissions is a map of capability to boolean. Can only grant capabilities the caller holds." },
+        { "m": "DELETE", "p": "/api/users/roles/{name}", "a": "Cap: user.roles", "params": "path: name", "d": "Delete a custom role. Built-in roles (admin, user) cannot be deleted." }
+      ]
+    },
+    {
+      "title": "Registration",
+      "note": "Public self-registration, only available when signup_enabled is on.",
+      "rows": [
+        { "m": "POST", "p": "/api/register", "a": "None (rate-limited)", "params": "{ username, password, code? }", "d": "Create a new user account (201). When signup_mode is 'code', a valid signup code is required. Rate-limited per IP." }
+      ]
+    },
+    {
+      "title": "Sharing (per-resource access)",
+      "note": "Table-driven over user_access; {table} is restricted to payloads|reports. Owner-or-admin only.",
+      "rows": [
+        { "m": "GET", "p": "/api/share/get/{table}/{id}", "a": "Owner or admin", "params": "path: table (payloads|reports), id", "d": "List who has access to the resource plus the global-access flag." },
+        { "m": "POST", "p": "/api/share/set/{table}/{id}", "a": "Owner or admin", "params": "{ action, username?, access_type? }", "d": "action = add_user | remove_user | change_access (access_type view|edit) | make_global | remove_global. Returns the recomputed share state." }
+      ]
+    },
+    {
+      "title": "Payloads",
+      "note": "Access = ownership or a user_access grant; admins see all. Create needs payload.create; advanced behaviours apply only when the global switch and the owner's behaviour capability both allow them (enforced server-side).",
+      "rows": [
+        { "m": "GET", "p": "/api/payloads", "a": "Bearer", "params": "-", "d": "List payloads the user owns or has shared access to (admins: all)." },
+        { "m": "POST", "p": "/api/payloads", "a": "Cap: payload.create", "params": "{ payload | identifier }", "d": "Create a payload owned by the caller (201). Validates the domain/identifier (no scheme, no trailing slash)." },
+        { "m": "GET", "p": "/api/payloads/get/{id}", "a": "View access", "params": "path: id", "d": "Full assembled config for one payload." },
+        { "m": "POST", "p": "/api/payloads/update/{id}", "a": "Edit access", "params": "{ collect?, customjs?, customjs2?, extensions?, persistent?, spider?, beacon? }", "d": "Update editable config. collect toggles honour the global collect_* switches; persistent/spider/beacon are rejected (422) when globally disabled." },
+        { "m": "DELETE", "p": "/api/payloads/delete/{id}", "a": "Owner or admin", "params": "path: id", "d": "Delete a payload (cascades pages/filters/collect/sharing; reports are kept and fall under the catch-all)." },
+        { "m": "POST", "p": "/api/payloads/addpage/{id}", "a": "Edit access", "params": "{ path }", "d": "Add an extract page (201). path must start with / and not contain ~." },
+        { "m": "DELETE", "p": "/api/payloads/deletepage/{id}/{pageId}", "a": "Edit access", "params": "path: id, pageId", "d": "Remove a page from the payload." },
+        { "m": "POST", "p": "/api/payloads/addfilter/{id}", "a": "Edit access", "params": "{ domain, type: allow|deny }", "d": "Add an allow/deny domain filter (201). Validates the wildcard-domain format." },
+        { "m": "DELETE", "p": "/api/payloads/deletefilter/{id}/{filterId}", "a": "Edit access", "params": "path: id, filterId", "d": "Remove a filter from the payload." },
+        { "m": "POST", "p": "/api/payloads/reassign/{id}", "a": "Cap: payload.viewall + payload.create", "params": "{ user }", "d": "Reassign a payload to another owner (by username or id)." }
+      ]
+    },
+    {
+      "title": "Reports",
+      "note": "Reading needs report.view (+ view access for non-admins); archive/delete need edit access; shares need report.share + edit access. Shares are on-request only.",
+      "rows": [
+        { "m": "GET", "p": "/api/reports", "a": "Cap: report.view", "params": "query: page, per_page, search, payload, archive", "d": "Paginated, searchable list. Non-admins are scoped to reports they may view; admins see all. payload=__catchall__ (admin) lists reports coupled to no payload; its total is capped (meta.capped). Pagination in meta." },
+        { "m": "GET", "p": "/api/reports/get/{id}", "a": "View access", "params": "path: id", "d": "Full report detail. The DOM is omitted inline when it exceeds dom_threshold - fetch it from the dom route instead." },
+        { "m": "GET", "p": "/api/reports/dom/{id}", "a": "View access", "params": "path: id", "d": "Download the full captured DOM as a text/plain attachment." },
+        { "m": "POST", "p": "/api/reports/archive/{id}", "a": "Edit access", "params": "path: id", "d": "Toggle the report's archive flag." },
+        { "m": "DELETE", "p": "/api/reports/delete/{id}", "a": "Edit access", "params": "path: id", "d": "Delete the report plus its data, shares and screenshot file." },
+        { "m": "POST", "p": "/api/reports/share/{id}", "a": "Cap: report.share + edit", "params": "{ columns[], expires_at? }", "d": "Create an on-request share (201) exposing only the selected shareable columns. Returns the slug + public /s/{slug} URL." },
+        { "m": "GET", "p": "/api/reports/shares/{id}", "a": "Edit access", "params": "path: id", "d": "List a report's active shares." },
+        { "m": "DELETE", "p": "/api/reports/shares/delete/{shareId}", "a": "Cap: report.share + edit", "params": "path: shareId", "d": "Revoke a share by its id." },
+        { "m": "GET", "p": "/api/reports/stats", "a": "Cap: report.viewall", "params": "-", "d": "Cached global aggregates (active/archived counts + per-payload totals)." }
+      ]
+    },
+    {
+      "title": "Sessions & Console",
+      "note": "Access inherits the session's payload: viewing needs view access, enqueueing commands needs edit access. A session is a (client_id + origin) group keyed by its representative row id.",
+      "rows": [
+        { "m": "GET", "p": "/api/sessions", "a": "Bearer", "params": "query: page, per_page, search, payload, archive", "d": "Paginated grouped listing, scoped by payload access (admins: all). payload=__catchall__ (admin) lists session groups coupled to no payload. Pagination in meta." },
+        { "m": "GET", "p": "/api/sessions/get/{id}", "a": "View access", "params": "path: id", "d": "One session group with the decompressed blob." },
+        { "m": "GET", "p": "/api/sessions/requests/{id}", "a": "View access", "params": "path: id", "d": "The group's request/navigation history." },
+        { "m": "GET", "p": "/api/sessions/request/{requestId}", "a": "View access", "params": "path: requestId", "d": "One request row (full)." },
+        { "m": "POST", "p": "/api/sessions/archive/{id}", "a": "Edit access", "params": "path: id", "d": "Toggle the group's archive flag." },
+        { "m": "DELETE", "p": "/api/sessions/delete/{id}", "a": "Edit access", "params": "path: id", "d": "Delete the group plus its data and console rows." },
+        { "m": "GET", "p": "/api/sessions/count", "a": "Bearer", "params": "query: archive, payload, search, seen_within, seen_before", "d": "Number of groups the given filter resolves to (the bulk blast-radius). Scoped to the caller's payloads." },
+        { "m": "GET", "p": "/api/sessions/payloads", "a": "Bearer", "params": "-", "d": "Distinct payload identifiers that actually have sessions, for the filter dropdown (scoped for non-admins)." },
+        { "m": "POST", "p": "/api/sessions/bulk", "a": "Edit access", "params": "{ action: archive|unarchive|delete, ids?: int[], scope?: {...} }", "d": "Archive/unarchive/delete many groups at once, by id list or by a scope filter. Capped per request." },
+        { "m": "POST", "p": "/api/console/execute/{id}", "a": "Edit access", "params": "{ command }", "d": "Enqueue a raw-JS console command for the session group (201). Evaluated by the persistent client on its next ping." },
+        { "m": "GET", "p": "/api/console/list/{id}", "a": "View access", "params": "path: id", "d": "List queued + already-sent commands for the group." },
+        { "m": "GET", "p": "/api/console/output/{id}", "a": "View access", "params": "path: id", "d": "The group's aggregated console output." },
+        { "m": "POST", "p": "/api/console/proxy/{id}", "a": "Edit access", "params": "{ ipport, passorigin?, autoreconnect? }", "d": "Start the reverse proxy (ezProxy) on the session." },
+        { "m": "POST", "p": "/api/console/kill/{id}", "a": "Edit access", "params": "path: id", "d": "Enqueue ez_stop() to stop the persistent client." },
+        { "m": "POST", "p": "/api/console/killreconnect/{id}", "a": "Edit access", "params": "path: id", "d": "Drop the client's auto-reconnect flag." },
+        { "m": "POST", "p": "/api/console/bulk", "a": "Edit access", "params": "{ action, ids?: int[], scope?: {...}, command? }", "d": "Enqueue a console command (or archive/delete action) to many session groups in one request (201)." }
+      ]
+    },
+    {
+      "title": "Alerts",
+      "note": "Own destinations are per-user; the global rows + method master switches are admin-only (settings.manage). An alert fires only when BOTH the method switch and the row are enabled.",
+      "rows": [
+        { "m": "GET", "p": "/api/alerts", "a": "Bearer", "params": "-", "d": "The current user's own alert destinations (mail / telegram / slack / discord) + per-row enable." },
+        { "m": "POST", "p": "/api/alerts", "a": "Bearer", "params": "{ ...destinations }", "d": "Update the current user's own destinations." },
+        { "m": "GET", "p": "/api/alerts/settings", "a": "Cap: settings.manage", "params": "-", "d": "Global destinations + the alert-method master switches + callback-url." },
+        { "m": "POST", "p": "/api/alerts/settings", "a": "Cap: settings.manage", "params": "{ ...global + switches }", "d": "Update the global destinations and master switches." },
+        { "m": "POST", "p": "/api/alerts/test", "a": "Bearer", "params": "-", "d": "Send a test alert to the caller's own destinations." },
+        { "m": "POST", "p": "/api/alerts/chatid", "a": "Bearer", "params": "{ token }", "d": "Resolve a Telegram bot token to its chat id, to help set up the Telegram destination." }
+      ]
+    },
+    {
+      "title": "Extensions",
+      "note": "Payload extensions are global/admin-managed - every action requires settings.manage.",
+      "rows": [
+        { "m": "GET", "p": "/api/extensions", "a": "Cap: settings.manage", "params": "-", "d": "List extensions (metadata only, no code)." },
+        { "m": "POST", "p": "/api/extensions", "a": "Cap: settings.manage", "params": "{ name, code, enabled?, source? }", "d": "Create an extension (201)." },
+        { "m": "GET", "p": "/api/extensions/get/{id}", "a": "Cap: settings.manage", "params": "path: id", "d": "One extension including its code." },
+        { "m": "POST", "p": "/api/extensions/update/{id}", "a": "Cap: settings.manage", "params": "{ name?, code?, enabled? }", "d": "Update an extension's editable fields." },
+        { "m": "DELETE", "p": "/api/extensions/delete/{id}", "a": "Cap: settings.manage", "params": "path: id", "d": "Delete an extension." },
+        { "m": "POST", "p": "/api/extensions/toggle/{id}", "a": "Cap: settings.manage", "params": "path: id", "d": "Toggle the enabled flag; returns the new state." },
+        { "m": "POST", "p": "/api/extensions/install", "a": "Cap: settings.manage", "params": "{ url }", "d": "Install extension(s) from a remote source URL (201)." },
+        { "m": "GET/POST", "p": "/api/extensions/remote/{id}", "a": "Cap: settings.manage", "params": "path: id", "d": "GET checks the extension's remote source for a newer version; POST applies the update." }
+      ]
+    },
+    {
+      "title": "Settings",
+      "note": "Application/payload/global settings (NOT the alert destinations - those are owned by /api/alerts). Every write requires settings.manage; updates are partial.",
+      "rows": [
+        { "m": "GET", "p": "/api/settings", "a": "Cap: settings.manage", "params": "-", "d": "Read all owned settings plus an 'available' block of selectable options." },
+        { "m": "POST", "p": "/api/settings/update", "a": "Cap: settings.manage", "params": "{ ...fields }", "d": "Validate and persist only the fields present in the body." },
+        { "m": "POST", "p": "/api/settings/killswitch", "a": "Cap: settings.manage", "params": "{ password }", "d": "Arm the platform kill switch. While armed every request 404s until any URL is visited with ?pass=<password>." }
+      ]
+    },
+    {
+      "title": "Dashboard & Logs",
+      "note": "The dashboard needs report.view and scopes to the caller; the audit log is admin-only global data.",
+      "rows": [
+        { "m": "GET", "p": "/api/dashboard", "a": "Cap: report.view", "params": "-", "d": "The dashboard stat tiles (admins read the cached global aggregate; others get a scoped live aggregate)." },
+        { "m": "GET", "p": "/api/dashboard/common", "a": "Cap: report.view", "params": "query: field (origins|ips|cookies|browsers|payloads)", "d": "Top-10 most-common {value,count} for one field." },
+        { "m": "GET", "p": "/api/dashboard/version", "a": "Cap: report.view", "params": "-", "d": "Current vs latest ezXSS version (cached) for the update card." },
+        { "m": "GET", "p": "/api/logs", "a": "Cap: log.view", "params": "query: page, per_page", "d": "Paginated audit log (newest first). Pagination in meta." }
+      ]
+    },
+    {
+      "title": "System & lifecycle",
+      "note": "Status/install/update stay reachable before the instance is installed so the first-run screens can drive setup.",
+      "rows": [
+        { "m": "GET", "p": "/api/ping", "a": "None", "params": "-", "d": "Liveness probe. Returns \"pong\"." },
+        { "m": "GET", "p": "/api/status", "a": "None", "params": "-", "d": "Coarse instance state { state: db_error|not_installed|upgrade|ready, version }. Leaks nothing sensitive." },
+        { "m": "GET", "p": "/api/install", "a": "None", "params": "-", "d": "{ installed: bool } so the first-run UI can detect install state." },
+        { "m": "POST", "p": "/api/install", "a": "None (first-run)", "params": "{ username, password }", "d": "One-time installer: run migrations, seed settings, create the first admin (201). Refuses once installed (409)." },
+        { "m": "GET", "p": "/api/update", "a": "None", "params": "-", "d": "{ current_version, code_version, legacy, pending[], needs_update } - version strings + migration filenames only." },
+        { "m": "POST", "p": "/api/update", "a": "None (rate-limited)", "params": "-", "d": "Apply pending migrations and bump the stored version. Runs WITHOUT a bearer - updating the panel is a system-wide action, not a per-user permission - and is rate-limited per IP; advises enabling IP_LOCK." }
+      ]
+    },
+    {
+      "title": "Public surface (outside /api)",
+      "note": "No auth, open CORS. These are the live collector + panel paths the payload and browser use.",
+      "rows": [
+        { "m": "GET", "p": "/  and  /{name}", "a": "None (public)", "params": "-", "d": "Serve the assembled payload JavaScript. A request serves the payload coupled to its host/path, or the catch-all (built from the instance's default settings) when none matches; /{name} serves a named custom payload. Also reachable at /api/payload." },
+        { "m": "POST", "p": "/callback", "a": "None (public)", "params": "collected report body", "d": "Report-ingest endpoint the served payload POSTs to. Always answers the plain placeholder body; never leaks internals. Also at /api/callback." },
+        { "m": "POST", "p": "/callback/attach", "a": "None (public)", "params": "{ at (attach token), field, value }", "d": "Deferred heavy-field ingest (dom, screenshot). The main callback returns an attach token; the payload sends large fields here in a follow-up request." },
+        { "m": "GET", "p": "/s/{slug}", "a": "None (public)", "params": "path: slug (25 lowercase chars); append .json for the data feed", "d": "Public view of an on-request report share - a readable HTML page, with /s/{slug}.json serving the same selected columns as JSON. Expiry respected (410 when expired)." },
+        { "m": "GET/POST", "p": "/beacon/{type}/{nonce}", "a": "None (public)", "params": "path: type, nonce  ·  query: d?", "d": "CSP-bypass beacon sinks. Always return a strictly-typed empty resource for the type and record the inferred-CSP signal." },
+        { "m": "GET", "p": "/manage[/...]", "a": "None (static shell)", "params": "-", "d": "The admin panel SPA shell. The same static HTML answers /manage and every client-router deep link; all its data calls go through the authenticated /api surface." }
+      ]
+    }
+  ]
+}
