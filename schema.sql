@@ -174,6 +174,7 @@ CREATE TABLE IF NOT EXISTS `console` (
     `id`        INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `client_id` VARCHAR(50) NOT NULL,
     `origin`    VARCHAR(500) NOT NULL,
+    `payload`   VARCHAR(255) NOT NULL DEFAULT '',
     `command`   TEXT NOT NULL,
     `executed`  TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),

