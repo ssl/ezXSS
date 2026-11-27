@@ -372,7 +372,7 @@ window.EZ = window.EZ || {};
     var body = el("user-modal-body"), title = el("user-modal-title");
     var self = (EZ.state.user || {}).id;
     var isSelf = String(user.id) === String(self);
-    title.textContent = util.escapeHtml(user.username || "User");
+    title.textContent = user.username || "User";
     var effMap = user.capabilities || effective(user);
 
     var canEditUsername = util.can("user.manage");
@@ -429,7 +429,7 @@ window.EZ = window.EZ || {};
             unameInput.value = name;
             unameInput.readOnly = true;
             savingUsername = false;
-            title.textContent = util.escapeHtml(name);
+            title.textContent = name;
             umMsg("Username updated.", false);
           }, function (err) {
             savingUsername = false;
