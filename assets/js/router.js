@@ -51,7 +51,11 @@ window.EZ = window.EZ || {};
       if (r.segs.length !== segs.length) { continue; }
       var params = {}, ok = true;
       for (var j = 0; j < r.segs.length; j++) {
-        if (r.segs[j].charAt(0) === ":") { params[r.segs[j].slice(1)] = decodeURIComponent(segs[j]); }
+        if (r.segs[j].charAt(0) === ":") {
+          var raw = segs[j], val;
+          try { val = decodeURIComponent(raw); } catch (e) { val = raw; }
+          params[r.segs[j].slice(1)] = val;
+        }
         else if (r.segs[j] !== segs[j]) { ok = false; break; }
       }
       if (ok) { return { screen: r.screen, params: params }; }
