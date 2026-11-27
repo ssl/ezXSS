@@ -114,7 +114,8 @@ class CallbackController extends Controller
         $value = isset($data->value) ? (string) $data->value : '';
         if ($field === 'screenshot') {
             $tmp = (object) array('screenshot' => $value, 'uri' => '');
-            $this->prepareScreenshot($tmp);
+            $this->decodeScreenshot($tmp);
+            $this->persistScreenshot($tmp);
             $value = isset($tmp->screenshotData) ? $tmp->screenshotData : '';
         }
 
@@ -273,11 +274,12 @@ class CallbackController extends Controller
             }
         }
 
-        $this->prepareScreenshot($data);
+        $this->decodeScreenshot($data);
 
         $reportArray = null;
 
         if (($doubleReport !== false && $filterSave === '1') || $doubleReport === false) {
+            $this->persistScreenshot($data);
             $reportId = Report::add(array(
                 'payload'        => $data->payload,
                 'uri'            => $data->uri,
@@ -487,22 +489,22 @@ class CallbackController extends Controller
     }
 
     /**
-     * Decode the posted screenshot and set $data->screenshotData to either.
+     * Decode the posted screenshot into memory: set $data->screenshotBase for
+     * alerts and, when file storage is on, keep the raw bytes for a later write.
+     * Writes nothing to disk, so an alert-only duplicate leaves no orphan file.
      *
      * @param array $data
-     * @throws Exception
      */
-    public function prepareScreenshot($data)
+    public function decodeScreenshot($data)
     {
+        $data->screenshotData = '';
         if (empty($data->screenshot)) {
-            $data->screenshotData = '';
             return;
         }
 
         try {
             $raw = (string) $data->screenshot;
             if (strlen($raw) > (int) (self::LIMIT_SCREENSHOT * 1.4) + 64) {
-                $data->screenshotData = '';
                 return;
             }
             $decoded = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $raw), true);
@@ -510,29 +512,48 @@ class CallbackController extends Controller
                 throw new Exception('Invalid screenshot data posted to callback');
             }
             if (strlen($decoded) > self::LIMIT_SCREENSHOT) {
-                $data->screenshotData = '';
                 return;
             }
 
             $data->screenshotBase = base64_encode($decoded);
 
             if ((string) Setting::get('storescreenshot', '0') === '0') {
-
-                $name = time() . md5((string) $data->uri . time() . bin2hex(random_bytes(16))) . bin2hex(random_bytes(5));
-                $dir = FRAMEWORK_ROOT . '/assets/img';
-                if (!is_dir($dir)) {
-                    @mkdir($dir, 0775, true);
-                }
-                $fh = @fopen($dir . '/report-' . $name . '.png', 'w');
-                if (!$fh) {
-                    throw new Exception('Unable to save screenshots to server, check permissions');
-                }
-                fwrite($fh, $decoded);
-                fclose($fh);
-                $data->screenshotData = $name;
+                $data->screenshotDecoded = $decoded;
             } else {
                 $data->screenshotData = $data->screenshotBase;
             }
+        } catch (Throwable $e) {
+            $data->screenshotData = '';
+        }
+    }
+
+    /**
+     * Write a decoded screenshot to disk and point $data->screenshotData at the
+     * file. Called only when a report is actually being stored, so the file and
+     * the row that references it are created together.
+     *
+     * @param array $data
+     */
+    public function persistScreenshot($data)
+    {
+        if (empty($data->screenshotDecoded)) {
+            return;
+        }
+
+        try {
+            $decoded = (string) $data->screenshotDecoded;
+            $name = time() . md5((string) $data->uri . time() . bin2hex(random_bytes(16))) . bin2hex(random_bytes(5));
+            $dir = FRAMEWORK_ROOT . '/assets/img';
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0775, true);
+            }
+            $fh = @fopen($dir . '/report-' . $name . '.png', 'w');
+            if (!$fh) {
+                throw new Exception('Unable to save screenshots to server, check permissions');
+            }
+            fwrite($fh, $decoded);
+            fclose($fh);
+            $data->screenshotData = $name;
         } catch (Throwable $e) {
             $data->screenshotData = '';
         }
