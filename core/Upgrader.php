@@ -349,7 +349,9 @@ class Upgrader
      * inline columns. The copy runs only when the data is not already in the target (willMoveInline),
      * so it is safe to repeat and safe after a failed-then-retried run; the inline data is uncompressed,
      * so `compressed` is 0. On an already-split 4.2/4.3 source nothing is copied and only the vestigial
-     * inline columns are dropped.
+     * inline columns are dropped. When a copy is needed but the target still carries its legacy id column
+     * name (report_id/session_id absent), this returns without dropping, so inline data is never dropped
+     * before it has been copied; a re-run after the *_data rename then copies and drops.
      *
      * @param object $db
      * @param string $table
@@ -374,7 +376,10 @@ class Upgrader
         if (!$present) {
             return;
         }
-        if (self::willMoveInline($table, $dataTable) && self::columnExists($dataTable, $idColumn)) {
+        if (self::willMoveInline($table, $dataTable)) {
+            if (!self::columnExists($dataTable, $idColumn)) {
+                return;
+            }
             $cols = '`' . implode('`, `', $present) . '`';
             $db->exec(
                 "INSERT INTO `{$dataTable}` (`{$idColumn}`, {$cols}, `compressed`)
