@@ -212,16 +212,15 @@ class Session extends Model
 
         self::query()->where('id', $sessionId)->update(array('updated_at' => time()));
 
+        $row = self::query()->from(self::TABLE_DATA)->where('session_id', $sessionId)->first();
+        $compressed = $row && (int) (isset($row['compressed']) ? $row['compressed'] : 0) === 1;
+
         $console = utf8Clean($console);
-        $enabled = Compression::enabled();
-        $stored = $enabled ? Compression::pack($console) : $console;
+        $stored = $compressed ? Compression::pack($console) : $console;
 
         self::query()->from(self::TABLE_DATA)
             ->where('session_id', $sessionId)
-            ->update(array(
-                'console'    => $stored,
-                'compressed' => $enabled ? 1 : 0,
-            ));
+            ->update(array('console' => $stored));
     }
 
     /**
