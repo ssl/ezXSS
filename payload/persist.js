@@ -45,9 +45,7 @@ function eze_ini() {
         ez_stp();
         try {
             var p = localStorage.getItem("ezProxy");
-            var ps = "";
-            try { ps = localStorage.getItem("ezProxyS") || ""; } catch (e) { ps = ""; }
-            p && ez_soc(p, "1", ps);
+            p && ez_soc(p, "1");
         } catch (t) { }
     });
 }
@@ -347,12 +345,11 @@ function ez_fet(e, t, n) {
     }
 }
 
-function ez_soc(e, t, s) {
+function ez_soc(e, t) {
     if (window.WebSocket) {
         if (ez_we && ez_we.readyState === WebSocket.OPEN) return;
         (ez_we = new WebSocket("wss://" + e)).onopen = function () {
             var h = { clientid: ra_client(), pass: t, origin: location.host };
-            if (s) { h.secret = s; }
             ez_we.send(JSON.stringify(h));
         };
         ez_we.onmessage = function (e) {
@@ -367,7 +364,7 @@ function ez_soc(e, t, s) {
         };
         ez_we.onerror = function (e) { };
         ez_we.onclose = function () {
-            setTimeout((function () { ez_soc(e, t, s); }), 5e3);
+            setTimeout((function () { ez_soc(e, t); }), 5e3);
         };
     }
 }
