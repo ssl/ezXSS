@@ -459,12 +459,13 @@ class CallbackController extends Controller
             $csp['policy'] = substr(trim($data->csp), 0, self::LIMIT_CSP);
         }
 
-        if (isset($data->ez_probe) && $data->ez_probe !== '') {
+        if (isset($data->ez_probe) && is_scalar($data->ez_probe) && (string) $data->ez_probe !== '') {
+            $directive = utf8CleanCut((string) $data->ez_probe, 64);
             $csp['probe'] = true;
-            $csp['probe_directive'] = (string) $data->ez_probe;
-            $csp['permitted'] = array((string) $data->ez_probe);
-            if (isset($data->ez_probe_channel) && $data->ez_probe_channel !== '') {
-                $csp['probe_channel'] = (string) $data->ez_probe_channel;
+            $csp['probe_directive'] = $directive;
+            $csp['permitted'] = array($directive);
+            if (isset($data->ez_probe_channel) && is_scalar($data->ez_probe_channel) && (string) $data->ez_probe_channel !== '') {
+                $csp['probe_channel'] = utf8CleanCut((string) $data->ez_probe_channel, 64);
             }
         }
 
