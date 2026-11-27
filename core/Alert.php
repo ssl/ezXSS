@@ -475,8 +475,12 @@ class Alert
         $hasShot = !empty($report['screenshotBase']);
         $data['screenshot'] = $hasShot ? 'attachment://screenshot.png' : '';
 
-        $rendered = self::renderTemplate('discord.json', $data, function ($v) {
-            return self::jsonValueSafe($v);
+        $rendered = self::renderTemplate('discord.json', $data, function ($v, $k) {
+            $v = self::jsonValueSafe($v);
+            if ($v === '' && !in_array($k, array('screenshot', 'domain', 'id', 'timestamp'), true)) {
+                return '-';
+            }
+            return $v;
         });
         $decoded = json_decode($rendered);
         $message = $decoded !== null
