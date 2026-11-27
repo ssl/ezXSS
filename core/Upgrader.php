@@ -410,8 +410,11 @@ class Upgrader
         $legacyVersion = null;
         $preV4 = false;
         if ($legacy) {
-            // Pre-4.0 (1.x-3.x): no payloads table yet, so only reports and settings survive.
-            $preV4 = !self::tableExists('payloads');
+            // Pre-4.0 (1.x-3.x) kept the admin in a `password` setting and had no users table.
+            // That setting outlives Migrator::run() and is cleared only once the admin is created,
+            // so it still identifies a pre-4.0 source on a retry where the 5.0 schema (and its
+            // payloads table) already exists, unlike the absence of the payloads table.
+            $preV4 = self::rawSetting('password') !== null;
             $legacyVersion = self::detectLegacyVersion();
             self::assertLegacyDiskSpace();
             if ($preV4) {
