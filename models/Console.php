@@ -50,7 +50,8 @@ class Console extends Model
     }
 
     /**
-     * Pull the next queued command for a client/origin/payload: the oldest `executed = 0`.
+     * Pull the next queued command for a client/origin/payload: the oldest `executed = 0`, claimed
+     * atomically with a compare-and-set so two concurrent pings never run the same command twice.
      *
      * @param string $clientId
      * @param string $origin
@@ -59,21 +60,34 @@ class Console extends Model
      */
     public static function getNext($clientId, $origin, $payload = null)
     {
-        $q = self::query()
-            ->select('id, command')
-            ->where('client_id', substr((string) $clientId, 0, 50))
-            ->where('origin', substr((string) $origin, 0, self::LIMIT_ORIGIN))
-            ->where('executed', 0);
-        self::scopePayload($q, $payload);
-        $row = $q->orderBy('id', 'ASC')->first();
+        $db = Database::getInstance();
+        $clientId = substr((string) $clientId, 0, 50);
+        $origin = substr((string) $origin, 0, self::LIMIT_ORIGIN);
 
-        if (!$row) {
-            return '';
+        $where = '`client_id` = ? AND `origin` = ? AND `executed` = 0';
+        $params = array($clientId, $origin);
+        if ($payload !== null) {
+            $where .= ' AND `payload` = ?';
+            $params[] = substr((string) $payload, 0, self::LIMIT_PAYLOAD);
         }
 
-        self::query()->where('id', (int) $row['id'])->update(array('executed' => 1));
+        $select = $db->prepare("SELECT `id`, `command` FROM `console` WHERE {$where} ORDER BY `id` ASC LIMIT 1");
+        $claim = $db->prepare("UPDATE `console` SET `executed` = 1 WHERE `id` = ? AND `executed` = 0");
 
-        return (string) $row['command'];
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            $select->execute($params);
+            $row = $select->fetch(PDO::FETCH_ASSOC);
+            if (!$row) {
+                return '';
+            }
+
+            $claim->execute(array((int) $row['id']));
+            if ($claim->rowCount() === 1) {
+                return (string) $row['command'];
+            }
+        }
+
+        return '';
     }
 
     /**
