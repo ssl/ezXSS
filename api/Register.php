@@ -49,6 +49,8 @@ class RegisterController extends Controller
             throw new HttpException(403, 'Signup is disabled');
         }
 
+        $body = Hook::filter('auth.signup', $body);
+
         if ((string) Setting::get('signup_mode', 'public') === 'code') {
             $code = isset($body['code']) && is_string($body['code']) ? $body['code'] : '';
             $hash = (string) Setting::get('signup_code_hash', '');
@@ -72,6 +74,8 @@ class RegisterController extends Controller
         }
 
         User::createUser($username, $password, 'user');
+
+        Hook::fire('user.created', User::findByUsername($username));
 
         return array('created' => true);
     }

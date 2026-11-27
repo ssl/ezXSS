@@ -231,7 +231,7 @@ class ReportsController extends Controller
             $out['dom_url'] = null;
         }
 
-        return $out;
+        return Hook::filter('report.view', $out, $report);
     }
 
     /**

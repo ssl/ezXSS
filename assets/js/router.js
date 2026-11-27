@@ -113,6 +113,10 @@ window.EZ = window.EZ || {};
 
   EZ.router = {
     register: function (name, def) { EZ.screens[name] = def; },
+    addRoute: function (segs, screen, pathFn) {
+      ROUTES.push({ segs: segs, screen: screen });
+      SCREEN_PATH[screen] = pathFn || function () { return segs; };
+    },
     start: start,
     resolve: resolve,
     go: go,

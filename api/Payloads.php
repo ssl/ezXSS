@@ -217,6 +217,8 @@ class PayloadsController extends Controller
     {
         $this->cap('payload.create');
 
+        Hook::fire('payload.before_create', Auth::user());
+
         $raw = '';
         if (isset($body['payload']) && is_string($body['payload'])) {
             $raw = $body['payload'];

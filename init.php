@@ -95,6 +95,8 @@ if (Config::get('DEBUG', false)) {
 }
 
 try {
+    ServerExtensions::boot();
+
     Security::bootstrap();
 
     Security::enforceKillswitch();
@@ -104,8 +106,11 @@ try {
     AppState::gate($firstSegment);
 
     if ($firstSegment === 'api') {
-        $router = new Router();
-        $router->route();
+        Hook::fire('request.before');
+        if (Hook::until('route.api', URI) === null) {
+            $router = new Router();
+            $router->route();
+        }
     } else {
         PublicRouter::dispatch();
     }

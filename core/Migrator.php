@@ -70,6 +70,12 @@ class Migrator
             $ran[] = $filename;
         }
 
+        try {
+            Hook::fire('migrate', $this->db());
+        } catch (Throwable $e) {
+            error_log('ezXSS extension migrate hook failed: ' . $e->getMessage());
+        }
+
         return $ran;
     }
 

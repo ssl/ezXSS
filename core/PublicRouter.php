@@ -8,9 +8,15 @@ class PublicRouter
     {
         $first = self::firstSegment();
 
+        Hook::fire('request.before');
+
         $reserved = self::reserved();
         if ($first !== '' && isset($reserved[$first])) {
             call_user_func($reserved[$first]);
+            return;
+        }
+
+        if (Hook::until('route.public', $first) !== null) {
             return;
         }
 
@@ -45,7 +51,7 @@ class PublicRouter
         'screens/alerts.js', 'screens/auth.js', 'screens/account.js',
         'screens/dashboard.js', 'screens/reports.js', 'screens/payloads.js',
         'screens/sessions.js', 'screens/users.js', 'screens/search.js',
-        'screens/settings.js', 'screens/docs.js', 'notepad.js', 'app.js',
+        'screens/settings.js', 'screens/docs.js', 'notepad.js', 'extend.js', 'app.js',
     );
 
     /**
@@ -56,7 +62,13 @@ class PublicRouter
         $dir = FRAMEWORK_ROOT . '/assets/js/';
         $files = array();
         $sig = array();
-        foreach (self::$bundleJs as $rel) {
+
+        $core = self::$bundleJs;
+        $appIdx = array_search('app.js', $core, true);
+        if ($appIdx !== false) {
+            unset($core[$appIdx]);
+        }
+        foreach ($core as $rel) {
             $path = $dir . $rel;
             if (is_file($path)) {
                 $files[] = $path;
@@ -64,12 +76,33 @@ class PublicRouter
             }
         }
 
+        $extRoot = FRAMEWORK_ROOT . '/extensions/';
+        $scripts = Hook::filter('panel.scripts', array());
+        if (!is_array($scripts)) {
+            $scripts = array();
+        }
+        foreach ($scripts as $path) {
+            $real = is_string($path) ? realpath($path) : false;
+            if ($real !== false && strpos($real, $extRoot) === 0 && is_file($real)) {
+                $files[] = $real;
+                $sig[] = $real . ':' . filemtime($real) . ':' . filesize($real);
+            }
+        }
+        $appPath = $dir . 'app.js';
+        if (is_file($appPath)) {
+            $files[] = $appPath;
+            $sig[] = 'app.js:' . filemtime($appPath) . ':' . filesize($appPath);
+        }
+
         $etag = '"' . md5(implode('|', $sig)) . '"';
         $lastMod = $files ? max(array_map('filemtime', $files)) : time();
 
         $noneMatch = isset($_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : '';
         $modSince = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : false;
-        if ($noneMatch === $etag || ($modSince !== false && $modSince >= $lastMod)) {
+        $notModified = ($noneMatch !== '')
+            ? ($noneMatch === $etag)
+            : ($modSince !== false && $modSince >= $lastMod);
+        if ($notModified) {
             if (!headers_sent()) {
                 http_response_code(304);
                 header('ETag: ' . $etag);

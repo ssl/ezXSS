@@ -198,6 +198,9 @@ class Auth
         $session = self::issueSession($user);
 
         Log::event('logins', (int) $user['id'], 'Logged in as ' . $user['username'], $ip);
+
+        Hook::fire('auth.login', $user);
+
         return $session;
     }
 

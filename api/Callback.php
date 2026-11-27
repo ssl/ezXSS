@@ -230,7 +230,14 @@ class CallbackController extends Controller
             return;
         }
 
+        $data = Hook::filter('report.before_store', $data);
+        if (!is_object($data)) {
+            return;
+        }
+
         $this->storeAndAlert($data);
+
+        Hook::fire('report.stored', $data);
     }
 
     /**

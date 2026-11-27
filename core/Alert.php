@@ -36,6 +36,10 @@ class Alert
             call_user_func(self::$hook, $report);
         }
 
+        self::guard(function () use ($report) {
+            Hook::fire('alert.report', $report);
+        });
+
         $sent = array();
 
         if (Setting::enabled('alert-callback')) {
@@ -339,6 +343,10 @@ class Alert
      */
     private static function sendMail(array $report, $email)
     {
+        $mailed = Hook::until('alert.mail', $report, $email);
+        if ($mailed !== null) {
+            return (bool) $mailed;
+        }
 
         $data = self::templateData($report);
         $escaped = array();
