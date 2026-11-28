@@ -29,7 +29,7 @@ class View
         $partials = self::dir() . '/partials';
         $head = str_replace(
             array('{{title}}', '{{scripts}}', '{{htmlattr}}'),
-            array($title, self::scriptTags($scripts), self::themeAttr() . ' data-panel="/' . Config::panelPath() . '"'),
+            array($title, self::scriptTags($scripts), self::themeAttr() . (isset($opts['panel']) && !$opts['panel'] ? '' : ' data-panel="/' . Config::panelPath() . '"')),
             file_get_contents($partials . '/head.html')
         );
 

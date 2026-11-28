@@ -74,7 +74,7 @@ class PayloadController extends Controller
 
             header("Content-Security-Policy: default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; worker-src 'none'; frame-ancestors 'none'");
         }
-        echo str_replace('href="/manage/', 'href="/' . Config::panelPath() . '/', (string) file_get_contents($file));
+        readfile($file);
     }
 
     /**

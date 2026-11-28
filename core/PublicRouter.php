@@ -173,6 +173,7 @@ class PublicRouter
         $html = View::page('shared', array(
             'title'   => 'Shared report &middot; ezXSS',
             'scripts' => array('shared.js'),
+            'panel'   => false,
         ));
         if ($html === null) {
             http_response_code(404);
