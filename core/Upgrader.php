@@ -37,6 +37,10 @@ class Upgrader
             if (self::tableExists('reports') && !self::tableExists('payloads')) {
                 return true;
             }
+            // A pre-4.0 run keeps its `password` setting until the very end, so a half-done run stays legacy.
+            if (self::rawSetting('password') !== null && !self::isUpgraded()) {
+                return true;
+            }
         } catch (Throwable $e) {
             return false;
         }
@@ -120,17 +124,19 @@ class Upgrader
      */
     private static function legacyShape()
     {
+        $v43 = array('customjs2' => 'TEXT', 'extensions' => 'VARCHAR(255) DEFAULT NULL');
         return array(
             '4.0' => array(
-                'payloads' => array('spider' => 'INT NOT NULL DEFAULT 0'),
+                'payloads' => array('spider' => 'INT NOT NULL DEFAULT 0', 'persistent' => "TINYINT(1) NOT NULL DEFAULT '0'") + $v43,
             ),
             '4.1' => array(
-                'payloads' => array('spider' => 'INT NOT NULL DEFAULT 0'),
+                'payloads' => array('spider' => 'INT NOT NULL DEFAULT 0') + $v43,
                 'sessions' => array('archive' => 'INT DEFAULT 0'),
             ),
             '4.2' => array(
-                'payloads' => array('spider' => 'INT NOT NULL DEFAULT 0'),
+                'payloads' => array('spider' => 'INT NOT NULL DEFAULT 0') + $v43,
                 'sessions' => array('archive' => 'INT DEFAULT 0'),
+                'reports_data' => array('extra' => 'LONGTEXT'),
             ),
             '4.3' => array(),
         );
@@ -444,6 +450,7 @@ class Upgrader
         self::transformExtensions($db);
         self::transformAlerts($db);
         self::transformSettings($db);
+        self::alignWithSchema($db);
 
         if ($preV4) {
             self::createLegacyAdmin($db);
@@ -857,6 +864,190 @@ class Upgrader
         }
         $db->exec("ALTER TABLE `settings` MODIFY `id` INT UNSIGNED NOT NULL AUTO_INCREMENT");
         self::ensureUniqueIndex($db, 'settings', 'uq_settings_setting', '`setting`');
+    }
+
+    /**
+     * The tables in schema.sql with their column definitions, keys and table options.
+     *
+     * @return array
+     */
+    private static function schemaTables()
+    {
+        $sql = (string) @file_get_contents(FRAMEWORK_ROOT . '/' . Migrator::SCHEMA_FILE);
+        preg_match_all('/CREATE TABLE IF NOT EXISTS `(\w+)` \((.*?)\n\)\s*([^;]*);/s', $sql, $m, PREG_SET_ORDER);
+        $tables = array();
+        foreach ($m as $t) {
+            $cols = array();
+            foreach (preg_split('/\n/', $t[2]) as $line) {
+                $line = rtrim(trim($line), ',');
+                if (preg_match('/^`(\w+)`\s+(.+)$/', $line, $c)) {
+                    $cols[$c[1]] = $c[2];
+                }
+            }
+            $tables[$t[1]] = array('body' => $t[2], 'options' => $t[3], 'columns' => $cols);
+        }
+        return $tables;
+    }
+
+    /**
+     * Column and index shape of a table from information_schema, keyed for comparison.
+     *
+     * @param string $table
+     * @return array
+     */
+    private static function liveShape($table)
+    {
+        $db = Database::getInstance();
+        $stmt = $db->prepare(
+            "SELECT `COLUMN_NAME`, `COLUMN_TYPE`, `IS_NULLABLE`, `COLUMN_DEFAULT`, `EXTRA`, `COLLATION_NAME`
+             FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ?"
+        );
+        $stmt->execute(array($table));
+        $cols = array();
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+            $cols[$r['COLUMN_NAME']] = array(
+                'sig'      => strtolower($r['COLUMN_TYPE']) . '|' . $r['IS_NULLABLE'] . '|' . var_export($r['COLUMN_DEFAULT'], true)
+                    . '|' . strtolower($r['EXTRA']) . '|' . $r['COLLATION_NAME'],
+                'nullable' => $r['IS_NULLABLE'] === 'YES',
+                'default'  => $r['COLUMN_DEFAULT'],
+                'type'     => strtolower($r['COLUMN_TYPE']),
+                'collation' => $r['COLLATION_NAME'],
+            );
+        }
+        $stmt = $db->prepare(
+            "SELECT `INDEX_NAME`, `NON_UNIQUE`, GROUP_CONCAT(CONCAT('`', `COLUMN_NAME`, '`') ORDER BY `SEQ_IN_INDEX`) AS `cols`
+             FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = ?
+             GROUP BY `INDEX_NAME`, `NON_UNIQUE`"
+        );
+        $stmt->execute(array($table));
+        $idx = array();
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+            if ($r['INDEX_NAME'] !== 'PRIMARY') {
+                $idx[$r['INDEX_NAME']] = ((int) $r['NON_UNIQUE'] ? 'KEY' : 'UNIQUE KEY') . ' (' . $r['cols'] . ')';
+            }
+        }
+        $stmt = $db->prepare(
+            "SELECT `ENGINE`, `TABLE_COLLATION` FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?"
+        );
+        $stmt->execute(array($table));
+        $tbl = $stmt->fetch(PDO::FETCH_ASSOC);
+        return array('columns' => $cols, 'indexes' => $idx, 'engine' => $tbl['ENGINE'], 'collation' => $tbl['TABLE_COLLATION']);
+    }
+
+    /**
+     * Replace invalid UTF-8 in a binary column row by row (only rows that need it are touched).
+     *
+     * @param object $db
+     * @param string $table
+     * @param string $column
+     */
+    private static function scrubBinaryColumn($db, $table, $column)
+    {
+        if (!self::columnExists($table, 'id')) {
+            return;
+        }
+        $rows = $db->query(
+            "SELECT `id`, `{$column}` FROM `{$table}`
+             WHERE `{$column}` <> CONVERT(CONVERT(`{$column}` USING utf8mb4) USING binary)"
+        )->fetchAll(PDO::FETCH_NUM);
+        $upd = $db->prepare("UPDATE `{$table}` SET `{$column}` = ? WHERE `id` = ?");
+        foreach ($rows as $row) {
+            $upd->execute(array(utf8Clean($row[1]), $row[0]));
+        }
+    }
+
+    /**
+     * SQL literal to backfill NULLs with before a column becomes NOT NULL (MariaDB quotes defaults, MySQL does not).
+     *
+     * @param object $db
+     * @param array $col
+     * @return string
+     */
+    private static function fillValue($db, array $col)
+    {
+        $d = $col['default'];
+        if ($d === null || $d === 'NULL') {
+            return preg_match('/int|decimal|float|double/', $col['type']) ? '0' : (preg_match('/date|time/', $col['type']) ? 'NOW()' : "''");
+        }
+        if (stripos($d, 'current_timestamp') === 0) {
+            return 'NOW()';
+        }
+        if (preg_match("/^'(.*)'$/s", $d, $m)) {
+            $d = str_replace("''", "'", $m[1]);
+        }
+        return $db->quote($d);
+    }
+
+    /**
+     * Bring every schema.sql table to exactly its schema.sql shape (engine, charset, columns, keys).
+     *
+     * @param object $db
+     */
+    private static function alignWithSchema($db)
+    {
+        foreach (self::schemaTables() as $table => $def) {
+            if (!self::tableExists($table)) {
+                continue;
+            }
+            // Build the wanted shape from schema.sql itself in a scratch table, so types compare normalized.
+            $probe = '_ezxss_shape_' . $table;
+            $db->exec("DROP TABLE IF EXISTS `{$probe}`");
+            $db->exec("CREATE TABLE `{$probe}` (" . $def['body'] . "\n) " . $def['options']);
+            try {
+                $want = self::liveShape($probe);
+            } finally {
+                $db->exec("DROP TABLE IF EXISTS `{$probe}`");
+            }
+            $have = self::liveShape($table);
+
+            if ($have['engine'] !== $want['engine']) {
+                $db->exec("ALTER TABLE `{$table}` ENGINE=" . $want['engine']);
+            }
+            if ($have['collation'] !== $want['collation']) {
+                $charset = strstr($want['collation'], '_', true);
+                $db->exec("ALTER TABLE `{$table}` CONVERT TO CHARACTER SET {$charset} COLLATE {$want['collation']}");
+                $have = self::liveShape($table);
+            }
+
+            $specs = array();
+            foreach ($def['columns'] as $column => $sqlDef) {
+                $w = $want['columns'][$column];
+                if (!isset($have['columns'][$column])) {
+                    $specs[] = "ADD COLUMN `{$column}` {$sqlDef}";
+                    continue;
+                }
+                $h = $have['columns'][$column];
+                if ($h['sig'] === $w['sig']) {
+                    continue;
+                }
+                if ($h['nullable'] && !$w['nullable']) {
+                    $db->exec("UPDATE `{$table}` SET `{$column}` = " . self::fillValue($db, $w) . " WHERE `{$column}` IS NULL");
+                }
+                $text = "`{$column}`";
+                if ($h['collation'] === null && $w['collation'] !== null) {
+                    // Binary left over from the pre-4.0 relabel: scrub invalid UTF-8 so the MODIFY cannot fail.
+                    self::scrubBinaryColumn($db, $table, $column);
+                    $text = "CONVERT(`{$column}` USING utf8mb4)";
+                }
+                if (preg_match('/^varchar\((\d+)\)/', $w['type'], $len)) {
+                    $db->exec("UPDATE `{$table}` SET `{$column}` = LEFT({$text}, {$len[1]}) WHERE CHAR_LENGTH({$text}) > {$len[1]}");
+                }
+                $specs[] = "MODIFY COLUMN `{$column}` {$sqlDef}";
+            }
+            foreach ($have['indexes'] as $name => $sig) {
+                if (!isset($want['indexes'][$name]) || $want['indexes'][$name] !== $sig) {
+                    $specs[] = "DROP INDEX `{$name}`";
+                }
+            }
+            foreach ($want['indexes'] as $name => $sig) {
+                if (!isset($have['indexes'][$name]) || $have['indexes'][$name] !== $sig) {
+                    $specs[] = 'ADD ' . str_replace(' (', " `{$name}` (", $sig);
+                }
+            }
+            if (!empty($specs)) {
+                $db->exec("ALTER TABLE `{$table}` " . implode(', ', $specs));
+            }
+        }
     }
 
     /**
