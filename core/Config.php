@@ -33,10 +33,13 @@ class Config
             'PANEL_PATH'    => 'manage',
         );
 
+        $codeVersion = self::$config['VERSION'];
         $envFile = FRAMEWORK_ROOT . '/.env';
         if (file_exists($envFile)) {
             self::parseEnvContent(file_get_contents($envFile));
         }
+        // The version belongs to the code, so an old VERSION line in .env cannot hide an update.
+        self::$config['VERSION'] = $codeVersion;
 
         self::legacyDbFallback();
 

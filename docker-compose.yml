@@ -37,7 +37,6 @@ services:
       DB_PASS: "${DB_PASS:-${dbPassword:-ezxss}}"
       DB_CHARSET: "utf8mb4"
 
-      VERSION: "${VERSION:-5.0}"
       DOMAIN: "${DOMAIN:-${domain:-localhost}}"
       TIMEZONE: "${TIMEZONE:-UTC}"
       DEBUG: "${DEBUG:-false}"
