@@ -373,6 +373,19 @@ async def handle_proxy(reader, writer, cfg):
             return
         request_method, request_uri = parts[0], parts[1]
 
+        if cfg.use_login:
+            expected = "Basic " + _basic_auth_token(cfg.username, cfg.password)
+            auth = [h for h in head_lines
+                    if h.lower().startswith("authorization")
+                    or h.lower().startswith("proxy-authorization")]
+            got = auth[0].split(" ", 1)[1].strip() if (auth and " " in auth[0]) else ""
+            if not auth or not hmac.compare_digest(got, expected):
+                writer.write(b'HTTP/1.1 401 Unauthorized\r\n'
+                             b'WWW-Authenticate: Basic realm="Proxy"\r\n'
+                             b'Proxy-Authenticate: Basic realm="Proxy"\r\n\r\n')
+                await writer.drain()
+                return
+
         content_length = _parse_content_length(head_lines)
         if content_length is not None and (content_length < 0 or content_length > MAX_MESSAGE_SIZE):
             logger.warning("Rejecting request with invalid Content-Length %s", content_length)
@@ -399,16 +412,6 @@ async def handle_proxy(reader, writer, cfg):
         response_headers = {}
         status_code = 200
         response_body = b"You can not browse the internet while on the ezXSS proxy."
-
-        if cfg.use_login:
-            expected = "Basic " + _basic_auth_token(cfg.username, cfg.password)
-            auth = [h for h in head_lines if h.lower().startswith("authorization")]
-            got = auth[0].split(" ", 1)[1].strip() if (auth and " " in auth[0]) else ""
-            if not auth or not hmac.compare_digest(got, expected):
-                writer.write(b'HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm="Proxy"\r\n\r\n')
-                writer.write(response_body)
-                await writer.drain()
-                return
 
         client_id = None
         do_proxy = False
