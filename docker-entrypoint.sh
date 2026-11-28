@@ -112,6 +112,9 @@ obtain_certificate() {
 }
 
 generate_env
+
+# The ./assets/img bind mount keeps the host owner; Apache must be able to write screenshots there.
+chown www-data:www-data "${APP_DIR}/assets/img" 2>/dev/null || true
 wait_for_db
 obtain_certificate
 
