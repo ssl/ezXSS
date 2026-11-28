@@ -360,7 +360,7 @@ class PayloadsController extends Controller
     public function doUpdate($id, $body)
     {
         $id = $this->validId($id, 'payload');
-        $this->ensurePayload($id);
+        $payload = $this->ensurePayload($id);
         $this->access($id, 'edit');
 
         $changes = array();
@@ -401,6 +401,15 @@ class PayloadsController extends Controller
                 throw new HttpException(422, 'Spidering is globally disabled by the ezXSS admin');
             }
             $changes['spider'] = (int) $spider;
+        }
+
+        $behaviourOf = array('customjs' => 'customjs', 'customjs2' => 'customjs', 'extensions' => 'extensions',
+            'persistent' => 'persistent', 'beacon' => 'beacon', 'spider' => 'spider');
+        foreach ($changes as $field => $value) {
+            $current = isset($payload[$field]) ? (string) $payload[$field] : '';
+            if ((string) $value !== $current) {
+                $this->behaviour($behaviourOf[$field]);
+            }
         }
 
         if (!empty($changes)) {
@@ -445,6 +454,7 @@ class PayloadsController extends Controller
         $id = $this->validId($id, 'payload');
         $this->ensurePayload($id);
         $this->access($id, 'edit');
+        $this->behaviour('pages');
 
         $path = isset($body['path']) && is_string($body['path']) ? trim($body['path']) : '';
 
@@ -505,6 +515,7 @@ class PayloadsController extends Controller
         $id = $this->validId($id, 'payload');
         $this->ensurePayload($id);
         $this->access($id, 'edit');
+        $this->behaviour('filters');
 
         $domain = isset($body['domain']) && is_string($body['domain']) ? trim($body['domain']) : '';
         $type = isset($body['type']) ? (string) $body['type'] : '';
@@ -647,6 +658,19 @@ class PayloadsController extends Controller
         }
         if (strlen($identifier) > 500) {
             throw new HttpException(422, 'Payload domain is too long');
+        }
+    }
+
+    /**
+     * Throw 403 unless the actor holds the payload behaviour capability.
+     *
+     * @param string $key
+     * @throws HttpException
+     */
+    private function behaviour($key)
+    {
+        if (!Permissions::canBehaviour(Auth::user(), $key)) {
+            throw new HttpException(403, 'You do not have permission to change that');
         }
     }
 
