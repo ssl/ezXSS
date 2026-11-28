@@ -461,7 +461,7 @@ class PayloadsController extends Controller
         if ($path === '' || substr($path, 0, 1) !== '/') {
             throw new HttpException(422, 'Path needs to start with a "/"');
         }
-        if (strpos($path, '~') !== false) {
+        if (strpos($path, '~') !== false || preg_match('/[\x00-\x1F\x7F]/', $path)) {
             throw new HttpException(422, 'This does not look like a valid path');
         }
         if (strlen($path) > 1000) {

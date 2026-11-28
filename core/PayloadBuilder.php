@@ -83,7 +83,7 @@ class PayloadBuilder
             if ($page === '') {
                 continue;
             }
-            $pageTokens[] = "'" . addslashes($page) . "'";
+            $pageTokens[] = "'" . self::jsEscape($page) . "'";
         }
 
         $persistentCode = $persistent ? self::load('persist') : '';
