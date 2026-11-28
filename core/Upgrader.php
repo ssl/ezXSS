@@ -172,9 +172,18 @@ class Upgrader
                 continue;
             }
             $db->exec("ALTER TABLE `{$table}` ENGINE=InnoDB");
-            // Pre-4.0 stored UTF-8 in latin1 columns; relabel via binary so CONVERT won't mojibake it.
-            $db->exec("ALTER TABLE `{$table}` CONVERT TO CHARACTER SET binary");
+            $utf8 = stripos((string) self::tableCollation($table), 'utf8') === 0;
+            if (!$utf8) {
+                // 1.x-3.1 stored UTF-8 in latin1 columns; relabel via binary so CONVERT won't mojibake it.
+                self::relabelToBinary($db, $table);
+                foreach (self::binaryColumns($table) as $column) {
+                    self::scrubBinaryColumn($db, $table, $column);
+                }
+            }
             $db->exec("ALTER TABLE `{$table}` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            if ($utf8) {
+                self::repairDoubleEncoding($db, $table);
+            }
         }
         if (self::tableExists('reports')) {
             if (!self::columnExists('reports', 'payload')) {
@@ -954,8 +963,171 @@ class Upgrader
         )->fetchAll(PDO::FETCH_NUM);
         $upd = $db->prepare("UPDATE `{$table}` SET `{$column}` = ? WHERE `id` = ?");
         foreach ($rows as $row) {
-            $upd->execute(array(utf8Clean($row[1]), $row[0]));
+            $upd->execute(array(self::legacyToUtf8($row[1]), $row[0]));
         }
+    }
+
+    /**
+     * Make legacy bytes valid UTF-8: drop a character cut off at the end, else read them as latin1.
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function legacyToUtf8($value)
+    {
+        $value = (string) $value;
+        if (preg_match('//u', $value)) {
+            return $value;
+        }
+        $trimmed = preg_replace('/[\xC0-\xF7][\x80-\xBF]{0,2}$/', '', $value);
+        if ($trimmed !== $value && preg_match('//u', $trimmed)) {
+            return $trimmed;
+        }
+        $latin = function_exists('mb_convert_encoding') ? mb_convert_encoding($value, 'UTF-8', 'Windows-1252')
+            : (string) iconv('Windows-1252', 'UTF-8//IGNORE', $value);
+        return utf8Clean($latin);
+    }
+
+    /**
+     * Undo UTF-8 that a latin1 connection stored a second time in a 3.x utf8 table.
+     *
+     * @param object $db
+     * @param string $table
+     */
+    private static function repairDoubleEncoding($db, $table)
+    {
+        if (!self::columnExists($table, 'id')) {
+            return;
+        }
+        $stmt = $db->prepare(
+            "SELECT `COLUMN_NAME` FROM information_schema.columns
+             WHERE table_schema = DATABASE() AND table_name = ? AND `CHARACTER_SET_NAME` IS NOT NULL"
+        );
+        $stmt->execute(array($table));
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $column) {
+            $rows = $db->query("SELECT `id`, `{$column}` FROM `{$table}` WHERE `{$column}` REGEXP '[^ -~\t\r\n]'")
+                ->fetchAll(PDO::FETCH_NUM);
+            $upd = $db->prepare("UPDATE `{$table}` SET `{$column}` = ? WHERE `id` = ?");
+            foreach ($rows as $row) {
+                $bytes = self::toLatin1Bytes((string) $row[1]);
+                if ($bytes !== null && $bytes !== $row[1] && preg_match('//u', $bytes)) {
+                    $upd->execute(array($bytes, $row[0]));
+                }
+            }
+        }
+    }
+
+    /**
+     * The latin1 (cp1252, as MySQL maps it) bytes of a UTF-8 string, or null when a character has no byte.
+     *
+     * @param string $value
+     * @return string|null
+     */
+    private static function toLatin1Bytes($value)
+    {
+        static $cp1252 = array(
+            0x20AC => 0x80, 0x201A => 0x82, 0x0192 => 0x83, 0x201E => 0x84, 0x2026 => 0x85, 0x2020 => 0x86,
+            0x2021 => 0x87, 0x02C6 => 0x88, 0x2030 => 0x89, 0x0160 => 0x8A, 0x2039 => 0x8B, 0x0152 => 0x8C,
+            0x017D => 0x8E, 0x2018 => 0x91, 0x2019 => 0x92, 0x201C => 0x93, 0x201D => 0x94, 0x2022 => 0x95,
+            0x2013 => 0x96, 0x2014 => 0x97, 0x02DC => 0x98, 0x2122 => 0x99, 0x0161 => 0x9A, 0x203A => 0x9B,
+            0x0153 => 0x9C, 0x017E => 0x9E, 0x0178 => 0x9F,
+        );
+        $out = '';
+        foreach (preg_split('//u', $value, -1, PREG_SPLIT_NO_EMPTY) as $ch) {
+            $cp = self::codepoint($ch);
+            if ($cp < 0x80 || ($cp >= 0xA0 && $cp <= 0xFF) || in_array($cp, array(0x81, 0x8D, 0x8F, 0x90, 0x9D), true)) {
+                $out .= chr($cp);
+            } elseif (isset($cp1252[$cp])) {
+                $out .= chr($cp1252[$cp]);
+            } else {
+                return null;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Code point of one UTF-8 character.
+     *
+     * @param string $ch
+     * @return int
+     */
+    private static function codepoint($ch)
+    {
+        $b = array_values(unpack('C*', $ch));
+        if ($b[0] < 0x80) {
+            return $b[0];
+        }
+        if ($b[0] < 0xE0) {
+            return (($b[0] & 0x1F) << 6) | ($b[1] & 0x3F);
+        }
+        if ($b[0] < 0xF0) {
+            return (($b[0] & 0x0F) << 12) | (($b[1] & 0x3F) << 6) | ($b[2] & 0x3F);
+        }
+        return (($b[0] & 0x07) << 18) | (($b[1] & 0x3F) << 12) | (($b[2] & 0x3F) << 6) | ($b[3] & 0x3F);
+    }
+
+    /**
+     * Relabel a latin1 table's text columns as binary, wide enough to hold the same text re-encoded as UTF-8.
+     *
+     * @param object $db
+     * @param string $table
+     */
+    private static function relabelToBinary($db, $table)
+    {
+        $stmt = $db->prepare(
+            "SELECT `COLUMN_NAME`, `DATA_TYPE`, `CHARACTER_MAXIMUM_LENGTH`, `IS_NULLABLE` FROM information_schema.columns
+             WHERE table_schema = DATABASE() AND table_name = ? AND `CHARACTER_SET_NAME` IS NOT NULL"
+        );
+        $stmt->execute(array($table));
+        $specs = array();
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $c) {
+            $type = strtolower($c['DATA_TYPE']);
+            if ($type === 'char' || $type === 'varchar') {
+                $bin = 'VARBINARY(' . min(65000, 4 * (int) $c['CHARACTER_MAXIMUM_LENGTH']) . ')';
+            } elseif ($type === 'tinytext' || $type === 'text') {
+                $bin = 'MEDIUMBLOB';
+            } else {
+                $bin = 'LONGBLOB';
+            }
+            $specs[] = "MODIFY `{$c['COLUMN_NAME']}` {$bin} " . ($c['IS_NULLABLE'] === 'YES' ? 'NULL' : 'NOT NULL');
+        }
+        if (!empty($specs)) {
+            $db->exec("ALTER TABLE `{$table}` " . implode(', ', $specs));
+        }
+    }
+
+    /**
+     * The binary/blob columns of a table.
+     *
+     * @param string $table
+     * @return array
+     */
+    private static function binaryColumns($table)
+    {
+        $stmt = Database::getInstance()->prepare(
+            "SELECT `COLUMN_NAME` FROM information_schema.columns
+             WHERE table_schema = DATABASE() AND table_name = ?
+             AND `DATA_TYPE` IN ('binary', 'varbinary', 'tinyblob', 'blob', 'mediumblob', 'longblob')"
+        );
+        $stmt->execute(array($table));
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * A table's collation, or null when it does not exist.
+     *
+     * @param string $table
+     * @return string|null
+     */
+    private static function tableCollation($table)
+    {
+        $stmt = Database::getInstance()->prepare(
+            "SELECT `TABLE_COLLATION` FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?"
+        );
+        $stmt->execute(array($table));
+        $c = $stmt->fetchColumn();
+        return $c === false ? null : $c;
     }
 
     /**
