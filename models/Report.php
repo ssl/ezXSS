@@ -781,7 +781,7 @@ class Report extends Model
         }
         if (!empty($idents)) {
             // Same resolution as Payload::resolveByIdentifier: domain/path wins over the bare domain.
-            $norm = "TRIM(BOTH '/' FROM SUBSTRING_INDEX(SUBSTRING_INDEX(LOWER(`reports`.`payload`), '?', 1), '://', -1))";
+            $norm = self::normalizedPayloadSql('`reports`.`payload`');
             $seg1 = 'SUBSTRING_INDEX(' . $norm . ", '/', 1)";
             $seg2 = 'SUBSTRING_INDEX(' . $norm . ", '/', 2)";
             $place = implode(', ', array_fill(0, count($idents), '?'));
@@ -792,6 +792,22 @@ class Report extends Model
         }
 
         return empty($ors) ? null : '(' . implode(' OR ', $ors) . ')';
+    }
+
+    /**
+     * SQL twin of PayloadBuilder::normalizeIdentifier for a payload column: lowercase, no scheme or //, no query, no trailing /.
+     *
+     * @param string $column
+     * @return string
+     */
+    public static function normalizedPayloadSql($column)
+    {
+        $p = 'LOWER(TRIM(' . $column . '))';
+        $at = "LOCATE('://', " . $p . ')';
+        $bare = '(CASE WHEN ' . $p . " LIKE '//%' THEN SUBSTRING(" . $p . ', 3)'
+            . ' WHEN ' . $at . ' > 1 AND SUBSTRING(' . $p . ', 1, ' . $at . " - 1) REGEXP '^[a-z][a-z0-9+.-]*$'"
+            . ' THEN SUBSTRING(' . $p . ', ' . $at . ' + 3) ELSE ' . $p . ' END)';
+        return "TRIM(TRAILING '/' FROM SUBSTRING_INDEX(" . $bare . ", '?', 1))";
     }
 
     /**
