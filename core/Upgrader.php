@@ -220,7 +220,7 @@ class Upgrader
             return;
         }
         $username = self::rawSetting('username');
-        $username = ($username !== null && trim($username) !== '') ? substr(trim($username), 0, 25) : 'admin';
+        $username = ($username !== null && trim($username) !== '') ? mb_substr(trim($username), 0, 25, 'UTF-8') : 'admin';
 
         $stmt = $db->prepare("INSERT INTO `users` (`username`, `password`, `role`) VALUES (?, ?, 'admin')");
         $stmt->execute(array($username, $password));
