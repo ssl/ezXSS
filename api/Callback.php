@@ -392,10 +392,7 @@ class CallbackController extends Controller
 
         $data->screenshot = isset($data->screenshot) ? $data->screenshot : '';
 
-        $ip = isset($data->ip) && $data->ip !== ''
-            ? $data->ip
-            : (isset($server['REMOTE_ADDR']) ? $server['REMOTE_ADDR'] : '');
-        $data->ip = utf8CleanCut($ip, self::LIMIT_IP);
+        $data->ip = utf8CleanCut(defined('USER_IP') ? USER_IP : '', self::LIMIT_IP);
 
         if (!isset($data->uri) || $data->uri === '') {
             $data->uri = isset($server['HTTP_REFERER']) ? $server['HTTP_REFERER']
