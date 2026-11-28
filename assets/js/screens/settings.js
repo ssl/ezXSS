@@ -417,12 +417,12 @@ window.EZ = window.EZ || {};
           '<button class="btn btn--primary" type="button" id="ext-apply">Apply update</button>' +
         "</div>" +
       "</div>";
-    dom.on(el("ext-apply"), "click", function () { applyRemote(d.id); });
+    dom.on(el("ext-apply"), "click", function () { applyRemote(d.id, d.remote_hash); });
     dom.on(el("ext-cancel"), "click", closeExtModal);
   }
 
-  function applyRemote(id) {
-    EZ.api.post("/extensions/remote/" + encodeURIComponent(id), {}, { noGlobalError: true }).then(function () {
+  function applyRemote(id, hash) {
+    EZ.api.post("/extensions/remote/" + encodeURIComponent(id), { hash: hash || "" }, { noGlobalError: true }).then(function () {
       EZ.ui.toast("Extension updated from remote.", "success");
       closeExtModal();
       loadExtensions();

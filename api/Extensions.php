@@ -92,7 +92,7 @@ class ExtensionsController extends Controller
     {
         $this->begin(array('GET', 'POST'));
         if ($this->method() === 'POST') {
-            return $this->respond($this->doRemoteApply($id));
+            return $this->respond($this->doRemoteApply($id, $this->input()));
         }
         return $this->respond($this->doRemoteCheck($id));
     }
@@ -238,11 +238,12 @@ class ExtensionsController extends Controller
 
         $remote = $this->fetchInfoFromSource($row['source']);
         return array(
-            'id'         => (int) $row['id'],
-            'is_custom'  => false,
-            'up_to_date' => (string) $row['version'] === (string) $remote['version'],
-            'current'    => $current,
-            'remote'     => $remote,
+            'id'          => (int) $row['id'],
+            'is_custom'   => false,
+            'up_to_date'  => (string) $row['version'] === (string) $remote['version'],
+            'current'     => $current,
+            'remote'      => $remote,
+            'remote_hash' => hash('sha256', (string) $remote['code']),
         );
     }
 
@@ -250,17 +251,25 @@ class ExtensionsController extends Controller
      * Apply the remote version to a remote-sourced extension. Refuses custom extensions.
      *
      * @param int $id
+     * @param array $body
      * @throws HttpException
      */
-    public function doRemoteApply($id)
+    public function doRemoteApply($id, array $body = array())
     {
         $this->cap('settings.manage');
         $row = $this->ensure($id);
         if ($row['source'] === 'custom') {
             throw new HttpException(422, 'Custom extensions cannot be remotely updated');
         }
+        $reviewed = isset($body['hash']) && is_string($body['hash']) ? strtolower($body['hash']) : '';
+        if (!preg_match('/^[a-f0-9]{64}$/', $reviewed)) {
+            throw new HttpException(422, 'Send the hash of the remote code you reviewed');
+        }
 
         $remote = $this->fetchInfoFromSource($row['source']);
+        if (!hash_equals($reviewed, hash('sha256', (string) $remote['code']))) {
+            throw new HttpException(409, 'The remote code changed since you reviewed it. Check for updates again.');
+        }
         Extension::edit((int) $row['id'], array(
             'name'        => $remote['name'],
             'description' => $remote['description'],
