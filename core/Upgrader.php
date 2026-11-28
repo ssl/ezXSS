@@ -379,9 +379,6 @@ class Upgrader
         if (!self::tableExists($table) || !self::tableExists($dataTable)) {
             return;
         }
-        if (!self::columnExists($table, 'dom')) {
-            return;
-        }
         $present = array();
         foreach ($columns as $column) {
             if (self::columnExists($table, $column)) {
@@ -401,9 +398,7 @@ class Upgrader
                  SELECT `id`, {$cols}, 0 FROM `{$table}`"
             );
         }
-        foreach ($present as $column) {
-            $db->exec("ALTER TABLE `{$table}` DROP COLUMN `{$column}`");
-        }
+        $db->exec("ALTER TABLE `{$table}` DROP COLUMN `" . implode('`, DROP COLUMN `', $present) . '`');
     }
 
     /**
