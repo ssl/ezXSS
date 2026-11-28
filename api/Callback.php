@@ -25,6 +25,11 @@ class CallbackController extends Controller
     private $persistResponse = null;
 
     /**
+     * Fields the server sets on the callback object; never taken from the posted body.
+     */
+    const INTERNAL_FIELDS = array('id', 'time', 'domain', 'inferredMeta', 'screenshotData', 'screenshotDecoded', 'screenshotBase');
+
+    /**
      * HTTP entry point. Returns the placeholder body for a normal callback.
      */
     public function handle()
@@ -40,6 +45,9 @@ class CallbackController extends Controller
         try {
             $data = $this->readBody();
             if ($data !== null) {
+                foreach (self::INTERNAL_FIELDS as $field) {
+                    unset($data->$field);
+                }
                 $this->process($data);
             }
         } catch (Throwable $e) {
