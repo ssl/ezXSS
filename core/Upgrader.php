@@ -505,6 +505,7 @@ class Upgrader
             $db->exec("ALTER TABLE `reports` ADD COLUMN `meta` JSON DEFAULT NULL");
         }
         $db->exec("ALTER TABLE `reports` MODIFY `id` INT UNSIGNED NOT NULL AUTO_INCREMENT");
+        $db->exec("UPDATE `reports` SET `archive` = 0 WHERE `archive` IS NULL");
         $db->exec("ALTER TABLE `reports` MODIFY `archive` TINYINT(1) NOT NULL DEFAULT 0");
         self::ensureIndex($db, 'reports', 'idx_reports_created', '`created_at`');
     }
@@ -581,6 +582,7 @@ class Upgrader
         }
 
         $db->exec("ALTER TABLE `sessions` MODIFY `id` INT UNSIGNED NOT NULL AUTO_INCREMENT");
+        $db->exec("UPDATE `sessions` SET `archive` = 0 WHERE `archive` IS NULL");
         $db->exec("ALTER TABLE `sessions` MODIFY `archive` TINYINT(1) NOT NULL DEFAULT 0");
         self::ensureIndex($db, 'sessions', 'idx_sessions_updated', '`updated_at`');
     }
