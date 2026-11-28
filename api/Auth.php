@@ -88,7 +88,7 @@ class AuthController extends Controller
             throw new HttpException(422, 'Enter your current account password to enable two-factor authentication.');
         }
 
-        if (preg_match('/[^A-Za-z2-7]/', $secret) || !Totp::verify($secret, $code)) {
+        if (strlen($secret) < 16 || strlen($secret) > 64 || preg_match('/[^A-Za-z2-7]/', $secret) || !Totp::verify($secret, $code)) {
             throw new HttpException(422, 'Invalid two-factor code. Scan the QR again and retry.');
         }
 

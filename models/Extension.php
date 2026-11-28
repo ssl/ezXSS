@@ -59,6 +59,9 @@ class Extension extends Model
         $enabled     = isset($fields['enabled']) ? ($fields['enabled'] ? 1 : 0) : 1;
 
         self::validate($name, $description, $version, $author);
+        if (strlen($source) > 250) {
+            throw new HttpException(422, 'Source must be less than 250 characters');
+        }
 
         return (int) self::create(array(
             'name'        => $name,
