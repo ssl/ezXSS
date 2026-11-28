@@ -566,8 +566,12 @@ class CallbackController extends Controller
      */
     private function matchesList($origin, array $list)
     {
+        $origin = strtolower((string) $origin);
+        if (preg_match('/^(\[[^\]]*\]|[^:]*):\d+$/', $origin, $m)) {
+            $origin = $m[1];
+        }
         foreach ($list as $domain) {
-            $domain = (string) $domain;
+            $domain = strtolower((string) $domain);
             if ($origin !== '' && $origin === $domain) {
                 return true;
             }
