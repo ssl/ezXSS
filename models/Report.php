@@ -795,6 +795,24 @@ class Report extends Model
     }
 
     /**
+     * Ids of the reports that resolve to a payload identifier (same matching as the report scope).
+     *
+     * @param string $identifier
+     * @return array
+     */
+    public static function idsOnPayload($identifier)
+    {
+        $params = array();
+        $where = self::scopeClause(array('identifiers' => array((string) $identifier)), $params);
+        if ($where === null) {
+            return array();
+        }
+        $stmt = Database::getInstance()->prepare('SELECT `id` FROM `reports` WHERE ' . $where);
+        $stmt->execute($params);
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+    /**
      * Whether a user can reach a report through a direct grant or through its payload.
      *
      * @param int $userId

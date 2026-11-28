@@ -1010,6 +1010,7 @@ select.input { appearance: none; background-image: none; padding-right: var(--sp
 .modal-scrim--top.is-open { display: flex; animation: fade var(--dur-base) var(--ease-out); }
 .modal { width: min(480px, 100%); background: var(--color-surface); border: 1px solid var(--color-border-soft); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); max-height: 90vh; overflow: auto; }
 .modal--sm { width: min(400px, 100%); }
+.modal--choice { width: min(560px, 100%); }
 .modal--wide { width: min(760px, 100%); }
 .domview__modal { width: min(1100px, 100%); display: flex; flex-direction: column; overflow: hidden; }
 .domview__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--color-border-soft); }
@@ -1019,7 +1020,7 @@ select.input { appearance: none; background-image: none; padding-right: var(--sp
 .modal__head { display: flex; align-items: center; justify-content: space-between; padding: var(--space-sm) var(--space-lg); border-bottom: 1px solid var(--color-border-soft); }
 .modal__title { font-size: var(--text-base); font-weight: var(--weight-semibold); }
 .modal__body { padding: var(--space-lg); }
-.modal__foot { padding: var(--space-sm) var(--space-lg); border-top: 1px solid var(--color-border-soft); display: flex; justify-content: flex-end; gap: var(--space-xs); }
+.modal__foot { padding: var(--space-sm) var(--space-lg); border-top: 1px solid var(--color-border-soft); display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-xs); }
 
 .checklist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2xs); }
 .checkitem { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-sm); background: var(--color-surface-2); font-size: var(--text-sm); cursor: pointer; }

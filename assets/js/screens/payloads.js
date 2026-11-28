@@ -1124,16 +1124,28 @@ window.EZ = window.EZ || {};
   }
 
   function deletePayload(p) {
-    EZ.ui.confirm({
-      title: "Delete payload", danger: true, confirmLabel: "Delete",
-      message: "Delete payload \u201c" + (p.identifier || "") + "\u201d? Its pages, filters and collect settings are removed. Captured reports are kept."
-    }).then(function (ok) {
-      if (!ok) { return; }
-      EZ.api.del("/payloads/delete/" + encodeURIComponent(p.id)).then(function () {
-        EZ.ui.toast("Payload deleted.", "success");
-        EZ.router.navigate("payloads");
-      }).catch(function () {});
-    });
+    var name = "\u201c" + (p.identifier || "") + "\u201d";
+    EZ.api.get("/payloads/datacount/" + encodeURIComponent(p.id)).then(function (res) {
+      var c = res.data || {};
+      var reports = Number(c.reports) || 0, sessions = Number(c.sessions) || 0;
+      var opts = { title: "Delete payload", danger: true, confirmLabel: "Delete",
+        message: "Delete payload " + name + "? Its pages, filters and collect settings are removed." };
+      if (reports || sessions) {
+        opts.message += " It still has " + reports + (reports === 1 ? " report" : " reports") + " and " +
+          sessions + (sessions === 1 ? " session" : " sessions") + ".";
+        opts.danger = false;
+        opts.confirmLabel = "Delete payload, keep data";
+        if (c.can_delete) { opts.altLabel = "Delete payload and data"; }
+      }
+      return EZ.ui.confirm(opts).then(function (choice) {
+        if (!choice) { return; }
+        var withData = choice === "alt";
+        return EZ.api.del("/payloads/delete/" + encodeURIComponent(p.id) + (withData ? "?data=1" : "")).then(function () {
+          EZ.ui.toast(withData ? "Payload and its data deleted." : "Payload deleted.", "success");
+          EZ.router.navigate("payloads");
+        });
+      });
+    }).catch(function () {});
   }
 
   if (EZ.autosave && EZ.autosave.register) {

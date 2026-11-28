@@ -4,7 +4,7 @@ class PayloadsController extends Controller
     /**
      * Web-reachable actions.
      */
-    public static $routable = array('index', 'get', 'update', 'delete', 'addpage', 'deletepage', 'addfilter', 'deletefilter', 'reassign');
+    public static $routable = array('index', 'get', 'update', 'delete', 'addpage', 'deletepage', 'addfilter', 'deletefilter', 'reassign', 'datacount');
 
         /**
          * GET lists, POST creates payloads.
@@ -49,7 +49,7 @@ class PayloadsController extends Controller
     }
 
     /**
-     * DELETE /api/payloads/delete/{id}.
+     * DELETE /api/payloads/delete/{id}; with ?data=1 its reports and sessions are deleted too.
      *
      * @param int $id
      */
@@ -57,9 +57,25 @@ class PayloadsController extends Controller
     {
         $this->begin('DELETE');
 
-        $data = $this->doDelete($id);
-        Log::event('payloads', Auth::id(), 'Deleted payload #' . (isset($data['id']) ? $data['id'] : $id), USER_IP);
+        $data = $this->doDelete($id, queryParam('data', '0') === '1');
+        $what = 'Deleted payload #' . (isset($data['id']) ? $data['id'] : $id);
+        if (!empty($data['reports']) || !empty($data['sessions'])) {
+            $what .= ' with ' . (int) $data['reports'] . ' reports and ' . (int) $data['sessions'] . ' sessions';
+        }
+        Log::event('payloads', Auth::id(), $what, USER_IP);
         $this->respond($data);
+    }
+
+    /**
+     * GET /api/payloads/datacount/{id} - reports and sessions still on a payload, and whether the actor may delete them.
+     *
+     * @param int $id
+     */
+    public function datacount($id)
+    {
+        $this->begin('GET');
+
+        $this->respond($this->doDataCount($id));
     }
 
     /**
@@ -424,21 +440,76 @@ class PayloadsController extends Controller
     }
 
     /**
-     * Delete a payload (payload.delete + delete access). Pages/filters/collect/sharing cascade.
+     * Delete a payload (payload.delete + delete access); pages/filters/collect/sharing cascade, reports and sessions only with $withData.
      *
      * @param int $id
+     * @param bool $withData
      * @return array
      */
-    public function doDelete($id)
+    public function doDelete($id, $withData = false)
     {
         $this->cap('payload.delete');
         $id = $this->validId($id, 'payload');
         $payload = $this->ensurePayload($id);
         $this->access($id, 'delete');
 
+        $reports = 0;
+        $sessions = 0;
+        if ($withData) {
+            @set_time_limit(0);
+            $may = $this->dataRights($payload);
+            if (!$may['reports'] || !$may['sessions']) {
+                throw new HttpException(403, 'You do not have permission to delete the reports and sessions of this payload');
+            }
+            foreach (Report::idsOnPayload($payload['identifier']) as $reportId) {
+                Report::deleteFull($reportId);
+                $reports++;
+            }
+            foreach (Session::groupsOnPayload($payload['identifier']) as $group) {
+                Session::deleteGroup($group['client_id'], $group['origin'], Session::normalizePayloadIdentifier($payload['identifier']));
+                $sessions++;
+            }
+        }
+
         Payload::deleteCascade($id);
 
-        return array('deleted' => true, 'id' => $id);
+        return array('deleted' => true, 'id' => $id, 'reports' => $reports, 'sessions' => $sessions);
+    }
+
+    /**
+     * Count the reports and sessions still on a payload before it is deleted.
+     *
+     * @param int $id
+     * @return array
+     */
+    public function doDataCount($id)
+    {
+        $this->cap('payload.delete');
+        $id = $this->validId($id, 'payload');
+        $payload = $this->ensurePayload($id);
+        $this->access($id, 'delete');
+
+        $may = $this->dataRights($payload);
+        return array(
+            'reports'    => count(Report::idsOnPayload($payload['identifier'])),
+            'sessions'   => count(Session::groupsOnPayload($payload['identifier'])),
+            'can_delete' => $may['reports'] && $may['sessions'],
+        );
+    }
+
+    /**
+     * Whether the actor may delete the reports and the sessions of a payload: owner, or the matching viewall cap.
+     *
+     * @param array $payload
+     * @return array
+     */
+    private function dataRights(array $payload)
+    {
+        $owner = (int) $payload['user_id'] === (int) Auth::id();
+        return array(
+            'reports'  => Auth::can('report.view') && ($owner || Auth::can('report.viewall')),
+            'sessions' => Auth::can('session.view') && ($owner || Auth::can('session.viewall')),
+        );
     }
 
     /**

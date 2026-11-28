@@ -368,6 +368,13 @@ window.EZ = window.EZ || {};
       else { okBtn.classList.add("btn--primary"); okBtn.classList.remove("btn--danger"); }
     }
     if (cancelBtn) { cancelBtn.style.display = isAlert ? "none" : ""; }
+    var altBtn = document.getElementById("confirm-alt");
+    if (altBtn) {
+      altBtn.hidden = !opts.altLabel || isAlert;
+      altBtn.textContent = opts.altLabel || "";
+    }
+    var box = m.querySelector(".modal");
+    if (box) { box.classList.toggle("modal--choice", !!opts.altLabel && !isAlert); }
     m.classList.add("is-open");
     var focusEl = (opts.danger && !isAlert && cancelBtn) ? cancelBtn : okBtn;
     if (focusEl && focusEl.focus) { try { focusEl.focus(); } catch (e) {} }
@@ -383,6 +390,8 @@ window.EZ = window.EZ || {};
     var cancelBtn = document.getElementById("confirm-cancel");
     if (okBtn) { dom.on(okBtn, "click", function () { settle(true); }); }
     if (cancelBtn) { dom.on(cancelBtn, "click", function () { settle(false); }); }
+    var altBtn = document.getElementById("confirm-alt");
+    if (altBtn) { dom.on(altBtn, "click", function () { settle("alt"); }); }
     dom.on(m, "click", function (e) {
       if (e.target === m || e.target.closest("[data-close-modal]")) { settle(false); }
     });

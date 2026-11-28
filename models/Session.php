@@ -618,6 +618,21 @@ class Session extends Model
     }
 
     /**
+     * The (client_id, origin) groups recorded on a payload identifier.
+     *
+     * @param string $identifier
+     * @return array
+     */
+    public static function groupsOnPayload($identifier)
+    {
+        $stmt = Database::getInstance()->prepare(
+            'SELECT DISTINCT `client_id`, `origin` FROM `sessions` WHERE ' . self::PAYLOAD_IDENTIFIER_SQL . ' = ?'
+        );
+        $stmt->execute(array(self::normalizePayloadIdentifier($identifier)));
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Delete an entire group: every `sessions` row, its `sessions_data` blob rows, and its `console` commands.
      *
      * @param string $clientId
