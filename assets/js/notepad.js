@@ -11,6 +11,9 @@ window.EZ = window.EZ || {};
   var overlay, textarea, header;
   var built = false;
   var openState = false;
+  var inited = false;
+  var suspended = false;
+  var saveTimer = null;
 
   function readLS(key) {
     try {
@@ -22,15 +25,13 @@ window.EZ = window.EZ || {};
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
   }
 
-  var save = util.debounce(function () {
-    if (!textarea || !EZ.api) { return; }
-    EZ.api.post("/account/notepad", { notepad: textarea.value }).then(function () {
-      if (EZ.ui) { EZ.ui.flashSaved(); }
-    }).catch(function () {  });
-  }, DEBOUNCE_MS);
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () { saveTimer = null; saveNow(); }, DEBOUNCE_MS);
+  }
 
   function saveNow() {
-    if (!textarea || !EZ.api) { return; }
+    if (!textarea || !EZ.api || suspended) { return; }
     EZ.api.post("/account/notepad", { notepad: textarea.value }).then(function () {
       if (EZ.ui) { EZ.ui.flashSaved(); }
     }).catch(function () {});
@@ -155,6 +156,7 @@ window.EZ = window.EZ || {};
 
   function open() {
     build();
+    suspended = false;
     seed();
     applyStored();
     overlay.hidden = false;
@@ -171,7 +173,17 @@ window.EZ = window.EZ || {};
 
   function toggle() { if (openState) { close(); } else { open(); } }
 
+  function reset() {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    suspended = true;
+    close();
+    if (textarea) { textarea.value = ""; }
+  }
+
   function init() {
+    if (inited) { return; }
+    inited = true;
     dom.on(document, "click", function (e) {
       var trigger = e.target.closest("[data-notepad-open]");
       if (!trigger) { return; }
@@ -183,5 +195,5 @@ window.EZ = window.EZ || {};
     });
   }
 
-  EZ.notepad = { init: init };
+  EZ.notepad = { init: init, reset: reset };
 })(window.EZ);

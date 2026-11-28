@@ -22,6 +22,7 @@ window.EZ = window.EZ || {};
 
   function showLogin() {
     var auth = el("auth"), app = el("app");
+    if (EZ.notepad && EZ.notepad.reset) { EZ.notepad.reset(); }
     if (auth) { auth.hidden = false; }
     if (app) { app.hidden = true; }
     pendingChallenge = null;
