@@ -337,6 +337,15 @@ class CallbackController extends Controller
 
             $reportArray = Report::getFull($doubleReport);
             $data->id = $doubleReport;
+            $data->domain = defined('HOST') ? HOST : '';
+
+            $nonce = $this->beaconNonce($data);
+            if ($nonce !== '') {
+                try {
+                    Report::linkBeaconNonce($nonce, $doubleReport);
+                } catch (Throwable $e) {
+                }
+            }
         }
 
         $data->time = time();
