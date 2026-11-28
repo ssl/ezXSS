@@ -269,7 +269,7 @@ class Session extends Model
     }
 
     /**
-     * Paginated grouped session listing: one entry per (client_id + origin)
+     * Paginated grouped session listing: one entry per (client_id + origin + payload) group.
      *
      * @param array $opts
      * @return array
@@ -715,7 +715,8 @@ class Session extends Model
     }
 
     /**
-     * Zeroed session stat map (the shape dashboardStats always returns
+     * Zeroed session stat map (the shape dashboardStats always returns).
+     *
      * @return array
      */
     private static function emptySessionStats()

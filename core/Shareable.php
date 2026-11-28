@@ -84,7 +84,7 @@ trait Shareable
     }
 
     /**
-     * List all rows of a table the user may view: rows they own plus shared.
+     * List all rows of a table the user may view: rows they own plus rows shared with them or globally.
      *
      * @param int $userId
      * @param string $forTable

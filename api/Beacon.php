@@ -45,7 +45,7 @@ class BeaconController
     }
 
     /**
-     * HTTP entry point. Emits the typed resource for {type}, then records.
+     * HTTP entry point. Records the beacon signal when a nonce is given, then emits the typed resource for {type}.
      */
     public function handle()
     {
@@ -189,7 +189,7 @@ class BeaconController
     }
 
     /**
-     * Emit the minimal typed resource for a channel (img PNG, css, ...), so another.
+     * Emit the minimal typed resource for a channel (img PNG, css, ...), so the no-JS CSP probe can reuse the beacon responses.
      *
      * @param string $type
      */

@@ -13,12 +13,12 @@ class ExtensionsController extends Controller
     const HEADER_CLOSE = '// </ezXSS extension>';
 
     /**
-     * Test/transport seam. When set it replaces the real curl call and returns.
+     * Test/transport seam. When set it replaces the real curl call and returns array('status' => int, 'body' => string|false).
      */
     public static $transport = null;
 
     /**
-     * GET -> list.
+     * GET lists, POST creates extensions.
      */
     public function index()
     {
@@ -75,7 +75,7 @@ class ExtensionsController extends Controller
     }
 
     /**
-     * POST /api/extensions/install - install extension(s) from a GitHub repo.
+     * POST /api/extensions/install - install extension(s) from a GitHub repo or Gist URL.
      */
     public function install()
     {
@@ -84,7 +84,7 @@ class ExtensionsController extends Controller
     }
 
     /**
-     * GET /api/extensions/remote/{id} - check the remote source, return.
+     * GET /api/extensions/remote/{id} - check the remote source; POST applies the remote version.
      *
      * @param int $id
      */
@@ -192,7 +192,7 @@ class ExtensionsController extends Controller
     }
 
     /**
-     * Install extension(s) from a GitHub repo or Gist URL: a repo URL may.
+     * Install extension(s) from a GitHub repo or Gist URL: a repo blob URL installs that one file, a repo URL every .js file.
      *
      * @param array $body
      * @throws HttpException
@@ -215,7 +215,7 @@ class ExtensionsController extends Controller
     }
 
     /**
-     * Check a remote-sourced extension against its upstream source and return.
+     * Check a remote-sourced extension against its upstream source and return the current and remote info with an up_to_date flag.
      *
      * @param int $id
      * @return array
@@ -247,7 +247,7 @@ class ExtensionsController extends Controller
     }
 
     /**
-     * Apply the remote version to a remote-sourced extension. Refuses custom.
+     * Apply the remote version to a remote-sourced extension. Refuses custom extensions.
      *
      * @param int $id
      * @throws HttpException
@@ -430,7 +430,7 @@ class ExtensionsController extends Controller
     }
 
     /**
-     * Classify + validate a GitHub/Gist install URL. Returns a descriptor:
+     * Classify + validate a GitHub/Gist install URL into a repo (user, repo, file) or gist (id) descriptor.
      *
      * @param string $url
      * @throws HttpException
@@ -506,7 +506,7 @@ class ExtensionsController extends Controller
     }
 
     /**
-     * Extract extension metadata + code from the header block:
+     * Extract the name/description/author/version header block and the code that follows it.
      *
      * @param string $code
      * @throws HttpException
@@ -606,7 +606,7 @@ class ExtensionsController extends Controller
     }
 
     /**
-     * Perform one GET against an allow-listed host. Maps GitHub status codes.
+     * Perform one GET against an allow-listed host, mapping GitHub error statuses to an HttpException.
      *
      * @param string $url
      * @throws HttpException

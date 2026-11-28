@@ -23,7 +23,7 @@ class Auth
     const CHALLENGE_TTL = 300;
 
     /**
-     * Require a valid bearer token. Loads the owning user and token into.
+     * Require a valid bearer token. Loads the owning user and token into the request context and returns the user.
      *
      * @throws HttpException
      */

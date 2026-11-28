@@ -38,7 +38,7 @@ class Mailer
     }
 
     /**
-     * PHP mail() with a proper envelope sender (-f). Without a valid return-path.
+     * PHP mail() with a proper envelope sender (-f) when the from address is valid, else plain mail().
      *
      * @param string $to
      * @param string $subject
@@ -57,7 +57,7 @@ class Mailer
     }
 
     /**
-     * The address mail is sent from: the configured SMTP "from" when it.
+     * The address mail is sent from: the smtp_from setting when it holds an address, else ezxss@{domain}.
      *
      * @return string
      */
@@ -110,7 +110,7 @@ class Mailer
     }
 
     /**
-     * Build the RFC822 message (CRLF line endings, dot-stuffed) for the DATA.
+     * Build the RFC822 message (CRLF line endings, dot-stuffed) for the DATA command.
      *
      * @param array $cfg
      * @param string $to

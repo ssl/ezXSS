@@ -7,7 +7,7 @@ class LogsController extends Controller
     public static $routable = array('index');
 
     /**
-     * GET /api/logs - paginated audit list (admin-only).
+     * GET /api/logs - paginated audit list (log.view).
      */
     public function index()
     {
@@ -18,7 +18,7 @@ class LogsController extends Controller
     }
 
     /**
-     * Build the paginated log list. Admin-only (global data).
+     * Build the paginated log list. Requires log.view (global data).
      *
      * @return array
      */

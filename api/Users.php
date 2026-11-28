@@ -58,7 +58,7 @@ class UsersController extends Controller
     }
 
     /**
-     * GET/POST/DELETE /api/users/roles[/{name}] - manage editable roles. Needs.
+     * GET/POST/DELETE /api/users/roles[/{name}] - manage editable roles. Needs user.roles.
      *
      * @param string $name
      * @throws HttpException
@@ -91,7 +91,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Create ($name null) or edit an editable role. A non-admin may only grant.
+     * Create ($name null) or edit an editable role. Only capabilities the actor holds are granted; the admin role is fixed.
      *
      * @param string $name
      * @param array $body
@@ -179,7 +179,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Granted-cap list from a { permissions: {cap: bool} } body, capped.
+     * Granted-cap list from a { permissions: {cap: bool} } body, capped to the capabilities the actor holds.
      *
      * @param array $body
      */
@@ -224,7 +224,7 @@ class UsersController extends Controller
     }
 
     /**
-     * List users (safe fields). Admin only. Paginated (id ASC) by default.
+     * List users (safe fields). Requires user.manage. Paginated (id ASC) by default.
      *
      * @return array
      */
@@ -280,7 +280,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Create a user. Admin only.
+     * Create a user. Requires user.manage, plus user.roles for a permissions override.
      *
      * @param string $body
      * @throws HttpException
@@ -320,7 +320,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Read one user (safe fields). Admin, or the user themselves.
+     * Read one user (safe fields). Requires user.manage, or the user themselves.
      *
      * @param int $id
      * @throws HttpException
@@ -345,7 +345,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Update a user. Admin may change role/permissions and reset the password.
+     * Update a user (user.manage, or self); username, role and ban need user.manage, permissions also user.roles.
      *
      * @param int $id
      * @param string $body
@@ -481,7 +481,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Delete a user. Admin only. Cannot delete yourself or the last admin.
+     * Delete a user. Requires user.manage. Cannot delete yourself or the last admin.
      *
      * @param int $id
      * @throws HttpException

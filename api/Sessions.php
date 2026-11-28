@@ -81,7 +81,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * POST /api/sessions/bulk - archive/unarchive/delete an id array in one.
+     * POST /api/sessions/bulk - archive/unarchive/delete an id array or a scope in one request.
      */
     public function bulk()
     {
@@ -101,7 +101,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * GET /api/sessions/payloads - distinct payload identifiers that have.
+     * GET /api/sessions/payloads - distinct payload identifiers that have sessions.
      */
     public function payloads()
     {
@@ -111,7 +111,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * Build the paginated grouped list for the actor. Admins list all groups.
+     * Build the paginated grouped list for the actor. session.viewall lists all groups; others only those on accessible payloads.
      *
      * @return array
      */
@@ -351,7 +351,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * Apply a bulk state change (archive/unarchive/delete) over an id array. Each.
+     * Apply a bulk state change (archive/unarchive/delete) over an id array or a scope, skipping each group the actor cannot edit.
      *
      * @param string $body
      * @throws HttpException
@@ -414,7 +414,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * Resolve a scope descriptor to the representative ids of every matching.
+     * Resolve a scope descriptor to the representative ids of every matching group, refusing more than SCOPE_MAX.
      *
      * @param string $scope
      * @throws HttpException
@@ -467,7 +467,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * Normalize a scope object into a countGroups/groupRepresentativeIds $opts:
+     * Normalize a scope object into a countGroups/groupRepresentativeIds $opts array.
      *
      * @param string $raw
      * @throws HHttpException
@@ -495,7 +495,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * The distinct payload identifiers that have sessions, scoped for non-admins.
+     * The distinct payload identifiers that have sessions, limited to accessible payloads without session.viewall.
      */
     public function doPayloads()
     {
@@ -508,7 +508,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * Resolve a group from a representative session row id. Returns.
+     * Resolve a group from a representative session row id. Returns its client_id, origin and payload.
      *
      * @param int $id
      * @throws HHttpException
@@ -527,7 +527,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * Enforce access to a session group via its payload identifier. session.viewall.
+     * Enforce access to a session group via its payload identifier. session.viewall bypasses; others need access to the payload.
      *
      * @param string $payloadIdentifier
      * @param string $type

@@ -110,7 +110,7 @@ class AppState
     }
 
     /**
-     * Pure disposition resolver. Returns one of:
+     * Pure disposition resolver. Returns an action of pass, json (status + error) or screen (status + screen file).
      *
      * @param string $state
      * @param string $firstSegment
@@ -224,7 +224,7 @@ class AppState
     }
 
     /**
-     * Render a first-run screen (views/panel/<name>) with the panel-scoped.
+     * Render a first-run screen (views/panel/<name>) with the panel-scoped response headers.
      *
      * @param string $file
      * @param int $status

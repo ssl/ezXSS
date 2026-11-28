@@ -43,7 +43,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * The 12 real dashboard stats for the actor's scope. Admin reads the cached.
+     * The 12 real dashboard stats for the actor's scope. report.viewall + session.viewall read the shared global cache; others get a per-user cache.
      */
     public function doStats()
     {
@@ -80,7 +80,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Top-10 most-common values for one field within the actor's scope. Admin.
+     * Top-10 most-common values for one field within the actor's scope; report.viewall counts every report.
      *
      * @param string $field
      * @throws HttpException
@@ -153,7 +153,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * The cached ezXSS version status. Pings status.ezxss.com at most once.
+     * The cached ezXSS version status. Pings status.ezxss.com at most once per VERSION_TTL.
      */
     public function doVersion()
     {
@@ -197,7 +197,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Compare the running version against the latest public release. state.
+     * Compare the running version against the latest public release and return update_available + state.
      *
      * @param string $current
      * @param string $latest
@@ -220,7 +220,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Merge the version comparison (update_available + state) into a version.
+     * Merge the version comparison (update_available + state) into a version status result.
      *
      * @param array $result
      */

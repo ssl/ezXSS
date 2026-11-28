@@ -7,7 +7,7 @@ class View
     }
 
     /**
-     * Render a panel page. Returns the final HTML, or null when the body.
+     * Render a panel page. Returns the final HTML, or null when the name is invalid or the body file is missing.
      *
      * @param string $name
      * @param array $opts
@@ -67,7 +67,7 @@ class View
     }
 
     /**
-     * Build the deferred <script> tags for a page. The 'bundle' token resolves.
+     * Build the deferred <script> tags for a page. The 'bundle' token resolves to /manage/bundle.js.
      *
      * @param array $scripts
      */

@@ -7,7 +7,7 @@ class PayloadController extends Controller
     public static $routable = array('serve', 'index');
 
     /**
-     * HTTP entry point. Resolves the payload for the current request, assembles.
+     * HTTP entry point. Serves the tester or a no-JS probe for their suffixes, else a custom payload file or the assembled payload JS.
      */
     public function serve()
     {
@@ -162,7 +162,7 @@ class PayloadController extends Controller
     }
 
     /**
-     * The catch-all config: a payload built purely from the admin's "Payload.
+     * The catch-all config: a payload built purely from the global settings (collect defaults, global JS, extensions).
      *
      * @param string $identifier
      * @param array $vars
@@ -194,7 +194,7 @@ class PayloadController extends Controller
     }
 
     /**
-     * Gather the full assemble() config for a resolved payload row, applying.
+     * Gather the full assemble() config for a resolved payload row, applying the global toggles and the owner's behaviour capabilities.
      *
      * @param array $row
      * @param array $vars
@@ -300,7 +300,7 @@ class PayloadController extends Controller
     }
 
     /**
-     * version/domain/protocol for the {{...}} placeholders
+     * The version/domain/protocol values for the {{...}} placeholders.
      */
     public function vars()
     {

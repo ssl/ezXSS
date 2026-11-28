@@ -53,7 +53,7 @@ class Report extends Model
     const CACHE_TTL          = 300;
 
     /**
-     * Cache keys for the admin-global dashboard aggregates.
+     * Cache keys for the global (report.viewall) dashboard stats and the most-common panels.
      */
     const CACHE_DASHBOARD_GLOBAL = 'dashboard:stats:global';
     const CACHE_COMMON_PREFIX    = 'dashboard:common:';
@@ -194,7 +194,7 @@ class Report extends Model
     }
 
     /**
-     * Fill a withheld heavy field (dom|screenshot) on an existing report, matching.
+     * Fill a withheld heavy field (dom|screenshot) on an existing report, matching the data row's compression.
      *
      * @param int $reportId
      * @param string $field

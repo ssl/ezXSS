@@ -45,7 +45,7 @@ class SharedController extends Controller
     }
 
     /**
-     * Project a report's values down to exactly what a share exposes. Plain.
+     * Project a report's values down to exactly what a share exposes: the allowed columns plus all or only the selected extra keys.
      *
      * @param array $allowed
      * @param array $values
@@ -113,7 +113,7 @@ class SharedController extends Controller
     }
 
     /**
-     * Extract the slug from the request URI (second path segment), stripping.
+     * Extract the slug from the request URI (second path segment), stripping a trailing .json.
      *
      * @return string
      */

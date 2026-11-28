@@ -44,7 +44,7 @@ class Permissions
     );
 
     /**
-     * Role -> capability presets. 'admin' is the special "all" marker. Users get.
+     * Role -> capability presets. 'admin' is the special "all" marker. Users get the default set below.
      */
     private static $presets = array(
         'admin'  => '*',
@@ -63,7 +63,7 @@ class Permissions
     }
 
     /**
-     * The preset capability map (cap => bool) for a role, before per-user.
+     * The preset capability map (cap => bool) for a role, before per-user overrides.
      *
      * @param string $role
      */
@@ -169,7 +169,7 @@ class Permissions
     }
 
     /**
-     * Whether a user may use a specific advanced payload behaviour:
+     * Whether a user may use a specific advanced payload behaviour: payload.behaviour plus that behaviour's child capability.
      *
      * @param array $user
      * @param string $key
@@ -203,7 +203,7 @@ class Permissions
     }
 
     /**
-     * Validate + normalize a client-supplied permissions object into a clean.
+     * Validate + normalize a client-supplied permissions object into a clean cap => bool map of known capabilities.
      *
      * @param array $permissions
      */

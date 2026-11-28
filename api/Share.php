@@ -133,7 +133,7 @@ class ShareController extends Controller
     }
 
     /**
-     * Load the resource row (validating the table allow-list and id) and ensure.
+     * Load the resource row (validating the table allow-list and id) and ensure the actor holds the viewall cap, or the share cap as owner.
      *
      * @param string $table
      * @param int $id

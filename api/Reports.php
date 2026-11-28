@@ -133,7 +133,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * Build a paginated list for the actor. report.viewall lists all reports; others.
+     * Build a paginated list for the actor. report.viewall lists all reports; others see only the reports in their scope.
      *
      * @return array
      */
@@ -181,7 +181,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * Full detail for a report. Omits the DOM inline when it exceeds.
+     * Full detail for a report. Omits the DOM inline when it exceeds the dom_threshold setting and points to /api/reports/dom/{id}.
      *
      * @param int $id
      */
@@ -269,7 +269,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * Create an on-request share (needs report.share AND edit access). Validates.
+     * Create an on-request share (needs report.share AND edit access). Validates the columns and the optional expiry.
      *
      * @param int $id
      * @param string $body
@@ -390,7 +390,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * Enforce per-report access. report.viewall bypasses; everyone else relies.
+     * Enforce per-report access. report.viewall bypasses; everyone else relies on Report::userCan().
      *
      * @param int $id
      * @param string $type
@@ -420,7 +420,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * Parse an optional expiry into a future unix timestamp, or null. Accepts.
+     * Parse an optional expiry into a future unix timestamp, or null. Accepts a unix timestamp or any strtotime() string.
      *
      * @param string $value
      * @throws HttpException

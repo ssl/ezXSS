@@ -44,7 +44,7 @@ class PublicRouter
     }
 
     /**
-     * The deferred panel scripts, in load order. boot.js is NOT here: it.
+     * The deferred panel scripts, in load order. boot.js is NOT here: it loads first from the page head.
      */
     private static $bundleJs = array(
         'core.js', 'api.js', 'ui.js', 'csp.js', 'autosave.js', 'router.js',
@@ -128,7 +128,7 @@ class PublicRouter
     }
 
     /**
-     * The /callback endpoint - the report-ingest handler (public, no auth, open.
+     * The /callback endpoint - the report-ingest handler (public, no auth, open CORS).
      */
     public static function callback()
     {
@@ -142,7 +142,7 @@ class PublicRouter
     }
 
     /**
-     * The /s/{slug} endpoint - the public on-request report share (no auth, open
+     * The /s/{slug} endpoint - the public on-request report share (no auth): the share page, its .json data or its .png screenshot.
      */
     public static function share()
     {
@@ -239,7 +239,7 @@ class PublicRouter
     }
 
     /**
-     * The /beacon/{type}/{nonce} endpoints - public beacon sinks that return
+     * The /beacon/{type}/{nonce} endpoints - public beacon sinks that return a minimal typed resource.
      */
     public static function beacon()
     {
@@ -249,7 +249,7 @@ class PublicRouter
     }
 
     /**
-     * The /manage[/...] endpoint - the admin panel SPA shell (no auth). The sa
+     * The /manage[/...] endpoint - the admin panel SPA shell (no auth). The same handler serves /manage/register and /manage/bundle.js.
      */
     public static function manage()
     {
@@ -296,7 +296,7 @@ class PublicRouter
     }
 
     /**
-     * The /manage/register screen - the public self-registration page, ser
+     * The /manage/register screen - the public self-registration page, served only while signup is enabled.
      */
     public static function register()
     {
@@ -323,7 +323,7 @@ class PublicRouter
     }
 
     /**
-     * Emit the panel-scoped response headers (content type + cache + CSP) shared.
+     * Emit the panel-scoped response headers (content type + cache + CSP) shared by the panel shell and the first-run screens.
      *
      * @param int $
      */
@@ -377,7 +377,7 @@ class PublicRouter
     }
 
     /**
-     * The 403 shown when the panel is requested on a host that i
+     * The 403 shown when the panel is requested on a host that is not a configured panel domain.
      */
     public static function blockedPage()
     {

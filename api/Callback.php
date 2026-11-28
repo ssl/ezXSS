@@ -64,7 +64,7 @@ class CallbackController extends Controller
     }
 
     /**
-     * /callback/attach - fill a heavy field (dom|screenshot) the payload withheld
+     * /callback/attach - fill a heavy field (dom|screenshot) the payload withheld.
      */
     public function attach()
     {
@@ -257,7 +257,7 @@ class CallbackController extends Controller
     }
 
     /**
-     * Duplicate-aware store + alert, applying the filter-save / filter-alert.
+     * Duplicate-aware store + alert, applying the filter-save / filter-alert settings.
      *
      * @param array $data
      */
@@ -344,7 +344,7 @@ class CallbackController extends Controller
     }
 
     /**
-     * Build the array handed to the Alert seam: the stored report merged.
+     * Build the array handed to the Alert seam: the stored report merged with the callback's id, payload, time, screenshot and domain.
      *
      * @param array $data
      * @param array $reportArray
@@ -365,7 +365,7 @@ class CallbackController extends Controller
     }
 
     /**
-     * Register the payload-chosen attach token -> report id (short TTL)
+     * Register the payload-chosen attach token -> report id (short TTL).
      *
      * @param array $data
      * @param int $reportId
@@ -438,7 +438,7 @@ class CallbackController extends Controller
     }
 
     /**
-     * Capture request metadata into a JSON-ready array: Sec-Fetch-* headers.
+     * Capture request metadata into a JSON-ready array: Sec-Fetch-* headers, client hints, DOM size and CSP details.
      *
      * @param array $data
      * @return array

@@ -2,7 +2,7 @@
 class PayloadBuilder
 {
     /**
-     * noCollect row order. 'useragent' is emitted as 'user-agent'; 'screenshot'
+     * noCollect row order. 'useragent' is emitted as 'user-agent'; 'screenshot' is handled by the screenshot module instead.
      */
     const NO_COLLECT_ROWS = array(
         'uri', 'ip', 'referer', 'useragent', 'cookies',
@@ -124,7 +124,7 @@ class PayloadBuilder
     }
 
     /**
-     * Load and render a named custom payload (payload/custom/{name}.js)
+     * Load and render a named custom payload (payload/custom/{name}.js).
      *
      * @param string $name
      * @param array $vars

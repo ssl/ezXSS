@@ -381,7 +381,7 @@ class SettingsController extends Controller
     }
 
     /**
-     * Validate the duplicate-columns set (array or CSV), rejecting anything not.
+     * Validate the duplicate-columns set (array or CSV), rejecting anything not in DUPLICATE_LIGHT or dom.
      *
      * @param string $value
      * @throws HttpException
@@ -427,7 +427,7 @@ class SettingsController extends Controller
     }
 
     /**
-     * Validate the global extension selection (array/CSV of ids); each must be.
+     * Validate the global extension selection (array/CSV of ids); each must be an enabled extension.
      *
      * @param string $value
      * @throws HttpException

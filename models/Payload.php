@@ -27,7 +27,7 @@ class Payload extends Model
     }
 
     /**
-     * The fixed set of collectable options. Column = 'collect_' . $option and
+     * The fixed set of collectable options. Column = 'collect_' . $option in payload_collect and in the global settings.
      */
     const COLLECT_OPTIONS = array(
         'uri', 'ip', 'referer', 'useragent', 'cookies',

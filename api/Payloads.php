@@ -113,7 +113,7 @@ class PayloadsController extends Controller
     }
 
     /**
-     * POST /api/payloads/reassign/{id} - admin-only move of a payload.
+     * POST /api/payloads/reassign/{id} - move a payload to another owner (payload.viewall).
      *
      * @param int $id
      */
@@ -208,7 +208,7 @@ class PayloadsController extends Controller
     }
 
     /**
-     * Create a payload owned by the actor. Requires payload.create and validates.
+     * Create a payload (payload.create); payload.viewall may set the owner and skips the panel-domain and domain-conflict checks.
      *
      * @param string $body
      * @throws HttpException
@@ -262,7 +262,7 @@ class PayloadsController extends Controller
     }
 
     /**
-     * Resolve the owner id for a create: a non-admin is forced to the actor.
+     * Resolve the owner id for a create: without payload.viewall it is always the actor.
      *
      * @param string $body
      * @throws HttpException
@@ -292,7 +292,7 @@ class PayloadsController extends Controller
     }
 
     /**
-     * Reassign an existing payload to another owner (admin-only). The owner.
+     * Reassign an existing payload to another owner (payload.viewall + payload.create), refusing a domain collision for the target user.
      *
      * @param int $id
      * @param string $body
@@ -351,7 +351,7 @@ class PayloadsController extends Controller
     }
 
     /**
-     * Update editable config (edit access). Enforces the global persistent.
+     * Update editable config (edit access). Enforces the global persistent/beacon/spider switches and the behaviour capability of each changed field.
      *
      * @param int $id
      * @param string $body
@@ -424,7 +424,7 @@ class PayloadsController extends Controller
     }
 
     /**
-     * Delete a payload (owner/admin). Pages/filters/collect/sharing cascade.
+     * Delete a payload (payload.delete + delete access). Pages/filters/collect/sharing cascade.
      *
      * @param int $id
      * @return array
@@ -564,7 +564,7 @@ class PayloadsController extends Controller
     }
 
         /**
-         * Apply collect toggles: an option is enabled only when its global setting.
+         * Apply collect toggles: an option is enabled only when its global setting is enabled too.
          *
          * @param int $payloadId
          * @param array $requested
@@ -588,7 +588,7 @@ class PayloadsController extends Controller
     }
 
     /**
-     * Normalize and validate an extensions selection (array or CSV of ids)
+     * Normalize and validate an extensions selection (array or CSV of ids).
      *
      * @param array $input
      * @throws HttpException
@@ -690,7 +690,7 @@ class PayloadsController extends Controller
     }
 
     /**
-     * Ensure the actor may access a payload. payload.viewall bypasses; others go through.
+     * Ensure the actor may access a payload. payload.viewall bypasses; others go through Payload::ensureAccess().
      *
      * @param int $id
      * @param string $type

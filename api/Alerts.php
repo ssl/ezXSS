@@ -42,7 +42,7 @@ class AlertsController extends Controller
     }
 
     /**
-     * GET/POST /api/alerts/settings - global config + master switches (admin).
+     * GET/POST /api/alerts/settings - global config + master switches (settings.manage).
      */
     public function settings()
     {
@@ -102,7 +102,7 @@ class AlertsController extends Controller
     }
 
     /**
-     * Global destinations + master switches (admin only).
+     * Global destinations + master switches (settings.manage).
      */
     public function doReadGlobal()
     {
@@ -146,7 +146,7 @@ class AlertsController extends Controller
     }
 
     /**
-     * Send a sample alert to the actor's own enabled destinations only, honoring.
+     * Send a sample alert to the actor's own enabled destinations only, skipping methods whose master switch is off.
      *
      * @return array
      */
@@ -310,7 +310,7 @@ class AlertsController extends Controller
     }
 
     /**
-     * Validate and upsert alert rows for a user (0 = global). Only sections.
+     * Validate and upsert alert rows for a user (0 = global). Only sections present in the body are written.
      *
      * @param int $userId
      * @param array $body

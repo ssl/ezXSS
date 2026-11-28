@@ -69,7 +69,7 @@ abstract class Controller
     }
 
     /**
-     * Admin preamble: CORS, Bearer auth and an optional method gate. Returns the actor.
+     * Management API preamble: CORS, Bearer auth and an optional method gate. Returns the actor.
      *
      * @param array $methods
      */

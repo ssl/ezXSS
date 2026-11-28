@@ -72,7 +72,7 @@ class UpdateController extends Controller
     }
 
     /**
-     * Legacy -> 5.0 upgrade (no 5.0 auth exists yet). Rate-limited and advises.
+     * Legacy -> 5.0 upgrade (no 5.0 auth exists yet). Rate-limited per IP and advises enabling IP_LOCK.
      *
      * @throws HttpException
      */
