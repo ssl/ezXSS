@@ -26,6 +26,7 @@ window.EZ = window.EZ || {};
   }
 
   function save() {
+    if (EZ.state && EZ.state.user && textarea) { EZ.state.user.notepad = textarea.value; }
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function () { saveTimer = null; saveNow(); }, DEBOUNCE_MS);
   }
