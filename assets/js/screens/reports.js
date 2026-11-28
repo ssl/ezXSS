@@ -121,7 +121,7 @@ window.EZ = window.EZ || {};
       '<div class="withbar" hidden id="rp-withbar">' +
         '<span class="withbar__label">\u21B3 with selected:</span>' +
         '<button class="btn btn--sm" type="button" id="rp-bulk-delete">Delete</button>' +
-        '<button class="btn btn--sm" type="button" id="rp-bulk-archive">Archive</button>' +
+        '<button class="btn btn--sm" type="button" id="rp-bulk-archive">' + (listState.archive ? "Unarchive" : "Archive") + "</button>" +
       "</div>" +
       '<div class="pagination" id="rp-pagination"></div>';
 
@@ -220,6 +220,8 @@ window.EZ = window.EZ || {};
   }
 
   function loadList() {
+    var bulkBtn = el("rp-bulk-archive");
+    if (bulkBtn) { bulkBtn.textContent = listState.archive ? "Unarchive" : "Archive"; }
     var tb = el("rp-tbody");
     if (!tb) { return; }
     tb.innerHTML = '<tr><td colspan="' + colCount() + '" class="faint">' + EZ.ui.loading() + '</td></tr>';
