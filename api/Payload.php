@@ -57,7 +57,7 @@ class PayloadController extends Controller
     }
 
     /**
-     * Serve the payload-tester HTML page (reached via /{payload}*test). The page.
+     * Serve the payload-tester HTML page (reached via /{payload}*test).
      */
     private function serveTester()
     {
@@ -78,7 +78,8 @@ class PayloadController extends Controller
     }
 
     /**
-     * ?nj single-char code => [tested directive, resource channel].
+     * No-JS CSP probe suffix code (/{payload}*<code>) => [tested directive, resource channel].
+     *
      * @return array
      */
     private static function nojsMap()
@@ -100,7 +101,9 @@ class PayloadController extends Controller
     }
 
     /**
-     * Serve a no-JS CSP probe (/{payload}*<char>). The payload.
+     * Serve a no-JS CSP probe (/{payload}*<code>): record the probe hit, then emit the channel response.
+     *
+     * @param string $code
      */
     private function serveNojsProbe($code)
     {
@@ -140,7 +143,7 @@ class PayloadController extends Controller
     }
 
     /**
-     * Resolve a payload for an identifier and assemble its JS. When nothing.
+     * Resolve a payload for an identifier and assemble its JS, or the fallback payload when none matches.
      *
      * @param string $identifier
      * @param array $vars

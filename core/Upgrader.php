@@ -935,7 +935,7 @@ class Upgrader
     }
 
     /**
-     * Replace invalid UTF-8 in a binary column row by row (only rows that need it are touched).
+     * Replace invalid UTF-8 in the rows of a binary column that have it.
      *
      * @param object $db
      * @param string $table
