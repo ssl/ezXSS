@@ -952,19 +952,23 @@ class Upgrader
         if (!self::columnExists($table, 'id')) {
             return;
         }
-        $rows = $db->query(
-            "SELECT `id`, `{$column}` FROM `{$table}`
+        $ids = $db->query(
+            "SELECT `id` FROM `{$table}`
              WHERE `{$column}` IS NOT NULL AND (CONVERT(`{$column}` USING utf8mb4) IS NULL
              OR `{$column}` <> CONVERT(CONVERT(`{$column}` USING utf8mb4) USING binary))"
-        )->fetchAll(PDO::FETCH_NUM);
+        )->fetchAll(PDO::FETCH_COLUMN);
+        $sel = $db->prepare("SELECT `{$column}` FROM `{$table}` WHERE `id` = ?");
         $upd = $db->prepare("UPDATE `{$table}` SET `{$column}` = ? WHERE `id` = ?");
-        foreach ($rows as $row) {
-            $upd->execute(array(self::legacyToUtf8($row[1]), $row[0]));
+        foreach ($ids as $id) {
+            $sel->execute(array($id));
+            $value = $sel->fetchColumn();
+            $sel->closeCursor();
+            $upd->execute(array(self::legacyToUtf8((string) $value), $id));
         }
     }
 
     /**
-     * Make legacy bytes valid UTF-8: drop a character cut off at the end, else read them as latin1.
+     * Make legacy bytes valid UTF-8: drop a cut-off last character of otherwise UTF-8 text, else read them as latin1.
      *
      * @param string $value
      * @return string
@@ -976,7 +980,7 @@ class Upgrader
             return $value;
         }
         $trimmed = preg_replace('/[\xC0-\xF7][\x80-\xBF]{0,2}$/', '', $value);
-        if ($trimmed !== $value && preg_match('//u', $trimmed)) {
+        if ($trimmed !== $value && preg_match('//u', $trimmed) && preg_match('/[\x80-\xFF]/', $trimmed)) {
             return $trimmed;
         }
         $latin = function_exists('mb_convert_encoding') ? mb_convert_encoding($value, 'UTF-8', 'Windows-1252')
@@ -1001,13 +1005,17 @@ class Upgrader
         );
         $stmt->execute(array($table));
         foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $column) {
-            $rows = $db->query("SELECT `id`, `{$column}` FROM `{$table}` WHERE `{$column}` REGEXP '[^ -~\t\r\n]'")
-                ->fetchAll(PDO::FETCH_NUM);
+            $ids = $db->query("SELECT `id` FROM `{$table}` WHERE `{$column}` REGEXP '[^ -~\t\r\n]'")
+                ->fetchAll(PDO::FETCH_COLUMN);
+            $sel = $db->prepare("SELECT `{$column}` FROM `{$table}` WHERE `id` = ?");
             $upd = $db->prepare("UPDATE `{$table}` SET `{$column}` = ? WHERE `id` = ?");
-            foreach ($rows as $row) {
-                $bytes = self::toLatin1Bytes((string) $row[1]);
-                if ($bytes !== null && $bytes !== $row[1] && preg_match('//u', $bytes)) {
-                    $upd->execute(array($bytes, $row[0]));
+            foreach ($ids as $id) {
+                $sel->execute(array($id));
+                $value = (string) $sel->fetchColumn();
+                $sel->closeCursor();
+                $bytes = self::toLatin1Bytes($value);
+                if ($bytes !== null && $bytes !== $value && preg_match('//u', $bytes)) {
+                    $upd->execute(array($bytes, $id));
                 }
             }
         }
