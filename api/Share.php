@@ -39,6 +39,10 @@ class ShareController extends Controller
         $row = $this->ensureOwnerOrAdmin($table, $id);
         $id = (int) $id;
         $ownerUid = isset($row['user_id']) ? (int) $row['user_id'] : 0;
+        if ($table === 'reports') {
+            $payload = Report::payloadOf($id);
+            $ownerUid = $payload ? (int) $payload['user_id'] : 0;
+        }
 
         $body = $this->input();
         $action = isset($body['action']) ? (string) $body['action'] : '';
@@ -154,6 +158,10 @@ class ShareController extends Controller
 
         $actorId = Auth::id();
         $ownerUid = isset($row['user_id']) ? (int) $row['user_id'] : 0;
+        if ($table === 'reports') {
+            $payload = Report::payloadOf($id);
+            $ownerUid = $payload ? (int) $payload['user_id'] : 0;
+        }
 
         if ($table === 'payloads') {
             if (Auth::can('payload.viewall')) {

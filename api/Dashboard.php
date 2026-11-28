@@ -63,7 +63,7 @@ class DashboardController extends Controller
         }
 
         $reportOpts = $reportAll ? array() : array(
-            'ids' => Auth::can('report.view') ? Report::accessibleIds(Auth::id()) : array(),
+            'scope' => Auth::can('report.view') ? Report::scopeFor(Auth::id()) : array(),
         );
         $sessionOpts = $sessionAll ? array() : array(
             'identifiers' => Auth::can('session.view') ? Payload::accessibleIdentifiers(Auth::id()) : array(),
@@ -99,11 +99,11 @@ class DashboardController extends Controller
             }, Report::CACHE_TTL);
         }
 
-        $reportIds = Report::accessibleIds(Auth::id());
+        $scope = Report::scopeFor(Auth::id());
         $key = Report::CACHE_COMMON_PREFIX . 'v' . Report::dashboardVersion() . ':' . $field . ':' . Auth::id();
 
-        return Cache::remember($key, function () use ($field, $reportIds) {
-            return $this->computeCommon($field, Report::commonData(array('ids' => $reportIds)));
+        return Cache::remember($key, function () use ($field, $scope) {
+            return $this->computeCommon($field, Report::commonData(array('scope' => $scope)));
         }, Report::CACHE_TTL);
     }
 

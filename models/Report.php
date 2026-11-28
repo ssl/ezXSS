@@ -426,15 +426,12 @@ class Report extends Model
             $where[] = '(' . implode(' OR ', $ors) . ')';
         }
 
-        if (array_key_exists('ids', $opts) && $opts['ids'] !== null) {
-            $ids = array();
-            foreach ((array) $opts['ids'] as $id) {
-                $ids[(int) $id] = (int) $id;
-            }
-            if (empty($ids)) {
+        if (array_key_exists('scope', $opts) && $opts['scope'] !== null) {
+            $scopeSql = self::scopeClause($opts['scope'], $params);
+            if ($scopeSql === null) {
                 return array('rows' => array(), 'total' => 0);
             }
-            $where[] = '`id` IN (' . implode(',', array_values($ids)) . ')';
+            $where[] = $scopeSql;
         }
 
         $whereSql = empty($where) ? '' : (' WHERE ' . implode(' AND ', $where));
@@ -442,7 +439,7 @@ class Report extends Model
         $filtered = (isset($opts['search']) && $opts['search'] !== '' && $opts['search'] !== null)
             || $payloadDomain !== ''
             || $catchall
-            || (array_key_exists('ids', $opts) && $opts['ids'] !== null);
+            || (array_key_exists('scope', $opts) && $opts['scope'] !== null);
 
         $capped = false;
 
@@ -644,8 +641,9 @@ class Report extends Model
      */
     public static function dashboardStats(array $opts)
     {
-        $whereSql = self::scopeIdWhere($opts, $scoped);
-        if ($scoped === false) {
+        $params = array();
+        $whereSql = self::scopeWhere($opts, $params);
+        if ($whereSql === null) {
             return self::emptyReportStats();
         }
 
@@ -653,7 +651,7 @@ class Report extends Model
         $stmt = $db->prepare(
             'SELECT `origin`, `referer`, `created_at` FROM `reports`' . $whereSql . ' ORDER BY `id` ASC'
         );
-        $stmt->execute();
+        $stmt->execute($params);
 
         $weekAgo = time() - 604800;
         $stats = self::emptyReportStats();
@@ -696,8 +694,9 @@ class Report extends Model
      */
     public static function commonData(array $opts)
     {
-        $whereSql = self::scopeIdWhere($opts, $scoped);
-        if ($scoped === false) {
+        $params = array();
+        $whereSql = self::scopeWhere($opts, $params);
+        if ($whereSql === null) {
             return array();
         }
 
@@ -705,7 +704,7 @@ class Report extends Model
         $stmt = $db->prepare(
             'SELECT `origin`, `ip`, `cookies`, `useragent`, `payload` FROM `reports`' . $whereSql . ' ORDER BY `id` ASC'
         );
-        $stmt->execute();
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -727,27 +726,103 @@ class Report extends Model
     }
 
     /**
-     * Build the `id IN (...)` scope clause for the dashboard aggregates (ids inlined as ints).
+     * WHERE clause for the dashboard aggregates: '' for no scope, null when nothing is in scope.
      *
      * @param array $opts
-     * @param array &$scoped
-     * @return string
+     * @param array &$params
+     * @return string|null
      */
-    private static function scopeIdWhere(array $opts, &$scoped)
+    private static function scopeWhere(array $opts, &$params)
     {
-        $scoped = true;
-        if (!array_key_exists('ids', $opts) || $opts['ids'] === null) {
+        if (!array_key_exists('scope', $opts) || $opts['scope'] === null) {
             return '';
         }
+        $sql = self::scopeClause($opts['scope'], $params);
+        return $sql === null ? null : ' WHERE ' . $sql;
+    }
+
+    /**
+     * Reports a user can see without report.viewall: direct grants plus reports on their payloads.
+     *
+     * @param int $userId
+     * @return array
+     */
+    public static function scopeFor($userId)
+    {
+        return array(
+            'ids'         => self::accessibleIds($userId),
+            'identifiers' => Payload::accessibleIdentifiers($userId),
+        );
+    }
+
+    /**
+     * SQL predicate for a scopeFor() result, or null when the scope is empty.
+     *
+     * @param array $scope
+     * @param array &$params
+     * @return string|null
+     */
+    private static function scopeClause(array $scope, &$params)
+    {
+        $ors = array();
+
         $ids = array();
-        foreach ((array) $opts['ids'] as $id) {
+        foreach ((array) (isset($scope['ids']) ? $scope['ids'] : array()) as $id) {
             $ids[(int) $id] = (int) $id;
         }
-        if (empty($ids)) {
-            $scoped = false;
-            return '';
+        if (!empty($ids)) {
+            $ors[] = '`reports`.`id` IN (' . implode(',', array_values($ids)) . ')';
         }
-        return ' WHERE `id` IN (' . implode(',', array_values($ids)) . ')';
+
+        $idents = array();
+        foreach ((array) (isset($scope['identifiers']) ? $scope['identifiers'] : array()) as $ident) {
+            $idents[(string) $ident] = (string) $ident;
+        }
+        if (!empty($idents)) {
+            // Same resolution as Payload::resolveByIdentifier: domain/path wins over the bare domain.
+            $norm = "TRIM(BOTH '/' FROM SUBSTRING_INDEX(SUBSTRING_INDEX(LOWER(`reports`.`payload`), '?', 1), '://', -1))";
+            $seg1 = 'SUBSTRING_INDEX(' . $norm . ", '/', 1)";
+            $seg2 = 'SUBSTRING_INDEX(' . $norm . ", '/', 2)";
+            $place = implode(', ', array_fill(0, count($idents), '?'));
+            $ors[] = '(' . $seg2 . ' IN (' . $place . ') OR (' . $seg1 . ' IN (' . $place . ')'
+                . ' AND NOT EXISTS (SELECT 1 FROM `payloads` `p` WHERE `p`.`identifier` = ' . $seg2
+                . ' AND ' . $seg2 . ' <> ' . $seg1 . ')))';
+            $params = array_merge($params, array_values($idents), array_values($idents));
+        }
+
+        return empty($ors) ? null : '(' . implode(' OR ', $ors) . ')';
+    }
+
+    /**
+     * Whether a user can reach a report through a direct grant or through its payload.
+     *
+     * @param int $userId
+     * @param int $id
+     * @param string $type
+     * @return bool
+     */
+    public static function userCan($userId, $id, $type)
+    {
+        if (self::hasAccess($userId, $id, $type, 'reports')) {
+            return true;
+        }
+        $payload = self::payloadOf($id);
+        return $payload ? Payload::hasAccess($userId, (int) $payload['id'], $type, 'payloads') : false;
+    }
+
+    /**
+     * The payload row a report was collected on, or null.
+     *
+     * @param int $id
+     * @return array|null
+     */
+    public static function payloadOf($id)
+    {
+        $report = self::find((int) $id);
+        if (!$report || !isset($report['payload']) || (string) $report['payload'] === '') {
+            return null;
+        }
+        return Payload::resolveByIdentifier((string) $report['payload']);
     }
 
     /**

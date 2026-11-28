@@ -165,7 +165,7 @@ class ReportsController extends Controller
         if ($viewAll) {
             $opts['cacheTotal'] = true;
         } else {
-            $opts['ids'] = Report::accessibleIds(Auth::id());
+            $opts['scope'] = Report::scopeFor(Auth::id());
         }
 
         $result = Report::listFor($opts);
@@ -400,7 +400,9 @@ class ReportsController extends Controller
         if (Auth::can('report.viewall')) {
             return;
         }
-        Report::ensureAccess(Auth::id(), $id, $type, 'reports');
+        if (!Report::userCan(Auth::id(), $id, $type)) {
+            throw new HttpException(403, 'Forbidden');
+        }
     }
 
     /**
