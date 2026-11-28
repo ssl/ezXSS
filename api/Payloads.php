@@ -659,6 +659,10 @@ class PayloadsController extends Controller
         if (strlen($identifier) > 500) {
             throw new HttpException(422, 'Payload domain is too long');
         }
+        $parts = explode('/', $identifier);
+        if (isset($parts[1]) && strtolower($parts[1]) === Config::panelPath()) {
+            throw new HttpException(422, 'Payload path /' . Config::panelPath() . ' is the panel URL');
+        }
     }
 
     /**

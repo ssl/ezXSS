@@ -39,7 +39,7 @@ class PublicRouter
 
             'beacon'   => array(__CLASS__, 'beacon'),
 
-            'manage'   => array(__CLASS__, 'manage'),
+            Config::panelPath() => array(__CLASS__, 'manage'),
         );
     }
 
@@ -55,7 +55,7 @@ class PublicRouter
     );
 
     /**
-     * GET /manage/bundle.js - concatenate the deferred panel scripts into one.
+     * GET /{panel}/bundle.js - concatenate the deferred panel scripts into one.
      */
     public static function bundle()
     {
@@ -249,7 +249,7 @@ class PublicRouter
     }
 
     /**
-     * The /manage[/...] endpoint - the admin panel SPA shell (no auth). The same handler serves /manage/register and /manage/bundle.js.
+     * The /{panel}[/...] endpoint (PANEL_PATH, default manage) - the panel SPA shell (no auth), plus /{panel}/register and /{panel}/bundle.js.
      */
     public static function manage()
     {
@@ -296,7 +296,7 @@ class PublicRouter
     }
 
     /**
-     * The /manage/register screen - the public self-registration page, served only while signup is enabled.
+     * The /{panel}/register screen - the public self-registration page, served only while signup is enabled.
      */
     public static function register()
     {

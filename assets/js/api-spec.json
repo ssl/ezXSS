@@ -188,7 +188,7 @@
         { "m": "POST", "p": "/callback/attach", "a": "None (public)", "params": "{ at (attach token), field, value }", "d": "Deferred heavy-field ingest (dom, screenshot). The main callback returns an attach token; the payload sends large fields here in a follow-up request." },
         { "m": "GET", "p": "/s/{slug}", "a": "None (public)", "params": "path: slug (25 lowercase chars); append .json for the data feed", "d": "Public view of an on-request report share - a readable HTML page, with /s/{slug}.json serving the same selected columns as JSON. Expiry respected (410 when expired)." },
         { "m": "GET/POST", "p": "/beacon/{type}/{nonce}", "a": "None (public)", "params": "path: type, nonce  ·  query: d?", "d": "CSP-bypass beacon sinks. Always return a strictly-typed empty resource for the type and record the inferred-CSP signal." },
-        { "m": "GET", "p": "/manage[/...]", "a": "None (static shell)", "params": "-", "d": "The admin panel SPA shell. The same static HTML answers /manage and every client-router deep link; all its data calls go through the authenticated /api surface." }
+        { "m": "GET", "p": "/manage[/...]", "a": "None (static shell)", "params": "-", "d": "The admin panel SPA shell, at PANEL_PATH (default manage). The same static HTML answers that path and every client-router deep link; all its data calls go through the authenticated /api surface." }
       ]
     }
   ]

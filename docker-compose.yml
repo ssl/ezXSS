@@ -46,6 +46,7 @@ services:
       ALLOWED_IPS: "${ALLOWED_IPS:-}"
       SESSION_TTL: "${SESSION_TTL:-604800}"
       PANEL_DOMAINS: "${PANEL_DOMAINS:-}"
+      PANEL_PATH: "${PANEL_PATH:-manage}"
       TRUST_PROXY: "${TRUST_PROXY:-false}"
 
       INSTALL_CERTIFICATE: "${INSTALL_CERTIFICATE:-${autoInstallCertificate:-false}}"

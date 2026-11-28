@@ -59,7 +59,7 @@
           if (text) { try { json = JSON.parse(text); } catch (err) { json = null; } }
 
           if (res.status === 201 && json && json.success) {
-            window.location.href = "/manage";
+            window.location.href = document.documentElement.getAttribute("data-panel") || "/manage";
             return;
           }
 

@@ -4,7 +4,7 @@
         {
             "title": "[ezXSS] XSS Report #{{id}}",
             "type": "rich",
-            "url": "https://{{domain}}/manage/reports/{{id}}",
+            "url": "https://{{domain}}/{{panel}}/reports/{{id}}",
             "timestamp": "{{timestamp}}",
             "color": 2924135,
             "fields": [

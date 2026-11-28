@@ -40,7 +40,10 @@ window.EZ = window.EZ || {};
   function pathSegments() {
     var path = location.pathname || "";
     var prefix = EZ.config.managePrefix;
-    if (path.indexOf(prefix) === 0) { path = path.slice(prefix.length); }
+    var lead = path.slice(0, prefix.length).toLowerCase();
+    if (lead === prefix.toLowerCase() && (path.length === prefix.length || path.charAt(prefix.length) === "/")) {
+      path = path.slice(prefix.length);
+    }
     path = path.replace(/^\/+|\/+$/g, "");
     return path === "" ? [] : path.split("/");
   }

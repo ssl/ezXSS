@@ -55,7 +55,7 @@
           if (text) { try { json = JSON.parse(text); } catch (err) { json = null; } }
 
           if (res.status === 201 && json && json.success) {
-            window.location.href = "/manage";
+            window.location.href = document.documentElement.getAttribute("data-panel") || "/manage";
             return;
           }
 
@@ -150,7 +150,7 @@
               if (submitLabel) { submitLabel.textContent = "Done - redirecting..."; }
               var busyText = el("update-busy-text");
               if (busyText) { busyText.textContent = "Update complete. Taking you to the panel..."; }
-              window.location.href = "/manage";
+              window.location.href = document.documentElement.getAttribute("data-panel") || "/manage";
               return;
             }
 

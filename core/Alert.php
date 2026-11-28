@@ -198,6 +198,7 @@ class Alert
             }
             $data['domain'] = $domain;
         }
+        $data['panel'] = Config::panelPath();
 
         return $data;
     }

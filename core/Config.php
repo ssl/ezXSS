@@ -30,6 +30,7 @@ class Config
 
             'TRUST_PROXY'   => false,
             'PANEL_DOMAINS' => '',
+            'PANEL_PATH'    => 'manage',
         );
 
         $envFile = FRAMEWORK_ROOT . '/.env';
@@ -100,6 +101,21 @@ class Config
             throw new Exception("Config key '$key' not found");
         }
         return isset(self::$config[$key]) ? self::$config[$key] : $default;
+    }
+
+    /**
+     * The panel's first URL segment from PANEL_PATH, or 'manage' when it is unset or not a usable slug.
+     *
+     * @return string
+     */
+    public static function panelPath()
+    {
+        $path = strtolower(trim((string) self::get('PANEL_PATH', 'manage'), " /"));
+        $taken = array('api', 'callback', 'beacon', 's', 'assets', '.well-known');
+        if (!preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $path) || in_array($path, $taken, true)) {
+            return 'manage';
+        }
+        return $path;
     }
 
     /**

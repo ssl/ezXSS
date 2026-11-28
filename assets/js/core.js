@@ -4,7 +4,7 @@ window.EZ = window.EZ || {};
 
   EZ.config = {
     apiBase: "/api",
-    managePrefix: "/manage",
+    managePrefix: document.documentElement.getAttribute("data-panel") || "/manage",
     tokenKey: "ezxss_token",
     themeKey: "ezxss_theme"
   };

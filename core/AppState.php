@@ -152,7 +152,7 @@ class AppState
         if ($isApi) {
             return array('action' => 'json', 'status' => 409, 'error' => $error);
         }
-        if ($firstSegment === '' || $firstSegment === 'manage') {
+        if ($firstSegment === '' || $firstSegment === Config::panelPath()) {
             return array('action' => 'screen', 'status' => 200, 'screen' => $screen);
         }
 

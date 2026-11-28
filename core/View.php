@@ -29,7 +29,7 @@ class View
         $partials = self::dir() . '/partials';
         $head = str_replace(
             array('{{title}}', '{{scripts}}', '{{htmlattr}}'),
-            array($title, self::scriptTags($scripts), self::themeAttr()),
+            array($title, self::scriptTags($scripts), self::themeAttr() . ' data-panel="/' . Config::panelPath() . '"'),
             file_get_contents($partials . '/head.html')
         );
 
@@ -41,6 +41,7 @@ class View
         if (isset($opts['tokens']) && is_array($opts['tokens'])) {
             $html = str_replace(array_keys($opts['tokens']), array_values($opts['tokens']), $html);
         }
+        $html = str_replace('{{panelPath}}', Config::panelPath(), $html);
 
         return self::versionAssets($html);
     }
@@ -67,7 +68,7 @@ class View
     }
 
     /**
-     * Build the deferred <script> tags for a page. The 'bundle' token resolves to /manage/bundle.js.
+     * Build the deferred <script> tags for a page. The 'bundle' token resolves to /{panel}/bundle.js.
      *
      * @param array $scripts
      */
@@ -75,7 +76,7 @@ class View
     {
         $out = '';
         foreach ($scripts as $s) {
-            $src = ($s === 'bundle') ? '/manage/bundle.js' : '/assets/js/' . $s;
+            $src = ($s === 'bundle') ? '/' . Config::panelPath() . '/bundle.js' : '/assets/js/' . $s;
             $out .= '<script defer src="' . $src . '?v={{assetVersion}}"></script>' . "\n";
         }
         return $out;

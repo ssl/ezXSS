@@ -1,5 +1,5 @@
 ***XSS Report #{{id}}***
-Get a fast view below or view the whole report on https://{{domain}}/manage/reports/{{id}}
+Get a fast view below or view the whole report on https://{{domain}}/{{panel}}/reports/{{id}}
 
 ***URL***
 ```
