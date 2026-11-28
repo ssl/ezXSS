@@ -82,9 +82,6 @@ class AuthController extends Controller
             ));
         }
 
-        if (!Security::rateLimit('enable2fa:' . (int) $user['id'], 5, 300)) {
-            throw new HttpException(429, 'Too many attempts. Please wait and try again.');
-        }
         $password = isset($body['password']) ? (string) $body['password'] : '';
         $hash = isset($user['password']) ? (string) $user['password'] : '';
         if ($password === '' || !password_verify($password, $hash)) {
@@ -121,7 +118,7 @@ class AuthController extends Controller
             throw new HttpException(429, 'Too many attempts. Please wait and try again.');
         }
 
-        $codeOk = $code !== '' && Totp::verify($user['twofa_secret'], $code);
+        $codeOk = $code !== '' && Totp::verifyOnce($user['twofa_secret'], $code, 'u' . $user['id']);
         if (!$codeOk) {
             throw new HttpException(422, 'Enter a valid current authenticator code to disable 2FA.');
         }

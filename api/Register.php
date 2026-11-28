@@ -73,7 +73,14 @@ class RegisterController extends Controller
             throw new HttpException(409, 'That username is already taken');
         }
 
-        User::createUser($username, $password, 'user');
+        try {
+            User::createUser($username, $password, 'user');
+        } catch (Throwable $e) {
+            if (User::findByUsername($username) !== null) {
+                throw new HttpException(409, 'That username is already taken');
+            }
+            throw $e;
+        }
 
         Hook::fire('user.created', User::findByUsername($username));
 

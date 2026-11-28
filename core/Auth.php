@@ -168,7 +168,7 @@ class Auth
     {
         $username = is_string($username) ? trim($username) : '';
 
-        self::rateLimitLogin($ip, $username);
+        self::rateLimitLogin($ip);
         $password = is_string($password) ? $password : '';
 
         $user = ($username !== '') ? User::findByUsername($username) : null;
@@ -184,7 +184,7 @@ class Auth
             if ($code === null || $code === '') {
                 return self::createChallenge($user['id']);
             }
-            if (!Totp::verify($user['twofa_secret'], $code)) {
+            if (!Totp::verifyOnce($user['twofa_secret'], $code, 'u' . $user['id'])) {
                 throw new HttpException(401, 'Invalid two-factor code');
             }
         }
@@ -192,8 +192,6 @@ class Auth
         if (User::isBanned($user)) {
             throw new HttpException(403, 'This account is disabled');
         }
-
-        self::clearLoginRateLimit($username);
 
         $session = self::issueSession($user);
 
@@ -216,7 +214,7 @@ class Auth
     {
         $challenge = is_string($challenge) ? $challenge : '';
 
-        self::rateLimitLogin($ip, 'twofa:' . hash('sha256', $challenge));
+        self::rateLimitLogin($ip);
 
         if ($challenge === '') {
             throw new HttpException(401, 'Invalid or expired challenge');
@@ -238,7 +236,7 @@ class Auth
             throw new HttpException(401, 'Invalid or expired challenge');
         }
 
-        if (!Totp::verify($user['twofa_secret'], $code)) {
+        if (!Totp::verifyOnce($user['twofa_secret'], $code, 'u' . $user['id'])) {
             throw new HttpException(401, 'Invalid two-factor code');
         }
 
@@ -314,29 +312,17 @@ class Auth
     }
 
     /**
-     * Apply login rate limiting by IP and by username. Throws 429 on exceed.
+     * Apply login rate limiting by IP. Throws 429 on exceed. Keyed on the IP only:
+     * a per-username bucket would let anyone lock a known account out by spending
+     * its attempts from other IPs.
      *
      * @param string $ip
-     * @param string $username
      * @throws HttpException
      */
-    private static function rateLimitLogin($ip, $username)
+    private static function rateLimitLogin($ip)
     {
-        $okIp = Security::rateLimit('login:ip:' . $ip, self::LOGIN_MAX, self::LOGIN_WINDOW);
-        $okUser = Security::rateLimit('login:user:' . strtolower((string) $username), self::LOGIN_MAX, self::LOGIN_WINDOW);
-
-        if (!$okIp || !$okUser) {
+        if (!Security::rateLimit('login:ip:' . $ip, self::LOGIN_MAX, self::LOGIN_WINDOW)) {
             throw new HttpException(429, 'Too many login attempts. Try again later.');
         }
-    }
-
-    /**
-     * Reset the per-username login throttle after a successful authentication.
-     *
-     * @param string $username
-     */
-    private static function clearLoginRateLimit($username)
-    {
-        Security::clearRateLimit('login:user:' . strtolower((string) $username), self::LOGIN_WINDOW);
     }
 }

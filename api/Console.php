@@ -232,6 +232,8 @@ class ConsoleController extends Controller
      */
     public function doBulk($body)
     {
+        $this->cap('session.interact');
+
         $action = isset($body['action']) ? (string) $body['action'] : '';
         if (!in_array($action, array('execute', 'kill', 'killreconnect'), true)) {
             throw new HttpException(422, 'Invalid bulk action');

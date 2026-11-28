@@ -96,6 +96,30 @@ class Totp
     }
 
     /**
+     * Verify a code and then burn it: a code that passes is recorded so the same
+     * code cannot be replayed within its validity window. $scopeKey isolates the
+     * marker per account (e.g. 'u' . $userId).
+     *
+     * @param string $secret
+     * @param string $code
+     * @param string $scopeKey
+     * @param int $window
+     * @return bool
+     */
+    public static function verifyOnce($secret, $code, $scopeKey, $window = 1)
+    {
+        if (!self::verify($secret, $code, $window)) {
+            return false;
+        }
+        $marker = 'totp_used:' . $scopeKey . ':' . hash('sha256', preg_replace('/\s+/', '', (string) $code));
+        if (Cache::get($marker) !== null) {
+            return false;
+        }
+        Cache::set($marker, time());
+        return true;
+    }
+
+    /**
      * TOTP code for a RAW binary key at a given time (RFC 6238).
      *
      * @param string $key

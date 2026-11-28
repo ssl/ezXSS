@@ -130,7 +130,7 @@ class AlertsController extends Controller
         );
         foreach ($switches as $setting => $key) {
             if (isset($body[$key]) && is_array($body[$key]) && array_key_exists('method_enabled', $body[$key])) {
-                Setting::put($setting, $body[$key]['method_enabled'] ? '1' : '0');
+                Setting::put($setting, $this->asBool($body[$key]['method_enabled']) ? '1' : '0');
             }
         }
 
