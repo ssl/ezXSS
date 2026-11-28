@@ -1015,34 +1015,18 @@ class Report extends Model
                 ),
                 'sec_fetch' => (object) $secFetch,
             );
-            $newId = (int) self::add(array(
-                'payload'    => isset($core['payload']) ? (string) $core['payload'] : '',
-                'uri'        => isset($core['uri']) ? (string) $core['uri'] : '',
-                'origin'     => isset($core['origin']) ? (string) $core['origin'] : '',
-                'referer'    => isset($core['referer']) ? (string) $core['referer'] : '',
-                'cookies'    => isset($core['cookies']) ? (string) $core['cookies'] : '',
-                'useragent'  => isset($core['useragent']) ? (string) $core['useragent'] : '',
-                'ip'         => isset($core['ip']) ? (string) $core['ip'] : '',
-                'meta'       => $meta,
-                'created_at' => time(),
-            ));
-
-            try {
-                Cache::set(self::CSP_NONCE_PREFIX . $nonce, $newId);
-            } catch (Throwable $e) {
-            }
-
-            try {
-                $report = self::getFull($newId);
-                if (is_array($report)) {
-                    $report['time'] = time();
-                    $report['domain'] = defined('HOST') ? HOST : '';
-                    Alert::dispatch($report);
+            $data = (object) array(
+                'payload' => (string) $core['payload'],
+                'ez_bid'  => $nonce,
+            );
+            foreach (array('uri', 'origin', 'referer', 'cookies') as $field) {
+                if (isset($core[$field])) {
+                    $data->$field = (string) $core[$field];
                 }
-            } catch (Throwable $e) {
             }
-
-            return $newId;
+            $controller = new CallbackController();
+            $newId = $controller->processInferred($data, $meta);
+            return $newId > 0 ? $newId : false;
         }
 
         if ($directive !== '') {

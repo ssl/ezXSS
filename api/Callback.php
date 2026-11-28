@@ -242,6 +242,21 @@ class CallbackController extends Controller
     }
 
     /**
+     * Run a beacon-inferred report through the same filters, dedupe and hooks as a callback.
+     *
+     * @param object $data
+     * @param array $meta
+     * @return int
+     */
+    public function processInferred($data, array $meta)
+    {
+        $data->inferredMeta = $meta;
+        unset($data->method);
+        $this->process($data);
+        return isset($data->id) ? (int) $data->id : 0;
+    }
+
+    /**
      * Duplicate-aware store + alert, applying the filter-save / filter-alert.
      *
      * @param array $data
@@ -293,7 +308,7 @@ class CallbackController extends Controller
                 'localstorage'   => json_encode(isset($data->localstorage) ? $data->localstorage : ''),
                 'sessionstorage' => json_encode(isset($data->sessionstorage) ? $data->sessionstorage : ''),
                 'extra'          => $data->extra,
-                'meta'           => $this->buildMeta($data),
+                'meta'           => isset($data->inferredMeta) ? $data->inferredMeta : $this->buildMeta($data),
                 'created_at'     => time(),
             ));
             $data->id = $reportId;
