@@ -186,6 +186,9 @@ class UsersController extends Controller
     private function grantedFromBody(array $body)
     {
         $caps = isset($body['permissions']) && is_array($body['permissions']) ? $body['permissions'] : array();
+        if (!empty($caps) && array_keys($caps) === range(0, count($caps) - 1)) {
+            throw new HttpException(422, 'permissions must be an object of capability => true/false');
+        }
         $granted = array();
         foreach ($caps as $cap => $on) {
             if ($on) {
