@@ -561,6 +561,7 @@ class PayloadsController extends Controller
         $pageId = $this->validId($pageId, 'page');
         $this->ensurePayload($id);
         $this->access($id, 'edit');
+        $this->behaviour('pages');
 
         $page = Payload::query()->from('payload_pages')
             ->where('id', $pageId)->where('payload_id', $id)->first();
@@ -622,6 +623,7 @@ class PayloadsController extends Controller
         $filterId = $this->validId($filterId, 'filter');
         $this->ensurePayload($id);
         $this->access($id, 'edit');
+        $this->behaviour('filters');
 
         $filter = Payload::query()->from('payload_filters')
             ->where('id', $filterId)->where('payload_id', $id)->first();
