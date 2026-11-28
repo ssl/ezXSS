@@ -954,7 +954,8 @@ class Upgrader
         }
         $rows = $db->query(
             "SELECT `id`, `{$column}` FROM `{$table}`
-             WHERE `{$column}` <> CONVERT(CONVERT(`{$column}` USING utf8mb4) USING binary)"
+             WHERE `{$column}` IS NOT NULL AND (CONVERT(`{$column}` USING utf8mb4) IS NULL
+             OR `{$column}` <> CONVERT(CONVERT(`{$column}` USING utf8mb4) USING binary))"
         )->fetchAll(PDO::FETCH_NUM);
         $upd = $db->prepare("UPDATE `{$table}` SET `{$column}` = ? WHERE `id` = ?");
         foreach ($rows as $row) {
