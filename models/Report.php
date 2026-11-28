@@ -570,6 +570,7 @@ class Report extends Model
 
         self::query()->from(self::TABLE_DATA)->where('report_id', $id)->delete();
         ReportShare::deleteForReport($id);
+        self::query()->from('user_access')->where('for_table', 'reports')->where('for_id', $id)->delete();
         self::query()->where('id', $id)->delete();
 
         self::invalidateCaches();
