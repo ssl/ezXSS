@@ -103,10 +103,10 @@ class AlertConfig extends Model
             ->orderBy('id', 'ASC')
             ->get();
 
-        $ownerBanned = false;
+        $ownerBlocked = false;
         if ($userId !== 0) {
             $owner = User::find($userId);
-            $ownerBanned = ($owner && User::isBanned($owner));
+            $ownerBlocked = !$owner || User::isBanned($owner) || !Permissions::can($owner, 'report.view');
         }
 
         $out = array();
@@ -114,7 +114,7 @@ class AlertConfig extends Model
             $owner = (int) $row['user_id'];
             if ($owner === 0) {
                 $out[] = $row;
-            } elseif ($owner === $userId && !$ownerBanned) {
+            } elseif ($owner === $userId && !$ownerBlocked) {
                 $out[] = $row;
             }
         }
