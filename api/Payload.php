@@ -110,7 +110,8 @@ class PayloadController extends Controller
         $map = self::nojsMap();
         $entry = isset($map[$code]) ? $map[$code] : $map['i'];
 
-        $identifier = HOST . (URI === '' ? '' : '/' . URI);
+        $path = rtrim(substr(URI, 0, -2), '/');
+        $identifier = HOST . ($path === '' ? '' : '/' . $path);
 
         try {
             require_once API_PATH . '/Callback.php';
