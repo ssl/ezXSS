@@ -468,6 +468,14 @@ class UsersController extends Controller
             throw new HttpException(422, 'Nothing to update');
         }
 
+        // The ceiling applies to the result too: dropping a deny-override can hand the user role caps the actor lacks.
+        if (!$isSelf && (array_key_exists('role', $changes) || array_key_exists('permissions', $changes))) {
+            $after = array_merge($target, array_intersect_key($changes, array('role' => 1, 'permissions' => 1)));
+            if (!Permissions::capsSubset($after, $actor)) {
+                throw new HttpException(403, 'That change would give the user capabilities beyond your own');
+            }
+        }
+
         User::update($id, $changes);
 
         if ($banChange === 1) {
